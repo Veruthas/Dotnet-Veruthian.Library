@@ -6,7 +6,7 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {            
-            TestText.Test();
+            TestCollections.Test();
             
             Pause();
         }

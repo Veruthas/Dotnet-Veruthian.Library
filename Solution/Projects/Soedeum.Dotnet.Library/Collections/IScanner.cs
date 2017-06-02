@@ -11,5 +11,7 @@ namespace Soedeum.Dotnet.Library.Collections
         T Peek();
 
         T Consume();
+
+        event Action<IScanner<T>, T> ItemConsumed;
     }
 }
