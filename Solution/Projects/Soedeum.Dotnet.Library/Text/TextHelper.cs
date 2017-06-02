@@ -97,5 +97,40 @@ namespace Soedeum.Dotnet.Library.Text
                     return "\\0";
             }
         }
+
+
+        public static string GetLineEndingShortName(LineEnding ending)
+        {
+            switch (ending)
+            {
+                case LineEnding.Null:
+                    return "Null";
+                case LineEnding.Lf:
+                    return "Lf";
+                case LineEnding.Cr:
+                    return "Cr";
+                case LineEnding.CrLf:
+                    return "CrLf";
+                default:
+                    return "?";
+            }
+        }
+
+        public static string GetLineEndingLongName(LineEnding ending)
+        {
+            switch (ending)
+            {
+                case LineEnding.Null:
+                    return "Null";
+                case LineEnding.Lf:
+                    return "LineFeed";
+                case LineEnding.Cr:
+                    return "CarriageReturn";
+                case LineEnding.CrLf:
+                    return "CarriageReturnLineFeed";
+                default:
+                    return "Unknown";
+            }
+        }
     }
 }

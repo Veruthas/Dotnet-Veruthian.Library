@@ -28,7 +28,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override string ToString()
         {
-            return string.Format("{0}; Value: '{1}'", Position, TextHelper.GetStringAsPrintable(Value));
+            return string.Format("{0}; Value: \"{1}\"", Position, TextHelper.GetStringAsPrintable(Value));
         }
 
         public IEnumerator<TextElement> GetEnumerator()

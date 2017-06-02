@@ -158,7 +158,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override string ToString()
         {
-            return string.Format("Position: {{{0}}}; Text: \"{1}\"; LineEnding: {2}", position, Text, ending);
+            return string.Format("{0}; Text: \"{1}\"; LineEnding: {2}", position, Text, TextHelper.GetLineEndingShortName(ending));
         }
 
 
