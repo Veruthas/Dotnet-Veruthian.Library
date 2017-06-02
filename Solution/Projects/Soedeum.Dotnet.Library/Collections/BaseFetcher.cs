@@ -33,9 +33,9 @@ namespace Soedeum.Dotnet.Library.Collections
             return new FetcherSimpleScanner<T>(this);
         }
 
-        public ILookaheadScanner<T> GetLookaheadScanner(int k)
+        public ILookaheadScanner<T> GetLookaheadScanner(int lookahead)
         {
-            throw new NotImplementedException();
+            return new FetcherLookaheadScanner<T>(lookahead, this);
         }
 
         public ISpeculativeScanner<T> GetSpeculativeScanner()

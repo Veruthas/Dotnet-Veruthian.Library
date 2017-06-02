@@ -11,6 +11,8 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public override int Position => position;
 
+        public override bool IsEnd => GetIsEnd(Peek());
+
 
         protected override void Initialize()
         {
@@ -19,9 +21,9 @@ namespace Soedeum.Dotnet.Library.Collections
             position = 0;
         }
 
-        protected override void MoveToNext()
+        protected override void MoveToNext(T previous)
         {
-            current = FetchNext(current);
+            current = FetchNext(previous);
 
             position++;
         }
@@ -30,9 +32,5 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             return current;
         }
-
-        protected abstract T FetchInitial();
-
-        protected abstract T FetchNext(T previous);
     }
 }

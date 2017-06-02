@@ -15,43 +15,58 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected abstract void Initialize();
 
-        protected abstract void MoveToNext();
+        protected abstract void MoveToNext(T previous);
+
+        protected abstract T FetchInitial();
+
+        protected abstract T FetchNext(T previous);
+
+        protected abstract bool GetIsEnd(T current);
 
         protected abstract T Get(int lookahead = 0);
 
 
-        public virtual T Peek()
+        protected void VerifyInitialized()
         {
             if (!initialized)
             {
                 Initialize();
                 initialized = true;
             }
+        }
+
+        public virtual T Peek()
+        {
+            VerifyInitialized();
 
             var current = Get();
 
             return current;
         }
 
+
         public virtual T Consume()
         {
-            if (!initialized)
-            {
-                Initialize();
-                initialized = true;
-            }
+            VerifyInitialized();
 
             var current = Get();
 
             if (!IsEnd)
             {
-                MoveToNext();
+                MoveToNext(current);
             }
 
             OnItemConsumed(current);
 
             return current;
         }
+
+        public void Consume(int amount)
+        {
+            for (int i = 0; i < amount; i++)
+                Consume();
+        }
+
 
         public virtual void Dispose() { }
 

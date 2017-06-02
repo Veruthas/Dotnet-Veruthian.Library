@@ -8,8 +8,11 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            //TestEnumerators();
-            TestTextElementFetcher();
+            var i = new[] { 'A', 'B', 'C', 'D', 'E' };
+
+            var f = new EnumeratorFetcher<char>(i);
+            var s = f.GetLookaheadScanner(3);
+            TestLookaheadScanner(s, 3);
         }
 
         private static void TestScanner<T>(IScanner<T> scanner)
@@ -23,6 +26,21 @@ namespace _TestConsole
             }
 
             System.Console.WriteLine("----");
+        }
+
+        private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
+        {
+            while (!scanner.IsEnd)
+            {
+                System.Console.WriteLine("For Position {0}", scanner.Position);
+
+                for (int i = 0; i < lookahead; i++)
+                {
+                    System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+                }
+
+                scanner.Consume();
+            }
         }
 
         private static void TestEnumerators()
@@ -48,7 +66,6 @@ namespace _TestConsole
 
             TestScanner(scanner);
         }
-
 
         public static void TestTextElementFetcher()
         {

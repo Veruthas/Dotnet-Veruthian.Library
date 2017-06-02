@@ -2,19 +2,20 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FetcherSimpleScanner<T> : BaseSimpleScanner<T>
+    public class FetcherLookaheadScanner<T> : BaseLookaheadScanner<T>
     {
         IFetcher<T> fetcher;
 
-
-        public FetcherSimpleScanner(IFetcher<T> fetcher)
+        public FetcherLookaheadScanner(int lookahead, IFetcher<T> fetcher)
+            : base(lookahead)
         {
             this.fetcher = fetcher;
         }
 
+
         public override void Dispose() => fetcher.Dispose();
 
-        protected override bool GetIsEnd(T current) => fetcher.IsEnd(current);
+        public override bool IsEnd => fetcher.IsEnd(Peek());
 
         protected override T FetchInitial()
         {
@@ -25,6 +26,5 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             return fetcher.FetchNext(previous);
         }
-
     }
 }
