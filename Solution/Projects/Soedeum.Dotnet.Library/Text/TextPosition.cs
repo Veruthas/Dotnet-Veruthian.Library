@@ -1,31 +1,32 @@
 namespace Soedeum.Dotnet.Library.Text
 {
- public struct TextPosition
+    public struct TextPosition
     {
+        readonly int position;
+
+        readonly int line;
+
+        readonly int column;
+
+
         public TextPosition(int position, int line, int Column)
         {
-            this.Position = position;
-            this.Line = line;
-            this.Column = Column;
+            this.position = position;
+            this.line = line;
+            this.column = Column;
         }
 
 
-        public int Position { get; private set; }
+        public int Position { get => position; }
 
-        public int Line { get; private set; }
+        public int Line { get => line; }
 
-        public int Column { get; private set; }
+        public int Column { get => column; }
 
-        
+
         public TextPosition IncrementLine(int lengthToEnd = 1)
         {
-            var newPosition = this;
-
-            newPosition.Position += lengthToEnd;
-            newPosition.Line++;
-            newPosition.Column = 0;
-
-            return newPosition;
+            return new TextPosition(this.Position + lengthToEnd, this.Line + 1, 0);
         }
 
         // override object.Equals
@@ -68,18 +69,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static TextPosition operator +(TextPosition position, int amount)
         {
-            position.Position += amount;
-            position.Column += amount;
-
-            return position;
+            return new TextPosition(position.Position + amount, position.Line, position.Column + amount);
         }
 
         public static TextPosition operator ++(TextPosition position)
         {
-            position.Position++;
-            position.Column++;
-
-            return position;
+            return new TextPosition(position.Position + 1, position.Line, position.Column + 1);
         }
 
 
