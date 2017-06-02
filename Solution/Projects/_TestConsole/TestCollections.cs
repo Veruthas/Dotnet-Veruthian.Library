@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Text;
 
 namespace _TestConsole
 {
@@ -6,16 +8,59 @@ namespace _TestConsole
     {
         public static void Test()
         {
+            //TestEnumerators();
+            TestTextElementFetcher();
+        }
+
+        private static void TestScanner<T>(IScanner<T> scanner)
+        {
+            scanner.ItemConsumed += (s, i) => System.Console.WriteLine("Consumed: {0}: {1}", s.Position - 1, i);
+
+            while (!scanner.IsEnd)
+            {
+                //System.Console.WriteLine("Peeked: {0}: {1}", scanner.Position, scanner.Peek());
+                scanner.Consume();
+            }
+
+            System.Console.WriteLine("----");
+        }
+
+        private static void TestEnumerators()
+        {
             int[] a = { 1, 2, 3, 4, 5 };
 
-            var b = new EnumeratorFetcher<int>(a);
+            string b = "Hello, world";
 
-            var c = b.GetSimpleScanner();
+            double[] c = { 1.2, 2.3, 3.4, 4.5 };
 
-            c.ItemConsumed += (scanner, i) => System.Console.WriteLine(i);
+            TestEnumerator(a);
 
-            while (!c.IsEnd)
-                c.Consume();
+            TestEnumerator(b);
+
+            TestEnumerator(c);
+        }
+
+        public static void TestEnumerator<T>(IEnumerable<T> list)
+        {
+            var fetcher = new EnumeratorFetcher<T>(list);
+
+            var scanner = fetcher.GetSimpleScanner();
+
+            TestScanner(scanner);
+        }
+
+
+        public static void TestTextElementFetcher()
+        {
+            string data = "Hello, world!\n\tMy name is Levi.\r\nWhat is your name?";
+
+            var charfetcher = CharFetcher.FromString(data);
+
+            var texelfetcher = new TextElementFetcher(charfetcher);
+
+            var scanner = texelfetcher.GetSimpleScanner();
+
+            TestScanner(scanner);
         }
     }
 }

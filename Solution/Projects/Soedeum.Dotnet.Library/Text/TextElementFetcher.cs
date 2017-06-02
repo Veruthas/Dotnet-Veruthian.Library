@@ -4,16 +4,16 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public class TextElementFetcher : BaseFetcher<TextElement>
     {
-        IScanner<char> stream;
+        IFetcher<char> chars;
 
-        public TextElementFetcher(IScanner<char> stream) => this.stream = stream;
+        public TextElementFetcher(IFetcher<char> chars) => this.chars = chars;
 
-        public override void Dispose() => stream.Dispose();
+        public override void Dispose() => chars.Dispose();
         public override bool IsEnd(TextElement item) => item.Value == '\0';
 
         public override TextElement FetchInitial()
         {
-            var value = stream.Consume();
+            var value = chars.FetchInitial();
 
             var element = new TextElement(value);
 
@@ -22,7 +22,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override TextElement FetchNext(TextElement previous)
         {
-            var value = stream.Consume();
+            var value = chars.FetchNext(previous.Value);
 
             previous += value;
 
