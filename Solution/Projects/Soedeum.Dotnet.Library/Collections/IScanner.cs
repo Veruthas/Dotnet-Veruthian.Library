@@ -1,6 +1,8 @@
+using System;
+
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface IScanner<T>
+    public interface IScanner<T> : IDisposable
     {
         bool IsEnd { get; }
 
