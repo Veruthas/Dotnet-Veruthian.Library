@@ -28,23 +28,23 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         // Scanners
-        public static IScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator)
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator)
         {
-            return null;
+            return new EnumeratorSimpleScanner<T>(enumerator);
         }
 
-        public static IScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable)
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable)
         {
             return GetSimpleScanner(enumerable.GetEnumerator());
         }
 
 
-        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator, int lookahead = 2)
+        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator, int lookahead = 1)
         {
             return null;
         }
 
-        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable, int lookahead = 2)
+        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable, int lookahead = 1)
         {
             return GetLookaheadScanner(enumerable.GetEnumerator(), lookahead);
         }

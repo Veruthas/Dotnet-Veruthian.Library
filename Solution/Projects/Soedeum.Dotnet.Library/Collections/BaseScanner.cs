@@ -2,14 +2,17 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class BaseScanner<T> : IScanner<T>
+    public abstract class BaseScanner<T, S> : IScanner<T>
+        where S : BaseScanner<T, S>
     {
         bool initialized;
+
+        int position;
 
 
         public abstract bool IsEnd { get; }
 
-        public abstract int Position { get; }
+        public int Position { get => position; protected set => position = value; }
 
 
         protected abstract void Initialize();
@@ -17,6 +20,8 @@ namespace Soedeum.Dotnet.Library.Collections
         protected abstract void MoveToNext();
 
         protected abstract T Get(int lookahead = 0);
+
+        public abstract void Dispose();
 
 
         protected void VerifyInitialized()
@@ -47,18 +52,28 @@ namespace Soedeum.Dotnet.Library.Collections
             if (!IsEnd)
             {
                 MoveToNext();
+
+                position++;
+
+                OnItemRead(current);
             }
 
             return current;
         }
+
+        private void OnItemRead(T current)
+        {
+            if (ItemRead != null)
+                ItemRead((S)this, current);
+        }
+
+        public event Action<S, T> ItemRead;
+
 
         public void Read(int amount)
         {
             for (int i = 0; i < amount; i++)
                 Read();
         }
-
-
-        public virtual void Dispose() { }
     }
 }
