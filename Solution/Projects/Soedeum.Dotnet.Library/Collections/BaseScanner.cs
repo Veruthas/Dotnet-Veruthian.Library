@@ -12,16 +12,9 @@ namespace Soedeum.Dotnet.Library.Collections
         public abstract int Position { get; }
 
 
-
         protected abstract void Initialize();
 
-        protected abstract void MoveToNext(T previous);
-
-        protected abstract T FetchInitial();
-
-        protected abstract T FetchNext(T previous);
-
-        protected abstract bool GetIsEnd(T current);
+        protected abstract void MoveToNext();
 
         protected abstract T Get(int lookahead = 0);
 
@@ -45,7 +38,7 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
 
-        public virtual T Consume()
+        public virtual T Read()
         {
             VerifyInitialized();
 
@@ -53,29 +46,19 @@ namespace Soedeum.Dotnet.Library.Collections
 
             if (!IsEnd)
             {
-                MoveToNext(current);
+                MoveToNext();
             }
-
-            OnItemConsumed(current);
 
             return current;
         }
 
-        public void Consume(int amount)
+        public void Read(int amount)
         {
             for (int i = 0; i < amount; i++)
-                Consume();
+                Read();
         }
 
 
         public virtual void Dispose() { }
-
-        public event Action<IScanner<T>, T> ItemConsumed;
-
-        protected virtual void OnItemConsumed(T item)
-        {
-            if (ItemConsumed != null)
-                ItemConsumed(this, item);
-        }
     }
 }

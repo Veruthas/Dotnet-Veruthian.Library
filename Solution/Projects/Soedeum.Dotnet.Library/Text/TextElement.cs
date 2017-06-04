@@ -91,7 +91,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        public TextElement MoveTo(char value)
+        public TextElement MoveTo(char value, bool acceptNulls = true)
         {
             char previous = this.value;
 
@@ -101,7 +101,10 @@ namespace Soedeum.Dotnet.Library.Text
             switch (previous)
             {
                 case '\0':
-                    value = '\0';
+                    if (acceptNulls)
+                        goto default;
+                    else
+                        value = '\0';
                     break;
 
                 case '\n':
@@ -120,12 +123,12 @@ namespace Soedeum.Dotnet.Library.Text
             return new TextElement(position, value);
         }
 
-        public TextElement MoveTo(string value)
+        public TextElement MoveTo(string value, bool acceptNulls = true)
         {
             TextElement result = this;
 
             foreach (char letter in value)
-                result += value;
+                result = result.MoveTo(value, acceptNulls);
 
             return result;
         }
@@ -139,19 +142,11 @@ namespace Soedeum.Dotnet.Library.Text
         // override object.Equals
         public override bool Equals(object obj)
         {
-            //
-            // See the full list of guidelines at
-            //   http://go.microsoft.com/fwlink/?LinkID=85237
-            // and also the guidance for operator== at
-            //   http://go.microsoft.com/fwlink/?LinkId=85238
-            //
-
             if (obj == null || GetType() != obj.GetType())
             {
                 return false;
             }
 
-            // TODO: write your implementation of Equals() here
             var texel = (TextElement)obj;
 
             return this.position == texel.position &&
@@ -188,45 +183,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static TextElement operator +(TextElement left, char right)
         {
-            char previous = left.value;
-
-            TextPosition position = left.position;
-
-
-            switch (previous)
-            {
-                case '\0':
-                    right = '\0';
-                    break;
-
-                case '\n':
-                    position = position.IncrementLine();
-                    break;
-
-                case '\r':
-                    position = (right == '\n') ? position + 1 : position = position.IncrementLine();
-                    break;
-
-                default:
-                    position += 1;
-                    break;
-
-            }
-
-            return new TextElement(position, right);
+            return left.MoveTo(right);
         }
 
         public static TextElement operator +(TextElement left, string right)
         {
-            TextElement result = left;
-
-            foreach (char value in right)
-                result += value;
-
-            return result;
+            return left.MoveTo(right);
         }
-
-
-
     }
 }

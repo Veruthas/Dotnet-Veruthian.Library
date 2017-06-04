@@ -23,7 +23,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public TextPosition Position => position;
 
-        public string Value => String.IsNullOrEmpty(value) ? "\0" : value;
+        public string Value => String.IsNullOrEmpty(value) ? string.Empty : value;
 
 
         public override string ToString()
@@ -33,7 +33,8 @@ namespace Soedeum.Dotnet.Library.Text
 
         public IEnumerator<TextElement> GetEnumerator()
         {
-            var value = Value;
+            if (string.IsNullOrEmpty(value))
+                yield break;
 
             var element = new TextElement(position, value[0]);
 

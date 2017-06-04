@@ -10,10 +10,8 @@ namespace Soedeum.Dotnet.Library.Collections
 
         T Peek();
 
-        T Consume();
+        T Read();
 
-        void Consume(int amount);
-
-        event Action<IScanner<T>, T> ItemConsumed;
+        void Read(int amount);
     }
 }

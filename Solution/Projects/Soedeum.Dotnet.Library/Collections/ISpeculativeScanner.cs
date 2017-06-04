@@ -21,12 +21,5 @@ namespace Soedeum.Dotnet.Library.Collections
 
         // The number of items consumed to the mark position
         int GetLengthToMark(int index);
-
-
-        event Action<ISpeculativeScanner<T>, int> MarkCreated;
-
-        event Action<ISpeculativeScanner<T>, int> MarkRolledback;
-
-        event Action<ISpeculativeScanner<T>> MarkCommitted;
     }
 }

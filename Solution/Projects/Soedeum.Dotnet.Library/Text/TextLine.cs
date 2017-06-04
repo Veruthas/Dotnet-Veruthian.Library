@@ -90,7 +90,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             while (true)
             {
-                var value = extractFrom.Consume();
+                var value = extractFrom.Read();
 
                 buffer.Append(value);
 
@@ -108,7 +108,7 @@ namespace Soedeum.Dotnet.Library.Text
                 {
                     if (extractFrom.Peek() == '\n')
                     {
-                        buffer.Append(extractFrom.Consume());
+                        buffer.Append(extractFrom.Read());
                         this.ending = LineEnding.CrLf;
                     }
                     else
