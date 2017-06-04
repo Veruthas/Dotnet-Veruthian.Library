@@ -15,7 +15,14 @@ namespace Soedeum.Dotnet.Library.Collections
         public EnumeratorSimpleScanner(IEnumerator<T> items) => this.items = items;
 
 
-        public override bool IsEnd => atEnd;
+        public override bool IsEnd
+        {
+            get
+            {
+                Peek();
+                return atEnd;
+            }
+        }
 
         public override void Dispose() => items.Dispose();
 
@@ -28,7 +35,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected override void MoveToNext()
         {
-            atEnd = items.MoveNext();
+            atEnd = !items.MoveNext();
 
             if (atEnd)
                 current = default(T);

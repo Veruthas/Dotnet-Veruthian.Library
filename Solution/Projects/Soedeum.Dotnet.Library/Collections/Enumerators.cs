@@ -12,44 +12,60 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         // NotifyinEnumerator
-        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator)
-        {
-            return new NotifyingEnumerator<T>(enumerator);
-        }
-
-        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, params Action<NotifyingEnumerator<T>, bool, T>[] notifyees)
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, Action<NotifyingEnumerator<T>, bool, T> onMoveNextHandler = null)
         {
             var notifyer = new NotifyingEnumerator<T>(enumerator);
 
-            foreach (var notifyee in notifyees)
-                notifyer.MovedNext += notifyee;
+            if (onMoveNextHandler != null)
+                notifyer.MovedNext += onMoveNextHandler;
 
             return notifyer;
         }
 
-        // Scanners
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator)
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerable<T> enumerable, Action<NotifyingEnumerator<T>, bool, T> onMoveNextHandler = null)
         {
-            return new EnumeratorSimpleScanner<T>(enumerator);
+            return GetNotifyingEnumerator(enumerable.GetEnumerator(), onMoveNextHandler);
         }
 
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable)
+        // Simple Scanner
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
         {
-            return GetSimpleScanner(enumerable.GetEnumerator());
+            var scanner = new EnumeratorSimpleScanner<T>(enumerator);
+
+            if (onItemReadHandler != null)
+                scanner.ItemRead += onItemReadHandler;
+
+            return scanner;
+        }
+
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
+        {
+            return GetSimpleScanner(enumerable.GetEnumerator(), onItemReadHandler);
         }
 
 
-        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator, int lookahead = 1)
+        // Lookahead Scanner
+        public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator,
+                                                                            int lookahead = 1,
+                                                                            Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
         {
-            return null;
+            var scanner = new EnumeratorLookaheadScanner<T>(enumerator, lookahead);
+
+            if (onItemReadHandler != null)
+                scanner.ItemRead += onItemReadHandler;
+
+            return scanner;
         }
 
-        public static ILookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable, int lookahead = 1)
+        public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable,
+                                                                            int lookahead = 1,
+                                                                            Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
         {
-            return GetLookaheadScanner(enumerable.GetEnumerator(), lookahead);
+            return GetLookaheadScanner(enumerable.GetEnumerator(), lookahead, onItemReadHandler);
         }
 
 
+        // SpeculativeScanner
         public static ILookaheadScanner<T> GetSpeculativeScanner<T>(this IEnumerator<T> enumerator)
         {
             return null;
