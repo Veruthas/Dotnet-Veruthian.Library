@@ -19,7 +19,7 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             get
             {
-                Peek();
+                VerifyInitialized();
                 return atEnd;
             }
         }
