@@ -7,12 +7,7 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            string x = "Hello";
 
-            var s = ((IEnumerable<char>)x).GetEnumerator();
-
-            var c = s.Current;
-            
             Pause();
         }
 

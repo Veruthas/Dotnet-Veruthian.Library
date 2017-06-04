@@ -14,12 +14,6 @@ namespace _TestConsole
         {
             string value = "Hello\nWorld";
 
-            var span = new TextSpan(value);
-
-            Console.WriteLine(span);
-            
-            foreach (var e in span)
-                Console.WriteLine(e);
         }
     }
 }

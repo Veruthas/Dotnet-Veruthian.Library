@@ -6,6 +6,28 @@ namespace Soedeum.Dotnet.Library.Collections
 {
     public static class Enumerators
     {
+        public static Enumerable<T> GetEnumerable<T>(this IEnumerator<T> enumerator)
+        {
+            return new Enumerable<T>(enumerator);
+        }
+
+        // NotifyinEnumerator
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator)
+        {
+            return new NotifyingEnumerator<T>(enumerator);
+        }
+
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, params Action<NotifyingEnumerator<T>, bool, T>[] notifyees)
+        {
+            var notifyer = new NotifyingEnumerator<T>(enumerator);
+
+            foreach (var notifyee in notifyees)
+                notifyer.MovedNext += notifyee;
+
+            return notifyer;
+        }
+
+        // Scanners
         public static IScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator)
         {
             return null;
@@ -36,11 +58,6 @@ namespace Soedeum.Dotnet.Library.Collections
         public static ILookaheadScanner<T> GetSpeculativeScanner<T>(this IEnumerable<T> enumerable)
         {
             return GetSpeculativeScanner(enumerable.GetEnumerator());
-        }
-
-        public static IEnumerable<T> GetEnumerable<T>(this IEnumerator<T> enumerator)
-        {
-            return new Enumerable<T>(enumerator);
         }
     }
 }

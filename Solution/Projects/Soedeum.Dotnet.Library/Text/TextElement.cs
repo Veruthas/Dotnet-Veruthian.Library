@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Soedeum.Dotnet.Library.Collections;
+
 namespace Soedeum.Dotnet.Library.Text
 {
     public struct TextElement
@@ -135,7 +138,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override string ToString()
         {
-            return string.Format("{0}; Value: '{1}'", position, TextHelper.GetCharAsPrintable(value));
+            return string.Format("{0}; Value: '{1}'", position, TextChars.GetCharAsPrintable(value));
         }
 
 
@@ -189,6 +192,36 @@ namespace Soedeum.Dotnet.Library.Text
         public static TextElement operator +(TextElement left, string right)
         {
             return left.MoveTo(right);
+        }
+
+
+        // Enumerators
+        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars)
+        {
+            return EnumerateFromChars(chars, new TextPosition());
+        }
+
+        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars, TextPosition position)
+        {
+            bool initialized = false;
+
+            TextElement current = default(TextElement);
+
+            foreach (char c in chars.GetEnumerable())
+            {
+                if (initialized)
+                {
+                    current += c;
+                }
+                else
+                {
+                    
+                    current = new TextElement(position, c);
+                    initialized = true;
+                }
+
+                yield return current;
+            }
         }
     }
 }

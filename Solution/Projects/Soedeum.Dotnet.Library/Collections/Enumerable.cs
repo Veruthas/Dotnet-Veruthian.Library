@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class Enumerable<T> : IEnumerable<T>
+    public struct Enumerable<T> : IEnumerable<T>
     {
         IEnumerator<T> enumerator;
 

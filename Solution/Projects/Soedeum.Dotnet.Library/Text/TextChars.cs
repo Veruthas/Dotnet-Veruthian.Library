@@ -1,9 +1,65 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public class TextHelper
+    public static class TextChars
     {
+        // Enumerators
+        public static IEnumerator<char> FromTextReader(TextReader reader)
+        {
+            while (true)
+            {
+                int read = reader.Read();
+
+                if (read == -1)
+                    break;
+                else
+                    yield return (char)read;
+            }
+        }
+
+        public static IEnumerator<char> FromStream(Stream stream, Encoding encoding = null)
+        {
+            var reader = GetTextReaderFromStream(stream, encoding);
+
+            return FromTextReader(reader);
+        }
+
+        public static IEnumerator<char> FromFile(string filepath, Encoding encoding = null)
+        {
+            var reader = GetTextReaderFromFile(filepath, encoding);
+
+            return FromTextReader(reader);
+        }
+
+        // TextElements
+        public static IEnumerator<TextElement> GetTextElements(this IEnumerator<char> chars)
+        {
+            return TextElement.EnumerateFromChars(chars);
+        }
+
+        public static IEnumerator<TextElement> GetTextElements(this IEnumerable<char> chars)
+        {
+            return TextElement.EnumerateFromChars(chars.GetEnumerator());
+        }
+
+
+        // TextReaders
+        public static TextReader GetTextReaderFromStream(Stream stream, Encoding encoding = null)
+        {
+            return (encoding == null) ? new StreamReader(stream) : new StreamReader(stream, encoding);
+        }
+
+        public static TextReader GetTextReaderFromFile(string filepath, Encoding encoding = null)
+        {
+            var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+
+            return GetTextReaderFromStream(stream, encoding);
+        }
+
+        // Printable Chars
         public static string GetCharAsPrintable(char value)
         {
             switch (value)
@@ -31,6 +87,8 @@ namespace Soedeum.Dotnet.Library.Text
             return builder.ToString();
         }
 
+
+        // LineEndings
         public static string GetLineEndingAsString(LineEnding ending)
         {
             switch (ending)
@@ -97,7 +155,6 @@ namespace Soedeum.Dotnet.Library.Text
                     return "\\0";
             }
         }
-
 
         public static string GetLineEndingShortName(LineEnding ending)
         {
