@@ -9,19 +9,35 @@ namespace Soedeum.Dotnet.Library.Collections
 
         int position;
 
+        int endPosition = -1;
 
-        public abstract bool IsEnd { get; }
+        T endItem;
+
+
+        public bool IsEnd { get => IsAtEnd(); }
+
+        protected bool IsAtEnd(int lookahead = 0)
+        {
+            VerifyInitialized();
+
+            VerifyLookahead(lookahead);
+
+            return (position + lookahead) >= endPosition;
+        }
+
+        protected void SetEnd(int position, T item)
+        {
+            endPosition = position;
+
+            endItem = item;
+        }
+
+        protected int EndPosition { get => endPosition; }
+
+        protected T EndItem { get => endItem; }
+
 
         public int Position { get => position; protected set => position = value; }
-
-
-        protected abstract void Initialize();
-
-        protected abstract void MoveToNext();
-
-        protected abstract T Get(int lookahead = 0);
-
-        public abstract void Dispose();
 
 
         protected void VerifyInitialized()
@@ -33,17 +49,20 @@ namespace Soedeum.Dotnet.Library.Collections
             }
         }
 
-        public virtual T Peek()
+        public T Peek() => PeekAhead();
+
+        protected T PeekAhead(int lookahead = 0)
         {
             VerifyInitialized();
 
-            var current = Get();
+            VerifyLookahead(lookahead);
+
+            var current = Get(lookahead);
 
             return current;
         }
 
-
-        public virtual T Read()
+        public T Read()
         {
             VerifyInitialized();
 
@@ -51,7 +70,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
             if (!IsEnd)
             {
-                MoveToNext();
+                ProcessMoveToNext();
 
                 position++;
 
@@ -66,6 +85,8 @@ namespace Soedeum.Dotnet.Library.Collections
             for (int i = 0; i < amount; i++)
                 Read();
         }
+
+
         private void OnItemRead(T current)
         {
             if (ItemRead != null)
@@ -73,5 +94,19 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         public event Action<S, T> ItemRead;
+
+
+        // The Abstracts
+        protected abstract void Initialize();
+
+        protected abstract void ProcessMoveToNext();
+
+        protected abstract bool MoveToNext(out T next);
+
+        protected abstract T RawGet(int lookahead = 0);
+
+        protected abstract void VerifyLookahead(int lookahead = 0);
+
+        public abstract void Dispose();
     }
 }

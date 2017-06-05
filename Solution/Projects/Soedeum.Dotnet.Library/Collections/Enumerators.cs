@@ -27,10 +27,11 @@ namespace Soedeum.Dotnet.Library.Collections
             return GetNotifyingEnumerator(enumerable.GetEnumerator(), onMoveNextHandler);
         }
 
+
         // Simple Scanner
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator, Func<T, T> generateEndItem = null, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
         {
-            var scanner = new EnumeratorSimpleScanner<T>(enumerator);
+            var scanner = new EnumeratorSimpleScanner<T>(enumerator, generateEndItem);
 
             if (onItemReadHandler != null)
                 scanner.ItemRead += onItemReadHandler;
@@ -38,33 +39,33 @@ namespace Soedeum.Dotnet.Library.Collections
             return scanner;
         }
 
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
+        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable, Func<T, T> generateEndItem = null, Action<EnumeratorSimpleScanner<T>, T> onItemReadHandler = null)
         {
-            return GetSimpleScanner(enumerable.GetEnumerator(), onItemReadHandler);
+            return GetSimpleScanner(enumerable.GetEnumerator(), generateEndItem, onItemReadHandler);
         }
 
 
         // Lookahead Scanner
-        public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator,
-                                                                            int lookahead = 1,
-                                                                            Func<T, T> generateEndItem = null,
-                                                                            Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
-        {
-            var scanner = new EnumeratorLookaheadScanner<T>(enumerator, lookahead, generateEndItem);
+        // public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerator<T> enumerator,
+        //                                                                     int lookahead = 1,
+        //                                                                     Func<T, T> generateEndItem = null,
+        //                                                                     Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
+        // {
+        //     var scanner = new EnumeratorLookaheadScanner<T>(enumerator, lookahead, generateEndItem);
 
-            if (onItemReadHandler != null)
-                scanner.ItemRead += onItemReadHandler;
+        //     if (onItemReadHandler != null)
+        //         scanner.ItemRead += onItemReadHandler;
 
-            return scanner;
-        }
+        //     return scanner;
+        // }
 
-        public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable,
-                                                                            int lookahead = 1,
-                                                                            Func<T, T> generateEndItem = null,
-                                                                            Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
-        {
-            return GetLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem, onItemReadHandler);
-        }
+        // public static EnumeratorLookaheadScanner<T> GetLookaheadScanner<T>(this IEnumerable<T> enumerable,
+        //                                                                     int lookahead = 1,
+        //                                                                     Func<T, T> generateEndItem = null,
+        //                                                                     Action<EnumeratorLookaheadScanner<T>, T> onItemReadHandler = null)
+        // {
+        //     return GetLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem, onItemReadHandler);
+        // }
 
 
         // SpeculativeScanner
