@@ -66,7 +66,6 @@ namespace Soedeum.Dotnet.Library.Collections
             for (int i = 0; i < amount; i++)
                 Read();
         }
-        
         private void OnItemRead(T current)
         {
             if (ItemRead != null)
@@ -74,7 +73,5 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         public event Action<S, T> ItemRead;
-
-
     }
 }

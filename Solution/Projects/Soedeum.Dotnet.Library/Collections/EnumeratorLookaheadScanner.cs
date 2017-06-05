@@ -17,6 +17,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         Func<T, T> generateEndItem;
 
+
         public EnumeratorLookaheadScanner(IEnumerator<T> items, int lookahead, Func<T, T> generateEndItem = null)
         {
             this.items = items;
@@ -28,6 +29,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
             this.generateEndItem = generateEndItem ?? ((last) => default(T));
         }
+
 
         public virtual int Size { get => buffer.Length; }
 
@@ -89,7 +91,9 @@ namespace Soedeum.Dotnet.Library.Collections
                     else
                     {
                         done = true;
+
                         endPosition = i;
+                        
                         end = buffer[i] = generateEndItem(lastValid);
                     }
                 }
@@ -115,6 +119,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 else
                 {
                     next = generateEndItem(lastValid);
+
                     endPosition = Position + Size;
                 }
             }
@@ -124,6 +129,7 @@ namespace Soedeum.Dotnet.Library.Collections
             }
 
             buffer[index] = next;
+
             index = (index + 1) % Size;
         }
     }
