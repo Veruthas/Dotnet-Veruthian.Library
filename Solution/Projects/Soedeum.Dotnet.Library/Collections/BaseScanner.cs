@@ -14,14 +14,19 @@ namespace Soedeum.Dotnet.Library.Collections
         T endItem;
 
 
-        public bool IsEnd { get => IsAtEnd(); }
+        public bool IsEnd { get => CheckedIsAtEnd(); }
 
-        protected bool IsAtEnd(int lookahead = 0)
+        protected bool CheckedIsAtEnd(int lookahead = 0)
         {
             VerifyInitialized();
 
             VerifyLookahead(lookahead);
 
+            return RawIsAtEnd(lookahead);
+        }
+
+        protected bool RawIsAtEnd(int lookahead = 0)
+        {
             return (position + lookahead) >= endPosition;
         }
 
@@ -49,15 +54,15 @@ namespace Soedeum.Dotnet.Library.Collections
             }
         }
 
-        public T Peek() => PeekAhead();
+        public T Peek() => CheckedPeek();
 
-        protected T PeekAhead(int lookahead = 0)
+        protected T CheckedPeek(int lookahead = 0)
         {
             VerifyInitialized();
 
             VerifyLookahead(lookahead);
 
-            var current = Get(lookahead);
+            var current = RawPeek(lookahead);
 
             return current;
         }
@@ -66,11 +71,11 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             VerifyInitialized();
 
-            var current = Get();
+            var current = RawPeek();
 
             if (!IsEnd)
             {
-                ProcessMoveToNext();
+                MoveToNext();
 
                 position++;
 
@@ -99,11 +104,11 @@ namespace Soedeum.Dotnet.Library.Collections
         // The Abstracts
         protected abstract void Initialize();
 
-        protected abstract void ProcessMoveToNext();
+        protected abstract void MoveToNext();
 
-        protected abstract bool MoveToNext(out T next);
+        protected abstract bool GetNext(out T next);
 
-        protected abstract T RawGet(int lookahead = 0);
+        protected abstract T RawPeek(int lookahead = 0);
 
         protected abstract void VerifyLookahead(int lookahead = 0);
 

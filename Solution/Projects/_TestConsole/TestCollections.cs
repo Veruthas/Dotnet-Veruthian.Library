@@ -9,7 +9,7 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            TestLookaheadScanner();
+            TestSimpleScanner();
         }
 
 
@@ -30,7 +30,7 @@ namespace _TestConsole
 
         private static void TestSimpleScanner<T>(IEnumerator<T> enumerator)
         {
-            TestScanner(enumerator.GetSimpleScanner(OnRead));
+            TestScanner(enumerator.GetSimpleScanner(null, OnRead));
         }
         private static void TestSimpleScanner<T>(IEnumerable<T> enumerable)
         {
@@ -48,36 +48,36 @@ namespace _TestConsole
             System.Console.WriteLine("----");
         }
 
-        // LookaheadScanner
-        private static void TestLookaheadScanner()
-        {
-            TestLookaheadScanner("ABCDEF", 8, ((i) => '!'));
-        }
+        // // LookaheadScanner
+        // private static void TestLookaheadScanner()
+        // {
+        //     TestLookaheadScanner("ABCDEF", 8, ((i) => '!'));
+        // }
 
 
-        private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
-        {
-            TestLookaheadScanner(enumerator.GetLookaheadScanner(lookahead, generateEndItem, OnRead), lookahead);
-        }
+        // private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
+        // {
+        //     TestLookaheadScanner(enumerator.GetLookaheadScanner(lookahead, generateEndItem, OnRead), lookahead);
+        // }
 
-        private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)
-        {
-            TestLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem);
-        }
+        // private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)
+        // {
+        //     TestLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem);
+        // }
 
-        private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
-        {
-            while (!scanner.IsEnd)
-            {
-                System.Console.WriteLine("For Position {0}", scanner.Position);
+        // private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
+        // {
+        //     while (!scanner.IsEnd)
+        //     {
+        //         System.Console.WriteLine("For Position {0}", scanner.Position);
 
-                for (int i = 0; i < lookahead; i++)
-                {
-                    System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
-                }
+        //         for (int i = 0; i < lookahead; i++)
+        //         {
+        //             System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+        //         }
 
-                scanner.Read();
-            }
-        }
+        //         scanner.Read();
+        //     }
+        // }
     }
 }

@@ -2,35 +2,35 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class BaseLookaheadScanner<T, S> : BaseScanner<T, S>, ILookaheadScanner<T>
-        where S : BaseLookaheadScanner<T, S>
-    {
-        int endPosition = -1;
-        T lastValid;
-        Func<T, T> generateEndItem;
+    // public abstract class BaseLookaheadScanner<T, S> : BaseScanner<T, S>, ILookaheadScanner<T>
+    //     where S : BaseLookaheadScanner<T, S>
+    // {
+    //     int endPosition = -1;
+    //     T lastValid;
+    //     Func<T, T> generateEndItem;
 
 
-        public override bool IsEnd => PeekIsEnd(0);
+    //     public override bool IsEnd => PeekIsEnd(0);
 
-        public T Peek(int lookahead)
-        {
-            VerifyInitialized();
+    //     public T Peek(int lookahead)
+    //     {
+    //         VerifyInitialized();
 
-            VerifyInRange(lookahead);
+    //         VerifyInRange(lookahead);
 
-            return Get(lookahead);
-        }
+    //         return Get(lookahead);
+    //     }
 
-        public bool PeekIsEnd(int lookahead)
-        {
-            VerifyInitialized();
+    //     public bool PeekIsEnd(int lookahead)
+    //     {
+    //         VerifyInitialized();
 
-            VerifyInRange(lookahead);
+    //         VerifyInRange(lookahead);
 
-            return Position + lookahead == endPosition;
-        }
+    //         return Position + lookahead == endPosition;
+    //     }
 
 
-        protected abstract void VerifyInRange(int lookahead);
-    }
+    //     protected abstract void VerifyInRange(int lookahead);
+    // }
 }
