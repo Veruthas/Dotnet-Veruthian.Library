@@ -28,7 +28,7 @@ namespace Soedeum.Dotnet.Library.Collections
                     next = enumerator.Current;
                 else
                 {
-                    var last = RawPeek(Size);
+                    var last = LastValid;
                     
                     next = (getEndItem != null) ? getEndItem(last) : default(T);
                 }

@@ -2,12 +2,14 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class FixedLookaheadScannerBase<T, S> : ScannerBase<T, S>, ILookaheadScanner<T>
+    public abstract class FixedLookaheadScannerBase<T, S> : LookaheadScannerBase<T, S>, ILookaheadScanner<T>
         where S : ScannerBase<T, S>
     {
         T[] buffer;
 
         int index = 0;
+
+        T lastValid;
 
 
         protected FixedLookaheadScannerBase(int lookahead)
@@ -17,11 +19,6 @@ namespace Soedeum.Dotnet.Library.Collections
 
             buffer = new T[lookahead];
         }
-
-        public T Peek(int lookahead) => base.CheckedPeek(lookahead);
-
-        public bool PeekIsEnd(int lookahead) => base.CheckedIsAtEnd(lookahead);
-
 
         protected int Size { get => buffer.Length; }
 
@@ -41,6 +38,8 @@ namespace Soedeum.Dotnet.Library.Collections
             return item;
         }
 
+        protected T LastValid { get => lastValid; }
+
         protected override void Initialize()
         {
             bool atEnd = false;
@@ -57,7 +56,11 @@ namespace Soedeum.Dotnet.Library.Collections
                 {
                     bool success = GetNext(out next);
 
-                    if (!success)
+                    if (success)
+                    {
+                        lastValid = next;
+                    }
+                    else
                     {
                         SetEnd(i, next);
 
@@ -73,8 +76,10 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             bool success = GetNext(out T next);
 
-            if (!success && EndPosition == -1)            
-                SetEnd(Position + Size, next);        
+            if (success)
+                lastValid = next;
+            else if (EndPosition == -1)
+                SetEnd(Position + Size, next);
 
             buffer[index] = next;
 

@@ -54,7 +54,7 @@ namespace _TestConsole
         // LookaheadScanner
         private static void TestLookaheadScanner()
         {
-            TestLookaheadScanner("ABCDEF", 8, ((i) => { System.Console.WriteLine("Last: {0}", i); return '!'; }));
+            TestLookaheadScanner("ABCDEF", 8, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
         }
 
 
