@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class EnumeratorSimpleScanner<T> : BaseSimpleScanner<T, EnumeratorSimpleScanner<T>>
+    public class SimpleScanner<T> : BaseSimpleScanner<T, SimpleScanner<T>>
     {
         IEnumerator<T> enumerator;
 
         Func<T, T> getEndItem;
 
-        public EnumeratorSimpleScanner(IEnumerator<T> enumerator, Func<T, T> getEndItem = null)
+        public SimpleScanner(IEnumerator<T> enumerator, Func<T, T> getEndItem = null)
         {
             this.enumerator = enumerator;
 
@@ -20,21 +20,25 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected override bool GetNext(out T next)
         {
-           if (EndPosition == -1)
+            if (EndPosition == -1)
             {
                 bool success = enumerator.MoveNext();
 
                 if (success)
                     next = enumerator.Current;
                 else
-                    next = (getEndItem != null) ? getEndItem(RawPeek()) : default(T);
+                {
+                    var last = RawPeek();
+
+                    next = (getEndItem != null) ? getEndItem(last) : default(T);
+                }
 
                 return success;
             }
             else
             {
                 next = EndItem;
-                
+
                 return false;
             }
         }

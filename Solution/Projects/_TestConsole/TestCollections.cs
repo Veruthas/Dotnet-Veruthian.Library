@@ -9,7 +9,8 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            TestSimpleScanner();
+            //TestSimpleScanner();
+            TestLookaheadScanner();
         }
 
 
@@ -28,11 +29,11 @@ namespace _TestConsole
             TestSimpleScanner(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
         }
 
-        private static void TestSimpleScanner<T>(IEnumerator<T> enumerator, Func<T,T> generateEndItem = null)
+        private static void TestSimpleScanner<T>(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
         {
             TestScanner(enumerator.GetSimpleScanner(generateEndItem, OnRead));
         }
-        private static void TestSimpleScanner<T>(IEnumerable<T> enumerable, Func<T,T> generateEndItem = null)
+        private static void TestSimpleScanner<T>(IEnumerable<T> enumerable, Func<T, T> generateEndItem = null)
         {
             TestSimpleScanner(enumerable.GetEnumerator(), generateEndItem);
         }
@@ -50,36 +51,42 @@ namespace _TestConsole
             System.Console.WriteLine("----");
         }
 
-        // // LookaheadScanner
-        // private static void TestLookaheadScanner()
-        // {
-        //     TestLookaheadScanner("ABCDEF", 8, ((i) => '!'));
-        // }
+        // LookaheadScanner
+        private static void TestLookaheadScanner()
+        {
+            TestLookaheadScanner("ABCDEF", 8, ((i) => { System.Console.WriteLine("Last: {0}", i); return '!'; }));
+        }
 
 
-        // private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
-        // {
-        //     TestLookaheadScanner(enumerator.GetLookaheadScanner(lookahead, generateEndItem, OnRead), lookahead);
-        // }
+        private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
+        {
+            TestLookaheadScanner(enumerator.GetFixedLookaheadScanner(lookahead, generateEndItem, OnRead), lookahead);
+        }
 
-        // private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)
-        // {
-        //     TestLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem);
-        // }
+        private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)
+        {
+            TestLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem);
+        }
 
-        // private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
-        // {
-        //     while (!scanner.IsEnd)
-        //     {
-        //         System.Console.WriteLine("For Position {0}", scanner.Position);
+        private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
+        {
+            while (!scanner.IsEnd)
+            {
+                System.Console.WriteLine("For Position {0}", scanner.Position);
 
-        //         for (int i = 0; i < lookahead; i++)
-        //         {
-        //             System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
-        //         }
+                for (int i = 0; i < lookahead; i++)
+                {
+                    System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+                }
 
-        //         scanner.Read();
-        //     }
-        // }
+                scanner.Read();
+            }
+
+            System.Console.WriteLine("At End:");
+            for (int i = 0; i < lookahead; i++)
+            {
+                System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+            }
+        }
     }
 }

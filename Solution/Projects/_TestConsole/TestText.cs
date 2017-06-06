@@ -12,7 +12,6 @@ namespace _TestConsole
 
         public static void TestTextSpan()
         {
-            string value = "Hello\nWorld";
 
         }
     }

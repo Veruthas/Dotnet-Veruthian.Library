@@ -28,12 +28,12 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
 
-        // SimpleScanner
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator,
+        // Simple Scanner
+        public static SimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator,
                                                              Func<T, T> getEndItem = null,
-                                                             Action<EnumeratorSimpleScanner<T>, T> onItemRead = null)
+                                                             Action<SimpleScanner<T>, T> onItemRead = null)
         {
-            var scanner = new EnumeratorSimpleScanner<T>(enumerator, getEndItem);
+            var scanner = new SimpleScanner<T>(enumerator, getEndItem);
 
             if (onItemRead != null)
                 scanner.ItemRead += onItemRead;
@@ -41,11 +41,33 @@ namespace Soedeum.Dotnet.Library.Collections
             return scanner;
         }
 
-        public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable,
+        public static SimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable,
                                                                      Func<T, T> getEndItem = null,
-                                                                     Action<EnumeratorSimpleScanner<T>, T> onItemRead = null)
+                                                                     Action<SimpleScanner<T>, T> onItemRead = null)
         {
             return GetSimpleScanner(enumerable.GetEnumerator(), getEndItem, onItemRead);
+        }
+
+        // Fixed Lookahead Scanner
+        public static FixedLookaheadScanner<T> GetFixedLookaheadScanner<T>(this IEnumerator<T> enumerator,
+                                                                                     int lookahead = 2,
+                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Action<FixedLookaheadScanner<T>, T> onItemRead = null)
+        {
+            var scanner = new FixedLookaheadScanner<T>(enumerator, lookahead, getEndItem);
+
+            if (onItemRead != null)
+                scanner.ItemRead += onItemRead;
+
+            return scanner;
+        }
+
+        public static FixedLookaheadScanner<T> GetFixedLookaheadScanner<T>(this IEnumerable<T> enumerable,
+                                                                                     int lookahead = 2,
+                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Action<FixedLookaheadScanner<T>, T> onItemRead = null)
+        {
+            return GetFixedLookaheadScanner(enumerable.GetEnumerator(), lookahead, getEndItem, onItemRead);
         }
     }
 }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class EnumeratorFixedLookaheadScanner<T> : BaseFixedLookaheadScanner<T, EnumeratorFixedLookaheadScanner<T>>
+    public class FixedLookaheadScanner<T> : BaseFixedLookaheadScanner<T, FixedLookaheadScanner<T>>
     {
         IEnumerator<T> enumerator;
 
         Func<T, T> getEndItem;
 
-        public EnumeratorFixedLookaheadScanner(IEnumerator<T> enumerator, int lookahead, Func<T, T> getEndItem = null)
+        public FixedLookaheadScanner(IEnumerator<T> enumerator, int lookahead, Func<T, T> getEndItem = null)
             : base(lookahead)
         {
             this.enumerator = enumerator;
@@ -27,7 +27,11 @@ namespace Soedeum.Dotnet.Library.Collections
                 if (success)
                     next = enumerator.Current;
                 else
-                    next = (getEndItem != null) ? getEndItem(RawPeek(Size - 1)) : default(T);
+                {
+                    var last = RawPeek(Size);
+                    
+                    next = (getEndItem != null) ? getEndItem(last) : default(T);
+                }
 
                 return success;
             }
