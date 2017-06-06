@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FixedLookaheadScanner<T> : BaseFixedLookaheadScanner<T, FixedLookaheadScanner<T>>
+    public class FixedLookaheadScanner<T> : FixedLookaheadScannerBase<T, FixedLookaheadScanner<T>>
     {
         IEnumerator<T> enumerator;
 

@@ -1,7 +1,7 @@
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class BaseSimpleScanner<T, S> : BaseScanner<T, S>
-        where S : BaseScanner<T, S>
+    public abstract class SimpleScannerBase<T, S> : ScannerBase<T, S>
+        where S : ScannerBase<T, S>
     {
         T item;
 

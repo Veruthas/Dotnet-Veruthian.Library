@@ -2,8 +2,8 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class BaseScanner<T, S> : IScanner<T>
-        where S : BaseScanner<T, S>
+    public abstract class ScannerBase<T, S> : IScanner<T>
+        where S : ScannerBase<T, S>
     {
         bool initialized;
 

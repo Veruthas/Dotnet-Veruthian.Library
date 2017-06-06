@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SimpleScanner<T> : BaseSimpleScanner<T, SimpleScanner<T>>
+    public class SimpleScanner<T> : SimpleScannerBase<T, SimpleScanner<T>>
     {
         IEnumerator<T> enumerator;
 

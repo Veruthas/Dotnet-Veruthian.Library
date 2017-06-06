@@ -2,15 +2,15 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class BaseFixedLookaheadScanner<T, S> : BaseScanner<T, S>, ILookaheadScanner<T>
-        where S : BaseScanner<T, S>
+    public abstract class FixedLookaheadScannerBase<T, S> : ScannerBase<T, S>, ILookaheadScanner<T>
+        where S : ScannerBase<T, S>
     {
         T[] buffer;
 
         int index = 0;
 
 
-        protected BaseFixedLookaheadScanner(int lookahead)
+        protected FixedLookaheadScannerBase(int lookahead)
         {
             if (lookahead < 1)
                 throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be greater than 1."));
