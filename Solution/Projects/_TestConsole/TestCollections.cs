@@ -22,19 +22,19 @@ namespace _TestConsole
         // Simple Scanners
         private static void TestSimpleScanner()
         {
-            TestSimpleScanner("Hello, world!");
-            TestSimpleScanner("");
-            TestSimpleScanner("Hello\r\n\0world!".GetTextElements());
-            TestSimpleScanner(new int[] { 1, 2, 3, 4, 5 });
+            TestSimpleScanner("Hello, world!", (i) => '~');
+            TestSimpleScanner("", (i) => '~');
+            TestSimpleScanner("Hello\r\n\0world!".GetTextElements(), (i) => i + '\0');
+            TestSimpleScanner(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
         }
 
-        private static void TestSimpleScanner<T>(IEnumerator<T> enumerator)
+        private static void TestSimpleScanner<T>(IEnumerator<T> enumerator, Func<T,T> generateEndItem = null)
         {
-            TestScanner(enumerator.GetSimpleScanner(null, OnRead));
+            TestScanner(enumerator.GetSimpleScanner(generateEndItem, OnRead));
         }
-        private static void TestSimpleScanner<T>(IEnumerable<T> enumerable)
+        private static void TestSimpleScanner<T>(IEnumerable<T> enumerable, Func<T,T> generateEndItem = null)
         {
-            TestSimpleScanner(enumerable.GetEnumerator());
+            TestSimpleScanner(enumerable.GetEnumerator(), generateEndItem);
         }
 
         private static void TestScanner<T>(IScanner<T> scanner)
@@ -44,6 +44,8 @@ namespace _TestConsole
                 System.Console.WriteLine("Peeked: {0}: {1}", scanner.Position, scanner.Peek());
                 scanner.Read();
             }
+
+            System.Console.WriteLine("End Item: {0}: '{1}'", scanner.Position, scanner.Peek());
 
             System.Console.WriteLine("----");
         }

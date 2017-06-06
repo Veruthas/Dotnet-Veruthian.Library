@@ -7,7 +7,7 @@ namespace Soedeum.Dotnet.Library.Collections
     {
         bool initialized;
 
-        int position;
+        int position = -1;
 
         int endPosition = -1;
 
@@ -27,7 +27,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected bool RawIsAtEnd(int lookahead = 0)
         {
-            return (position + lookahead) >= endPosition;
+            return (endPosition != -1) && (position + lookahead) >= endPosition;
         }
 
         protected void SetEnd(int position, T item)
@@ -50,6 +50,9 @@ namespace Soedeum.Dotnet.Library.Collections
             if (!initialized)
             {
                 Initialize();
+                
+                position++;
+
                 initialized = true;
             }
         }
@@ -92,7 +95,7 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
 
-        private void OnItemRead(T current)
+        protected void OnItemRead(T current)
         {
             if (ItemRead != null)
                 ItemRead((S)this, current);

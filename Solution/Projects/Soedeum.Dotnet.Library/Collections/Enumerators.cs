@@ -33,7 +33,12 @@ namespace Soedeum.Dotnet.Library.Collections
                                                              Func<T, T> getEndItem = null,
                                                              Action<EnumeratorSimpleScanner<T>, T> onItemRead = null)
         {
-            return GetSimpleScanner(enumerator, getEndItem, onItemRead);
+            var scanner = new EnumeratorSimpleScanner<T>(enumerator, getEndItem);
+
+            if (onItemRead != null)
+                scanner.ItemRead += onItemRead;
+
+            return scanner;
         }
 
         public static EnumeratorSimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable,
