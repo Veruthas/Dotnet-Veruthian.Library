@@ -9,7 +9,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         int index = 0;
 
-        T lastValid;
+
 
 
         protected FixedLookaheadScannerBase(int lookahead)
@@ -38,7 +38,7 @@ namespace Soedeum.Dotnet.Library.Collections
             return item;
         }
 
-        protected T LastValid { get => lastValid; }
+        
 
         protected override void Initialize()
         {
@@ -58,7 +58,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
                     if (success)
                     {
-                        lastValid = next;
+                        LastValid = next;
                     }
                     else
                     {
@@ -77,9 +77,9 @@ namespace Soedeum.Dotnet.Library.Collections
             bool success = GetNext(out T next);
 
             if (success)
-                lastValid = next;
-            else if (EndPosition == -1)
-                SetEnd(Position + Size, next);
+                LastValid = next;
+            else if (!EndFound)
+                SetEnd(Position + Size , next);
 
             buffer[index] = next;
 

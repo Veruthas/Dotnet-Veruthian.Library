@@ -37,6 +37,8 @@ namespace Soedeum.Dotnet.Library.Collections
             endItem = item;
         }
 
+        protected bool EndFound { get => endPosition != -1; }
+        
         protected int EndPosition { get => endPosition; }
 
         protected T EndItem { get => endItem; }
@@ -50,7 +52,7 @@ namespace Soedeum.Dotnet.Library.Collections
             if (!initialized)
             {
                 Initialize();
-                
+
                 position++;
 
                 initialized = true;
@@ -80,7 +82,7 @@ namespace Soedeum.Dotnet.Library.Collections
             {
                 MoveToNext();
 
-                position++;
+                Position++;
 
                 OnItemRead(current);
             }
@@ -93,7 +95,6 @@ namespace Soedeum.Dotnet.Library.Collections
             for (int i = 0; i < amount; i++)
                 Read();
         }
-
 
         protected void OnItemRead(T current)
         {

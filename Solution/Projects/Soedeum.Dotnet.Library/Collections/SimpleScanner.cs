@@ -20,7 +20,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected override bool GetNext(out T next)
         {
-            if (EndPosition == -1)
+            if (!EndFound)
             {
                 bool success = enumerator.MoveNext();
 

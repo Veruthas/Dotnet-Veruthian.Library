@@ -1,3 +1,5 @@
+using Soedeum.Dotnet.Library.Utility;
+
 namespace Soedeum.Dotnet.Library.Text
 {
     public struct TextPosition
@@ -26,7 +28,14 @@ namespace Soedeum.Dotnet.Library.Text
 
         public TextPosition IncrementLine(int lengthToEnd = 1)
         {
-            return new TextPosition(this.Position + lengthToEnd, this.Line + 1, 0);
+            return new TextPosition(this.position + lengthToEnd, this.line + 1, 0);
+        }
+
+        public bool Equals(TextPosition position)
+        {
+            return (this.position == position.position) &&
+                   (this.line == position.line) &&
+                   (this.column == position.column);
         }
 
         // override object.Equals
@@ -39,42 +48,34 @@ namespace Soedeum.Dotnet.Library.Text
 
             var position = (TextPosition)obj;
 
-            return this == position;
+            return this.Equals(position);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            int hash = 269;
-            hash = (hash * 47) + Position.GetHashCode();
-            hash = (hash * 47) + Line.GetHashCode();
-            hash = (hash * 47) + Column.GetHashCode();
-            return hash;
+            return HashCodeCombiner.Combiner.Combine(Position, Line, Column);
         }
 
         public static bool operator ==(TextPosition left, TextPosition right)
         {
-            return (left.Position == right.Position) &&
-                   (left.Line == right.Line) &&
-                   (left.Column == right.Column);
+            return left.Equals(right);
         }
 
         public static bool operator !=(TextPosition left, TextPosition right)
         {
-            return (left.Position != right.Position) ||
-                   (left.Line != right.Line) ||
-                   (left.Column != right.Column);
+            return !left.Equals(right);
         }
 
 
         public static TextPosition operator +(TextPosition position, int amount)
         {
-            return new TextPosition(position.Position + amount, position.Line, position.Column + amount);
+            return new TextPosition(position.position + amount, position.line, position.column + amount);
         }
 
         public static TextPosition operator ++(TextPosition position)
         {
-            return new TextPosition(position.Position + 1, position.Line, position.Column + 1);
+            return new TextPosition(position.position + 1, position.line, position.column + 1);
         }
 
 

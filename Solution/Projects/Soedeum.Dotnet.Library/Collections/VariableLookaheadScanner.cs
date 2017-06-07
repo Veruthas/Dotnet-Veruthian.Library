@@ -3,21 +3,23 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FixedLookaheadScanner<T> : FixedLookaheadScannerBase<T, FixedLookaheadScanner<T>>
+    public class VariableLookaheadScanner<T> : VariableLookaheadScannerBase<T, VariableLookaheadScanner<T>>
     {
         IEnumerator<T> enumerator;
 
         Func<T, T> getEndItem;
 
-        public FixedLookaheadScanner(IEnumerator<T> enumerator, int lookahead, Func<T, T> getEndItem = null)
-            : base(lookahead)
+        public VariableLookaheadScanner(IEnumerator<T> enumerator, Func<T, T> getEndItem = null)
         {
             this.enumerator = enumerator;
 
             this.getEndItem = getEndItem;
         }
 
+        protected override bool CanRollback => true;
+
         public override void Dispose() => enumerator.Dispose();
+
         protected override bool GetNext(out T next)
         {
             if (!EndFound)
@@ -29,7 +31,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 else
                 {
                     var last = LastValid;
-                    
+
                     next = (getEndItem != null) ? getEndItem(last) : default(T);
                 }
 

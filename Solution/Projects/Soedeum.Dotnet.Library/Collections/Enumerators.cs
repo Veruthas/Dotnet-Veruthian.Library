@@ -69,5 +69,25 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             return GetFixedLookaheadScanner(enumerable.GetEnumerator(), lookahead, getEndItem, onItemRead);
         }
+
+        // Variable Lookahead Scanner
+        public static VariableLookaheadScanner<T> GetVariableLookaheadScanner<T>(this IEnumerator<T> enumerator,                                                                                     
+                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Action<VariableLookaheadScanner<T>, T> onItemRead = null)
+        {
+            var scanner = new VariableLookaheadScanner<T>(enumerator, getEndItem);
+
+            if (onItemRead != null)
+                scanner.ItemRead += onItemRead;
+
+            return scanner;
+        }
+
+        public static VariableLookaheadScanner<T> GetVariableLookaheadScanner<T>(this IEnumerable<T> enumerable,
+                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Action<VariableLookaheadScanner<T>, T> onItemRead = null)
+        {
+            return GetVariableLookaheadScanner(enumerable.GetEnumerator(), getEndItem, onItemRead);
+        }
     }
 }

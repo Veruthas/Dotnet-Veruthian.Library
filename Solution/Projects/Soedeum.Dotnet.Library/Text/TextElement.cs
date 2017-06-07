@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
@@ -138,9 +139,15 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override string ToString()
         {
-            return string.Format("{0}; Value: '{1}'", position, TextChars.GetCharAsPrintable(value));
+            return string.Format("{0}; Value: '{1}'", position, TextUtility.GetCharAsPrintable(value));
         }
 
+
+        public bool Equals(TextElement element)
+        {
+            return this.position == element.position &&
+                   this.value == element.value;
+        }
 
         // override object.Equals
         public override bool Equals(object obj)
@@ -150,19 +157,15 @@ namespace Soedeum.Dotnet.Library.Text
                 return false;
             }
 
-            var texel = (TextElement)obj;
+            var element = (TextElement)obj;
 
-            return this.position == texel.position &&
-                    this.value == texel.value;
+            return this.Equals(element);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            int hash = 269;
-            hash = (hash * 47) + Position.GetHashCode();
-            hash = (hash * 47) + Value.GetHashCode();
-            return hash;
+            return HashCodeCombiner.Combiner.Combine(position.Position, position.Line, position.Column, value);
         }
 
 
@@ -174,14 +177,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator ==(TextElement left, TextElement right)
         {
-            return left.position == right.position &&
-                   left.value == right.value;
+            return left.Equals(right);
         }
 
         public static bool operator !=(TextElement left, TextElement right)
         {
-            return left.position != right.position ||
-                   left.value != right.value;
+            return !left.Equals(right);
         }
 
         public static TextElement operator +(TextElement left, char right)
