@@ -54,18 +54,25 @@ namespace _TestConsole
         // LookaheadScanner
         private static void TestLookaheadScanner()
         {
-            TestLookaheadScanner("ABCDEFGHIJKLMNOP", 20, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
+            TestLookaheadScanner("ABCDEFGHIJKLMNOP", false, 20, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
         }
 
 
-        private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, bool variable, int lookahead, Func<T, T> generateEndItem = null)
         {
-            TestLookaheadScanner(enumerator.GetVariableLookaheadScanner(generateEndItem, OnRead), lookahead);
+            ILookaheadScanner<T> scanner;
+            
+            if (variable)
+                scanner = enumerator.GetVariableLookaheadScanner(generateEndItem, OnRead);
+            else
+                scanner = enumerator.GetFixedLookaheadScanner(lookahead, generateEndItem, OnRead);
+
+            TestLookaheadScanner(scanner, lookahead);
         }
 
-        private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, bool variable, int lookahead, Func<T, T> generateEndItem = null)
         {
-            TestLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem);
+            TestLookaheadScanner(enumerable.GetEnumerator(), variable, lookahead, generateEndItem);
         }
 
         private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
@@ -76,7 +83,7 @@ namespace _TestConsole
 
                 for (int i = 0; i < lookahead; i++)
                 {
-                    System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+                    System.Console.WriteLine("  [{0}]: {1}, IsEnd:{2}", i, scanner.Peek(i), scanner.PeekIsEnd(i));
                 }
 
                 scanner.Read();
