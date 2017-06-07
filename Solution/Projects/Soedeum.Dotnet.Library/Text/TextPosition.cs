@@ -1,8 +1,9 @@
+using System;
 using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public struct TextPosition
+    public struct TextPosition : IEquatable<TextPosition>
     {
         readonly int position;
 
@@ -11,11 +12,11 @@ namespace Soedeum.Dotnet.Library.Text
         readonly int column;
 
 
-        public TextPosition(int position, int line, int Column)
+        public TextPosition(int position, int line, int column)
         {
             this.position = position;
             this.line = line;
-            this.column = Column;
+            this.column = column;
         }
 
 
@@ -30,6 +31,39 @@ namespace Soedeum.Dotnet.Library.Text
         {
             return new TextPosition(this.position + lengthToEnd, this.line + 1, 0);
         }
+
+        public TextPosition MoveToNext(char current, char next, bool acceptNulls = true)
+        {
+            switch (current)
+            {
+                case '\0':
+                    return (acceptNulls) ? this + 1 : this;
+
+                case '\n':
+                    return this.IncrementLine();
+
+                case '\r':
+                    return (next == '\n') ? this + 1 : this.IncrementLine();
+
+                default:
+                    return this + 1;
+            }
+        }
+
+        public TextPosition MoveThrough(char current, string following, bool acceptNulls = true)
+        {
+            TextPosition result = this;
+
+            foreach (char next in following)
+            {
+                result = result.MoveToNext(current, next, acceptNulls);
+
+                current = next;
+            }
+
+            return result;
+        }
+
 
         public bool Equals(TextPosition position)
         {

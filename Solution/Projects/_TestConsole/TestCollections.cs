@@ -138,7 +138,7 @@ namespace _TestConsole
                         }
                         if (scanner.Position == rollbackAt)
                         {
-                            scanner.Rollback();
+                            scanner.Retract();
                             speculated = true;
                             continue;
                         }

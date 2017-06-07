@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Soedeum.Dotnet.Library.Text;
 
 namespace _TestConsole
 {
@@ -7,7 +8,8 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            TestCollections.Test();            
+            System.Console.WriteLine(CharSet.HexDigit);
+            System.Console.WriteLine(CharSet.LetterOrDigit);
             Pause();
         }
 

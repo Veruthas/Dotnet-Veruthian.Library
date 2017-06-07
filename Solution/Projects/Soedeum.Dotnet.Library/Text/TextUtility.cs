@@ -6,8 +6,14 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public static class TextUtility
     {
+        // Char Extensions
+        public static bool IsIn(this char value, CharSet set)
+        {
+            return set.Includes(value);
+        }
+
         // Enumerators
-        public static IEnumerator<char> FromTextReader(TextReader reader)
+        public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
         {
             while (true)
             {
@@ -20,19 +26,20 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static IEnumerator<char> FromStream(Stream stream, Encoding encoding = null)
+        public static IEnumerator<char> GetCharEnumerator(this Stream stream, Encoding encoding = null)
         {
-            var reader = GetTextReaderFromStream(stream, encoding);
+            var reader = GetTextReader(stream, encoding);
 
-            return FromTextReader(reader);
+            return GetCharEnumerator(reader);
         }
 
-        public static IEnumerator<char> FromFile(string filepath, Encoding encoding = null)
+        public static IEnumerator<char> GetCharEnumerator(string filepath, Encoding encoding = null)
         {
-            var reader = GetTextReaderFromFile(filepath, encoding);
+            var reader = GetTextReader(filepath, encoding);
 
-            return FromTextReader(reader);
+            return GetCharEnumerator(reader);
         }
+
 
         // TextElements
         public static IEnumerator<TextElement> GetTextElements(this IEnumerator<char> chars)
@@ -47,20 +54,20 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // TextReaders
-        public static TextReader GetTextReaderFromStream(Stream stream, Encoding encoding = null)
+        public static TextReader GetTextReader(this Stream stream, Encoding encoding = null)
         {
             return (encoding == null) ? new StreamReader(stream) : new StreamReader(stream, encoding);
         }
 
-        public static TextReader GetTextReaderFromFile(string filepath, Encoding encoding = null)
+        public static TextReader GetTextReader(string filepath, Encoding encoding = null)
         {
             var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-            return GetTextReaderFromStream(stream, encoding);
+            return GetTextReader(stream, encoding);
         }
 
         // Printable Chars
-        public static string GetCharAsPrintable(char value)
+        public static string GetAsPrintable(this char value)
         {
             switch (value)
             {
@@ -77,19 +84,19 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static string GetStringAsPrintable(string value)
+        public static string GetAsPrintable(this string value)
         {
             var builder = new StringBuilder();
 
             foreach (char c in value)
-                builder.Append(GetCharAsPrintable(c));
+                builder.Append(GetAsPrintable(c));
 
             return builder.ToString();
         }
 
 
         // LineEndings
-        public static string GetLineEndingAsString(LineEnding ending)
+        public static string GetAsString(this LineEnding ending)
         {
             switch (ending)
             {
@@ -106,7 +113,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static int GetLineEndingSize(LineEnding ending)
+        public static int GetSize(this LineEnding ending)
         {
             switch (ending)
             {
@@ -122,24 +129,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static LineEnding GetLineEnding(string ending)
-        {
-            switch (ending)
-            {
-                case "\n":
-                    return LineEnding.Lf;
-                case "\r":
-                    return LineEnding.Cr;
-                case "\r\n":
-                    return LineEnding.CrLf;
-                case "\0":
-                    return LineEnding.Null;
-                default:
-                    return LineEnding.Null;
-            }
-        }
-
-        public static string GetLineEndingAsPrintable(LineEnding ending)
+        public static string GetAsPrintable(this LineEnding ending)
         {
             switch (ending)
             {
@@ -156,7 +146,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static string GetLineEndingShortName(LineEnding ending)
+        public static string GetShortName(this LineEnding ending)
         {
             switch (ending)
             {
@@ -173,7 +163,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static string GetLineEndingLongName(LineEnding ending)
+        public static string GetLongName(this LineEnding ending)
         {
             switch (ending)
             {
@@ -187,6 +177,24 @@ namespace Soedeum.Dotnet.Library.Text
                     return "CarriageReturnLineFeed";
                 default:
                     return "Unknown";
+            }
+        }
+
+
+        public static LineEnding GetLineEnding(string ending)
+        {
+            switch (ending)
+            {
+                case "\n":
+                    return LineEnding.Lf;
+                case "\r":
+                    return LineEnding.Cr;
+                case "\r\n":
+                    return LineEnding.CrLf;
+                case "\0":
+                    return LineEnding.Null;
+                default:
+                    return LineEnding.Null;
             }
         }
     }

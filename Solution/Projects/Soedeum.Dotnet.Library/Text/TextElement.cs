@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public struct TextElement
+    public struct TextElement : IEquatable<TextElement>
     {
         readonly TextPosition position;
         readonly char value;
@@ -36,10 +37,35 @@ namespace Soedeum.Dotnet.Library.Text
 
         public char Value { get => value; }
 
-
+        
         public bool Is(char value)
         {
             return this.value == value;
+        }
+
+        public bool Is(CharSet set)
+        {
+            return set.Includes(value);
+        }
+
+        public bool IsNull()
+        {
+            return this.value == '\0';
+        }
+
+        public bool IsSpaceOrTab()
+        {
+            return this.value == ' ' || this.value == '\t';
+        }
+
+        public bool IsNewline()
+        {
+            return this.value == '\n' || this.value == '\r';
+        }
+
+        public bool IsWhitespace()
+        {
+            return char.IsWhiteSpace(this.value);
         }
 
         public bool IsDigit()
@@ -67,26 +93,6 @@ namespace Soedeum.Dotnet.Library.Text
             return char.IsLetterOrDigit(this.value);
         }
 
-        public bool IsSpaceOrTab()
-        {
-            return this.value == ' ' || this.value == '\t';
-        }
-
-        public bool IsNewline()
-        {
-            return this.value == '\n' || this.value == '\r';
-        }
-
-        public bool IsNull()
-        {
-            return this.value == '\0';
-        }
-
-        public bool IsWhitespace()
-        {
-            return char.IsWhiteSpace(this.value);
-        }
-
         public bool IsHexDigit()
         {
             return (this.value >= '0' && this.value <= '9') ||
@@ -94,52 +100,26 @@ namespace Soedeum.Dotnet.Library.Text
                    (this.value >= 'a' && this.value <= 'f');
         }
 
-
-        public TextElement MoveTo(char value, bool acceptNulls = true)
+        public TextElement MoveTo(char next, bool acceptNulls = true)
         {
-            char previous = this.value;
+            var nextPosition = this.Position.MoveToNext(this.value, next);
 
-            TextPosition position = this.position;
-
-
-            switch (previous)
-            {
-                case '\0':
-                    if (acceptNulls)
-                        goto default;
-                    else
-                        value = '\0';
-                    break;
-
-                case '\n':
-                    position = position.IncrementLine();
-                    break;
-
-                case '\r':
-                    position = (value == '\n') ? position + 1 : position = position.IncrementLine();
-                    break;
-
-                default:
-                    position += 1;
-                    break;
-            }
-
-            return new TextElement(position, value);
+            return new TextElement(nextPosition, next);
         }
 
-        public TextElement MoveTo(string value, bool acceptNulls = true)
+        public TextElement MoveThrough(string following, bool acceptNulls = true)
         {
             TextElement result = this;
 
-            foreach (char letter in value)
-                result = result.MoveTo(value, acceptNulls);
+            foreach (char next in following)
+                result = result.MoveTo(next, acceptNulls);
 
             return result;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}; Value: '{1}'", position, TextUtility.GetCharAsPrintable(value));
+            return string.Format("{0}; Value: '{1}'", position, TextUtility.GetAsPrintable(value));
         }
 
 
@@ -192,7 +172,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static TextElement operator +(TextElement left, string right)
         {
-            return left.MoveTo(right);
+            return left.MoveThrough(right);
         }
 
 
@@ -216,9 +196,8 @@ namespace Soedeum.Dotnet.Library.Text
                 }
                 else
                 {
-                    
-                    current = new TextElement(position, c);
                     initialized = true;
+                    current = c;
                 }
 
                 yield return current;
