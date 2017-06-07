@@ -54,13 +54,13 @@ namespace _TestConsole
         // LookaheadScanner
         private static void TestLookaheadScanner()
         {
-            TestLookaheadScanner("ABCDEF", 8, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
+            TestLookaheadScanner("ABCDEFGHIJKLMNOP", 20, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
         }
 
 
         private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
         {
-            TestLookaheadScanner(enumerator.GetFixedLookaheadScanner(lookahead, generateEndItem, OnRead), lookahead);
+            TestLookaheadScanner(enumerator.GetVariableLookaheadScanner(generateEndItem, OnRead), lookahead);
         }
 
         private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, int lookahead, Func<T, T> generateEndItem = null)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
@@ -11,7 +12,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         int endPosition = -1;
 
-        T endItem;
+        T lastItem;
 
 
         public bool IsEnd { get => CheckedIsAtEnd(); }
@@ -30,18 +31,12 @@ namespace Soedeum.Dotnet.Library.Collections
             return (endPosition != -1) && (position + lookahead) >= endPosition;
         }
 
-        protected void SetEnd(int position, T item)
-        {
-            endPosition = position;
-
-            endItem = item;
-        }
 
         protected bool EndFound { get => endPosition != -1; }
-        
-        protected int EndPosition { get => endPosition; }
 
-        protected T EndItem { get => endItem; }
+        protected int EndPosition { get => endPosition; set => endPosition = value; }
+
+        protected T LastItem { get => lastItem; set => lastItem = value; }
 
 
         public int Position { get => position; protected set => position = value; }
@@ -103,6 +98,30 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         public event Action<S, T> ItemRead;
+
+
+        protected bool GetNextFromEnumerator(IEnumerator<T> enumerator, Func<T, T> generateEndItem, out T next)
+        {
+            if (!EndFound)
+            {
+                bool success = enumerator.MoveNext();
+
+                if (success)
+                    next = enumerator.Current;
+                else
+                    next = (generateEndItem != null) ? generateEndItem(LastItem) : default(T);
+
+                LastItem = next;
+
+                return success;
+            }
+            else
+            {
+                next = LastItem;
+
+                return false;
+            }
+        }
 
 
         // The Abstracts

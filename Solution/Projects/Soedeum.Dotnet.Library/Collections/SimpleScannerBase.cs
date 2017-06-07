@@ -14,7 +14,7 @@ namespace Soedeum.Dotnet.Library.Collections
             bool success = GetNext(out T next);
 
             if (!success)
-                SetEnd(Position + 1, next);
+                EndPosition = Position + 1;
 
             item = next;
         }

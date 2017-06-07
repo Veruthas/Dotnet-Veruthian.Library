@@ -10,8 +10,6 @@ namespace Soedeum.Dotnet.Library.Collections
         int index = 0;
 
 
-
-
         protected FixedLookaheadScannerBase(int lookahead)
         {
             if (lookahead < 1)
@@ -38,7 +36,6 @@ namespace Soedeum.Dotnet.Library.Collections
             return item;
         }
 
-        
 
         protected override void Initialize()
         {
@@ -50,22 +47,20 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 if (atEnd)
                 {
-                    next = base.EndItem;
+                    next = LastItem;
                 }
                 else
                 {
                     bool success = GetNext(out next);
 
-                    if (success)
+                    if (!success)
                     {
-                        LastValid = next;
-                    }
-                    else
-                    {
-                        SetEnd(i, next);
+                        EndPosition = i;
 
                         atEnd = true;
                     }
+
+                    LastItem = next;
                 }
 
                 buffer[i] = next;
@@ -76,10 +71,8 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             bool success = GetNext(out T next);
 
-            if (success)
-                LastValid = next;
-            else if (!EndFound)
-                SetEnd(Position + Size , next);
+            if (!EndFound)
+                EndPosition = Position + Size;
 
             buffer[index] = next;
 

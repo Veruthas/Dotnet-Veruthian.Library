@@ -7,42 +7,19 @@ namespace Soedeum.Dotnet.Library.Collections
     {
         IEnumerator<T> enumerator;
 
-        Func<T, T> getEndItem;
+        Func<T, T> generateEndItem;
 
-        public VariableLookaheadScanner(IEnumerator<T> enumerator, Func<T, T> getEndItem = null)
+        public VariableLookaheadScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
-            this.getEndItem = getEndItem;
+            this.generateEndItem = generateEndItem;
         }
 
         protected override bool CanRollback => true;
 
         public override void Dispose() => enumerator.Dispose();
 
-        protected override bool GetNext(out T next)
-        {
-            if (!EndFound)
-            {
-                bool success = enumerator.MoveNext();
-
-                if (success)
-                    next = enumerator.Current;
-                else
-                {
-                    var last = LastValid;
-
-                    next = (getEndItem != null) ? getEndItem(last) : default(T);
-                }
-
-                return success;
-            }
-            else
-            {
-                next = EndItem;
-
-                return false;
-            }
-        }
+        protected override bool GetNext(out T next) => GetNextFromEnumerator(enumerator, generateEndItem, out next);
     }
 }

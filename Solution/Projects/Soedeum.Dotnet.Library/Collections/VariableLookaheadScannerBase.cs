@@ -23,12 +23,14 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected override void VerifyLookahead(int lookahead = 0)
         {
-            int difference = size - index;
+            // Find out if we have enough lookahead.
+            int available = (size - index);
 
-            if (difference <= lookahead)
-            {
-                Prefetch(difference);
-            }
+            int difference = available - lookahead;
+
+            // Prefetch (d + 1) items (since index and lookaheads are indices)
+            if (difference <= 0)
+                Prefetch(difference + 1);
         }
 
         private void Prefetch(int amount)
@@ -36,7 +38,7 @@ namespace Soedeum.Dotnet.Library.Collections
             if (EndFound)
                 return;
 
-            int lastPosition = amount;
+            int lastPosition = size;
 
             for (int i = 0; i < amount; i++)
             {
@@ -44,8 +46,6 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 if (success)
                 {
-                    LastValid = next;
-
                     if (size == buffer.Count)
                         buffer.Add(next);
                     else
@@ -55,7 +55,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 }
                 else
                 {
-                    SetEnd(lastPosition + i, next);
+                    EndPosition = lastPosition + i;
                     break;
                 }
             }
@@ -65,7 +65,7 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             // We don't want to add infinite end items, the set one should just be returned
             if (EndFound && Position + lookahead >= EndPosition)
-                return EndItem;
+                return LastItem;
             else
                 return buffer[index + lookahead];
         }

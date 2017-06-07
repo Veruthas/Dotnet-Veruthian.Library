@@ -30,10 +30,10 @@ namespace Soedeum.Dotnet.Library.Collections
 
         // Simple Scanner
         public static SimpleScanner<T> GetSimpleScanner<T>(this IEnumerator<T> enumerator,
-                                                             Func<T, T> getEndItem = null,
+                                                             Func<T, T> generateEndItem = null,
                                                              Action<SimpleScanner<T>, T> onItemRead = null)
         {
-            var scanner = new SimpleScanner<T>(enumerator, getEndItem);
+            var scanner = new SimpleScanner<T>(enumerator, generateEndItem);
 
             if (onItemRead != null)
                 scanner.ItemRead += onItemRead;
@@ -42,19 +42,19 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         public static SimpleScanner<T> GetSimpleScanner<T>(this IEnumerable<T> enumerable,
-                                                                     Func<T, T> getEndItem = null,
+                                                                     Func<T, T> generateEndItem = null,
                                                                      Action<SimpleScanner<T>, T> onItemRead = null)
         {
-            return GetSimpleScanner(enumerable.GetEnumerator(), getEndItem, onItemRead);
+            return GetSimpleScanner(enumerable.GetEnumerator(), generateEndItem, onItemRead);
         }
 
         // Fixed Lookahead Scanner
         public static FixedLookaheadScanner<T> GetFixedLookaheadScanner<T>(this IEnumerator<T> enumerator,
                                                                                      int lookahead = 2,
-                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Func<T, T> generateEndItem = null,
                                                                                      Action<FixedLookaheadScanner<T>, T> onItemRead = null)
         {
-            var scanner = new FixedLookaheadScanner<T>(enumerator, lookahead, getEndItem);
+            var scanner = new FixedLookaheadScanner<T>(enumerator, lookahead, generateEndItem);
 
             if (onItemRead != null)
                 scanner.ItemRead += onItemRead;
@@ -64,18 +64,18 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public static FixedLookaheadScanner<T> GetFixedLookaheadScanner<T>(this IEnumerable<T> enumerable,
                                                                                      int lookahead = 2,
-                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Func<T, T> generateEndItem = null,
                                                                                      Action<FixedLookaheadScanner<T>, T> onItemRead = null)
         {
-            return GetFixedLookaheadScanner(enumerable.GetEnumerator(), lookahead, getEndItem, onItemRead);
+            return GetFixedLookaheadScanner(enumerable.GetEnumerator(), lookahead, generateEndItem, onItemRead);
         }
 
         // Variable Lookahead Scanner
         public static VariableLookaheadScanner<T> GetVariableLookaheadScanner<T>(this IEnumerator<T> enumerator,                                                                                     
-                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Func<T, T> generateEndItem = null,
                                                                                      Action<VariableLookaheadScanner<T>, T> onItemRead = null)
         {
-            var scanner = new VariableLookaheadScanner<T>(enumerator, getEndItem);
+            var scanner = new VariableLookaheadScanner<T>(enumerator, generateEndItem);
 
             if (onItemRead != null)
                 scanner.ItemRead += onItemRead;
@@ -84,10 +84,10 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         public static VariableLookaheadScanner<T> GetVariableLookaheadScanner<T>(this IEnumerable<T> enumerable,
-                                                                                     Func<T, T> getEndItem = null,
+                                                                                     Func<T, T> generateEndItem = null,
                                                                                      Action<VariableLookaheadScanner<T>, T> onItemRead = null)
         {
-            return GetVariableLookaheadScanner(enumerable.GetEnumerator(), getEndItem, onItemRead);
+            return GetVariableLookaheadScanner(enumerable.GetEnumerator(), generateEndItem, onItemRead);
         }
     }
 }
