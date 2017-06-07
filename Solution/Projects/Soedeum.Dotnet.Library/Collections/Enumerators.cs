@@ -93,7 +93,7 @@ namespace Soedeum.Dotnet.Library.Collections
                                                                 Action<IScanner<T>, T> onItemRead = null,
                                                                 Action<ISpeculativeScanner<T>> onSpeculating = null,
                                                                 Action<ISpeculativeScanner<T>> onCommitted = null,
-                                                                Action<ISpeculativeScanner<T>, int, int> onRolledback = null)
+                                                                Action<ISpeculativeScanner<T>, int, int> onRetracted = null)
         {
             var scanner = new SpeculativeScanner<T>(enumerator, generateEndItem);
 
@@ -103,7 +103,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
             scanner.Committed += onCommitted;
 
-            scanner.RolledBack += onRolledback;
+            scanner.Retracted += onRetracted;
 
             return scanner;
         }
@@ -114,9 +114,9 @@ namespace Soedeum.Dotnet.Library.Collections
                                                                 Action<IScanner<T>, T> onItemRead = null,
                                                                 Action<ISpeculativeScanner<T>> onSpeculating = null,
                                                                 Action<ISpeculativeScanner<T>> onCommitted = null,
-                                                                Action<ISpeculativeScanner<T>, int, int> onRolledback = null)
+                                                                Action<ISpeculativeScanner<T>, int, int> onRetracted = null)
         {
-            return GetSpeculativeScanner(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRolledback);
+            return GetSpeculativeScanner(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRetracted);
         }
 
 
@@ -127,7 +127,7 @@ namespace Soedeum.Dotnet.Library.Collections
                                                                 Action<IScanner<T>, T> onItemRead = null,
                                                                 Func<ISpeculativeScanner<T>, S> onSpeculating = null,
                                                                 Action<ISpeculativeScanner<T>> onCommitted = null,
-                                                                Action<ISpeculativeScanner<T>, int, int, S> onRolledback = null)
+                                                                Action<ISpeculativeScanner<T>, int, int, S> onRetracted = null)
         {
             var scanner = new SpeculativeScannerWithState<T, S>(enumerator, generateEndItem);
 
@@ -137,7 +137,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
             scanner.Committed += onCommitted;
 
-            scanner.RolledBack += onRolledback;
+            scanner.Retracted += onRetracted;
 
             return scanner;
         }
@@ -148,9 +148,9 @@ namespace Soedeum.Dotnet.Library.Collections
                                                                 Action<IScanner<T>, T> onItemRead = null,
                                                                 Func<ISpeculativeScanner<T>, S> onSpeculating = null,
                                                                 Action<ISpeculativeScanner<T>> onCommitted = null,
-                                                                Action<ISpeculativeScanner<T>, int, int, S> onRolledback = null)
+                                                                Action<ISpeculativeScanner<T>, int, int, S> onRetracted = null)
         {
-            return GetSpeculativeScannerWithState(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRolledback);
+            return GetSpeculativeScannerWithState(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRetracted);
         }
     }
 }

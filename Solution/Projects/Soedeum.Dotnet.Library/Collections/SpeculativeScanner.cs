@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public event Action<ISpeculativeScanner<T>> Speculating;
 
-        public event Action<ISpeculativeScanner<T>, int, int> RolledBack;
+        public event Action<ISpeculativeScanner<T>, int, int> Retracted;
 
 
         protected override object OnSpeculating()
@@ -21,10 +21,10 @@ namespace Soedeum.Dotnet.Library.Collections
             return null;
         }
 
-        protected override void OnRolledback(int returningFromPosition, int speculationPosition, object speculationState)
+        protected override void OnRetracted(int returningFromPosition, int speculationPosition, object speculationState)
         {
-            if (RolledBack != null)
-                RolledBack(this, returningFromPosition, speculationPosition);
+            if (Retracted != null)
+                Retracted(this, returningFromPosition, speculationPosition);
         }
 
     }
@@ -36,17 +36,17 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public event Func<ISpeculativeScanner<T>, S> Speculating;
 
-        public event Action<ISpeculativeScanner<T>, int, int, S> RolledBack;
+        public event Action<ISpeculativeScanner<T>, int, int, S> Retracted;
 
         protected override S OnSpeculating()
         {
             return (Speculating != null) ? Speculating(this) : default(S);
         }
 
-        protected override void OnRolledback(int returningFromPosition, int speculationPosition, S speculationState)
+        protected override void OnRetracted(int returningFromPosition, int speculationPosition, S speculationState)
         {
-            if (RolledBack != null)
-                RolledBack(this, returningFromPosition, speculationPosition, speculationState);
+            if (Retracted != null)
+                Retracted(this, returningFromPosition, speculationPosition, speculationState);
         }
     }
 
@@ -96,9 +96,9 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             VerifyInitialized();
 
-            var store = OnSpeculating();
+            var state = OnSpeculating();
 
-            marks.Push(new Mark(Position, Index, store));
+            marks.Push(new Mark(Position, Index, state));
         }
 
         protected abstract S OnSpeculating();
@@ -121,12 +121,12 @@ namespace Soedeum.Dotnet.Library.Collections
                 Committed(this);
         }
 
-        public void Rollback()
+        public void Retract()
         {
-            Rollback(1);
+            Retract(1);
         }
 
-        public void Rollback(int speculations)
+        public void Retract(int speculations)
         {
             if (speculations < -1 || speculations > SpeculationCount)
                 throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", speculations, SpeculationCount));
@@ -145,16 +145,16 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 this.Position = mark.Position;
 
-                OnRolledback(oldPosition, this.Position, mark.State);
+                OnRetracted(oldPosition, this.Position, mark.State);
             }
         }
 
-        public void RollbackAll()
+        public void RetractAll()
         {
-            Rollback(SpeculationCount);
+            Retract(SpeculationCount);
         }
 
-        protected abstract void OnRolledback(int returningFromPosition, int speculationPosition, S speculationState);
+        protected abstract void OnRetracted(int returningFromPosition, int speculationPosition, S speculationState);
 
     }
 }

@@ -10,13 +10,14 @@ namespace _TestConsole
         public static void Test()
         {
             //TestSimpleScanner();
-            TestLookaheadScanner();
+            //TestLookaheadScanner();
+            TestSpeculativeScanner();
         }
 
 
-        private static void OnRead<T>(IScanner<T> scanner, T item)            
+        private static void OnRead<T>(IScanner<T> scanner, T item)
         {
-            System.Console.WriteLine("Read: {0}: {1}", scanner.Position - 1, item);
+            System.Console.WriteLine("Read: {0}: '{1}'", scanner.Position - 1, item);
         }
 
         // Simple Scanners
@@ -60,7 +61,7 @@ namespace _TestConsole
         private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, bool variable, int lookahead, Func<T, T> generateEndItem = null)
         {
             ILookaheadScanner<T> scanner;
-            
+
             if (variable)
                 scanner = enumerator.GetVariableLookaheadScanner(generateEndItem, OnRead);
             else
@@ -92,6 +93,62 @@ namespace _TestConsole
             for (int i = 0; i < lookahead; i++)
             {
                 System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+            }
+        }
+
+
+        private static void TestSpeculativeScanner()
+        {
+            TestSpeculativeScanner("Hello, world!", 2, 7);
+        }
+
+        private static void TestSpeculativeScanner<T>(IEnumerator<T> enumerator, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        {
+            var scanner = enumerator.GetSpeculativeScanner(generateEndItem, OnRead,
+                    ((s) => Console.WriteLine("Speculating at Position: {0}", s.Position)),
+                    ((s) => Console.WriteLine("Committed to our speculation at Position {0}", s.Position)),
+                    ((s, from, to) => Console.WriteLine("Rolledback from {0} to {1}!", from, to)));
+
+            TestSpeculativeScanner(scanner, speculateAt, rollbackAt);
+        }
+
+        private static void TestSpeculativeScanner<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        {
+            TestSpeculativeScanner(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
+        }
+
+        private static void TestSpeculativeScanner<T>(ISpeculativeScanner<T> scanner, int speculateAt, int rollbackAt)
+        {
+            bool speculated = false;
+
+            while (!scanner.IsEnd)
+            {
+                while (!scanner.IsEnd)
+                {
+                    System.Console.WriteLine("Peeked: {0}: '{1}'", scanner.Position, scanner.Peek());
+
+                    scanner.Read();
+
+                    if (!speculated)
+                    {
+                        if (scanner.Position == speculateAt)
+                        {
+                            scanner.Speculate();
+                            continue;
+                        }
+                        if (scanner.Position == rollbackAt)
+                        {
+                            scanner.Rollback();
+                            speculated = true;
+                            continue;
+                        }
+                    }
+                    
+                }
+
+                System.Console.WriteLine("End Item: {0}: '{1}'", scanner.Position, scanner.Peek());
+
+                System.Console.WriteLine("----");
             }
         }
     }

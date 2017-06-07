@@ -12,10 +12,10 @@ namespace Soedeum.Dotnet.Library.Collections
 
         void Commit();
 
-        void Rollback();
+        void Retract();
 
-        void Rollback(int speculations);
+        void Retract(int speculations);
 
-        void RollbackAll();
+        void RetractAll();
     }
 }
