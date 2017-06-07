@@ -3,23 +3,86 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class VariableLookaheadScanner<T> : VariableLookaheadScannerBase<T, VariableLookaheadScanner<T>>
+    public class VariableLookaheadScanner<T> : LookaheadScannerBase<T, VariableLookaheadScanner<T>>
     {
-        IEnumerator<T> enumerator;
+        List<T> buffer = new List<T>();
 
-        Func<T, T> generateEndItem;
+        int index;
+
+        int size;
+
 
         public VariableLookaheadScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
-        {
-            this.enumerator = enumerator;
+            : base(enumerator, generateEndItem) { }
 
-            this.generateEndItem = generateEndItem;
+        protected int Index { get => index; set => index = value; }
+
+        protected int Size { get => size; }
+
+
+        protected virtual bool CanRollback { get => true; }
+
+
+        protected override void VerifyLookahead(int lookahead = 0)
+        {
+            // Find out if we have enough lookahead.
+            int available = (size - index);
+
+            int difference = available - lookahead;
+
+            // Prefetch (d + 1) items (since index and lookaheads are indices)
+            if (difference <= 0)
+                Prefetch(difference + 1);
         }
 
-        protected override bool CanRollback => true;
+        private void Prefetch(int amount)
+        {
+            if (EndFound)
+                return;
 
-        public override void Dispose() => enumerator.Dispose();
+            int lastPosition = size;
 
-        protected override bool GetNext(out T next) => GetNextFromEnumerator(enumerator, generateEndItem, out next);
+            for (int i = 0; i < amount; i++)
+            {
+                bool success = GetNext(out T next);
+
+                if (success)
+                {
+                    if (size == buffer.Count)
+                        buffer.Add(next);
+                    else
+                        buffer[size] = next;
+
+                    size++;
+                }
+                else
+                {
+                    EndPosition = lastPosition + i;
+                    break;
+                }
+            }
+        }
+
+        protected override T RawPeek(int lookahead = 0)
+        {
+            // We don't want to add infinite end items, the set one should just be returned
+            if (EndFound && Position + lookahead >= EndPosition)
+                return LastItem;
+            else
+                return buffer[index + lookahead];
+        }
+
+        // Prefetch(0) should've done this for us
+        protected override void Initialize() { }
+
+        protected override void MoveToNext()
+        {
+            index++;
+
+            if (index == size && CanRollback)
+                index = size = 0;
+
+            Prefetch(1);
+        }
     }
 }

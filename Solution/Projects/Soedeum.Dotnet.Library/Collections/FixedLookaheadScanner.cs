@@ -3,21 +3,81 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FixedLookaheadScanner<T> : FixedLookaheadScannerBase<T, FixedLookaheadScanner<T>>
+    public class FixedLookaheadScanner<T> : LookaheadScannerBase<T, FixedLookaheadScanner<T>>
     {
-        IEnumerator<T> enumerator;
+        T[] buffer;
 
-        Func<T, T> generateEndItem;
+        int index = 0;
 
         public FixedLookaheadScanner(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
-            : base(lookahead)
+            : base(enumerator, generateEndItem)
         {
-            this.enumerator = enumerator;
+            if (lookahead < 1)
+                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be greater than 1."));
 
-            this.generateEndItem = generateEndItem;
+            buffer = new T[lookahead];
         }
 
-        public override void Dispose() => enumerator.Dispose();
-        protected override bool GetNext(out T next) => GetNextFromEnumerator(enumerator, generateEndItem, out next);
+
+        protected int Size { get => buffer.Length; }
+
+
+        protected override void VerifyLookahead(int lookahead = 0)
+        {
+            if (lookahead < 0 || lookahead >= Size)
+                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be in the range [1, {1}]", lookahead, Size - 1));
+        }
+
+        protected override T RawPeek(int lookahead = 0)
+        {
+            var actualIndex = (index + lookahead) % Size;
+
+            var item = buffer[actualIndex];
+
+            return item;
+        }
+
+
+        protected override void Initialize()
+        {
+            bool atEnd = false;
+
+            for (int i = 0; i < Size; i++)
+            {
+                T next;
+
+                if (atEnd)
+                {
+                    next = LastItem;
+                }
+                else
+                {
+                    bool success = GetNext(out next);
+
+                    if (!success)
+                    {
+                        EndPosition = i;
+
+                        atEnd = true;
+                    }
+
+                    LastItem = next;
+                }
+
+                buffer[i] = next;
+            }
+        }
+
+        protected override void MoveToNext()
+        {
+            bool success = GetNext(out T next);
+
+            if (!EndFound)
+                EndPosition = Position + Size;
+
+            buffer[index] = next;
+
+            index = (index + 1) % Size;
+        }
     }
 }

@@ -3,21 +3,27 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SimpleScanner<T> : SimpleScannerBase<T, SimpleScanner<T>>
+    public class SimpleScanner<T> : ScannerBase<T, SimpleScanner<T>>
     {
-        IEnumerator<T> enumerator;
+        T item;
 
-        Func<T, T> generateEndItem;
+        public SimpleScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem) 
+            : base(enumerator, generateEndItem) { }
+        
+        protected override T RawPeek(int lookahead = 0) => item;
 
-        public SimpleScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        protected override void Initialize() => MoveToNext();
+
+        protected override void MoveToNext()
         {
-            this.enumerator = enumerator;
+            bool success = GetNext(out T next);
 
-            this.generateEndItem = generateEndItem;
+            if (!success)
+                EndPosition = Position + 1;
+
+            item = next;
         }
 
-        public override void Dispose() => enumerator.Dispose();
-
-        protected override bool GetNext(out T next) => GetNextFromEnumerator(enumerator, generateEndItem, out next);
+        protected override void VerifyLookahead(int lookahead = 0) { }
     }
 }

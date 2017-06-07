@@ -6,6 +6,10 @@ namespace Soedeum.Dotnet.Library.Collections
     public abstract class ScannerBase<T, S> : IScanner<T>
         where S : ScannerBase<T, S>
     {
+        IEnumerator<T> enumerator;
+
+        Func<T, T> generateEndItem;
+
         bool initialized;
 
         int position = -1;
@@ -15,6 +19,21 @@ namespace Soedeum.Dotnet.Library.Collections
         T lastItem;
 
 
+        public ScannerBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        {
+            this.enumerator = enumerator;
+
+            this.generateEndItem = generateEndItem;
+        }
+
+
+        public int Position { get => position; protected set => position = value; }
+
+
+        public virtual void Dispose() => enumerator.Dispose();
+
+
+        // End
         public bool IsEnd { get => CheckedIsAtEnd(); }
 
         protected bool CheckedIsAtEnd(int lookahead = 0)
@@ -31,17 +50,14 @@ namespace Soedeum.Dotnet.Library.Collections
             return (endPosition != -1) && (position + lookahead) >= endPosition;
         }
 
-
         protected bool EndFound { get => endPosition != -1; }
 
         protected int EndPosition { get => endPosition; set => endPosition = value; }
 
         protected T LastItem { get => lastItem; set => lastItem = value; }
 
-
-        public int Position { get => position; protected set => position = value; }
-
-
+        
+        // Reading and Peeking
         protected void VerifyInitialized()
         {
             if (!initialized)
@@ -100,7 +116,7 @@ namespace Soedeum.Dotnet.Library.Collections
         public event Action<S, T> ItemRead;
 
 
-        protected bool GetNextFromEnumerator(IEnumerator<T> enumerator, Func<T, T> generateEndItem, out T next)
+        public bool GetNext(out T next)
         {
             if (!EndFound)
             {
@@ -129,12 +145,8 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected abstract void MoveToNext();
 
-        protected abstract bool GetNext(out T next);
-
         protected abstract T RawPeek(int lookahead = 0);
 
         protected abstract void VerifyLookahead(int lookahead = 0);
-
-        public abstract void Dispose();
     }
 }
