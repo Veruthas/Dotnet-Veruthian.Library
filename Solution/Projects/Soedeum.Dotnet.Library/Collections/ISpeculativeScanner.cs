@@ -4,22 +4,18 @@ namespace Soedeum.Dotnet.Library.Collections
 {
     public interface ISpeculativeScanner<T> : ILookaheadScanner<T>
     {
-        // The number of marks that have been pushed
-        int MarkCount { get; }
+        int SpeculationCount { get; }
 
-        // Sets a mark for backtracking
-        void Mark();
+        bool IsSpeculating { get; }
 
-        // Commits everything until the first mark
+        void Speculate();
+
         void Commit();
 
-        // Rollback to previous mark
         void Rollback();
 
-        // The position of Mark[n] in the Scanner
-        int GetMarkPosition(int index);
+        void Rollback(int speculations);
 
-        // The number of items read since the mark position
-        int GetLengthToMark(int index);
+        void RollbackAll();
     }
 }

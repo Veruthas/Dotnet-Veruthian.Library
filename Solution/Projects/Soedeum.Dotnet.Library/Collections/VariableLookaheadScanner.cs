@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class VariableLookaheadScanner<T> : LookaheadScannerBase<T, VariableLookaheadScanner<T>>
+    public class VariableLookaheadScanner<T> : LookaheadScannerBase<T>
     {
         List<T> buffer = new List<T>();
 
@@ -20,7 +20,7 @@ namespace Soedeum.Dotnet.Library.Collections
         protected int Size { get => size; }
 
 
-        protected virtual bool CanRollback { get => true; }
+        protected virtual bool CanReset { get => true; }
 
 
         protected override void VerifyLookahead(int lookahead = 0)
@@ -79,7 +79,7 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             index++;
 
-            if (index == size && CanRollback)
+            if (index == size && CanReset)
                 index = size = 0;
 
             Prefetch(1);

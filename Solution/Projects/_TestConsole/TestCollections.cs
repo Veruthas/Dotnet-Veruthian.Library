@@ -14,8 +14,7 @@ namespace _TestConsole
         }
 
 
-        private static void OnRead<S, T>(S scanner, T item)
-            where S : ScannerBase<T, S>
+        private static void OnRead<T>(IScanner<T> scanner, T item)            
         {
             System.Console.WriteLine("Read: {0}: {1}", scanner.Position - 1, item);
         }

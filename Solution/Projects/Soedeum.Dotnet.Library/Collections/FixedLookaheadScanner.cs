@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FixedLookaheadScanner<T> : LookaheadScannerBase<T, FixedLookaheadScanner<T>>
+    public class FixedLookaheadScanner<T> : LookaheadScannerBase<T>
     {
         T[] buffer;
 
