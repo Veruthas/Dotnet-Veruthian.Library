@@ -3,7 +3,54 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SpeculativeScanner<T> : VariableLookaheadScanner<T>, ISpeculativeScanner<T>
+    public class SpeculativeScanner<T> : SpeculativeScannerBase<T, object>
+    {
+        public SpeculativeScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+            : base(enumerator, generateEndItem) { }
+
+        public event Action<ISpeculativeScanner<T>> Speculating;
+
+        public event Action<ISpeculativeScanner<T>, int, int> RolledBack;
+
+
+        protected override object OnSpeculating()
+        {
+            if (Speculating != null)
+                Speculating(this);
+
+            return null;
+        }
+
+        protected override void OnRolledback(int returningFromPosition, int speculationPosition, object speculationState)
+        {
+            if (RolledBack != null)
+                RolledBack(this, returningFromPosition, speculationPosition);
+        }
+
+    }
+
+    public class SpeculativeScannerWithState<T, S> : SpeculativeScannerBase<T, S>
+    {
+        public SpeculativeScannerWithState(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+            : base(enumerator, generateEndItem) { }
+
+        public event Func<ISpeculativeScanner<T>, S> Speculating;
+
+        public event Action<ISpeculativeScanner<T>, int, int, S> RolledBack;
+
+        protected override S OnSpeculating()
+        {
+            return (Speculating != null) ? Speculating(this) : default(S);
+        }
+
+        protected override void OnRolledback(int returningFromPosition, int speculationPosition, S speculationState)
+        {
+            if (RolledBack != null)
+                RolledBack(this, returningFromPosition, speculationPosition, speculationState);
+        }
+    }
+
+    public abstract class SpeculativeScannerBase<T, S> : VariableLookaheadScanner<T>, ISpeculativeScanner<T>
     {
         protected struct Mark
         {
@@ -11,22 +58,24 @@ namespace Soedeum.Dotnet.Library.Collections
 
             public int Index { get; }
 
+            public S State { get; }
 
-            public Mark(int position, int index)
+            public Mark(int position, int index, S state)
             {
                 this.Position = position;
                 this.Index = index;
+                this.State = state;
             }
 
             public override string ToString()
             {
-                return string.Format("Position: {0}; Index: {1}", Position, Index);
+                return string.Format("Position: {0}; Index: {1}; State: {2}", Position, Index, ((State.Equals(null)) ? "<Null>" : State.ToString()));
             }
         }
 
         Stack<Mark> marks = new Stack<Mark>();
 
-        public SpeculativeScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public SpeculativeScannerBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
         }
@@ -47,18 +96,12 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             VerifyInitialized();
 
-            marks.Push(new Mark(Position, Index));
+            var store = OnSpeculating();
 
-            OnSpeculating();
+            marks.Push(new Mark(Position, Index, store));
         }
 
-        public event Action<ISpeculativeScanner<T>> Speculating;
-
-        protected virtual void OnSpeculating()
-        {
-            if (Speculating != null)
-                Speculating(this);
-        }
+        protected abstract S OnSpeculating();
 
         public void Commit()
         {
@@ -102,7 +145,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 this.Position = mark.Position;
 
-                OnRollback(oldPosition, this.Position);
+                OnRolledback(oldPosition, this.Position, mark.State);
             }
         }
 
@@ -111,13 +154,7 @@ namespace Soedeum.Dotnet.Library.Collections
             Rollback(SpeculationCount);
         }
 
-        public event Action<ISpeculativeScanner<T>, int, int> Rolledback;
-
-        protected virtual void OnRollback(int from, int to)
-        {
-            if (Rolledback != null)
-                Rolledback(this, from, to);
-        }
+        protected abstract void OnRolledback(int returningFromPosition, int speculationPosition, S speculationState);
 
     }
 }
