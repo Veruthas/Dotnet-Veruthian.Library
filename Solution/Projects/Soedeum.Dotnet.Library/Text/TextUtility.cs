@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public static class TextChars
+    public static class TextUtility
     {
         // Enumerators
         public static IEnumerator<char> FromTextReader(TextReader reader)
