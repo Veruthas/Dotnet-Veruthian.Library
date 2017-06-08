@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Soedeum.Dotnet.Library.Text
@@ -88,7 +89,26 @@ namespace Soedeum.Dotnet.Library.Text
 
             public CharSetUnion(params CharSet[] sets)
             {
-                this.sets = sets;
+                List<CharSet> flattened = new List<CharSet>();
+
+                foreach (CharSet set in sets)
+                    FlattenCharSet(flattened, set);
+            }
+
+            private void FlattenCharSet(List<CharSet> flattened, CharSet set)
+            {
+                if (set is CharSetUnion)
+                {
+                    var union = set as CharSetUnion;
+
+                    foreach (var subset in union.sets)
+                        FlattenCharSet(flattened, subset);
+                }
+                else
+                {
+                    if (set != null)
+                        flattened.Add(set);
+                }
             }
 
             public override bool Includes(char value)
@@ -156,9 +176,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly CharSet Digit = FromRange('0', '9');
 
-        public static readonly CharSet LetterOrDigit = FromUnion(Lower, Upper, Digit);
+        public static readonly CharSet LetterOrDigit = FromUnion(Letter, Digit);
 
         public static readonly CharSet HexDigit = FromUnion(Digit, FromRange('A', 'F'), FromRange('a', 'f'));
 
+        public static readonly CharSet CStyleIndentifierStart = FromUnion(Letter, '_');
+
+        public static readonly CharSet CStyleIndentifier = FromUnion(LetterOrDigit, '_');
     }
 }

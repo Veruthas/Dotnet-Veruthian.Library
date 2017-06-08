@@ -1,3 +1,4 @@
+using System;
 using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
@@ -9,6 +10,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         TextSpan Span { get; }
 
+        T TokenType { get; }
+        
         bool Is(T type);
 
         void VerifyIs(T type);
