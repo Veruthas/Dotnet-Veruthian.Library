@@ -37,7 +37,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public char Value { get => value; }
 
-        
+
         public bool Is(char value)
         {
             return this.value == value;
@@ -177,12 +177,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Enumerators
-        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars)
-        {
-            return EnumerateFromChars(chars, new TextPosition());
-        }
-
-        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars, TextPosition position)
+        public static IEnumerator<TextElement> EnumerateFromChars(TextPosition position, IEnumerator<char> chars, bool acceptNulls = true)
         {
             bool initialized = false;
 
@@ -192,7 +187,7 @@ namespace Soedeum.Dotnet.Library.Text
             {
                 if (initialized)
                 {
-                    current += c;
+                    current.MoveTo(c, acceptNulls);
                 }
                 else
                 {
@@ -202,6 +197,22 @@ namespace Soedeum.Dotnet.Library.Text
 
                 yield return current;
             }
+        }
+
+        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars, bool acceptNulls = true)
+        {
+            return EnumerateFromChars(new TextPosition(), chars, acceptNulls);
+        }
+
+        
+        public static IEnumerator<TextElement> EnumerateFromChars(IEnumerable<char> chars, bool acceptNulls = true)
+        {
+            return EnumerateFromChars(new TextPosition(), chars.GetEnumerator(), acceptNulls);
+        }
+
+        public static IEnumerator<TextElement> EnumerateFromChars(TextPosition position, IEnumerable<char> chars, bool acceptNulls = true)
+        {
+            return EnumerateFromChars(position, chars.GetEnumerator(), acceptNulls);
         }
     }
 }
