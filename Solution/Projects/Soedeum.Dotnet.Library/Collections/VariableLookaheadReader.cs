@@ -9,15 +9,13 @@ namespace Soedeum.Dotnet.Library.Collections
 
         int index;
 
-        int size;
-
 
         public VariableLookaheadReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
         protected int Index { get => index; set => index = value; }
 
-        protected int Size { get => size; }
+        protected int Size { get => buffer.Count; }
 
 
         protected virtual bool CanReset { get => true; }
@@ -26,7 +24,7 @@ namespace Soedeum.Dotnet.Library.Collections
         protected override void VerifyLookahead(int lookahead = 0)
         {
             // Find out if we have enough lookahead.
-            int available = (size - index);
+            int available = (Size - index);
 
             int difference = available - lookahead;
 
@@ -40,7 +38,7 @@ namespace Soedeum.Dotnet.Library.Collections
             if (EndFound)
                 return;
 
-            int lastPosition = size;
+            int lastPosition = Size;
 
             for (int i = 0; i < amount; i++)
             {
@@ -48,12 +46,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 if (success)
                 {
-                    if (size == buffer.Count)
-                        buffer.Add(next);
-                    else
-                        buffer[size] = next;
-
-                    size++;
+                    buffer.Add(next);
                 }
                 else
                 {
@@ -79,8 +72,11 @@ namespace Soedeum.Dotnet.Library.Collections
         {
             index++;
 
-            if (index == size && CanReset)
-                index = size = 0;
+            if (index == Size && CanReset)
+            {
+                index = 0;
+                buffer.Clear();                
+            }
 
             Prefetch(1);
         }

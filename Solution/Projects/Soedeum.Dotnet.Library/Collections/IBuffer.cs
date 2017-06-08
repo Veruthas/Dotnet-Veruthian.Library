@@ -1,10 +1,10 @@
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface IBuffer<in TIn, out TOut, in TStart>
+    public interface IBuffer<in TIn, out TOut>
     {
         bool IsBuffering { get; }
 
-        void Start(TStart start = default(TStart));
+        void Capture();
 
         void Add(TIn value);
 

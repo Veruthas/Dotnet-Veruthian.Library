@@ -55,7 +55,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected T LastItem { get => lastItem; set => lastItem = value; }
 
-        
+
         // Reading and Peeking
         protected void VerifyInitialized()
         {
