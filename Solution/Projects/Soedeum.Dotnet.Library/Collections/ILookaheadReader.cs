@@ -1,6 +1,6 @@
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface ILookaheadScanner<T> : IScanner<T>
+    public interface ILookaheadReader<T> : IReader<T>
     {
         // Peek() = Peek(0);
         T Peek(int lookahead);

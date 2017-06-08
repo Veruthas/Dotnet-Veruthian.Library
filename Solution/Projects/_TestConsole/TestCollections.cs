@@ -9,36 +9,36 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            //TestSimpleScanner();
-            //TestLookaheadScanner();
-            TestSpeculativeScanner();
+            //TestSimpleReader();
+            //TestLookaheadReader();
+            TestSpeculativeReader();
         }
 
 
-        private static void OnRead<T>(IScanner<T> scanner, T item)
+        private static void OnRead<T>(IReader<T> scanner, T item)
         {
             System.Console.WriteLine("Read: {0}: '{1}'", scanner.Position - 1, item);
         }
 
-        // Simple Scanners
-        private static void TestSimpleScanner()
+        // Simple Readers
+        private static void TestSimpleReader()
         {
-            TestSimpleScanner("Hello, world!", (i) => '~');
-            TestSimpleScanner("", (i) => '~');
-            TestSimpleScanner("Hello\r\n\0world!".GetTextElements(), (i) => i + '\0');
-            TestSimpleScanner(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
+            TestSimpleReader("Hello, world!", (i) => '~');
+            TestSimpleReader("", (i) => '~');
+            TestSimpleReader("Hello\r\n\0world!".GetTextElements(), (i) => i + '\0');
+            TestSimpleReader(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
         }
 
-        private static void TestSimpleScanner<T>(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        private static void TestSimpleReader<T>(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
         {
-            TestScanner(enumerator.GetSimpleScanner(generateEndItem, OnRead));
+            TestReader(enumerator.GetSimpleReader(generateEndItem, OnRead));
         }
-        private static void TestSimpleScanner<T>(IEnumerable<T> enumerable, Func<T, T> generateEndItem = null)
+        private static void TestSimpleReader<T>(IEnumerable<T> enumerable, Func<T, T> generateEndItem = null)
         {
-            TestSimpleScanner(enumerable.GetEnumerator(), generateEndItem);
+            TestSimpleReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
-        private static void TestScanner<T>(IScanner<T> scanner)
+        private static void TestReader<T>(IReader<T> scanner)
         {
             while (!scanner.IsEnd)
             {
@@ -51,31 +51,31 @@ namespace _TestConsole
             System.Console.WriteLine("----");
         }
 
-        // LookaheadScanner
-        private static void TestLookaheadScanner()
+        // LookaheadReader
+        private static void TestLookaheadReader()
         {
-            TestLookaheadScanner("ABCDEFGHIJKLMNOP", false, 20, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
+            TestLookaheadReader("ABCDEFGHIJKLMNOP", false, 20, ((i) => { System.Console.WriteLine("Last: {0}", i); return (char)(i + 1); }));
         }
 
 
-        private static void TestLookaheadScanner<T>(IEnumerator<T> enumerator, bool variable, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadReader<T>(IEnumerator<T> enumerator, bool variable, int lookahead, Func<T, T> generateEndItem = null)
         {
-            ILookaheadScanner<T> scanner;
+            ILookaheadReader<T> scanner;
 
             if (variable)
-                scanner = enumerator.GetVariableLookaheadScanner(generateEndItem, OnRead);
+                scanner = enumerator.GetVariableLookaheadReader(generateEndItem, OnRead);
             else
-                scanner = enumerator.GetFixedLookaheadScanner(lookahead, generateEndItem, OnRead);
+                scanner = enumerator.GetFixedLookaheadReader(lookahead, generateEndItem, OnRead);
 
-            TestLookaheadScanner(scanner, lookahead);
+            TestLookaheadReader(scanner, lookahead);
         }
 
-        private static void TestLookaheadScanner<T>(IEnumerable<T> enumerable, bool variable, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadReader<T>(IEnumerable<T> enumerable, bool variable, int lookahead, Func<T, T> generateEndItem = null)
         {
-            TestLookaheadScanner(enumerable.GetEnumerator(), variable, lookahead, generateEndItem);
+            TestLookaheadReader(enumerable.GetEnumerator(), variable, lookahead, generateEndItem);
         }
 
-        private static void TestLookaheadScanner<T>(ILookaheadScanner<T> scanner, int lookahead)
+        private static void TestLookaheadReader<T>(ILookaheadReader<T> scanner, int lookahead)
         {
             while (!scanner.IsEnd)
             {
@@ -97,27 +97,27 @@ namespace _TestConsole
         }
 
 
-        private static void TestSpeculativeScanner()
+        private static void TestSpeculativeReader()
         {
-            TestSpeculativeScanner("Hello, world!", 2, 7);
+            TestSpeculativeReader("Hello, world!", 2, 7);
         }
 
-        private static void TestSpeculativeScanner<T>(IEnumerator<T> enumerator, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        private static void TestSpeculativeReader<T>(IEnumerator<T> enumerator, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
         {
-            var scanner = enumerator.GetSpeculativeScanner(generateEndItem, OnRead,
+            var scanner = enumerator.GetSpeculativeReader(generateEndItem, OnRead,
                     ((s) => Console.WriteLine("Speculating at Position: {0}", s.Position)),
                     ((s) => Console.WriteLine("Committed to our speculation at Position {0}", s.Position)),
                     ((s, from, to) => Console.WriteLine("Rolledback from {0} to {1}!", from, to)));
 
-            TestSpeculativeScanner(scanner, speculateAt, rollbackAt);
+            TestSpeculativeReader(scanner, speculateAt, rollbackAt);
         }
 
-        private static void TestSpeculativeScanner<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        private static void TestSpeculativeReader<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
         {
-            TestSpeculativeScanner(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
+            TestSpeculativeReader(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
         }
 
-        private static void TestSpeculativeScanner<T>(ISpeculativeScanner<T> scanner, int speculateAt, int rollbackAt)
+        private static void TestSpeculativeReader<T>(ISpeculativeReader<T> scanner, int speculateAt, int rollbackAt)
         {
             bool speculated = false;
 

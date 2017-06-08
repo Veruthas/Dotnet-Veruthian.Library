@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public abstract class ScannerBase<T> : IScanner<T>
+    public abstract class BaseReader<T> : IReader<T>
     {
         IEnumerator<T> enumerator;
 
@@ -18,7 +18,7 @@ namespace Soedeum.Dotnet.Library.Collections
         T lastItem;
 
 
-        public ScannerBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public BaseReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
@@ -112,7 +112,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 ItemRead(this, current);
         }
 
-        public event Action<IScanner<T>, T> ItemRead;
+        public event Action<IReader<T>, T> ItemRead;
 
 
         public bool GetNext(out T next)

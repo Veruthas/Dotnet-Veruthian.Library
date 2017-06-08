@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SimpleScanner<T> : ScannerBase<T>
+    public class SimpleReader<T> : BaseReader<T>
     {
         T item;
 
-        public SimpleScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem) 
+        public SimpleReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem) 
             : base(enumerator, generateEndItem) { }
         
         protected override T RawPeek(int lookahead = 0) => item;

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SpeculativeScanner<T> : SpeculativeScannerBase<T, object>
+    public class SpeculativeReader<T> : SpeculativeReaderBase<T, object>
     {
-        public SpeculativeScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public SpeculativeReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
-        public event Action<ISpeculativeScanner<T>> Speculating;
+        public event Action<ISpeculativeReader<T>> Speculating;
 
-        public event Action<ISpeculativeScanner<T>, int, int> Retracted;
+        public event Action<ISpeculativeReader<T>, int, int> Retracted;
 
 
         protected override object OnSpeculating()
@@ -29,14 +29,14 @@ namespace Soedeum.Dotnet.Library.Collections
 
     }
 
-    public class SpeculativeScannerWithState<T, S> : SpeculativeScannerBase<T, S>
+    public class SpeculativeReaderWithState<T, S> : SpeculativeReaderBase<T, S>
     {
-        public SpeculativeScannerWithState(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public SpeculativeReaderWithState(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
-        public event Func<ISpeculativeScanner<T>, S> Speculating;
+        public event Func<ISpeculativeReader<T>, S> Speculating;
 
-        public event Action<ISpeculativeScanner<T>, int, int, S> Retracted;
+        public event Action<ISpeculativeReader<T>, int, int, S> Retracted;
 
         protected override S OnSpeculating()
         {
@@ -50,7 +50,7 @@ namespace Soedeum.Dotnet.Library.Collections
         }
     }
 
-    public abstract class SpeculativeScannerBase<T, S> : VariableLookaheadScanner<T>, ISpeculativeScanner<T>
+    public abstract class SpeculativeReaderBase<T, S> : VariableLookaheadReader<T>, ISpeculativeReader<T>
     {
         protected struct Mark
         {
@@ -75,7 +75,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         Stack<Mark> marks = new Stack<Mark>();
 
-        public SpeculativeScannerBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public SpeculativeReaderBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
         }
@@ -113,7 +113,7 @@ namespace Soedeum.Dotnet.Library.Collections
             OnCommitted();
         }
 
-        public event Action<ISpeculativeScanner<T>> Committed;
+        public event Action<ISpeculativeReader<T>> Committed;
 
         protected virtual void OnCommitted()
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class VariableLookaheadScanner<T> : LookaheadScannerBase<T>
+    public class VariableLookaheadReader<T> : BaseLookaheadReader<T>
     {
         List<T> buffer = new List<T>();
 
@@ -12,7 +12,7 @@ namespace Soedeum.Dotnet.Library.Collections
         int size;
 
 
-        public VariableLookaheadScanner(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public VariableLookaheadReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
         protected int Index { get => index; set => index = value; }

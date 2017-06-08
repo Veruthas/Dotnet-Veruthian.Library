@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class FixedLookaheadScanner<T> : LookaheadScannerBase<T>
+    public class FixedLookaheadReader<T> : BaseLookaheadReader<T>
     {
         T[] buffer;
 
         int index = 0;
 
-        public FixedLookaheadScanner(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
+        public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
             if (lookahead < 1)

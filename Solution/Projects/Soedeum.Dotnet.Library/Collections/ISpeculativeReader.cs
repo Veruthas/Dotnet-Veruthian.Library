@@ -2,7 +2,7 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface ISpeculativeScanner<T> : ILookaheadScanner<T>
+    public interface ISpeculativeReader<T> : ILookaheadReader<T>
     {
         int SpeculationCount { get; }
 

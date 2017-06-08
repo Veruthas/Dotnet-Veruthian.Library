@@ -2,7 +2,7 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface IScanner<T> : IDisposable
+    public interface IReader<T> : IDisposable
     {
         bool IsEnd { get; }
 
