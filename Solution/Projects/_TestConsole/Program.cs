@@ -8,8 +8,6 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            System.Console.WriteLine(CharSet.HexDigit);
-            System.Console.WriteLine(CharSet.LetterOrDigit);
             Pause();
         }
 

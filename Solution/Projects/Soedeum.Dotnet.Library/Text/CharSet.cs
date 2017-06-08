@@ -93,13 +93,15 @@ namespace Soedeum.Dotnet.Library.Text
 
                 foreach (CharSet set in sets)
                     FlattenCharSet(flattened, set);
+
+                this.sets = flattened.ToArray();
             }
 
             private void FlattenCharSet(List<CharSet> flattened, CharSet set)
             {
                 if (set is CharSetUnion)
                 {
-                    var union = set as CharSetUnion;
+                    var union = (CharSetUnion)set;
 
                     foreach (var subset in union.sets)
                         FlattenCharSet(flattened, subset);
