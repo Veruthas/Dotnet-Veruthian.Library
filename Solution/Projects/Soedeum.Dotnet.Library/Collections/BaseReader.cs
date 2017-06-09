@@ -112,7 +112,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 ItemRead(this, current);
         }
 
-        public event Action<IReader<T>, T> ItemRead;
+        public event ItemRead<T> ItemRead;
 
 
         public bool GetNext(out T next)

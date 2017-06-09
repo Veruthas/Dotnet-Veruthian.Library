@@ -8,6 +8,7 @@ namespace Soedeum.Dotnet.Library.Collections
         public SpeculativeReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
+
         public event Action<ISpeculativeReader<T>> Speculating;
 
         public event Action<ISpeculativeReader<T>, int, int> Retracted;
@@ -155,6 +156,5 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         protected abstract void OnRetracted(int returningFromPosition, int speculationPosition, S speculationState);
-
     }
 }

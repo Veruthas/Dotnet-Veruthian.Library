@@ -9,7 +9,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         string Source { get; }
 
         TextSpan Span { get; }
-
+        
         T TokenType { get; }
         
         bool Is(T type);
