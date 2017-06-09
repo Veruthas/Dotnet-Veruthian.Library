@@ -69,24 +69,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         object IEnumerator.Current => Current;
 
 
-        public bool MoveNext()
-        {
-            throw new NotImplementedException();
-        }
-
-        // Token code
-        protected abstract TToken CreateEofToken(TextLocation location);
-
-        protected abstract TToken GetNextToken();
-
-        protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
-
-        // Todo add default string check?
-        protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType)
-        {
-            return CreateToken(tokenType, bufferLocation, Extract());
-        }
-
         // Buffer code
         protected void Capture()
         {
@@ -141,6 +123,41 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             if (capturing)
                 buffer.Append(item);
+        }
+
+        // Token code
+        protected abstract TToken GetNextToken();
+
+        protected abstract TToken CreateEofToken(TextLocation location);
+
+        protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
+
+        protected virtual TToken CreateBufferedToken(TTokenType tokenType, bool releaseBuffer = true)
+        {
+            string value = TryGetDefaultString(tokenType) ?? Extract();
+            
+            if (releaseBuffer)
+                Release();
+
+            return CreateToken(tokenType, bufferLocation, value);
+        }
+
+        protected virtual string TryGetDefaultString(TTokenType tokenType) => null;
+
+
+        public bool MoveNext()
+        {
+            if (!reader.IsEnd)
+            {
+                current = GetNextToken();
+                return true;
+            }
+            else
+            {
+                current = CreateEofToken(location);
+                return false;
+            }
+
         }
     }
 }
