@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
@@ -15,5 +16,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         bool Is(T type);
 
         void VerifyIs(T type);
+
+        IDictionary<string, object> Annotations { get; }
     }
 }
