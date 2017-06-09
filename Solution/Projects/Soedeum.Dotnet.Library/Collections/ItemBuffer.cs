@@ -37,7 +37,10 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public void Release(int amount)
         {
-            throw new NotImplementedException();
+            if (amount > buffer.Count)
+                Release();
+            else
+                buffer.RemoveRange(buffer.Count - amount, amount);
         }
     }
 }
