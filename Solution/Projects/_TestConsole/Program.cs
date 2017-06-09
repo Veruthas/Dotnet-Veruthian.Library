@@ -9,9 +9,7 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            GenerateEndItem<int> item = (i) => i;
-
-            Func<int, int> s = (i) => i + 1;
+            TestCollections.Test();
 
             Pause();
         }

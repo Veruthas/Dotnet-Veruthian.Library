@@ -99,7 +99,24 @@ namespace _TestConsole
 
         private static void TestSpeculativeReader()
         {
-            TestSpeculativeReader<char, object>("Hello, world!", 2, 7);
+            TestSpeculativeReader<char>("Hello, world!", 2, 7);
+        }
+
+        private static void TestSpeculativeReader<T>(IEnumerator<T> enumerator, int speculateAt, int retreatAt, GenerateEndItem<T> generateEndItem = null)
+        {
+            var reader = enumerator.GetSpeculativeReader(
+                    generateEndItem,
+                    OnRead,
+                    ((r, s) => Console.WriteLine("Marked Position: {0}, with State: {1}", r.Position, s)),
+                    ((r) => Console.WriteLine("Committed to our speculation at Position {0}", r.Position)),
+                    ((r, from, to, s) => Console.WriteLine("Retreated from {0} to {1}!", from, to)));
+
+            TestSpeculativeReader(reader, speculateAt, retreatAt);
+        }
+
+        private static void TestSpeculativeReader<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, GenerateEndItem<T> generateEndItem = null)
+        {
+            TestSpeculativeReader(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
         }
 
         private static void TestSpeculativeReader<T, TState>(IEnumerator<T> enumerator, int speculateAt, int retreatAt, GenerateEndItem<T> generateEndItem = null)

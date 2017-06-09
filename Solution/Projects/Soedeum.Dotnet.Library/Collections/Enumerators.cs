@@ -86,6 +86,40 @@ namespace Soedeum.Dotnet.Library.Collections
             return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem, onItemRead);
         }
 
+        // SimpleSpeculativeReader
+        public static SpeculativeReader<T> GetSpeculativeReader<T>(
+                                                                this IEnumerator<T> enumerator,
+                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                ReaderRead<T> onItemRead = null,
+                                                                SpeculationStarted<T, object> onMarked = null,
+                                                                SpeculationIncident<T, object> onCommitted = null,
+                                                                SpeculationRetreated<T, object> onRetreated = null)
+        {
+            var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
+
+            reader.ItemRead += onItemRead;
+
+            reader.Marked += onMarked;
+
+            reader.Committed += onCommitted;
+
+            reader.Retreated += onRetreated;
+
+            return reader;
+        }
+
+        public static SpeculativeReader<T> GetSpeculativeReader<T>(
+                                                       this IEnumerable<T> enumerable,
+                                                       GenerateEndItem<T> generateEndItem = null,
+                                                       ReaderRead<T> onItemRead = null,
+                                                       SpeculationStarted<T, object> onMarked = null,
+                                                       SpeculationIncident<T, object> onCommitted = null,
+                                                       SpeculationRetreated<T, object> onRetreated = null)
+        {
+            return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
+        }
+
+
         // Speculative Reader
         public static SpeculativeReader<T, TState> GetSpeculativeReader<T, TState>(
                                                                 this IEnumerator<T> enumerator,
@@ -118,38 +152,6 @@ namespace Soedeum.Dotnet.Library.Collections
             return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
         }
 
-        // SimpleSpeculativeReader
-        public static SpeculativeReader<T> GetSimpleSpeculativeReader<T>(
-                                                                this IEnumerator<T> enumerator,
-                                                                GenerateEndItem<T> generateEndItem = null,
-                                                                ReaderRead<T> onItemRead = null,
-                                                                SpeculationStarted<T, object> onMarked = null,
-                                                                SpeculationIncident<T, object> onCommitted = null,
-                                                                SpeculationRetreated<T, object> onRetreated = null)
-        {
-            var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
-
-            reader.ItemRead += onItemRead;
-
-            reader.Marked += onMarked;
-
-            reader.Committed += onCommitted;
-
-            reader.Retreated += onRetreated;
-
-            return reader;
-        }
-        
-        public static SpeculativeReader<T> GetSimpleSpeculativeReader<T>(
-                                                       this IEnumerable<T> enumerable,
-                                                       GenerateEndItem<T> generateEndItem = null,
-                                                       ReaderRead<T> onItemRead = null,
-                                                       SpeculationStarted<T, object> onMarked = null,
-                                                       SpeculationIncident<T, object> onCommitted = null,
-                                                       SpeculationRetreated<T, object> onRetreated = null)
-        {           
-            return GetSimpleSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
-        }
 
     }
 }
