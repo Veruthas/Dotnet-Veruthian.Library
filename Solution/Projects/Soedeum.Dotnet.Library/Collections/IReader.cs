@@ -13,5 +13,10 @@ namespace Soedeum.Dotnet.Library.Collections
         T Read();
 
         void Read(int amount);
+
+
+        event ReaderRead<T> ItemRead;
     }
+
+    public delegate void ReaderRead<T>(IReader<T> reader, T item);    
 }
