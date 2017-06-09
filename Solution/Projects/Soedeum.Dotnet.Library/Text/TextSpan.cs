@@ -6,33 +6,39 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public struct TextSpan : IEnumerable<TextElement>
     {
-        TextPosition position;
+        TextLocation location;
 
         string text;
 
 
-        public TextSpan(string text) : this(default(TextPosition), text)
+        public TextSpan(string text) : this(default(TextLocation), text)
         {
         }
 
-        public TextSpan(TextPosition position, string text)
+        public TextSpan(TextLocation location, string text)
         {
-            this.position = position;
+            this.location = location;
             this.text = text;
         }
 
-        public TextPosition Position { get => position; }
+        public TextLocation Location { get => location; }
+
+        public int Position { get => location.Position; }
+
+        public int Line { get => location.Line; }
+
+        public int Column { get => location.Column; }
 
         public string Text { get => text ?? string.Empty; }
 
         public IEnumerator<TextElement> GetEnumerator(bool acceptNulls)
         {
-            return TextElement.EnumerateFromChars(position, text, acceptNulls);
+            return TextElement.EnumerateFromChars(location, text, acceptNulls);
         }
 
         public IEnumerator<TextElement> GetEnumerator()
         {
-            return TextElement.EnumerateFromChars(position, text);
+            return TextElement.EnumerateFromChars(location, text);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

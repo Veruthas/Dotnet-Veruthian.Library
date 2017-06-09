@@ -2,37 +2,50 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public interface ISpeculativeReader<T, S> : ILookaheadReader<T>
+    public interface ISpeculativeReader<T, TState> : ILookaheadReader<T>
     {
-        int SpeculationCount { get; }
-
         bool IsSpeculating { get; }
 
-        void Speculate();
+
+        int MarkCount { get; }
+
+
+        int GetMarkPosition(int mark);
+
+
+        void SetMarkState(int mark, TState state);
+
+        TState GetMarkState(int mark);
+
+
+
+        void Mark(TState withState = default(TState));
 
         void Commit();
 
-        void Retract();
+        void Retreat();
 
-        void Retract(int speculations);
+        void Retreat(int marks);
 
-        void RetractAll();
+        void RetreatAll();
 
 
-        event SpeculationBegun<T, S> Speculating;
+        event SpeculationStarted<T, TState> Marked;
 
-        event Action<ISpeculativeReader<T, S>> Committed;
+        event SpeculationIncident<T, TState> Committed;
 
-        event SpeculationRetracted<T, S> Retracted;
+        event SpeculationRetreated<T, TState> Retreated;
     }
 
-    public interface ISpeculativeReader<T> : ISpeculativeReader<T, object>
+    public interface ISpeculativeReader<T> :ISpeculativeReader<T, object>
     {
-
+        
     }
 
-    public delegate S SpeculationBegun<T, S>(ISpeculativeReader<T, S> reader);
+    public delegate void SpeculationStarted<T, TState>(ISpeculativeReader<T, TState> reader, TState withState);
+    
+    public delegate void SpeculationIncident<T, TState>(ISpeculativeReader<T, TState> reader);
 
-    public delegate void SpeculationRetracted<T, S>(ISpeculativeReader<T, S> reader,
-            int fromPosition, int originalPosition, S originalState);
+    public delegate void SpeculationRetreated<T, TState>(ISpeculativeReader<T, TState> reader,
+            int fromPosition, int originalPosition, TState originalState);
 }

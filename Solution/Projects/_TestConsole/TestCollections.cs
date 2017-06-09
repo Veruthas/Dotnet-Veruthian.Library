@@ -15,9 +15,9 @@ namespace _TestConsole
         }
 
 
-        private static void OnRead<T>(IReader<T> scanner, T item)
+        private static void OnRead<T>(IReader<T> reader, T item)
         {
-            System.Console.WriteLine("Read: {0}: '{1}'", scanner.Position - 1, item);
+            System.Console.WriteLine("Read: {0}: '{1}'", reader.Position - 1, item);
         }
 
         // Simple Readers
@@ -25,28 +25,28 @@ namespace _TestConsole
         {
             TestSimpleReader("Hello, world!", (i) => '~');
             TestSimpleReader("", (i) => '~');
-            TestSimpleReader("Hello\r\n\0world!".GetTextElements(), (i) => i + '\0');
+            TestSimpleReader("Hello\r\n\0world!".GetTextElements(), ((i) => i + '\0'));
             TestSimpleReader(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
         }
 
-        private static void TestSimpleReader<T>(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        private static void TestSimpleReader<T>(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
         {
             TestReader(enumerator.GetSimpleReader(generateEndItem, OnRead));
         }
-        private static void TestSimpleReader<T>(IEnumerable<T> enumerable, Func<T, T> generateEndItem = null)
+        private static void TestSimpleReader<T>(IEnumerable<T> enumerable, GenerateEndItem<T> generateEndItem = null)
         {
             TestSimpleReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
-        private static void TestReader<T>(IReader<T> scanner)
+        private static void TestReader<T>(IReader<T> reader)
         {
-            while (!scanner.IsEnd)
+            while (!reader.IsEnd)
             {
-                System.Console.WriteLine("Peeked: {0}: {1}", scanner.Position, scanner.Peek());
-                scanner.Read();
+                System.Console.WriteLine("Peeked: {0}: {1}", reader.Position, reader.Peek());
+                reader.Read();
             }
 
-            System.Console.WriteLine("End Item: {0}: '{1}'", scanner.Position, scanner.Peek());
+            System.Console.WriteLine("End Item: {0}: '{1}'", reader.Position, reader.Peek());
 
             System.Console.WriteLine("----");
         }
@@ -58,87 +58,89 @@ namespace _TestConsole
         }
 
 
-        private static void TestLookaheadReader<T>(IEnumerator<T> enumerator, bool variable, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadReader<T>(IEnumerator<T> enumerator, bool variable, int lookahead, GenerateEndItem<T> generateEndItem = null)
         {
-            ILookaheadReader<T> scanner;
+            ILookaheadReader<T> reader;
 
             if (variable)
-                scanner = enumerator.GetVariableLookaheadReader(generateEndItem, OnRead);
+                reader = enumerator.GetVariableLookaheadReader(generateEndItem, OnRead);
             else
-                scanner = enumerator.GetFixedLookaheadReader(lookahead, generateEndItem, OnRead);
+                reader = enumerator.GetFixedLookaheadReader(lookahead, generateEndItem, OnRead);
 
-            TestLookaheadReader(scanner, lookahead);
+            TestLookaheadReader(reader, lookahead);
         }
 
-        private static void TestLookaheadReader<T>(IEnumerable<T> enumerable, bool variable, int lookahead, Func<T, T> generateEndItem = null)
+        private static void TestLookaheadReader<T>(IEnumerable<T> enumerable, bool variable, int lookahead, GenerateEndItem<T> generateEndItem = null)
         {
             TestLookaheadReader(enumerable.GetEnumerator(), variable, lookahead, generateEndItem);
         }
 
-        private static void TestLookaheadReader<T>(ILookaheadReader<T> scanner, int lookahead)
+        private static void TestLookaheadReader<T>(ILookaheadReader<T> reader, int lookahead)
         {
-            while (!scanner.IsEnd)
+            while (!reader.IsEnd)
             {
-                System.Console.WriteLine("For Position {0}", scanner.Position);
+                System.Console.WriteLine("For Position {0}", reader.Position);
 
                 for (int i = 0; i < lookahead; i++)
                 {
-                    System.Console.WriteLine("  [{0}]: {1}, IsEnd:{2}", i, scanner.Peek(i), scanner.PeekIsEnd(i));
+                    System.Console.WriteLine("  [{0}]: {1}, IsEnd:{2}", i, reader.Peek(i), reader.PeekIsEnd(i));
                 }
 
-                scanner.Read();
+                reader.Read();
             }
 
             System.Console.WriteLine("At End:");
             for (int i = 0; i < lookahead; i++)
             {
-                System.Console.WriteLine("  [{0}]: {1}", i, scanner.Peek(i));
+                System.Console.WriteLine("  [{0}]: {1}", i, reader.Peek(i));
             }
         }
 
 
         private static void TestSpeculativeReader()
         {
-            TestSpeculativeReader("Hello, world!", 2, 7);
+            TestSpeculativeReader<char, object>("Hello, world!", 2, 7);
         }
 
-        private static void TestSpeculativeReader<T>(IEnumerator<T> enumerator, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        private static void TestSpeculativeReader<T, TState>(IEnumerator<T> enumerator, int speculateAt, int retreatAt, GenerateEndItem<T> generateEndItem = null)
         {
-            var scanner = enumerator.GetSpeculativeReader(generateEndItem, OnRead,
-                    ((s) => Console.WriteLine("Speculating at Position: {0}", s.Position)),
-                    ((s) => Console.WriteLine("Committed to our speculation at Position {0}", s.Position)),
-                    ((s, from, to) => Console.WriteLine("Rolledback from {0} to {1}!", from, to)));
+            var reader = enumerator.GetSpeculativeReader<T, TState>(
+                    generateEndItem, 
+                    OnRead,
+                    ((r, s) => Console.WriteLine("Marked Position: {0}, with State: {1}", r.Position, s)),
+                    ((r) => Console.WriteLine("Committed to our speculation at Position {0}", r.Position)),
+                    ((r, from, to, s) => Console.WriteLine("Retreated from {0} to {1}!", from, to)));
 
-            TestSpeculativeReader(scanner, speculateAt, rollbackAt);
+            TestSpeculativeReader(reader, speculateAt, retreatAt);
         }
 
-        private static void TestSpeculativeReader<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, Func<T, T> generateEndItem = null)
+        private static void TestSpeculativeReader<T, TState>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, GenerateEndItem<T> generateEndItem = null)
         {
-            TestSpeculativeReader(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
+            TestSpeculativeReader<T, TState>(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
         }
 
-        private static void TestSpeculativeReader<T>(ISpeculativeReader<T> scanner, int speculateAt, int rollbackAt)
+        private static void TestSpeculativeReader<T, TState>(ISpeculativeReader<T, TState> reader, int speculateAt, int rollbackAt)
         {
             bool speculated = false;
 
-            while (!scanner.IsEnd)
+            while (!reader.IsEnd)
             {
-                while (!scanner.IsEnd)
+                while (!reader.IsEnd)
                 {
-                    System.Console.WriteLine("Peeked: {0}: '{1}'", scanner.Position, scanner.Peek());
+                    System.Console.WriteLine("Peeked: {0}: '{1}'", reader.Position, reader.Peek());
 
-                    scanner.Read();
+                    reader.Read();
 
                     if (!speculated)
                     {
-                        if (scanner.Position == speculateAt)
+                        if (reader.Position == speculateAt)
                         {
-                            scanner.Speculate();
+                            reader.Mark();
                             continue;
                         }
-                        if (scanner.Position == rollbackAt)
+                        if (reader.Position == rollbackAt)
                         {
-                            scanner.Retract();
+                            reader.Retreat();
                             speculated = true;
                             continue;
                         }
@@ -146,7 +148,7 @@ namespace _TestConsole
                     
                 }
 
-                System.Console.WriteLine("End Item: {0}: '{1}'", scanner.Position, scanner.Peek());
+                System.Console.WriteLine("End Item: {0}: '{1}'", reader.Position, reader.Peek());
 
                 System.Console.WriteLine("----");
             }

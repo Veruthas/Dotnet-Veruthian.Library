@@ -7,7 +7,7 @@ namespace Soedeum.Dotnet.Library.Collections
     {
         IEnumerator<T> enumerator;
 
-        Func<T, T> generateEndItem;
+        GenerateEndItem<T> generateEndItem;
 
         bool initialized;
 
@@ -18,7 +18,7 @@ namespace Soedeum.Dotnet.Library.Collections
         T lastItem;
 
 
-        public BaseReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public BaseReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
@@ -112,7 +112,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 ItemRead(this, current);
         }
 
-        public event ItemRead<T> ItemRead;
+        public event ReaderRead<T> ItemRead;
 
 
         public bool GetNext(out T next)
@@ -148,4 +148,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         protected abstract void VerifyLookahead(int lookahead = 0);
     }
+
+
+    public delegate T GenerateEndItem<T>(T previous);
 }

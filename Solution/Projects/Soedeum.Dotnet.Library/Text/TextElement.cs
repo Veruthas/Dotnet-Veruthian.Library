@@ -7,34 +7,40 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public struct TextElement : IEquatable<TextElement>
     {
-        readonly TextPosition position;
+        readonly TextLocation location;
         readonly char value;
 
 
         public TextElement(char value)
         {
-            this.position = new TextPosition();
+            this.location = new TextLocation();
 
             this.value = value;
         }
 
-        public TextElement(TextPosition position, char value)
+        public TextElement(TextLocation location, char value)
         {
-            this.position = position;
+            this.location = location;
 
             this.value = value;
         }
 
         public TextElement(int position, int line, int column, char value)
         {
-            this.position = new TextPosition(position, line, column);
+            this.location = new TextLocation(position, line, column);
 
             this.value = value;
         }
 
 
-        public TextPosition Position { get => position; }
+        public TextLocation Location { get => location; }
 
+        public int Position { get => location.Position; }
+        
+        public int Line { get => location.Line; }
+
+        public int Column { get => location.Column; }
+        
         public char Value { get => value; }
 
 
@@ -102,7 +108,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public TextElement MoveTo(char next, bool acceptNulls = true)
         {
-            var nextPosition = this.Position.MoveToNext(this.value, next);
+            var nextPosition = this.location.MoveToNext(this.value, next);
 
             return new TextElement(nextPosition, next);
         }
@@ -119,13 +125,13 @@ namespace Soedeum.Dotnet.Library.Text
 
         public override string ToString()
         {
-            return string.Format("{0}; Value: '{1}'", position, TextUtility.GetAsPrintable(value));
+            return string.Format("{0}; Value: '{1}'", this.location, TextUtility.GetAsPrintable(value));
         }
 
 
         public bool Equals(TextElement element)
         {
-            return this.position == element.position &&
+            return this.location == element.location &&
                    this.value == element.value;
         }
 
@@ -145,7 +151,7 @@ namespace Soedeum.Dotnet.Library.Text
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return HashCodeCombiner.Combiner.Combine(position.Position, position.Line, position.Column, value);
+            return HashCodeCombiner.Combiner.Combine(location.Position, location.Line, location.Column, value);
         }
 
 
@@ -177,7 +183,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Enumerators
-        public static IEnumerator<TextElement> EnumerateFromChars(TextPosition position, IEnumerator<char> chars, bool acceptNulls = true)
+        public static IEnumerator<TextElement> EnumerateFromChars(TextLocation position, IEnumerator<char> chars, bool acceptNulls = true)
         {
             bool initialized = false;
 
@@ -201,16 +207,16 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static IEnumerator<TextElement> EnumerateFromChars(IEnumerator<char> chars, bool acceptNulls = true)
         {
-            return EnumerateFromChars(new TextPosition(), chars, acceptNulls);
+            return EnumerateFromChars(new TextLocation(), chars, acceptNulls);
         }
 
         
         public static IEnumerator<TextElement> EnumerateFromChars(IEnumerable<char> chars, bool acceptNulls = true)
         {
-            return EnumerateFromChars(new TextPosition(), chars.GetEnumerator(), acceptNulls);
+            return EnumerateFromChars(new TextLocation(), chars.GetEnumerator(), acceptNulls);
         }
 
-        public static IEnumerator<TextElement> EnumerateFromChars(TextPosition position, IEnumerable<char> chars, bool acceptNulls = true)
+        public static IEnumerator<TextElement> EnumerateFromChars(TextLocation position, IEnumerable<char> chars, bool acceptNulls = true)
         {
             return EnumerateFromChars(position, chars.GetEnumerator(), acceptNulls);
         }

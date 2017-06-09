@@ -39,6 +39,8 @@ namespace Soedeum.Dotnet.Library.Collections
                 MovedNext(this, success, item);
         }
 
-        public event Action<NotifyingEnumerator<T>, bool, T> MovedNext;
+        public event EnumeratorMoveNext<T> MovedNext;
     }
+
+    public delegate void EnumeratorMoveNext<T>(NotifyingEnumerator<T> enumerator, bool success, T current);
 }

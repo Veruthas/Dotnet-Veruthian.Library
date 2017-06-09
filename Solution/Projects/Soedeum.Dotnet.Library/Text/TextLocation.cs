@@ -3,7 +3,7 @@ using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public struct TextPosition : IEquatable<TextPosition>
+    public struct TextLocation : IEquatable<TextLocation>
     {
         readonly int position;
 
@@ -12,7 +12,7 @@ namespace Soedeum.Dotnet.Library.Text
         readonly int column;
 
 
-        public TextPosition(int position, int line, int column)
+        public TextLocation(int position, int line, int column)
         {
             this.position = position;
             this.line = line;
@@ -27,12 +27,12 @@ namespace Soedeum.Dotnet.Library.Text
         public int Column { get => column; }
 
 
-        public TextPosition IncrementLine(int lengthToEnd = 1)
+        public TextLocation IncrementLine(int lengthToEnd = 1)
         {
-            return new TextPosition(this.position + lengthToEnd, this.line + 1, 0);
+            return new TextLocation(this.position + lengthToEnd, this.line + 1, 0);
         }
 
-        public TextPosition MoveToNext(char current, char next, bool acceptNulls = true)
+        public TextLocation MoveToNext(char current, char next, bool acceptNulls = true)
         {
             switch (current)
             {
@@ -50,9 +50,9 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public TextPosition MoveThrough(char current, string following, bool acceptNulls = true)
+        public TextLocation MoveThrough(char current, string following, bool acceptNulls = true)
         {
-            TextPosition result = this;
+            TextLocation result = this;
 
             foreach (char next in following)
             {
@@ -65,7 +65,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        public bool Equals(TextPosition position)
+        public bool Equals(TextLocation position)
         {
             return (this.position == position.position) &&
                    (this.line == position.line) &&
@@ -80,7 +80,7 @@ namespace Soedeum.Dotnet.Library.Text
                 return false;
             }
 
-            var position = (TextPosition)obj;
+            var position = (TextLocation)obj;
 
             return this.Equals(position);
         }
@@ -91,31 +91,31 @@ namespace Soedeum.Dotnet.Library.Text
             return HashCodeCombiner.Combiner.Combine(Position, Line, Column);
         }
 
-        public static bool operator ==(TextPosition left, TextPosition right)
+        public static bool operator ==(TextLocation left, TextLocation right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(TextPosition left, TextPosition right)
+        public static bool operator !=(TextLocation left, TextLocation right)
         {
             return !left.Equals(right);
         }
 
 
-        public static TextPosition operator +(TextPosition position, int amount)
+        public static TextLocation operator +(TextLocation position, int amount)
         {
-            return new TextPosition(position.position + amount, position.line, position.column + amount);
+            return new TextLocation(position.position + amount, position.line, position.column + amount);
         }
 
-        public static TextPosition operator ++(TextPosition position)
+        public static TextLocation operator ++(TextLocation position)
         {
-            return new TextPosition(position.position + 1, position.line, position.column + 1);
+            return new TextLocation(position.position + 1, position.line, position.column + 1);
         }
 
 
         public override string ToString()
         {
             return string.Format("Position: {0}; Line: {1}; Column: {2}", Position, Line, Column);
-        }
+        }        
     }
 }

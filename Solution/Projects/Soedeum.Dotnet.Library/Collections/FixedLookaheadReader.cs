@@ -9,7 +9,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         int index = 0;
 
-        public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, Func<T, T> generateEndItem = null)
+        public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, GenerateEndItem<T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
             if (lookahead < 1)

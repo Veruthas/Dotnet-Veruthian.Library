@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Collections
         int index;
 
 
-        public VariableLookaheadReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+        public VariableLookaheadReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
         protected int Index { get => index; set => index = value; }

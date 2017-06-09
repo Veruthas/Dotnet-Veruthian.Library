@@ -12,145 +12,144 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
         // NotifyingEnumerator
-        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, Action<NotifyingEnumerator<T>, bool, T> onMoveNextHandler = null)
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, EnumeratorMoveNext<T> onMoveNext = null)
         {
             var notifyer = new NotifyingEnumerator<T>(enumerator);
 
-            notifyer.MovedNext += onMoveNextHandler;
+            notifyer.MovedNext += onMoveNext;
 
             return notifyer;
         }
 
-        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerable<T> enumerable, Action<NotifyingEnumerator<T>, bool, T> onMoveNextHandler = null)
+        public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerable<T> enumerable, EnumeratorMoveNext<T> onMoveNext = null)
         {
-            return GetNotifyingEnumerator(enumerable.GetEnumerator(), onMoveNextHandler);
+            return GetNotifyingEnumerator(enumerable.GetEnumerator(), onMoveNext);
         }
 
 
         // Simple Reader
         public static SimpleReader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
-                                                             Func<T, T> generateEndItem = null,
-                                                             Action<IReader<T>, T> onItemRead = null)
+                                                             GenerateEndItem<T> generateEndItem = null,
+                                                             ReaderRead<T> onItemRead = null)
         {
-            var scanner = new SimpleReader<T>(enumerator, generateEndItem);
+            var reader = new SimpleReader<T>(enumerator, generateEndItem);
 
-            scanner.ItemRead += onItemRead;
+            reader.ItemRead += onItemRead;
 
-            return scanner;
+            return reader;
         }
 
         public static SimpleReader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
-                                                                     Func<T, T> generateEndItem = null,
-                                                                     Action<IReader<T>, T> onItemRead = null)
+                                                            GenerateEndItem<T> generateEndItem = null,
+                                                            ReaderRead<T> onItemRead = null)
         {
             return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem, onItemRead);
         }
 
         // Fixed Lookahead Reader
         public static FixedLookaheadReader<T> GetFixedLookaheadReader<T>(this IEnumerator<T> enumerator,
-                                                                                     int lookahead = 2,
-                                                                                     Func<T, T> generateEndItem = null,
-                                                                                     Action<IReader<T>, T> onItemRead = null)
+                                                                            int lookahead = 2,
+                                                                            GenerateEndItem<T> generateEndItem = null,
+                                                                            ReaderRead<T> onItemRead = null)
         {
-            var scanner = new FixedLookaheadReader<T>(enumerator, lookahead, generateEndItem);
+            var reader = new FixedLookaheadReader<T>(enumerator, lookahead, generateEndItem);
 
-            scanner.ItemRead += onItemRead;
+            reader.ItemRead += onItemRead;
 
-            return scanner;
+            return reader;
         }
 
         public static FixedLookaheadReader<T> GetFixedLookaheadReader<T>(this IEnumerable<T> enumerable,
-                                                                                     int lookahead = 2,
-                                                                                     Func<T, T> generateEndItem = null,
-                                                                                     Action<IReader<T>, T> onItemRead = null)
+                                                                            int lookahead = 2,
+                                                                            GenerateEndItem<T> generateEndItem = null,
+                                                                            ReaderRead<T> onItemRead = null)
         {
             return GetFixedLookaheadReader(enumerable.GetEnumerator(), lookahead, generateEndItem, onItemRead);
         }
 
         // Variable Lookahead Reader
         public static VariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerator<T> enumerator,
-                                                                                     Func<T, T> generateEndItem = null,
-                                                                                     Action<IReader<T>, T> onItemRead = null)
+                                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                                ReaderRead<T> onItemRead = null)
         {
-            var scanner = new VariableLookaheadReader<T>(enumerator, generateEndItem);
+            var reader = new VariableLookaheadReader<T>(enumerator, generateEndItem);
 
-            scanner.ItemRead += onItemRead;
+            reader.ItemRead += onItemRead;
 
-            return scanner;
+            return reader;
         }
 
         public static VariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
-                                                                                     Func<T, T> generateEndItem = null,
-                                                                                     Action<IReader<T>, T> onItemRead = null)
+                                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                                ReaderRead<T> onItemRead = null)
         {
             return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem, onItemRead);
         }
 
-        // SpeculativeReader
-        public static SpeculativeReader<T> GetSpeculativeReader<T>(
+        // Speculative Reader
+        public static SpeculativeReader<T, TState> GetSpeculativeReader<T, TState>(
                                                                 this IEnumerator<T> enumerator,
-                                                                Func<T, T> generateEndItem = null,
-                                                                Action<IReader<T>, T> onItemRead = null,
-                                                                Action<ISpeculativeReader<T>> onSpeculating = null,
-                                                                Action<ISpeculativeReader<T>> onCommitted = null,
-                                                                Action<ISpeculativeReader<T>, int, int> onRetracted = null)
+                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                ReaderRead<T> onItemRead = null,
+                                                                SpeculationStarted<T, TState> onMarked = null,
+                                                                SpeculationIncident<T, TState> onCommitted = null,
+                                                                SpeculationRetreated<T, TState> onRetreated = null)
         {
-            var scanner = new SpeculativeReader<T>(enumerator, generateEndItem);
+            var reader = new SpeculativeReader<T, TState>(enumerator, generateEndItem);
 
-            scanner.ItemRead += onItemRead;
+            reader.ItemRead += onItemRead;
 
-            scanner.Speculating += onSpeculating;
+            reader.Marked += onMarked;
 
-            scanner.Committed += onCommitted;
+            reader.Committed += onCommitted;
 
-            scanner.Retracted += onRetracted;
+            reader.Retreated += onRetreated;
 
-            return scanner;
+            return reader;
         }
-
-        public static SpeculativeReader<T> GetSpeculativeReader<T>(
+        public static SpeculativeReader<T, TState> GetSpeculativeReader<T, TState>(
                                                                 this IEnumerable<T> enumerable,
-                                                                Func<T, T> generateEndItem = null,
-                                                                Action<IReader<T>, T> onItemRead = null,
-                                                                Action<ISpeculativeReader<T>> onSpeculating = null,
-                                                                Action<ISpeculativeReader<T>> onCommitted = null,
-                                                                Action<ISpeculativeReader<T>, int, int> onRetracted = null)
+                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                ReaderRead<T> onItemRead = null,
+                                                                SpeculationStarted<T, TState> onMarked = null,
+                                                                SpeculationIncident<T, TState> onCommitted = null,
+                                                                SpeculationRetreated<T, TState> onRetreated = null)
         {
-            return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRetracted);
+            return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
         }
 
-
-        // Speculative Reader w/State
-        public static SpeculativeReaderWithState<T, S> GetSpeculativeReaderWithState<T, S>(
+        // SimpleSpeculativeReader
+        public static SpeculativeReader<T> GetSimpleSpeculativeReader<T>(
                                                                 this IEnumerator<T> enumerator,
-                                                                Func<T, T> generateEndItem = null,
-                                                                Action<IReader<T>, T> onItemRead = null,
-                                                                Func<ISpeculativeReader<T>, S> onSpeculating = null,
-                                                                Action<ISpeculativeReader<T>> onCommitted = null,
-                                                                Action<ISpeculativeReader<T>, int, int, S> onRetracted = null)
+                                                                GenerateEndItem<T> generateEndItem = null,
+                                                                ReaderRead<T> onItemRead = null,
+                                                                SpeculationStarted<T, object> onMarked = null,
+                                                                SpeculationIncident<T, object> onCommitted = null,
+                                                                SpeculationRetreated<T, object> onRetreated = null)
         {
-            var scanner = new SpeculativeReaderWithState<T, S>(enumerator, generateEndItem);
+            var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
 
-            scanner.ItemRead += onItemRead;
+            reader.ItemRead += onItemRead;
 
-            scanner.Speculating += onSpeculating;
+            reader.Marked += onMarked;
 
-            scanner.Committed += onCommitted;
+            reader.Committed += onCommitted;
 
-            scanner.Retracted += onRetracted;
+            reader.Retreated += onRetreated;
 
-            return scanner;
+            return reader;
+        }
+        
+        public static SpeculativeReader<T> GetSimpleSpeculativeReader<T>(
+                                                       this IEnumerable<T> enumerable,
+                                                       GenerateEndItem<T> generateEndItem = null,
+                                                       ReaderRead<T> onItemRead = null,
+                                                       SpeculationStarted<T, object> onMarked = null,
+                                                       SpeculationIncident<T, object> onCommitted = null,
+                                                       SpeculationRetreated<T, object> onRetreated = null)
+        {           
+            return GetSimpleSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
         }
 
-        public static SpeculativeReaderWithState<T, S> GetSpeculativeReaderWithState<T, S>(
-                                                                this IEnumerable<T> enumerable,
-                                                                Func<T, T> generateEndItem = null,
-                                                                Action<IReader<T>, T> onItemRead = null,
-                                                                Func<ISpeculativeReader<T>, S> onSpeculating = null,
-                                                                Action<ISpeculativeReader<T>> onCommitted = null,
-                                                                Action<ISpeculativeReader<T>, int, int, S> onRetracted = null)
-        {
-            return GetSpeculativeReaderWithState(enumerable.GetEnumerator(), generateEndItem, onItemRead, onSpeculating, onCommitted, onRetracted);
-        }
     }
 }

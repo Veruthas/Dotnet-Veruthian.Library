@@ -7,7 +7,7 @@ namespace Soedeum.Dotnet.Library.Collections
     {
         T item;
 
-        public SimpleReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem) 
+        public SimpleReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem) 
             : base(enumerator, generateEndItem) { }
         
         protected override T RawPeek(int lookahead = 0) => item;

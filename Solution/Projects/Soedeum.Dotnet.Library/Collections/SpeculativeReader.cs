@@ -3,65 +3,17 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SpeculativeReader<T> : SpeculativeReaderBase<T, object>
+    public class SpeculativeReader<T, TState> : VariableLookaheadReader<T>, ISpeculativeReader<T, TState>
     {
-        public SpeculativeReader(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
-            : base(enumerator, generateEndItem) { }
-
-
-        public event Action<ISpeculativeReader<T>> Speculating;
-
-        public event Action<ISpeculativeReader<T>, int, int> Retracted;
-
-
-        protected override object OnSpeculating()
+        protected struct MarkItem
         {
-            if (Speculating != null)
-                Speculating(this);
+            public int Position { get; set; }
 
-            return null;
-        }
+            public int Index { get; set; }
 
-        protected override void OnRetracted(int returningFromPosition, int speculationPosition, object speculationState)
-        {
-            if (Retracted != null)
-                Retracted(this, returningFromPosition, speculationPosition);
-        }
+            public TState State { get; set; }
 
-    }
-
-    public class SpeculativeReaderWithState<T, S> : SpeculativeReaderBase<T, S>
-    {
-        public SpeculativeReaderWithState(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
-            : base(enumerator, generateEndItem) { }
-
-        public event Func<ISpeculativeReader<T>, S> Speculating;
-
-        public event Action<ISpeculativeReader<T>, int, int, S> Retracted;
-
-        protected override S OnSpeculating()
-        {
-            return (Speculating != null) ? Speculating(this) : default(S);
-        }
-
-        protected override void OnRetracted(int returningFromPosition, int speculationPosition, S speculationState)
-        {
-            if (Retracted != null)
-                Retracted(this, returningFromPosition, speculationPosition, speculationState);
-        }
-    }
-
-    public abstract class SpeculativeReaderBase<T, S> : VariableLookaheadReader<T>, ISpeculativeReader<T>
-    {
-        protected struct Mark
-        {
-            public int Position { get; }
-
-            public int Index { get; }
-
-            public S State { get; }
-
-            public Mark(int position, int index, S state)
+            public MarkItem(int position, int index, TState state)
             {
                 this.Position = position;
                 this.Index = index;
@@ -74,36 +26,60 @@ namespace Soedeum.Dotnet.Library.Collections
             }
         }
 
-        Stack<Mark> marks = new Stack<Mark>();
+        List<MarkItem> marks = new List<MarkItem>();
 
-        public SpeculativeReaderBase(IEnumerator<T> enumerator, Func<T, T> generateEndItem = null)
+
+        public SpeculativeReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
         }
 
 
-        protected Stack<Mark> Marks { get => marks; }
+        protected List<MarkItem> Marks { get => marks; }
 
 
         protected override bool CanReset { get => !IsSpeculating; }
 
 
-        public int SpeculationCount => marks.Count;
-
         public bool IsSpeculating => marks.Count != 0;
 
 
-        public void Speculate()
+        public int MarkCount => marks.Count;
+
+
+        public int GetMarkPosition(int mark) => marks[mark].Position;
+
+        public TState GetMarkState(int mark) => marks[mark].State;
+
+        public void SetMarkState(int mark, TState state)
+        {
+            MarkItem item = marks[mark];
+
+            item.State = state;
+
+            marks[mark] = item;
+        }
+
+
+        // Mark
+        public void Mark(TState withState = default(TState))
         {
             VerifyInitialized();
 
-            var state = OnSpeculating();
+            marks.Add(new MarkItem(Position, Index, withState));
 
-            marks.Push(new Mark(Position, Index, state));
+            OnMarked(withState);
         }
 
-        protected abstract S OnSpeculating();
+        protected void OnMarked(TState withState)
+        {
+            if (Marked != null)
+                Marked(this, withState);
+        }
 
+        public event SpeculationStarted<T, TState> Marked;
+
+        // Commit
         public void Commit()
         {
             if (!IsSpeculating)
@@ -114,47 +90,70 @@ namespace Soedeum.Dotnet.Library.Collections
             OnCommitted();
         }
 
-        public event Action<ISpeculativeReader<T>> Committed;
-
         protected virtual void OnCommitted()
         {
             if (Committed != null)
                 Committed(this);
         }
 
-        public void Retract()
+        public event SpeculationIncident<T, TState> Committed;
+
+
+        // Retreat
+        public void Retreat()
         {
-            Retract(1);
+            Retreat(1);
         }
 
-        public void Retract(int speculations)
+        public void Retreat(int marks)
         {
-            if (speculations < -1 || speculations > SpeculationCount)
-                throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", speculations, SpeculationCount));
+            if (marks < -1 || marks > MarkCount)
+                throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
 
-            if (speculations > 0)
+            if (marks > 0)
             {
-                Mark mark = default(Mark);
+                // Get mark to retreat to
+                var markIndex = this.marks.Count - marks;
 
-                for (int i = 0; i < speculations; i++)
-                    mark = marks.Pop();
+                var mark = this.marks[markIndex];
 
 
-                int oldPosition = Position;
+                // Pop off all marks
+                this.marks.RemoveRange(markIndex, marks);
+
+
+                // Set to marked positions
+                var oldPosition = Position;
 
                 this.Index = mark.Index;
 
                 this.Position = mark.Position;
 
-                OnRetracted(oldPosition, this.Position, mark.State);
+
+                // Notify suscribers of retreat
+                OnRetreated(oldPosition, this.Position, mark.State);
             }
         }
 
-        public void RetractAll()
+        public void RetreatAll()
         {
-            Retract(SpeculationCount);
+            Retreat(MarkCount);
         }
 
-        protected abstract void OnRetracted(int returningFromPosition, int speculationPosition, S speculationState);
+        protected virtual void OnRetreated(int fromPosition, int originalPosition, TState originalState)
+        {
+            if (Retreated != null)
+                Retreated(this, fromPosition, originalPosition, originalState);
+        }
+
+        public event SpeculationRetreated<T, TState> Retreated;
+    }
+
+    public class SpeculativeReader<T> : SpeculativeReader<T, Object>, ISpeculativeReader<T>
+    {
+        public SpeculativeReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
+            : base(enumerator, generateEndItem)
+        {
+        }
     }
 }
