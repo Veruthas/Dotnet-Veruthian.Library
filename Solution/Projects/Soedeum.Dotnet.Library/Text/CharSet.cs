@@ -9,12 +9,66 @@ namespace Soedeum.Dotnet.Library.Text
     {
         public abstract bool Includes(char value);
 
+        // Sets
+        public static readonly CharSet All = AllOrNothingSet.All;
 
-        private class CharSetValue : CharSet
+        public static readonly CharSet Nothing = AllOrNothingSet.Nothing;
+        
+        public static readonly CharSet Null = '\0';
+
+        public static readonly CharSet NewLine = FromList('\n', '\r');
+
+        public static readonly CharSet SpaceOrTab = FromList(' ', '\t');
+
+        public static readonly CharSet Whitespace = FromUnion(SpaceOrTab, NewLine);
+
+        public static readonly CharSet Lower = FromRange('a', 'z');
+
+        public static readonly CharSet Upper = FromRange('A', 'Z');
+
+        public static readonly CharSet Letter = FromUnion(Lower, Upper);
+
+        public static readonly CharSet Digit = FromRange('0', '9');
+
+        public static readonly CharSet LetterOrDigit = FromUnion(Letter, Digit);
+
+        public static readonly CharSet HexDigit = FromUnion(Digit, FromRange('A', 'F'), FromRange('a', 'f'));
+
+        public static readonly CharSet CStyleIndentifierStart = FromUnion(Letter, '_');
+
+        public static readonly CharSet CStyleIndentifier = FromUnion(LetterOrDigit, '_');
+
+
+        private class AllOrNothingSet : CharSet
+        {
+            bool all;
+
+            public AllOrNothingSet(bool all)
+            {
+                this.all = all;
+            }
+
+            public override bool Includes(char value)
+            {
+                return this.all;
+            }
+
+            public static readonly AllOrNothingSet All = new AllOrNothingSet(true);
+
+            public static readonly AllOrNothingSet Nothing = new AllOrNothingSet(false);
+
+            public override string ToString()
+            {
+                return all ? "<all>" : "<none>";
+            }
+        }
+
+        // Implementations
+        private class CharValue : CharSet
         {
             public char value;
 
-            public CharSetValue(char value)
+            public CharValue(char value)
             {
                 this.value = value;
             }
@@ -30,11 +84,11 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private class CharSetRange : CharSet
+        private class CharRange : CharSet
         {
             public char lowest, highest;
 
-            public CharSetRange(char lowest, char highest)
+            public CharRange(char lowest, char highest)
             {
                 this.lowest = lowest;
                 this.highest = highest;
@@ -51,16 +105,16 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private class CharSetList : CharSet
+        private class CharList : CharSet
         {
-            public SortedSet<char> set = new SortedSet<char>();
+            public SortedSet<char> values = new SortedSet<char>();
 
-            public CharSetList()
+            public CharList()
             {
 
             }
 
-            public CharSetList(IEnumerable<char> list)
+            public CharList(IEnumerable<char> list)
             {
                 Add(list);
             }
@@ -68,30 +122,61 @@ namespace Soedeum.Dotnet.Library.Text
             public void Add(IEnumerable<char> list)
             {
                 foreach (char value in list)
-                    set.Add(value);
+                    this.values.Add(value);
             }
 
             public void Add(char value)
             {
-                set.Add(value);
+                values.Add(value);
             }
 
             public override bool Includes(char value)
             {
-                return set.Contains(value);
+                return values.Contains(value);
             }
 
             public override string ToString()
             {
-                if (set.Count == 0)
+                if (values.Count == 0)
                     return string.Empty;
 
-                List<string> buffer = new List<String>();
+                bool started = false;
 
-                foreach (char c in set)
-                    buffer.Add(c.GetAsPrintable());
+                StringBuilder builder = new StringBuilder();
 
-                return string.Join(" | ", buffer);
+                foreach (char c in values)
+                {
+                    if (started)
+                        builder.Append(" | ");
+
+                    builder.Append("'")
+                           .Append(TextUtility.GetAsPrintable(c))
+                           .Append("'");
+
+                    started = true;
+                }
+
+                return builder.ToString();
+            }
+        }
+
+        private class CharSetCompliment : CharSet
+        {
+            CharSet set;
+
+            public CharSetCompliment(CharSet set)
+            {
+                this.set = set ?? AllOrNothingSet.Nothing;
+            }
+
+            public override bool Includes(char value)
+            {
+                return !set.Includes(value);
+            }
+
+            public override string ToString()
+            {
+                return "not (" + set.ToString() + ")";
             }
         }
 
@@ -121,143 +206,225 @@ namespace Soedeum.Dotnet.Library.Text
 
                 StringBuilder buffer = new StringBuilder();
 
-                buffer.Append(string.Format("'{0}'", sets[0]));
+                buffer.Append(string.Format("{0}", sets[0]));
 
                 for (int i = 1; i < sets.Length; i++)
-                    buffer.Append(string.Format(" | '{0}'", sets[i]));
+                    buffer.Append(string.Format(" | {0}", sets[i]));
 
                 return buffer.ToString();
             }
         }
 
-        public static CharSet FromValue(char value) => new CharSetValue(value);
+        // Operators
+        public static implicit operator CharSet(char value) => FromValue(value);
 
-        public static CharSet FromRange(char lowest, char highest) => new CharSetRange(lowest, highest);
 
-        public static CharSet FromList(params char[] list) => new CharSetList(list);
+        public static implicit operator CharSet(char[] list) => FromList(list);
 
-        public static CharSet FromUnion(params CharSet[] sets)
+
+        public static implicit operator CharSet(CharSet[] sets) => FromUnion(sets);
+
+        // Static creators
+        public static CharSet FromValue(char value) => new CharValue(value);
+
+        public static CharSet FromRange(char lowest, char highest) => new CharRange(lowest, highest);
+
+        public static CharSet FromList(params char[] list) => new CharList(list);
+
+        public static CharSet FromCompliment(CharSet set) => new CharSetCompliment(set);
+
+        public static CharSet FromUnion(params CharSet[] sets) => OptimizeCharSetUnion(sets);
+        
+        // Todo: make optimizer more efficient (overlapping ranges, compliment elimination, etc)
+        private class CharSetOptimizer
         {
-            return OptimizeCharSetUnion(sets);
+            List<CharRange> ranges;
+
+            List<CharSetCompliment> compliments;
+
+            CharList list;
+
+            CharValue value;
+
+            int length;
+
+            private void ProcessSets(CharSet[] sets)
+            {
+                foreach (var set in sets)
+                {
+                    if (set is CharRange)
+                        AddRange(set as CharRange);
+                    else if (set is CharList)
+                        AddList(set as CharList);
+                    else if (set is CharValue)
+                        AddValue(set as CharValue);
+                    else if (set is CharSetCompliment)
+                        AddCompliment(set as CharSetCompliment);
+                    else if (set is CharSetUnion)
+                        AddUnion(set as CharSetUnion);
+                }
+            }
+
+            public void AddUnion(CharSetUnion union)
+            {
+                ProcessSets(union.sets);
+            }
+
+            public void AddCompliment(CharSetCompliment compliment)
+            {
+                if (compliments == null)
+                    compliments = new List<CharSetCompliment>();
+
+                compliments.Add(compliment);
+
+                length++;
+            }
+
+            public void AddRange(CharRange range)
+            {
+                if (ranges == null)
+                {
+                    ranges = new List<CharRange>();
+
+                    ranges.Add(range);
+
+                    length++;
+                }
+                else
+                {
+                    // Todo: optimize
+                    // 'A' to 'F'
+                    // 'A' to 'Z'
+                    // 'B' to 'G'
+                    ranges.Add(range);
+
+                    length++;
+                }
+            }
+
+            public void AddList(CharList list)
+            {
+                if (this.list != null)
+                {
+                    this.list.values.UnionWith(list.values);
+                }
+                else
+                {
+                    this.list = new CharList(list.values);
+
+                    if (this.value != null)
+                    {
+                        list.Add(this.value.value);
+                        this.value = null;
+                    }
+                    else
+                    {
+                        length++;
+                    }
+                }
+            }
+
+            public void AddValue(CharValue value)
+            {
+                if (this.list != null)
+                {
+                    this.list.values.Add(value.value);
+                }
+                else if (this.value != null)
+                {
+                    this.list = new CharList();
+                    this.list.Add(this.value.value);
+                    this.list.Add(value.value);
+                    this.value = null;
+                }
+                else
+                {
+                    this.value = value;
+
+                    length++;
+                }
+            }
+
+            public CharSet GetOptimized(CharSet[] sets)
+            {
+                ProcessSets(sets);
+
+                if (compliments == null && ranges == null)
+                {
+                    return list != null ? (CharSet)list : (CharSet)value;
+                }
+                else
+                {
+                    if (list != null)
+                    {                        
+                        list.values.RemoveWhere((c) => CharIncluded(c));
+
+                        if (list.values.Count == 0)
+                        {
+                            list = null;
+                            length--;
+                        }
+                    }
+                    else if (value != null)
+                    {
+                        if (CharIncluded(value.value))
+                        {
+                            value = null;
+                            length--;
+                        }
+                    }
+
+                    sets = new CharSet[length];
+
+                    int index = 0;
+
+                    if (compliments != null)
+                        foreach (var compliment in compliments)
+                            sets[index++] = compliment;
+
+                    if (ranges != null)
+                        foreach (var range in ranges)
+                            sets[index++] = range;
+
+                    if (list != null)
+                        sets[index] = list;
+                    else if (value != null)
+                        sets[index] = value;
+
+                    return new CharSetUnion(sets);
+                }
+            }
+
+            private bool CharIncluded(char value)
+            {
+                if (ranges != null)
+                {
+                    foreach (var range in ranges)
+                        if (range.Includes(value))
+                            return true;
+                }
+
+                if (compliments != null)
+                {
+                    foreach (var compliment in compliments)
+                        if (compliment.Includes(value))
+                            return true;
+                }
+                
+                return false;
+            }
+
+            public static CharSet Optimize(CharSet[] sets)
+            {
+                var optimizer = new CharSetOptimizer();
+
+                return optimizer.GetOptimized(sets);
+            }
         }
 
         private static CharSet OptimizeCharSetUnion(CharSet[] sets)
         {
-            List<CharSet> ranges = null;
-
-            CharSet chars = null;
-
-            bool newListCreated = false;
-
-            foreach (CharSet set in sets)
-                OptimizeCharSetUnion(set, ref ranges, ref chars, ref newListCreated);
-
-            if (ranges == null)
-            {
-                return chars;
-            }
-            else
-            {
-                if (chars != null)
-                    ranges.Add(chars);
-
-                return new CharSetUnion(ranges.ToArray());
-            }
+            return CharSetOptimizer.Optimize(sets);
         }
-
-        private static void OptimizeCharSetUnion(CharSet set, ref List<CharSet> ranges, ref CharSet chars, ref bool newListCreated)
-        {
-            if (set is CharSetUnion)
-            {
-                var union = set as CharSetUnion;
-
-                foreach (var subset in union.sets)
-                    OptimizeCharSetUnion(set, ref ranges, ref chars, ref newListCreated);
-            }
-            else if (set is CharSetRange)
-            {
-                if (ranges == null)
-                    ranges = new List<CharSet>();
-
-                ranges.Add(set);
-            }
-            else if (set is CharSetList)
-            {
-                var list = set as CharSetList;
-
-                if (chars == null)
-                {
-                    chars = list;
-                }
-                else if (chars is CharSetValue)
-                {
-                    char value = (chars as CharSetValue).value;
-
-                    var newList = new CharSetList(list.set);
-
-                    newList.Add(value);
-
-                    chars = newList;
-                }
-                else
-                {
-                    var oldList = chars as CharSetList;
-
-                    if (!newListCreated)
-                    {
-                        oldList = new CharSetList(oldList.set);
-                        newListCreated = true;
-                    }
-
-                    oldList.Add(list.set);
-
-                    chars = oldList;
-                }
-            }
-            else if (set is CharSetValue)
-            {
-                chars = set;
-            }
-        }
-
-
-        public static implicit operator CharSet(char value)
-        {
-            return FromValue(value);
-        }
-
-        public static implicit operator CharSet(char[] list)
-        {
-            return FromList(list);
-        }
-
-        public static implicit operator CharSet(CharSet[] sets)
-        {
-            return FromUnion(sets);
-        }
-
-        public static readonly CharSet Null = '\0';
-
-        public static readonly CharSet NewLine = FromList('\n', '\r');
-
-        public static readonly CharSet SpaceOrTab = FromList(' ', '\t');
-
-        public static readonly CharSet Whitespace = FromUnion(SpaceOrTab, NewLine);
-
-        public static readonly CharSet Lower = FromRange('a', 'z');
-
-        public static readonly CharSet Upper = FromRange('A', 'Z');
-
-        public static readonly CharSet Letter = FromUnion(Lower, Upper);
-
-        public static readonly CharSet Digit = FromRange('0', '9');
-
-        public static readonly CharSet LetterOrDigit = FromUnion(Letter, Digit);
-
-        public static readonly CharSet HexDigit = FromUnion(Digit, FromRange('A', 'F'), FromRange('a', 'f'));
-
-        public static readonly CharSet CStyleIndentifierStart = FromUnion(Letter, '_');
-
-        public static readonly CharSet CStyleIndentifier = FromUnion(LetterOrDigit, '_');
     }
 }
