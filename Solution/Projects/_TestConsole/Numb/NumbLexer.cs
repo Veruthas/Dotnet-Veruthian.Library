@@ -58,6 +58,16 @@ namespace _TestConsole.Numb
                 reader.Read();
         }
 
+        
+        public void SkipComment()
+        {
+            if (reader.Peek() == '#')
+                reader.Read();
+
+            while (!reader.Peek().IsIn(CharSet.NewLine))
+                reader.Read();
+        }
+
         protected override NumbToken GetNextToken()
         {
             SkipWhitespace();

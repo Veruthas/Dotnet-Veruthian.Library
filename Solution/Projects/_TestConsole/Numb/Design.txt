@@ -11,11 +11,11 @@ rule Term := Variable or Number or EnclosedTerm ;
 rule EnclosedTerm := [Plus or Minus] OpenParentheses Equation CloseParentheses ;
 
 
-token Number :=  Integer [ '.' (Numeric)+  ] [ ('E' or 'e') Integer ] ;
+token Number :=  Integer [ '.' (numeric)+  ] [ ('E' or 'e') Integer ] ;
 
-subtoken Integer := ['+' or '-'] +{Numeric} ;
+subtoken Integer := ['+' or '-'] +{numeric} ;
 
-token Variable := (Alpha or '_') +{AlphaNumeric or '_'} ;
+token Variable := (Alpha or '_') +{alphanumeric or '_'} ;
 
 token Plus := '+' ;
 
@@ -35,8 +35,19 @@ token CloseParentheses := ')' ;
 
 token SemiColon := ';' ;
 
-charset Numeric = '0' to '9' ;
+skiptoken Whitespace := {whitespace} ;
 
-charset Alpha = 'A' to 'Z' or 'a'..'z' ;
+skiptoken LineComment := '#' not (eol or eof) ;
 
-charset AlphaNumeric = Alpha or Numeric ;
+
+charset numeric := '0' to '9' ;
+
+charset alpha := 'A' to 'Z' or 'a'..'z' ;
+
+charset alphanumeric := alpha or numeric ;
+
+charset eol := '\r' or '\n'
+
+charset eof := '\0';
+
+charset whitespace := ' ' or '\t' or eol ;

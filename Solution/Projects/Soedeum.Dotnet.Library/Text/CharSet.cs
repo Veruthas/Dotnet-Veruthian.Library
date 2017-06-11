@@ -12,7 +12,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         private class CharSetValue : CharSet
         {
-            char value;
+            public char value;
 
             public CharSetValue(char value)
             {
@@ -32,7 +32,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         private class CharSetRange : CharSet
         {
-            char lowest, highest;
+            public char lowest, highest;
 
             public CharSetRange(char lowest, char highest)
             {
@@ -53,65 +53,57 @@ namespace Soedeum.Dotnet.Library.Text
 
         private class CharSetList : CharSet
         {
-            char[] list;
+            public SortedSet<char> set = new SortedSet<char>();
 
-            public CharSetList(params char[] list)
+            public CharSetList()
             {
-                Array.Sort(list);
 
-                this.list = list;
+            }
+
+            public CharSetList(IEnumerable<char> list)
+            {
+                Add(list);
+            }
+
+            public void Add(IEnumerable<char> list)
+            {
+                foreach (char value in list)
+                    set.Add(value);
+            }
+
+            public void Add(char value)
+            {
+                set.Add(value);
             }
 
             public override bool Includes(char value)
             {
-                return Array.BinarySearch(list, value) >= 0;
+                return set.Contains(value);
             }
 
             public override string ToString()
             {
-                if (list.Length == 0)
+                if (set.Count == 0)
                     return string.Empty;
 
-                StringBuilder buffer = new StringBuilder();
+                List<string> buffer = new List<String>();
 
-                buffer.Append(string.Format("'{0}'", list[0].GetAsPrintable()));
+                foreach (char c in set)
+                    buffer.Add(c.GetAsPrintable());
 
-                for (int i = 1; i < list.Length; i++)
-                    buffer.Append(string.Format(" | '{0}'", list[i].GetAsPrintable()));
-
-                return buffer.ToString();
+                return string.Join(" | ", buffer);
             }
         }
 
         private class CharSetUnion : CharSet
         {
-            CharSet[] sets;
+            public CharSet[] sets;
 
             public CharSetUnion(params CharSet[] sets)
             {
-                List<CharSet> flattened = new List<CharSet>();
-
-                foreach (CharSet set in sets)
-                    FlattenCharSet(flattened, set);
-
-                this.sets = flattened.ToArray();
+                this.sets = sets;
             }
 
-            private void FlattenCharSet(List<CharSet> flattened, CharSet set)
-            {
-                if (set is CharSetUnion)
-                {
-                    var union = (CharSetUnion)set;
-
-                    foreach (var subset in union.sets)
-                        FlattenCharSet(flattened, subset);
-                }
-                else
-                {
-                    if (set != null)
-                        flattened.Add(set);
-                }
-            }
 
             public override bool Includes(char value)
             {
@@ -144,7 +136,89 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharSet FromList(params char[] list) => new CharSetList(list);
 
-        public static CharSet FromUnion(params CharSet[] sets) => new CharSetUnion(sets);
+        public static CharSet FromUnion(params CharSet[] sets)
+        {
+            return OptimizeCharSetUnion(sets);
+        }
+
+        private static CharSet OptimizeCharSetUnion(CharSet[] sets)
+        {
+            List<CharSet> ranges = null;
+
+            CharSet chars = null;
+
+            bool newListCreated = false;
+
+            foreach (CharSet set in sets)
+                OptimizeCharSetUnion(set, ref ranges, ref chars, ref newListCreated);
+
+            if (ranges == null)
+            {
+                return chars;
+            }
+            else
+            {
+                if (chars != null)
+                    ranges.Add(chars);
+
+                return new CharSetUnion(ranges.ToArray());
+            }
+        }
+
+        private static void OptimizeCharSetUnion(CharSet set, ref List<CharSet> ranges, ref CharSet chars, ref bool newListCreated)
+        {
+            if (set is CharSetUnion)
+            {
+                var union = set as CharSetUnion;
+
+                foreach (var subset in union.sets)
+                    OptimizeCharSetUnion(set, ref ranges, ref chars, ref newListCreated);
+            }
+            else if (set is CharSetRange)
+            {
+                if (ranges == null)
+                    ranges = new List<CharSet>();
+
+                ranges.Add(set);
+            }
+            else if (set is CharSetList)
+            {
+                var list = set as CharSetList;
+
+                if (chars == null)
+                {
+                    chars = list;
+                }
+                else if (chars is CharSetValue)
+                {
+                    char value = (chars as CharSetValue).value;
+
+                    var newList = new CharSetList(list.set);
+
+                    newList.Add(value);
+
+                    chars = newList;
+                }
+                else
+                {
+                    var oldList = chars as CharSetList;
+
+                    if (!newListCreated)
+                    {
+                        oldList = new CharSetList(oldList.set);
+                        newListCreated = true;
+                    }
+
+                    oldList.Add(list.set);
+
+                    chars = oldList;
+                }
+            }
+            else if (set is CharSetValue)
+            {
+                chars = set;
+            }
+        }
 
 
         public static implicit operator CharSet(char value)
@@ -168,7 +242,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly CharSet SpaceOrTab = FromList(' ', '\t');
 
-        public static readonly CharSet Whitespace = FromList(' ', '\t', '\n', '\r');
+        public static readonly CharSet Whitespace = FromUnion(SpaceOrTab, NewLine);
 
         public static readonly CharSet Lower = FromRange('a', 'z');
 
