@@ -2,25 +2,25 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public class TokenTypeMismatchException<TTokenType> : System.Exception
+    public class TokenTypeMismatchException<TType> : System.Exception
     {
-        public TokenTypeMismatchException(TTokenType expected, TTokenType found)
+        public TokenTypeMismatchException(TType expected, TType found)
             : base(GetMessage(expected, found)) { }
 
 
-        public TokenTypeMismatchException(TTokenType expected, TTokenType found, Exception inner)
+        public TokenTypeMismatchException(TType expected, TType found, Exception inner)
             : base(GetMessage(expected, found), inner)
         {
             Expected = expected;
             Found = found;
         }
 
-        TTokenType Expected { get; }
+        TType Expected { get; }
 
-        TTokenType Found { get; }
+        TType Found { get; }
 
 
-        private static string GetMessage(TTokenType expected, TTokenType found)
+        private static string GetMessage(TType expected, TType found)
         {
             return string.Format("{0} Expected '{1}', Found '{2}'", DefaultMessage, expected, found);
         }

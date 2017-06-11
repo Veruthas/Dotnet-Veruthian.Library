@@ -2,16 +2,16 @@ using Soedeum.Dotnet.Library.Collections;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public abstract class SpeculativeLexer<TToken, TTokenType, TReader> : SpeculativeLexer<TToken, TTokenType, TReader, object>
-        where TToken : IToken<TTokenType>
+    public abstract class SpeculativeLexer<TToken, TType, TReader> : SpeculativeLexer<TToken, TType, TReader, object>
+        where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char>
     {
         public SpeculativeLexer(TReader reader)
             : base(reader) { }
     }
 
-    public abstract class SpeculativeLexer<TToken, TTokenType, TReader, TState> : Lexer<TToken, TTokenType, TReader>
-        where TToken : IToken<TTokenType>
+    public abstract class SpeculativeLexer<TToken, TType, TReader, TState> : Lexer<TToken, TType, TReader>
+        where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char, TState>
     {
         public SpeculativeLexer(TReader reader)

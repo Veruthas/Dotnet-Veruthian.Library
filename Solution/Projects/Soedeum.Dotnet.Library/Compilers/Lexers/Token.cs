@@ -4,51 +4,51 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public class Token<TTokenType> : IToken<TTokenType>
+    public class Token<TType> : IToken<TType>
     {
         string source;
 
         TextSpan span;
 
-        TTokenType tokenType;
+        TType type;
 
 
-        public Token(string source, TextSpan span, TTokenType tokenType)
+        public Token(string source, TextSpan span, TType type)
         {
             this.source = source;
 
             this.span = span;
 
-            this.tokenType = tokenType;
+            this.type = type;
         }
 
         public string Source => source;
 
         public TextSpan Span => span;
 
-        public TTokenType TokenType => tokenType;
+        public TType Type => type;
 
 
-        protected virtual bool TokenTypeEquals(TTokenType tokenType) => this.tokenType.Equals(tokenType);
+        protected virtual bool TypeEquals(TType type) => this.type.Equals(type);
 
-        public bool IsOf(TTokenType tokenType)
+        public bool IsOf(TType type)
         {
-            return TokenTypeEquals(tokenType);
+            return TypeEquals(type);
         }
 
-        public void VerifyIsOf(TTokenType tokenType)
+        public void VerifyIsOf(TType type)
         {
-            if (!TokenTypeEquals(tokenType))
-                throw new TokenTypeMismatchException<TTokenType>(tokenType, this.tokenType);
+            if (!TypeEquals(type))
+                throw new TokenTypeMismatchException<TType>(type, this.type);
         }
 
         public override string ToString()
         {
-            return string.Format("TokenType: '{0}'; Source: '{1}'; {2}", tokenType, source, span.ToString());
+            return string.Format("Type: '{0}'; Source: '{1}'; {2}", type, source, span.ToString());
         }
         public virtual string ToShortString()
         {
-            return string.Format("TokenType: '{0}'; Value: '{2}'", tokenType, source, span.Text);
+            return string.Format("Type: '{0}'; Value: '{2}'", type, source, span.Text);
         }
     }
 }

@@ -5,8 +5,8 @@ namespace _TestConsole.Numb
 {
     public class NumbToken : Token<NumbType>
     {
-        public NumbToken(string source, TextSpan span, NumbType tokenType)
-            : base(source, span, tokenType) { }
+        public NumbToken(string source, TextSpan span, NumbType type)
+            : base(source, span, type) { }
 
         public double? Value { get; set; }
 

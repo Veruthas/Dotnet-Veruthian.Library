@@ -4,16 +4,16 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public interface IToken<TTokenType>
+    public interface IToken<TType>
     {
         string Source { get; }
 
         TextSpan Span { get; }
         
-        TTokenType TokenType { get; }
+        TType Type { get; }
         
-        bool IsOf(TTokenType type);
+        bool IsOf(TType type);
 
-        void VerifyIsOf(TTokenType type);
+        void VerifyIsOf(TType type);
     }
 }

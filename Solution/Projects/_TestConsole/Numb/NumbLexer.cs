@@ -20,14 +20,14 @@ namespace _TestConsole.Numb
             return new NumbToken(source, new TextSpan(location, "\0"), NumbType.Eof);
         }
 
-        protected override NumbToken CreateToken(NumbType tokenType, TextLocation location, string value)
+        protected override NumbToken CreateToken(NumbType type, TextLocation location, string value)
         {
-            return new NumbToken(source, new TextSpan(location, value), tokenType);
+            return new NumbToken(source, new TextSpan(location, value), type);
         }
 
-        protected override string GetDefaultString(NumbType tokenType)
+        protected override string GetDefaultString(NumbType type)
         {
-            switch (tokenType)
+            switch (type)
             {
                 case NumbType.Plus:
                     return "+";

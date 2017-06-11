@@ -215,7 +215,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        // Operators
+        // Implicit converters
         public static implicit operator CharSet(char value) => FromValue(value);
 
 
@@ -235,6 +235,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharSet FromUnion(params CharSet[] sets) => OptimizeCharSetUnion(sets);
         
+
         // Todo: make optimizer more efficient (overlapping ranges, compliment elimination, etc)
         private class CharSetOptimizer
         {

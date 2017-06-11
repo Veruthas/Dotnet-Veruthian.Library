@@ -7,8 +7,8 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public abstract class Lexer<TToken, TTokenType, TReader> : IEnumerator<TToken>
-        where TToken : IToken<TTokenType>
+    public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
+        where TToken : IToken<TType>
         where TReader : IReader<char>
     {
 
@@ -129,11 +129,11 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         }
 
-        protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType, bool releaseBuffer = true)
+        protected virtual TToken CreateTokenFromBuffer(TType type, bool releaseBuffer = true)
         {
-            string value = GetDefaultString(tokenType) ?? ExtractBuffer();
+            string value = GetDefaultString(type) ?? ExtractBuffer();
 
-            var token = CreateToken(tokenType, bufferLocation, value);
+            var token = CreateToken(type, bufferLocation, value);
 
             if (releaseBuffer)
                 ReleaseBuffer();
@@ -144,9 +144,9 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         // Abstracts
         protected abstract TToken CreateEofToken(TextLocation location);
 
-        protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
+        protected abstract TToken CreateToken(TType type, TextLocation location, string value);
 
-        protected abstract string GetDefaultString(TTokenType tokenType);
+        protected abstract string GetDefaultString(TType type);
 
         protected abstract TToken GetNextToken();
     }

@@ -3,8 +3,8 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public abstract class LookaheadLexer<TToken, TTokenType, TReader> : Lexer<TToken, TTokenType, TReader>
-        where TToken : IToken<TTokenType>
+    public abstract class LookaheadLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
+        where TToken : IToken<TType>
         where TReader : ILookaheadReader<char>
     {
         public LookaheadLexer(TReader reader)
