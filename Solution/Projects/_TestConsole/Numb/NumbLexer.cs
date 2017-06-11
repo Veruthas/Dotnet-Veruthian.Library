@@ -52,25 +52,42 @@ namespace _TestConsole.Numb
             }
         }
 
+        public void Skip()
+        {
+            while (true)
+            {
+                char c = reader.Peek();
+                if (c.IsIn(CharSet.Whitespace))
+                {
+                    reader.Read();
+                    SkipWhitespace();
+                }
+                else if (c == '#')
+                {
+                    reader.Read();
+                    SkipComment();
+                }
+                else
+                    break;
+            }
+        }
+
         public void SkipWhitespace()
         {
             while (reader.Peek().IsIn(CharSet.Whitespace))
                 reader.Read();
         }
 
-        
+
         public void SkipComment()
         {
-            if (reader.Peek() == '#')
-                reader.Read();
-
             while (!reader.Peek().IsIn(CharSet.NewLine))
                 reader.Read();
         }
 
         protected override NumbToken GetNextToken()
         {
-            SkipWhitespace();
+            Skip();
 
             Capture();
 

@@ -17,7 +17,7 @@ namespace _TestConsole.Numb
         
         Assign,
         
-        SemiColon,
+        Semicolon,
 
         OpenParentheses,
         CloseParentheses

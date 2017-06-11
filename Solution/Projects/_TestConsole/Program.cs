@@ -16,12 +16,10 @@ namespace _TestConsole
             var d = CharSet.FromUnion(b, CharSet.Letter);
             var c = CharSet.FromCompliment(b);
 
-            System.Console.WriteLine(a);
-            System.Console.WriteLine(b);
 
             TestNumbLexer("a := 1 + 2;");
             TestNumbLexer("a := -10 ^ 4.12;");
-            TestNumbLexer("pi := 3.1412;\nr := -1.23e3;\r\ncircumference := 2 * pi * r;\narea := pi * r ^ 2;");
+            TestNumbLexer("# Algorithms for circle formula\npi := 3.1412;\nr := -1.23e3;\r\ncircumference := 2 * pi * r;\narea := pi * r ^ 2;");
 
             Pause();
         }
