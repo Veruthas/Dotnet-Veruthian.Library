@@ -10,9 +10,9 @@ namespace Soedeum.Dotnet.Library.Text
         public abstract bool Includes(char value);
 
         // Sets
-        public static readonly CharSet All = AllOrNothingSet.All;
+        public static readonly CharSet All = AllOrNothingSet.AllSet;
 
-        public static readonly CharSet Nothing = AllOrNothingSet.Nothing;
+        public static readonly CharSet Nothing = AllOrNothingSet.NothingSet;
         
         public static readonly CharSet Null = '\0';
 
@@ -53,9 +53,9 @@ namespace Soedeum.Dotnet.Library.Text
                 return this.all;
             }
 
-            public static readonly AllOrNothingSet All = new AllOrNothingSet(true);
+            public static readonly AllOrNothingSet AllSet = new AllOrNothingSet(true);
 
-            public static readonly AllOrNothingSet Nothing = new AllOrNothingSet(false);
+            public static readonly AllOrNothingSet NothingSet = new AllOrNothingSet(false);
 
             public override string ToString()
             {

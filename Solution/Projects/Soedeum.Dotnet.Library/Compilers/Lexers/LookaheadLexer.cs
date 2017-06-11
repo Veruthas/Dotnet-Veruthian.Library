@@ -14,8 +14,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual char Peek(int lookahead) => reader.Peek(lookahead);
 
-        protected virtual bool IsPeekIn(int lookahead, CharSet set) => set.Includes(reader.Peek(lookahead));
+        protected virtual bool PeekIsIn(int lookahead, CharSet set) => set.Includes(reader.Peek(lookahead));
 
-        protected virtual bool IsPeek(int lookahead, char value) => reader.Peek(lookahead) == value;
+        protected virtual bool PeekIs(int lookahead, char value) => reader.Peek(lookahead) == value;
     }
 }

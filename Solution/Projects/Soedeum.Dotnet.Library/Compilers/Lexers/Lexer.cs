@@ -61,21 +61,21 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // Buffer code
-        protected void Capture()
+        protected void BufferRead()
         {
-            Release();
+            ReleaseBuffer();
             bufferLocation = location;
             capturing = true;
         }
 
-        protected void Release()
+        protected void ReleaseBuffer()
         {
             buffer.Clear();
             bufferLocation = default(TextLocation);
             capturing = false;
         }
 
-        protected string Extract()
+        protected string ExtractBuffer()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
@@ -102,9 +102,9 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual char Peek() => reader.Peek();
 
-        protected virtual bool IsPeekIn(CharSet set) => set.Includes(reader.Peek());
+        protected virtual bool PeekIsIn(CharSet set) => set.Includes(reader.Peek());
 
-        protected virtual bool IsPeek(char value) => reader.Peek() == value;
+        protected virtual bool PeekIs(char value) => reader.Peek() == value;
 
         protected virtual char Read() => reader.Read();
 
@@ -131,12 +131,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType, bool releaseBuffer = true)
         {
-            string value = GetDefaultString(tokenType) ?? Extract();
+            string value = GetDefaultString(tokenType) ?? ExtractBuffer();
 
             var token = CreateToken(tokenType, bufferLocation, value);
 
             if (releaseBuffer)
-                Release();
+                ReleaseBuffer();
 
             return token;
         }
