@@ -9,7 +9,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
     public abstract class Lexer<TToken, TTokenType, TReader> : Lexer<TToken, TTokenType, TReader, Object>
         where TToken : IToken<TTokenType>
-        where TTokenType : IEquatable<TTokenType>
         where TReader : IReader<char>
     {
         public Lexer(TReader reader)
@@ -20,7 +19,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
     public abstract class Lexer<TToken, TTokenType, TReader, TState> : IEnumerator<TToken>
         where TToken : IToken<TTokenType>
-        where TTokenType : IEquatable<TTokenType>
         where TReader : IReader<char>
     {
         bool initialized = false;
@@ -73,6 +71,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         protected void Capture()
         {
             Release();
+            bufferLocation = location;
             capturing = true;
         }
 
@@ -123,30 +122,35 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             if (capturing)
                 buffer.Append(item);
+
+            location = location.MoveToNext(item, reader.Peek());
         }
 
         // Token code
-        protected abstract TToken GetNextToken();
-
         protected abstract TToken CreateEofToken(TextLocation location);
 
         protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
 
-        protected virtual TToken CreateBufferedToken(TTokenType tokenType, bool releaseBuffer = true)
+        protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType, bool releaseBuffer = true)
         {
-            string value = TryGetDefaultString(tokenType) ?? Extract();
-            
+            string value = GetDefaultString(tokenType) ?? Extract();
+
+            var token = CreateToken(tokenType, bufferLocation, value);
+
             if (releaseBuffer)
                 Release();
 
-            return CreateToken(tokenType, bufferLocation, value);
+            return token;
         }
 
-        protected virtual string TryGetDefaultString(TTokenType tokenType) => null;
+        protected abstract string GetDefaultString(TTokenType tokenType);
 
+        protected abstract TToken GetNextToken();
 
-        public bool MoveNext()
+        public virtual bool MoveNext()
         {
+            initialized = true;
+
             if (!reader.IsEnd)
             {
                 current = GetNextToken();

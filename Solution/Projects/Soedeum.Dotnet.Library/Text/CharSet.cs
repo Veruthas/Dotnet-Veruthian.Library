@@ -64,7 +64,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override bool Includes(char value)
             {
-                return Array.BinarySearch(list, value) != -1;
+                return Array.BinarySearch(list, value) >= 0;
             }
 
             public override string ToString()

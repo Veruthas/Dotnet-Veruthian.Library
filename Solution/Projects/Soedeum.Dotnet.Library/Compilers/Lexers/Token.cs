@@ -30,7 +30,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         protected virtual bool TokenTypeEquals(TTokenType tokenType) => this.tokenType.Equals(tokenType);
-        
+
         public bool IsOf(TTokenType tokenType)
         {
             return TokenTypeEquals(tokenType);
@@ -40,6 +40,15 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             if (!TokenTypeEquals(tokenType))
                 throw new TokenTypeMismatchException<TTokenType>(tokenType, this.tokenType);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("TokenType: '{0}'; Source: '{1}'; {2}", tokenType, source, span.ToString());
+        }
+        public virtual string ToShortString()
+        {
+            return string.Format("TokenType: '{0}'; Value: '{2}'", tokenType, source, span.Text);
         }
     }
 }

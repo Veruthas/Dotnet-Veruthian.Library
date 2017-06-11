@@ -1,6 +1,6 @@
 rule Numb := Assignment* ;
 
-rule Assignment := Variable Assignment Equation ;
+rule Assignment := Variable Assignment Equation SemiColon;
 
 rule Equation := Term {Operator Term} ;
 
@@ -11,7 +11,7 @@ rule Term := Variable or Number or EnclosedTerm ;
 rule EnclosedTerm := [Plus or Minus] OpenParentheses Equation CloseParentheses ;
 
 
-token Number :=  Integer [ ( '.' (Numeric)+ ) or (('E' or 'e') Integer) ] ;
+token Number :=  Integer [ '.' (Numeric)+  ] [ ('E' or 'e') Integer ] ;
 
 subtoken Integer := ['+' or '-'] +{Numeric} ;
 
@@ -25,7 +25,7 @@ token Times := '*' ;
 
 token DivideBy := '/' ;
 
-token Exponent := '^' ;        
+token PowerOf := '^' ;        
 
 token Assign := ':=' ;
 
@@ -33,6 +33,7 @@ token OpenParentheses := '(' ;
 
 token CloseParentheses := ')' ;
 
+token SemiColon := ';' ;
 
 charset Numeric = '0' to '9' ;
 

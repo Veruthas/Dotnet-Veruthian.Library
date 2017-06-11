@@ -42,5 +42,10 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public override string ToString()
+        {
+            return string.Format("{0}; Value: '{1}'", this.location, TextUtility.GetAsPrintable(text));
+        }
     }
 }

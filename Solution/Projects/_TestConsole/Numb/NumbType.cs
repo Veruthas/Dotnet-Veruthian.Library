@@ -12,9 +12,12 @@ namespace _TestConsole.Numb
         Minus,
         Times,
         DivideBy,
+
+        PowerOf,
         
         Assign,
         
+        SemiColon,
 
         OpenParentheses,
         CloseParentheses

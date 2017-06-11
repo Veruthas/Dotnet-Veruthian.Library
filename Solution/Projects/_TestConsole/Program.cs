@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using _TestConsole.Numb;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Text;
 
@@ -9,10 +10,23 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            var s =new Dictionary<string, string> ();            
+            TestNumbLexer("a := 1 + 2;");
+            TestNumbLexer("a := -10 ^ 4.12;");
+            TestNumbLexer("pi := 3.1412;\nr := -1.23e3;\r\ncircumference := 2 * pi * r;\narea := pi * r ^ 2;");
+
             Pause();
         }
+        static int run = 0;
+        static void TestNumbLexer(string program)
+        {
+            NumbLexer lexer = new NumbLexer((run++).ToString(), program.GetSimpleReader());
 
+            foreach (var token in lexer.GetEnumerable())
+            {
+                System.Console.WriteLine(token.ToShortString());
+            }
+            System.Console.WriteLine("--------");
+        }
         static void Pause()
         {
             Console.Write("Press any key to continue...");
