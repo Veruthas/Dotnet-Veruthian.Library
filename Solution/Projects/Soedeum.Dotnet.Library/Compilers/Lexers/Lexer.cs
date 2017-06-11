@@ -7,45 +7,38 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public abstract class Lexer<TToken, TTokenType, TReader> : Lexer<TToken, TTokenType, TReader, Object>
+    public abstract class Lexer<TToken, TTokenType, TReader> : IEnumerator<TToken>
         where TToken : IToken<TTokenType>
         where TReader : IReader<char>
     {
-        public Lexer(TReader reader)
-            : base(reader) { }
 
-    }
-
-
-    public abstract class Lexer<TToken, TTokenType, TReader, TState> : IEnumerator<TToken>
-        where TToken : IToken<TTokenType>
-        where TReader : IReader<char>
-    {
+        // Reader data        
         bool initialized = false;
-
-
-        // Capture Buffer
-        bool capturing = false;
-
-        StringBuilder buffer = new StringBuilder();
-
-        TextLocation bufferLocation;
-
-
 
         protected TextLocation location;
 
         protected TToken current;
 
-        protected TReader reader;
+        protected readonly TReader reader;
 
 
+
+        // Buffer data
+        protected bool capturing = false;
+
+        protected StringBuilder buffer = new StringBuilder();
+
+        protected TextLocation bufferLocation;
+
+
+        // Constructor
         public Lexer(TReader reader)
         {
             this.reader = reader;
 
             AttachBufferEvents();
         }
+
 
         public void Reset() => throw new NotImplementedException();
 
@@ -93,30 +86,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         protected virtual void AttachBufferEvents()
         {
             reader.ItemRead += OnRead;
-
-            if (reader is ISpeculativeReader<char, TState>)
-            {
-                var speculativeReader = reader as ISpeculativeReader<char, TState>;
-
-                speculativeReader.Retreated += OnRetreated;
-            }
         }
 
-        protected virtual void OnRetreated(ISpeculativeReader<char, TState> reader,
-                                            int fromPosition,
-                                            int originalPosition,
-                                            TState originalState)
-        {
-            if (capturing)
-            {
-                int length = fromPosition - originalPosition;
-
-                if (length > buffer.Length)
-                    Release();
-                else
-                    buffer.Remove(buffer.Length - length, length);
-            }
-        }
 
         protected virtual void OnRead(IReader<char> reader, char item)
         {
@@ -126,27 +97,21 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             location = location.MoveToNext(item, reader.Peek());
         }
 
+        // Helper Code    
+        protected virtual bool IsEnd => reader.IsEnd;
+
+        protected virtual char Peek() => reader.Peek();
+
+        protected virtual bool IsPeekIn(CharSet set) => set.Includes(reader.Peek());
+
+        protected virtual bool IsPeek(char value) => reader.Peek() == value;
+
+        protected virtual char Read() => reader.Read();
+
+        protected virtual void Read(int amount) => reader.Read(amount);
+
+
         // Token code
-        protected abstract TToken CreateEofToken(TextLocation location);
-
-        protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
-
-        protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType, bool releaseBuffer = true)
-        {
-            string value = GetDefaultString(tokenType) ?? Extract();
-
-            var token = CreateToken(tokenType, bufferLocation, value);
-
-            if (releaseBuffer)
-                Release();
-
-            return token;
-        }
-
-        protected abstract string GetDefaultString(TTokenType tokenType);
-
-        protected abstract TToken GetNextToken();
-
         public virtual bool MoveNext()
         {
             initialized = true;
@@ -163,5 +128,26 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
 
         }
+
+        protected virtual TToken CreateTokenFromBuffer(TTokenType tokenType, bool releaseBuffer = true)
+        {
+            string value = GetDefaultString(tokenType) ?? Extract();
+
+            var token = CreateToken(tokenType, bufferLocation, value);
+
+            if (releaseBuffer)
+                Release();
+
+            return token;
+        }
+
+        // Abstracts
+        protected abstract TToken CreateEofToken(TextLocation location);
+
+        protected abstract TToken CreateToken(TTokenType tokenType, TextLocation location, string value);
+
+        protected abstract string GetDefaultString(TTokenType tokenType);
+
+        protected abstract TToken GetNextToken();
     }
 }

@@ -45,7 +45,7 @@ namespace _TestConsole.Numb
                     return ")";
                 case NumbType.Assign:
                     return ":=";
-                case NumbType.SemiColon:
+                case NumbType.Semicolon:
                     return ";";
                 default:
                     return null;
@@ -81,7 +81,7 @@ namespace _TestConsole.Numb
 
         public void SkipComment()
         {
-            while (!reader.Peek().IsIn(CharSet.NewLine))
+            while (!reader.IsEnd && !reader.Peek().IsIn(CharSet.NewLine))
                 reader.Read();
         }
 
@@ -128,7 +128,7 @@ namespace _TestConsole.Numb
                 case ')':
                     return CreateTokenFromBuffer(NumbType.CloseParentheses);
                 case ';':
-                    return CreateTokenFromBuffer(NumbType.SemiColon);
+                    return CreateTokenFromBuffer(NumbType.Semicolon);
                 default:
                     if (c.IsIn(CharSet.CStyleIndentifierStart))
                         return GetVariableToken();
@@ -141,7 +141,7 @@ namespace _TestConsole.Numb
 
         private NumbToken GetVariableToken()
         {
-            while (reader.Peek().IsIn(CharSet.CStyleIndentifier))
+            while (Peek().IsIn(CharSet.CStyleIndentifier))
                 reader.Read();
 
             return CreateTokenFromBuffer(NumbType.Variable);
