@@ -9,9 +9,8 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            TestCollections.Test();
-
-            Pause();
+            //TestCollections.Test();
+           Pause();
         }
 
         static void Pause()

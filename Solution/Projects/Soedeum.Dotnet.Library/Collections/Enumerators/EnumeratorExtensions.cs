@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public static class Enumerators
+    public static class EnumeratorExtensions
     {
         public static Enumerable<T> GetEnumerable<T>(this IEnumerator<T> enumerator)
         {

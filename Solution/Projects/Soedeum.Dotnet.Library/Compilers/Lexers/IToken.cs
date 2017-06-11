@@ -4,19 +4,17 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public interface IToken<T>
-        where T : IEquatable<T>
+    public interface IToken<TTokenType>
+        where TTokenType : IEquatable<TTokenType>
     {
         string Source { get; }
 
         TextSpan Span { get; }
         
-        T TokenType { get; }
+        TTokenType TokenType { get; }
         
-        bool Is(T type);
+        bool IsOf(TTokenType type);
 
-        void VerifyIs(T type);
-
-        IDictionary<string, object> Annotations { get; }
+        void VerifyIsOf(TTokenType type);
     }
 }
