@@ -9,8 +9,8 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            //TestCollections.Test();
-           Pause();
+            var s =new Dictionary<string, string> ();            
+            Pause();
         }
 
         static void Pause()

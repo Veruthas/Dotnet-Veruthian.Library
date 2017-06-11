@@ -1,0 +1,41 @@
+rule Numb := Assignment* ;
+
+rule Assignment := Variable Assignment Equation ;
+
+rule Equation := Term {Operator Term} ;
+
+rule Operator := Plus or Minus or Times or DivideBy or Exponent ;
+
+rule Term := Variable or Number or EnclosedTerm ;
+
+rule EnclosedTerm := [Plus or Minus] OpenParentheses Equation CloseParentheses ;
+
+
+token Number :=  Integer [ ( '.' (Numeric)+ ) or (('E' or 'e') Integer) ] ;
+
+subtoken Integer := ['+' or '-'] +{Numeric} ;
+
+token Variable := (Alpha or '_') +{AlphaNumeric or '_'} ;
+
+token Plus := '+' ;
+
+token Minus := '-' ;
+
+token Times := '*' ;
+
+token DivideBy := '/' ;
+
+token Exponent := '^' ;        
+
+token Assign := ':=' ;
+
+token OpenParentheses := '(' ;
+
+token CloseParentheses := ')' ;
+
+
+charset Numeric = '0' to '9' ;
+
+charset Alpha = 'A' to 'Z' or 'a'..'z' ;
+
+charset AlphaNumeric = Alpha or Numeric ;

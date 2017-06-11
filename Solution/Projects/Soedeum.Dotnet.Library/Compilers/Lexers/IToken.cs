@@ -5,7 +5,6 @@ using Soedeum.Dotnet.Library.Text;
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
     public interface IToken<TTokenType>
-        where TTokenType : IEquatable<TTokenType>
     {
         string Source { get; }
 

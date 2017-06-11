@@ -4,17 +4,16 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public class Token<T> : IToken<T>
-        where T : IEquatable<T>
+    public class Token<TTokenType> : IToken<TTokenType>
     {
         string source;
 
         TextSpan span;
 
-        T tokenType;
+        TTokenType tokenType;
 
 
-        public Token(string source, TextSpan span, T tokenType)
+        public Token(string source, TextSpan span, TTokenType tokenType)
         {
             this.source = source;
 
@@ -27,18 +26,20 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         public TextSpan Span => span;
 
-        public T TokenType => tokenType;
+        public TTokenType TokenType => tokenType;
 
 
-        public bool IsOf(T tokenType)
+        protected virtual bool TokenTypeEquals(TTokenType tokenType) => this.tokenType.Equals(tokenType);
+        
+        public bool IsOf(TTokenType tokenType)
         {
-            return this.tokenType.Equals(tokenType);
+            return TokenTypeEquals(tokenType);
         }
 
-        public void VerifyIsOf(T tokenType)
+        public void VerifyIsOf(TTokenType tokenType)
         {
-            if (!IsOf(tokenType))
-                throw new TokenTypeMismatchException<T>(tokenType, this.tokenType);
+            if (!TokenTypeEquals(tokenType))
+                throw new TokenTypeMismatchException<TTokenType>(tokenType, this.tokenType);
         }
     }
 }
