@@ -17,7 +17,7 @@ namespace _TestConsole.Numb
 
         protected override NumbToken CreateEofToken(TextLocation location)
         {
-            return new NumbToken(source, new TextSpan(location, "\0"), NumbType.Eof);
+            return new NumbToken(source, new TextSpan(location, "\0"), NumbType.EofToken);
         }
 
         protected override NumbToken CreateToken(NumbType type, TextLocation location, string value)
@@ -29,23 +29,23 @@ namespace _TestConsole.Numb
         {
             switch (type)
             {
-                case NumbType.Plus:
+                case NumbType.PlusToken:
                     return "+";
-                case NumbType.Minus:
+                case NumbType.MinusToken:
                     return "-";
-                case NumbType.Times:
+                case NumbType.TimesToken:
                     return "*";
-                case NumbType.DivideBy:
+                case NumbType.DivideByToken:
                     return "/";
-                case NumbType.PowerOf:
+                case NumbType.PowerOfToken:
                     return "^";
-                case NumbType.OpenParentheses:
+                case NumbType.OpenParenthesesToken:
                     return "(";
-                case NumbType.CloseParentheses:
+                case NumbType.CloseParenthesesToken:
                     return ")";
-                case NumbType.Assign:
+                case NumbType.AssignToken:
                     return ":=";
-                case NumbType.Semicolon:
+                case NumbType.SemicolonToken:
                     return ";";
                 default:
                     return null;
@@ -101,7 +101,7 @@ namespace _TestConsole.Numb
                         return GetNumberToken();
                     }
                     else
-                        return CreateTokenFromBuffer(NumbType.Plus);
+                        return CreateTokenFromBuffer(NumbType.PlusToken);
                 
                 case '-':
                     if (PeekIsIn(CharSet.Digit))
@@ -109,34 +109,34 @@ namespace _TestConsole.Numb
                         return GetNumberToken(0, -1);
                     }
                     else
-                        return CreateTokenFromBuffer(NumbType.Minus);
+                        return CreateTokenFromBuffer(NumbType.MinusToken);
                 
                 case '*':
-                    return CreateTokenFromBuffer(NumbType.Times);
+                    return CreateTokenFromBuffer(NumbType.TimesToken);
                 
                 case '/':
-                    return CreateTokenFromBuffer(NumbType.DivideBy);
+                    return CreateTokenFromBuffer(NumbType.DivideByToken);
                 
                 case '^':
-                    return CreateTokenFromBuffer(NumbType.PowerOf);
+                    return CreateTokenFromBuffer(NumbType.PowerOfToken);
                 
                 case ':':
                     if (PeekIs('='))
                     {
                         Read();
-                        return CreateTokenFromBuffer(NumbType.Assign);
+                        return CreateTokenFromBuffer(NumbType.AssignToken);
                     }
                     else
-                        return CreateTokenFromBuffer(NumbType.Error);
+                        return CreateTokenFromBuffer(NumbType.ErrorToken);
                 
                 case '(':
-                    return CreateTokenFromBuffer(NumbType.OpenParentheses);
+                    return CreateTokenFromBuffer(NumbType.OpenParenthesesToken);
                 
                 case ')':
-                    return CreateTokenFromBuffer(NumbType.CloseParentheses);
+                    return CreateTokenFromBuffer(NumbType.CloseParenthesesToken);
                 
                 case ';':
-                    return CreateTokenFromBuffer(NumbType.Semicolon);
+                    return CreateTokenFromBuffer(NumbType.SemicolonToken);
 
                 default:
                     if (c.IsIn(CharSet.CStyleIndentifierStart))
@@ -146,7 +146,7 @@ namespace _TestConsole.Numb
                         return GetNumberToken(c - '0');
 
                     else
-                        return CreateTokenFromBuffer(NumbType.Error);
+                        return CreateTokenFromBuffer(NumbType.ErrorToken);
             }
         }
 
@@ -155,7 +155,7 @@ namespace _TestConsole.Numb
             while (PeekIsIn(CharSet.CStyleIndentifier))
                 Read();
 
-            return CreateTokenFromBuffer(NumbType.Variable);
+            return CreateTokenFromBuffer(NumbType.VariableToken);
         }
 
         private NumbToken GetNumberToken(double baseInteger = 0, double signOfValue = 1)
@@ -178,7 +178,7 @@ namespace _TestConsole.Numb
                 Read();
 
                 if (!PeekIsIn(CharSet.Digit))
-                    return CreateTokenFromBuffer(NumbType.Error);
+                    return CreateTokenFromBuffer(NumbType.ErrorToken);
 
                 while (PeekIsIn(CharSet.Digit))
                 {
@@ -211,7 +211,7 @@ namespace _TestConsole.Numb
                     Read();
                 }
                 else if (!c.IsIn(CharSet.Digit))
-                    return CreateTokenFromBuffer(NumbType.Error);
+                    return CreateTokenFromBuffer(NumbType.ErrorToken);
 
                 while (PeekIsIn(CharSet.Digit))
                 {
@@ -227,7 +227,7 @@ namespace _TestConsole.Numb
 
             double result = signOfValue * baseInteger * Math.Pow(10, powerOfTen);
 
-            var token = CreateTokenFromBuffer(NumbType.Number);
+            var token = CreateTokenFromBuffer(NumbType.NumberToken);
 
             token.Value = result;
 
