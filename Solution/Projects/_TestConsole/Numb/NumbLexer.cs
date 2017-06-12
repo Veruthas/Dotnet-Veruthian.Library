@@ -7,7 +7,7 @@ namespace _TestConsole.Numb
 {
     public class NumbLexer : Lexer<NumbToken, NumbType, SimpleReader<char>>
     {
-        public string source;
+        string source;
 
         public NumbLexer(string source, SimpleReader<char> reader)
             : base(reader)
@@ -89,7 +89,7 @@ namespace _TestConsole.Numb
         {
             Skip();
 
-            BufferRead();
+            CaptureRead();
 
             char c = reader.Read();
 

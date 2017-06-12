@@ -18,8 +18,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Parsers
 
         public TToken Token { get => token; }
 
-        public TType Type { get => token.Type; }
-
 
         public bool HasChildren { get => children != null && children.Count > 0; }
         

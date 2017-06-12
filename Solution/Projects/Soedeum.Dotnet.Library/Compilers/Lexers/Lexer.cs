@@ -7,11 +7,12 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
+    // THOUGHT: Should TReader be part of the signature?
+    // It's there now to facilitate the inhertied Lexers
     public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
         where TToken : IToken<TType>
         where TReader : IReader<char>
     {
-
         // Reader data        
         bool initialized = false;
 
@@ -61,21 +62,21 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // Buffer code
-        protected void BufferRead()
+        protected void CaptureRead()
         {
-            ReleaseBuffer();
+            ReleaseRead();
             bufferLocation = location;
             capturing = true;
         }
 
-        protected void ReleaseBuffer()
+        protected void ReleaseRead()
         {
             buffer.Clear();
             bufferLocation = default(TextLocation);
             capturing = false;
         }
 
-        protected string ExtractBuffer()
+        protected string ExtractRead()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
@@ -131,12 +132,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual TToken CreateTokenFromBuffer(TType type, bool releaseBuffer = true)
         {
-            string value = GetDefaultString(type) ?? ExtractBuffer();
+            string value = GetDefaultString(type) ?? ExtractRead();
 
             var token = CreateToken(type, bufferLocation, value);
 
             if (releaseBuffer)
-                ReleaseBuffer();
+                ReleaseRead();
 
             return token;
         }

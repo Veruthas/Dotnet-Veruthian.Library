@@ -10,6 +10,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         public LookaheadLexer(TReader reader)
             : base(reader) { }
 
+        
         protected virtual bool PeekIsEnd(int lookahead) => reader.PeekIsEnd(lookahead);
 
         protected virtual char Peek(int lookahead) => reader.Peek(lookahead);

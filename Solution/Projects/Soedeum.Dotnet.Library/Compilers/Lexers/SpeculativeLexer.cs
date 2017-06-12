@@ -35,7 +35,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
                 int length = fromPosition - originalPosition;
 
                 if (length > buffer.Length)
-                    ReleaseBuffer();
+                    ReleaseRead();
                 else
                     buffer.Remove(buffer.Length - length, length);
             }

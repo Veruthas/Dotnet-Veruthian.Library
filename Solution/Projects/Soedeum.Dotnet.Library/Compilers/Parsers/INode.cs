@@ -6,7 +6,5 @@ namespace Soedeum.Dotnet.Library.Compilers.Parsers
         where TToken : IToken<TType>
     {
         TToken Token { get; }
-
-        TType Type { get; }
     }
 }
