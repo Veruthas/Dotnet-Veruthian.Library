@@ -1,14 +1,22 @@
-tree Numb := list a as Assignment;
+root    => set trees root to this node
+branch  => a new node point
+leaf    => a terminal node
+tree    => a tree rule
+list    => a list of nodes
 
-tree Assignment := leaf v, branch e as Equation;
 
-tree Equation := branch t as Term, list ts as (leaf o, branch t as Term);
+tree Numb on Numb.n := list a as Assignment;                        ;; <Numb> -> [0]: {<Assignment>}
 
-tree Term := if Variable then leaf
-             if Number then leaf
-             if EnclosedTerm then branch as EnclosedTerm;
+tree Assignment on Assignment.a := leaf v, branch e as Equation;    ;; <Assignment> -> [0]: (Variable) 
 
-tree EnclosedTerm := leaf s, branch e as Equation;
+tree Equation on Equation.e := branch t as Term, list ts as (leaf o, branch t as Term);
+
+tree Term on Term.t:= if t 
+                        is Variable.v      then leaf v
+                        is Number.n        then leaf n
+                        is EnclosedTerm.et then branch et as EnclosedTerm;
+
+tree EnclosedTerm on EnclosedTerm.e := leaf s, branch e as Equation;
 
 
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soedeum.Dotnet.Library", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_TestConsole", "Projects\_TestConsole\_TestConsole.csproj", "{529383F8-3C27-4425-AEA8-C28743D35EF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soedeum.Dotnet.Library.Gray", "Projects\Soedeum.Dotnet.Library.Gray\Soedeum.Dotnet.Library.Gray.csproj", "{2A3527C1-51D1-47E7-AB65-243718D33E6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,9 +48,22 @@ Global
 		{529383F8-3C27-4425-AEA8-C28743D35EF5}.Release|x64.Build.0 = Release|x64
 		{529383F8-3C27-4425-AEA8-C28743D35EF5}.Release|x86.ActiveCfg = Release|x86
 		{529383F8-3C27-4425-AEA8-C28743D35EF5}.Release|x86.Build.0 = Release|x86
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|x64.ActiveCfg = Debug|x64
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|x64.Build.0 = Debug|x64
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|x86.ActiveCfg = Debug|x86
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Debug|x86.Build.0 = Debug|x86
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|x64.ActiveCfg = Release|x64
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|x64.Build.0 = Release|x64
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|x86.ActiveCfg = Release|x86
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{035C2F97-4A69-48D7-A054-C5DF6E3F9EB8} = {08017E7F-71BE-4236-8973-877433A87909}
 		{529383F8-3C27-4425-AEA8-C28743D35EF5} = {08017E7F-71BE-4236-8973-877433A87909}
+		{2A3527C1-51D1-47E7-AB65-243718D33E6C} = {08017E7F-71BE-4236-8973-877433A87909}
 	EndGlobalSection
 EndGlobal

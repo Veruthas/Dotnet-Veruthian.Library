@@ -1,0 +1,68 @@
+rule Gray := {Declaration};
+
+rule Declaration := CharSetDeclaration ;
+
+
+rule CharSetDeclaration := 'charset' Identifier ':=' CharList;
+
+rule CharList := CharSet {'or' CharSet};
+
+rule CharSet := Identifier or Character or CharRange or CharCompliment;
+
+rule CharCompliment := 'not' '(' CharSet ')' ;
+
+rule CharRange := '(' CharValue 'to' CharValue ')' ;
+
+
+;; Keywords
+token CharSetKeyword := 'charset';
+
+token OrKeyword := 'or';
+
+token ToKeyword := 'to';
+
+token NotKeyword := 'not';
+
+
+
+token Character := '\'' (EscapeSequence or any) '\'';
+
+partial token EscapeSequence := '\\' ('n' or 'r' or 't' or '\\' or '\'' or '"' or ('x' hexdigit hexdigit hexdigit )) ;
+
+token Identifier := (alpha or '_') {alphanumeric or '_'};
+
+token IsDefinedAs := ':=';
+
+token ParenthesesStart := '(';
+
+token ParenthesesEnd := ')'
+
+token Semicolon := ';'
+
+
+;; Skip tokens
+skip token Whitespace := {whitespace};
+
+skip token Comment := ';;' {commentchar} ;
+
+
+
+charset commentchar := not (eol or eof);
+
+charset any := not ( eof );
+
+charset alpha := ('a' to 'z') or ('A' to 'Z')
+
+charset numeric := ('0' to '9')
+
+charset alphanumeric := alpha or numeric
+
+charset hexdigit := numeric or ('A' to 'F') or ('a' to 'f');
+
+charset eol := '\n' or '\r';
+
+charset space := ' ' or '\t';
+
+charset whitespace := eol or space;
+
+charset eof := '\0';

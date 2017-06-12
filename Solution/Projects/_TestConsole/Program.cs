@@ -11,11 +11,6 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {            
-            System.Console.WriteLine(a);
-            System.Console.WriteLine(b);
-            System.Console.WriteLine(c);
-            System.Console.WriteLine(d);
-
             Pause();
         }
 
