@@ -1,17 +1,33 @@
-rule Numb := Assignment* ;
+tree Numb := list a as Assignment;
 
-rule Assignment := Variable Assignment Equation SemiColon;
+tree Assignment := leaf v, branch e as Equation;
 
-rule Equation := Term {Operator Term} ;
+tree Equation := branch t as Term, list ts as (leaf o, branch t as Term);
 
-rule Operator := Plus or Minus or Times or DivideBy or Exponent ;
+tree Term := if Variable then leaf
+             if Number then leaf
+             if EnclosedTerm then branch as EnclosedTerm;
 
-rule Term := Variable or Number or EnclosedTerm ;
-
-rule EnclosedTerm := [Plus or Minus] OpenParentheses Equation CloseParentheses ;
+tree EnclosedTerm := leaf s, branch e as Equation;
 
 
-token Number :=  Integer [ '.' (numeric)+  ] [ ('E' or 'e') Integer ] ;
+
+rule Numb := {Assignment}.a ;
+
+rule Assignment := Variable.v Assignment.a Equation.e Semicolon.s;
+
+rule Equation := Term.t {Operator.o Term.t}.ts ;
+
+rule Operator := (Plus or Minus or Times or DivideBy or Exponent) ;
+
+rule Term := (Variable or Number or EnclosedTerm) ;
+
+rule EnclosedTerm := [Sign].s OpenParentheses.op Equation.e CloseParentheses.cp ;
+
+rule Sign := (Plus or Minus) ;
+
+
+token Number :=  Integer [ '.' +{numeric}  ] [ ('E' or 'e') Integer ] ;
 
 subtoken Integer := ['+' or '-'] +{numeric} ;
 
@@ -33,12 +49,14 @@ token OpenParentheses := '(' ;
 
 token CloseParentheses := ')' ;
 
-token SemiColon := ';' ;
+token Semicolon := ';' ;
 
 skiptoken Whitespace := {whitespace} ;
 
-skiptoken LineComment := '#' not (eol or eof) ;
+skiptoken LineComment := '#'  ;
 
+
+charset comment := not (eol or eof) ;
 
 charset numeric := '0' to '9' ;
 

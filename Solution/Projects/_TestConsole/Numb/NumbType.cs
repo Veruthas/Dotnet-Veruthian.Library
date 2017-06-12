@@ -2,24 +2,34 @@ namespace _TestConsole.Numb
 {
     public enum NumbType
     {
-        Eof,
-        Error,
+        // Tokens
+        EofToken,
+        ErrorToken,
 
-        Number,
-        Variable,
+        NumberToken,
+        VariableToken,
 
-        Plus,
-        Minus,
-        Times,
-        DivideBy,
+        PlusToken,
+        MinusToken,
+        TimesToken,
+        DivideByToken,
 
-        PowerOf,
+        PowerOfToken,
         
-        Assign,
+        AssignToken,
         
-        Semicolon,
+        SemicolonToken,
 
-        OpenParentheses,
-        CloseParentheses
+        OpenParenthesesToken,
+        CloseParenthesesToken,
+
+
+        // Rules
+        NumbRule,
+        AssignmentRule,
+        EquationRule,
+        OperatorRule,
+        TermRule,
+        EnclosedTerm,
     }
 }

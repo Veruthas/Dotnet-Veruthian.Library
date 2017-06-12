@@ -5,6 +5,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Parsers
     public interface INode<TToken, TType>
         where TToken : IToken<TType>
     {
+        TToken Token { get; }
 
+        TType Type { get; }
     }
 }
