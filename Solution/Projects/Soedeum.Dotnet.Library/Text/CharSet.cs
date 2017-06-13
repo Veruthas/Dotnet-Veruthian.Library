@@ -4,16 +4,15 @@ using System.Text;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    // TODO: calculate simplifications
     public abstract class CharSet
     {
         public abstract bool Includes(char value);
 
         // Sets
-        public static readonly CharSet All = AllOrNothingSet.AllSet;
+        public static readonly CharSet All = AllSet.Default;
 
-        public static readonly CharSet Nothing = AllOrNothingSet.NothingSet;
-        
+        public static readonly CharSet Nothing = NothingSet.Default;
+
         public static readonly CharSet Null = '\0';
 
         public static readonly CharSet NewLine = FromList('\n', '\r');
@@ -39,31 +38,22 @@ namespace Soedeum.Dotnet.Library.Text
         public static readonly CharSet CStyleIndentifier = FromUnion(LetterOrDigit, '_');
 
 
-        private class AllOrNothingSet : CharSet
+        // Implementations
+        private class AllSet : CharSet
         {
-            bool all;
+            public override bool Includes(char value) => true;
 
-            public AllOrNothingSet(bool all)
-            {
-                this.all = all;
-            }
-
-            public override bool Includes(char value)
-            {
-                return this.all;
-            }
-
-            public static readonly AllOrNothingSet AllSet = new AllOrNothingSet(true);
-
-            public static readonly AllOrNothingSet NothingSet = new AllOrNothingSet(false);
-
-            public override string ToString()
-            {
-                return all ? "<all>" : "<none>";
-            }
+            public static readonly AllSet Default = new AllSet();
         }
 
-        // Implementations
+        private class NothingSet : CharSet
+        {
+            public override bool Includes(char value) => false;
+
+            public static readonly NothingSet Default = new NothingSet();
+        }
+
+
         private class CharValue : CharSet
         {
             public char value;
@@ -160,13 +150,13 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private class CharSetCompliment : CharSet
+        private class CharSetComplement : CharSet
         {
             CharSet set;
 
-            public CharSetCompliment(CharSet set)
+            public CharSetComplement(CharSet set)
             {
-                this.set = set ?? AllOrNothingSet.Nothing;
+                this.set = set ?? Nothing;
             }
 
             public override bool Includes(char value)
@@ -231,17 +221,17 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharSet FromList(params char[] list) => new CharList(list);
 
-        public static CharSet FromCompliment(CharSet set) => new CharSetCompliment(set);
+        public static CharSet FromComplement(CharSet set) => new CharSetComplement(set);
 
         public static CharSet FromUnion(params CharSet[] sets) => OptimizeCharSetUnion(sets);
-        
+
 
         // Todo: make optimizer more efficient (overlapping ranges, compliment elimination, etc)
         private class CharSetOptimizer
         {
             List<CharRange> ranges;
 
-            List<CharSetCompliment> compliments;
+            List<CharSetComplement> compliments;
 
             CharList list;
 
@@ -259,8 +249,8 @@ namespace Soedeum.Dotnet.Library.Text
                         AddList(set as CharList);
                     else if (set is CharValue)
                         AddValue(set as CharValue);
-                    else if (set is CharSetCompliment)
-                        AddCompliment(set as CharSetCompliment);
+                    else if (set is CharSetComplement)
+                        AddCompliment(set as CharSetComplement);
                     else if (set is CharSetUnion)
                         AddUnion(set as CharSetUnion);
                 }
@@ -271,10 +261,10 @@ namespace Soedeum.Dotnet.Library.Text
                 ProcessSets(union.sets);
             }
 
-            public void AddCompliment(CharSetCompliment compliment)
+            public void AddCompliment(CharSetComplement compliment)
             {
                 if (compliments == null)
-                    compliments = new List<CharSetCompliment>();
+                    compliments = new List<CharSetComplement>();
 
                 compliments.Add(compliment);
 
@@ -357,7 +347,7 @@ namespace Soedeum.Dotnet.Library.Text
                 else
                 {
                     if (list != null)
-                    {                        
+                    {
                         list.values.RemoveWhere((c) => CharIncluded(c));
 
                         if (list.values.Count == 0)
@@ -411,7 +401,7 @@ namespace Soedeum.Dotnet.Library.Text
                         if (compliment.Includes(value))
                             return true;
                 }
-                
+
                 return false;
             }
 
