@@ -1,0 +1,51 @@
+List(n)    
+    -> (c0, c1, c2, ..., cn)
+Value
+    -> value
+
+    -> List(1)    
+
+Range
+    -> X to Y, where X < Y
+    
+    -> List(n > 1), where c[x] + 1 = c[x + 1]    
+
+Union
+    -> Every set in a union must be disjoint
+
+    X + Y           => if (x + 1 == y)  -> X to Y
+                       else             -> (X, Y)
+                       
+    (X to Y) + Z    => if (X <= Z <= X) -> X to Y
+                       if (Z + 1 = X)   -> Z to Y
+                       if (Y + 1 = Z)   -> X to Z
+                       else             -> X to Y + Z
+
+    (M to N) + (X to Y) => if (M < X   && N <  X)  -> (M to N) + (X to Y)
+                           if (M > Y   && N >  Y)  -> (M to N) + (X to Y)
+
+    
+    X + not x       => ALL
+
+Compliment
+
+    not not X       => X
+
+    not (X)         => (MIN to X-1)    + (X+1 to MAX)
+
+    not (X, Y)      => (MIN to X-1)    + (X+1 to Y-1)       + (Y+1 to MAX)
+
+    not (X...)      => (MIN to X[0]-1) + (X[0]+1 to X[1]-1) + ... + (X[n]+1 to MAX)
+
+                    -> # of ranges = n+1
+
+    not (X to Y)    => (MIN to X-1)    + (X+1 to MAX)
+
+                    -> treat a range like a single item
+
+
+All
+    => MIN to MAX
+
+NOTHING
+    => not ALL   
