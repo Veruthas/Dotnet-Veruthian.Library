@@ -11,9 +11,10 @@ namespace Soedeum.Dotnet.Library.Text
 
         public abstract bool Includes(char value);
 
+        protected abstract void AddPairs(ICollection<Pair> pairs);
 
         // Sets
-        public static readonly CharacterSet All = AllCharacters.Defualt;
+        public static readonly CharacterSet All = AllCharacters.Default;
 
         public static readonly CharacterSet None = NoCharacters.Defualt;
 
@@ -31,8 +32,8 @@ namespace Soedeum.Dotnet.Library.Text
                 return None;
             else if (list.Length == 1)
                 return FromValue(list[0]);
-            else            
-                return CheckForRanges(list);            
+            else
+                return CheckForRanges(list);
         }
 
         private static CharacterSet CheckForRanges(char[] list)
@@ -111,18 +112,48 @@ namespace Soedeum.Dotnet.Library.Text
                 return new Range(lowest, highest);
         }
 
+        private static CharacterSet FromRange(Pair pair) => FromRange(pair.Lowest, pair.Highest);
+
         public static CharacterSet FromUnion(params CharacterSet[] sets)
         {
             if (sets == null || sets.Length == 0)
                 return None;
+            else if (sets.Length == 1)
+                return sets[0];
             else
             {
-                return null;
+                SortedSet<Pair> pairs = new SortedSet<Pair>();
+
+                foreach (var set in sets)
+
+                    if (set is AllCharacters)
+                        return set;
+                    else
+                        set.AddPairs(pairs);
+
+                Pair[] ranges = MergePairs(pairs);
+
+                if (ranges.Length == 0)
+                    return None;
+                else if (ranges.Length == 1)
+                    return FromRange(ranges[0]);
+                else
+                    return new Union(ranges);
             }
         }
 
+        private static Pair[] MergePairs(SortedSet<Pair> pairs)
+        {
+            List<Pair> merged = new List<Pair>(pairs);
+
+            if (merged.Count < 2)
+                return merged.ToArray();
+
+            
+        }
+
         // Helper
-        private struct Pair : IEquatable<Pair>, IComparable<Pair>, IEnumerable<char>
+        protected struct Pair : IEquatable<Pair>, IComparable<Pair>, IEnumerable<char>
         {
             public char Lowest, Highest;
 
@@ -191,7 +222,9 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override string ToString() => "<all>";
 
-            public static readonly AllCharacters Defualt = new AllCharacters();
+            protected sealed override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(char.MinValue, char.MaxValue));
+
+            public static readonly AllCharacters Default = new AllCharacters();
         }
 
         private class NoCharacters : CharacterSet
@@ -199,6 +232,8 @@ namespace Soedeum.Dotnet.Library.Text
             public override bool Includes(char value) => false;
 
             public override string ToString() => "<none>";
+
+            protected override void AddPairs(ICollection<Pair> pairs) { }
 
             public static readonly NoCharacters Defualt = new NoCharacters();
         }
@@ -209,10 +244,12 @@ namespace Soedeum.Dotnet.Library.Text
 
             public Value(char value) => this.value = value;
 
-            public override bool Includes(char value) => this.value == value;
+            public sealed override bool Includes(char value) => this.value == value;
 
 
             public override string ToString() => GetString(value);
+
+            protected override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(value, value));
         }
 
         private class Range : CharacterSet
@@ -225,6 +262,8 @@ namespace Soedeum.Dotnet.Library.Text
             public Range(Pair region) => this.region = region;
 
             public override bool Includes(char value) => region.Contains(value);
+
+            protected override void AddPairs(ICollection<Pair> pairs) => pairs.Add(region);
 
             public override string ToString() => region.ToString();
         }
@@ -240,6 +279,12 @@ namespace Soedeum.Dotnet.Library.Text
 
 
             public override bool Includes(char value) => this.list.Contains(value);
+
+            protected sealed override void AddPairs(ICollection<Pair> pairs)
+            {
+                foreach (char value in list)
+                    pairs.Add(new Pair(value, value));
+            }
 
             public void Add(char value) => this.list.Add(value);
 
@@ -268,6 +313,7 @@ namespace Soedeum.Dotnet.Library.Text
             public IEnumerator<char> GetEnumerator() => list.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         }
 
         private class Union : CharacterSet
@@ -281,6 +327,11 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override bool Includes(char value) => Find(value) != -1;
 
+            protected sealed override void AddPairs(ICollection<Pair> pairs)
+            {
+                foreach (var range in ranges)
+                    pairs.Add(range);
+            }
             public int Find(char value)
             {
                 int low = 0;
