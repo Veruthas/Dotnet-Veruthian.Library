@@ -10,7 +10,8 @@ namespace _TestConsole
     class Program
     {
         static void Main(string[] args)
-        {            
+        {
+            var set = CharacterSet.FromList('A', 'D', 'E', 'F', 'Z', 'M', 'N', 'O');
             Pause();
         }
 

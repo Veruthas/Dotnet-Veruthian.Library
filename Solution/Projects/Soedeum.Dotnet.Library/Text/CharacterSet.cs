@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -24,15 +25,85 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharacterSet FromValue(char value) => new Value(value);
 
-        public static CharacterSet FromList(params char[] list) => (list == null || list.Length == 0) ? None : new List(list);
+        public static CharacterSet FromList(params char[] list)
+        {
+            if (list == null || list.Length == 0)
+                return None;
+            else if (list.Length == 1)
+                return FromValue(list[0]);
+            else            
+                return CheckForRanges(list);            
+        }
+
+        private static CharacterSet CheckForRanges(char[] list)
+        {
+            List newlist = new List(list);
+
+            List<Pair> pairs = new List<Pair>();
+
+
+            int maxLength = 0;
+
+
+            bool started = false;
+
+            char lowest = '\0';
+
+            char last = '\0';
+
+
+            foreach (char value in newlist)
+            {
+                if (!started)
+                {
+                    started = true;
+                    lowest = last = value;
+                }
+                else
+                {
+                    // Add a range if the two chars are not consecutive
+                    if (last + 1 != value)
+                    {
+                        maxLength = Math.Max(maxLength, (last - lowest) + 1);
+
+                        pairs.Add(new Pair(lowest, last));
+
+                        lowest = value;
+                    }
+
+                    last = value;
+                }
+            }
+
+            // Need to add range for remaining char(s)
+            maxLength = Math.Max(maxLength, (last - lowest) + 1);
+
+            pairs.Add(new Pair(lowest, last));
+
+            // If range is of all characters, return All
+            if (pairs.Count == 1)
+            {
+                var pair = pairs[0];
+
+                if (pair.Lowest == char.MinValue && pair.Highest == char.MaxValue)
+                    return All;
+            }
+
+            // If there are any ranges in the list return a union instead of a list
+            if (maxLength > 1)
+                return new Union(pairs.ToArray());
+            else
+                return newlist;
+        }
 
         public static CharacterSet FromRange(char lowest, char highest)
         {
             if (lowest == highest)
                 return FromValue(lowest);
 
-            if (lowest > highest)
-                Swap(ref lowest,  ref highest);
+            else if (lowest > highest)
+                //Swap(ref lowest, ref highest);
+                return None;
 
             if (lowest == char.MinValue && highest == char.MaxValue)
                 return All;
@@ -40,13 +111,18 @@ namespace Soedeum.Dotnet.Library.Text
                 return new Range(lowest, highest);
         }
 
-        public static CharacterSet FromUnion(CharacterSet sets)
+        public static CharacterSet FromUnion(params CharacterSet[] sets)
         {
-            return null;
+            if (sets == null || sets.Length == 0)
+                return None;
+            else
+            {
+                return null;
+            }
         }
-        
+
         // Helper
-        private struct Pair
+        private struct Pair : IEquatable<Pair>, IComparable<Pair>, IEnumerable<char>
         {
             public char Lowest, Highest;
 
@@ -66,8 +142,35 @@ namespace Soedeum.Dotnet.Library.Text
 
             public bool Contains(char value) => (value >= Lowest) && (value <= Highest);
 
+            public int CompareTo(Pair other)
+            {
+                if (this.Lowest > other.Lowest)
+                    return 1;
+                else if (this.Highest > other.Highest)
+                    return 1;
+                else if (this.Highest < other.Highest)
+                    return -1;
+                else
+                    return 0;
+            }
+
+            public bool Equals(Pair other) => (this.Lowest == other.Lowest) && (this.Highest == other.Highest);
+
 
             public override string ToString() => (Length == 1) ? GetString(Lowest) : GetString(this);
+
+            public IEnumerator<char> GetEnumerator()
+            {
+                char current = Lowest;
+
+                while (current <= Highest)
+                {
+                    yield return current;
+                    current++;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         private static string GetString(char value) => string.Format("'{0}'", TextUtility.GetAsPrintable(value));
@@ -126,7 +229,7 @@ namespace Soedeum.Dotnet.Library.Text
             public override string ToString() => region.ToString();
         }
 
-        private class List : CharacterSet
+        private class List : CharacterSet, IEnumerable<char>
         {
             public SortedSet<char> list;
 
@@ -161,6 +264,10 @@ namespace Soedeum.Dotnet.Library.Text
 
                 return buffer.ToString();
             }
+
+            public IEnumerator<char> GetEnumerator() => list.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         private class Union : CharacterSet
@@ -172,10 +279,28 @@ namespace Soedeum.Dotnet.Library.Text
             public Union(Pair[] ranges) => this.ranges = ranges;
 
 
-            public override bool Includes(char value)
+            public override bool Includes(char value) => Find(value) != -1;
+
+            public int Find(char value)
             {
-                // TODO: Binary search
-                return false;
+                int low = 0;
+                int high = ranges.Length - 1;
+
+                while (low < high)
+                {
+                    int current = (high - low) / 2;
+
+                    var range = ranges[current];
+
+                    if (value < range.Lowest)
+                        high = current - 1;
+                    else if (value > range.Highest)
+                        low = current + 1;
+                    else
+                        return current;
+                }
+
+                return -1;
             }
 
             public override string ToString()
