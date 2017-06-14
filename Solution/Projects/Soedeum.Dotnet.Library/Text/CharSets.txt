@@ -21,13 +21,14 @@ Union
                        if (Y + 1 = Z)   -> X to Z
                        else             -> X to Y + Z
 
-    (M to N) + (X to Y) => if (M < X   && N <  X)  -> (M to N) + (X to Y)
-                           if (M > Y   && N >  Y)  -> (M to N) + (X to Y)
-
+    (M to N) + (X to Y) < Assuming (M < X) >
+                        => (N < Y)                          => DISJOINT -> (M to N) + (X + Y)
+                        => (M <= X) & (N >= Y)              => SUBSUMED -> (M to N)
+                        => (M <= X) & (N < Y)  & (N >= X)   => OVERLAP  -> (M to Y)
     
-    X + not x       => ALL
+    X + not (X)       => ALL
 
-Compliment
+Complement
 
     not not X       => X
 

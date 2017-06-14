@@ -78,23 +78,28 @@ namespace Soedeum.Dotnet.Library.Gray
                         return CreateTokenFromBuffer(GrayType.ParenthesesStartToken);
                     case ')':
                         return CreateTokenFromBuffer(GrayType.ParenthesesEndToken);
-                    case ';'
+                    case ';':
                         if (PeekIs(';'))
                         {
                             ReleaseRead();
+                            return null;
                         }
+                        else
+                            return CreateTokenFromBuffer(GrayType.SemicolonToken);
 
+                    default:
+                        return null;
                 }
-                default:
-                    return null;
             }
         }
 
-        protected override GrayToken ScanCharacter()
+        protected GrayToken ScanCharacter()
         {
             CaptureRead();
 
             Read();
+
+            return null;
         }
     }
 }
