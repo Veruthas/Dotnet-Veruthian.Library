@@ -7,7 +7,15 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            TestEquality();
+            var all = CharacterSet.FromRange(char.MinValue, char.MaxValue);
+
+            var none = CharacterSet.None;
+
+            var union = CharacterSet.FromUnion(all, none);
+            
+            CharacterSetInfo(all);
+            CharacterSetInfo(none);
+            CharacterSetInfo(union);
         }
 
         private static void TestEquality()
@@ -50,6 +58,13 @@ namespace _TestConsole
             TestEquality(union0, union1);
         }
 
+        private static void CharacterSetInfo(CharacterSet set)
+        {
+            System.Console.WriteLine("{{{0}}}", set);
+            System.Console.WriteLine(" Type: {0}", set.GetType().Name);
+            System.Console.WriteLine(" Size: {0}", set.Size);
+            System.Console.WriteLine(" Hashcode: {0}\n", set.GetHashCode());            
+        }
         private static void TestEquality(CharacterSet union0, CharacterSet union1)
         {
             System.Console.WriteLine("{0} {2} {1}", union0, union1, union0 == union1 ? "==" : "!=");
