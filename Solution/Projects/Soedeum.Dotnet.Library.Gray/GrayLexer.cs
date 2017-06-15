@@ -85,8 +85,7 @@ namespace Soedeum.Dotnet.Library.Gray
                             return null;
                         }
                         else
-                            return CreateTokenFromBuffer(GrayType.SemicolonToken);
-
+                            return CreateTokenFromBuffer(GrayType.SemicolonToken);                        
                     default:
                         return null;
                 }

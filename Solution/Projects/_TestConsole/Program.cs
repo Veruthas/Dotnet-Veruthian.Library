@@ -11,7 +11,8 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            var set = CharacterSet.FromList('A', 'D', 'E', 'F', 'Z', 'M', 'N', 'O');
+            TestText.Test();
+            
             Pause();
         }
 
