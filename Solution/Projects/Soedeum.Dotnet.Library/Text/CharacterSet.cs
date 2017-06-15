@@ -127,15 +127,15 @@ namespace Soedeum.Dotnet.Library.Text
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private class CompleteCharacterSet : CharacterSet
+        private class CompleteSet : CharacterSet
         {
-            public CompleteCharacterSet() : base(AsPair.GetHashCode()) { }
+            public CompleteSet() : base(AsPair.GetHashCode()) { }
 
             public override bool Includes(char value) => true;
 
             public override int Size => AsPair.Size;
 
-            protected override bool IsEqualTo(CharacterSet other) => other is CompleteCharacterSet;
+            protected override bool IsEqualTo(CharacterSet other) => other is CompleteSet;
 
             public override IEnumerator<char> GetEnumerator() => AsPair.GetEnumerator();
 
@@ -143,21 +143,21 @@ namespace Soedeum.Dotnet.Library.Text
 
             protected sealed override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(char.MinValue, char.MaxValue));
 
-            public static readonly CompleteCharacterSet Default = new CompleteCharacterSet();
+            public static readonly CompleteSet Default = new CompleteSet();
 
             private static readonly Pair AsPair = new Pair(char.MinValue, char.MaxValue);
         }
 
-        private class EmptyCharacterSet : CharacterSet
+        private class EmptySet : CharacterSet
         {
-            public EmptyCharacterSet() : base(0) { }
+            public EmptySet() : base(0) { }
 
 
             public override bool Includes(char value) => false;
 
             public override int Size => 0;
 
-            protected override bool IsEqualTo(CharacterSet other) => other is EmptyCharacterSet;
+            protected override bool IsEqualTo(CharacterSet other) => other is EmptySet;
 
             public override IEnumerator<char> GetEnumerator()
             {
@@ -168,7 +168,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             protected override void AddPairs(ICollection<Pair> pairs) { }
 
-            public static readonly EmptyCharacterSet Default = new EmptyCharacterSet();
+            public static readonly EmptySet Default = new EmptySet();
         }
 
         private sealed class ValueSet : CharacterSet
@@ -513,7 +513,7 @@ namespace Soedeum.Dotnet.Library.Text
 
                 foreach (var set in sets)
                 {
-                    if (set is CompleteCharacterSet)
+                    if (set is CompleteSet)
                         return set;
                     else
                         set.AddPairs(pairs);
@@ -584,9 +584,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         // Sets
         #region Sets (only using ASCII for now)
-        public static readonly CharacterSet All = CompleteCharacterSet.Default;
+        public static readonly CharacterSet All = CompleteSet.Default;
 
-        public static readonly CharacterSet None = EmptyCharacterSet.Default;
+        public static readonly CharacterSet None = EmptySet.Default;
 
         public static readonly CharacterSet Null = '\0';
 

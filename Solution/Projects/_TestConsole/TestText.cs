@@ -16,7 +16,7 @@ namespace _TestConsole
             CharacterSetInfo(all);
             CharacterSetInfo(none);
             CharacterSetInfo(union);
-            CharacterSetInfo();
+            CharacterSetInfo(none + "ABCD");
         }
 
         private static void TestEquality()
