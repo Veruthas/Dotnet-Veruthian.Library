@@ -149,7 +149,27 @@ namespace Soedeum.Dotnet.Library.Text
             if (merged.Count < 2)
                 return merged.ToArray();
 
-            
+            // This assumes that for the two ranges, low <= high
+            for (int i = 0; i < merged.Count - 1; i++)
+            {
+                Pair low = merged[i];
+                Pair high = merged[i + 1];
+
+                // There is some overlap between mn and xy
+                if (low.Highest >= high.Lowest)
+                {
+                    // The end of the range will be the whatever is higher.
+                    char newHighest = low.Highest > high.Highest ? low.Highest : high.Highest;
+
+                    merged[i] = new Pair(low.Lowest, newHighest);
+                    merged.RemoveAt(i + 1);
+
+                    // Try to merged the same range with the next range
+                    i--;
+                }
+            }
+
+            return merged.ToArray();
         }
 
         // Helper
