@@ -7,7 +7,7 @@ namespace Soedeum.Dotnet.Library.Text
     public static class TextUtility
     {
         // Char Extensions
-        public static bool IsIn(this char value, CharSet set)
+        public static bool IsIn(this char value, CharacterSet set)
         {
             return set.Includes(value);
         }

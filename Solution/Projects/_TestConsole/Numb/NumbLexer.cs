@@ -57,7 +57,7 @@ namespace _TestConsole.Numb
             while (true)
             {
                 char c = Peek();
-                if (c.IsIn(CharSet.Whitespace))
+                if (c.IsIn(CharacterSet.Whitespace))
                 {
                     reader.Read();
                     SkipWhitespace();
@@ -74,14 +74,14 @@ namespace _TestConsole.Numb
 
         public void SkipWhitespace()
         {
-            while (PeekIsIn(CharSet.Whitespace))
+            while (PeekIsIn(CharacterSet.Whitespace))
                 reader.Read();
         }
 
 
         public void SkipComment()
         {
-            while (!IsEnd && !PeekIsIn(CharSet.NewLine))
+            while (!IsEnd && !PeekIsIn(CharacterSet.NewLine))
                 reader.Read();
         }
 
@@ -96,7 +96,7 @@ namespace _TestConsole.Numb
             switch (c)
             {
                 case '+':
-                    if (PeekIsIn(CharSet.Digit))
+                    if (PeekIsIn(CharacterSet.Digit))
                     {
                         return GetNumberToken();
                     }
@@ -104,7 +104,7 @@ namespace _TestConsole.Numb
                         return CreateTokenFromBuffer(NumbType.PlusToken);
                 
                 case '-':
-                    if (PeekIsIn(CharSet.Digit))
+                    if (PeekIsIn(CharacterSet.Digit))
                     {
                         return GetNumberToken(0, -1);
                     }
@@ -139,10 +139,10 @@ namespace _TestConsole.Numb
                     return CreateTokenFromBuffer(NumbType.SemicolonToken);
 
                 default:
-                    if (c.IsIn(CharSet.CStyleIndentifierStart))
+                    if (c.IsIn(CharacterSet.IdentifierFirst))
                         return GetVariableToken();
 
-                    else if (c.IsIn(CharSet.Digit))
+                    else if (c.IsIn(CharacterSet.Digit))
                         return GetNumberToken(c - '0');
 
                     else
@@ -152,7 +152,7 @@ namespace _TestConsole.Numb
 
         private NumbToken GetVariableToken()
         {
-            while (PeekIsIn(CharSet.CStyleIndentifier))
+            while (PeekIsIn(CharacterSet.IdentifierFollow))
                 Read();
 
             return CreateTokenFromBuffer(NumbType.VariableToken);
@@ -164,7 +164,7 @@ namespace _TestConsole.Numb
 
             char c;
 
-            while (PeekIsIn(CharSet.Digit))
+            while (PeekIsIn(CharacterSet.Digit))
             {
                 c = reader.Read();
 
@@ -177,10 +177,10 @@ namespace _TestConsole.Numb
             {
                 Read();
 
-                if (!PeekIsIn(CharSet.Digit))
+                if (!PeekIsIn(CharacterSet.Digit))
                     return CreateTokenFromBuffer(NumbType.ErrorToken);
 
-                while (PeekIsIn(CharSet.Digit))
+                while (PeekIsIn(CharacterSet.Digit))
                 {
                     c = reader.Read();
 
@@ -210,10 +210,10 @@ namespace _TestConsole.Numb
                     signOfExponent = -1;
                     Read();
                 }
-                else if (!c.IsIn(CharSet.Digit))
+                else if (!c.IsIn(CharacterSet.Digit))
                     return CreateTokenFromBuffer(NumbType.ErrorToken);
 
-                while (PeekIsIn(CharSet.Digit))
+                while (PeekIsIn(CharacterSet.Digit))
                 {
                     c = Read();
 
