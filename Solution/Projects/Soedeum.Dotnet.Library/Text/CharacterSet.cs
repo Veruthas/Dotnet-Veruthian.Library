@@ -191,9 +191,9 @@ namespace Soedeum.Dotnet.Library.Text
                 int low = 0;
                 int high = ranges.Length - 1;
 
-                while (low < high)
+                while (low <= high)
                 {
-                    int current = (high - low) / 2;
+                    int current = (high + low) / 2;
 
                     var range = ranges[current];
 
@@ -234,6 +234,8 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static implicit operator CharacterSet(char[] list) => FromList(list);
 
+        public static implicit operator CharacterSet(string list) => FromList(list);
+
         public static CharacterSet FromValue(char value) => new Value(value);
 
         public static CharacterSet FromList(params char[] list)
@@ -246,7 +248,17 @@ namespace Soedeum.Dotnet.Library.Text
                 return CheckForRanges(list);
         }
 
-        private static CharacterSet CheckForRanges(char[] list)
+        public static CharacterSet FromList(string list)
+        {
+            if (string.IsNullOrEmpty(list))
+                return None;
+            else if (list.Length == 1)
+                return FromValue(list[0]);
+            else
+                return CheckForRanges(list);
+        }
+
+        private static CharacterSet CheckForRanges(IEnumerable<char> list)
         {
             List newlist = new List(list);
 
@@ -455,9 +467,40 @@ namespace Soedeum.Dotnet.Library.Text
             b = temp;
         }
 
-        // Sets
+        // Sets (only using ASCII for now)
         public static readonly CharacterSet All = AllCharacters.Default;
 
         public static readonly CharacterSet None = NoCharacters.Default;
+
+        public static readonly CharacterSet Null = '\0';
+
+        public static readonly CharacterSet NewLine = FromList("\n\r");
+
+        public static readonly CharacterSet SpaceOrTab = FromList(" \t");
+
+        public static readonly CharacterSet Whitespace = FromUnion(SpaceOrTab, NewLine);
+
+        public static readonly CharacterSet Lower = FromRange('a', 'z');
+
+        public static readonly CharacterSet Upper = FromRange('A', 'Z');
+
+        public static readonly CharacterSet Letter = FromUnion(Lower, Upper);
+
+        public static readonly CharacterSet LetterOrUnderscore = FromUnion(Letter, '_');
+
+        public static readonly CharacterSet Digit = FromRange('0', '9');
+
+        public static readonly CharacterSet LetterOrDigit = FromUnion(Letter, Digit);
+
+        public static readonly CharacterSet LetterOrDigitOrUnderscore = FromUnion(LetterOrDigit, '_');
+
+        public static readonly CharacterSet HexDigit = FromUnion(Digit, FromRange('A', 'F'), FromRange('a', 'f'));
+
+        public static readonly CharacterSet Symbol = FromList("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+
+        public static readonly CharacterSet IdentifierFirst = LetterOrUnderscore;
+
+        public static readonly CharacterSet IdentifierFollow = LetterOrDigitOrUnderscore;
+
     }
 }

@@ -7,22 +7,14 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            var a = CharacterSet.FromList('A', 'D', 'E', 'F', 'Z', 'M', 'N', 'O');
-            System.Console.WriteLine("({0})\n", a);
+            CharacterSet alpha = CharacterSet.LetterOrDigitOrUnderscore;
 
-            var b = CharacterSet.FromRange('K', 'T');
+            Console.WriteLine("Set: {{{0}}}", alpha);
 
-            var c = CharacterSet.FromRange('M', 'O');
-
-            var d = CharacterSet.FromRange('B', 'L');
-
-            var e = CharacterSet.FromRange('C', 'H');
-
-            TestUnion();
-
-
-            TestEnumerable(a);
-            TestEnumerable(b);
+            foreach (char c in "Hello, I am '31' years old_.")
+            {
+                Console.WriteLine("  {0} [{1}].", c, alpha.Includes(c) ? "YES" : "NO");
+            }
         }
 
         private static void TestUnion()
