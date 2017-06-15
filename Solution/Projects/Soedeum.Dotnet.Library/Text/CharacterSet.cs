@@ -2,12 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public abstract class CharacterSet : IEnumerable<char>
+    public abstract class CharacterSet : IEnumerable<char>, IEquatable<CharacterSet>
     {
-        private CharacterSet() { }
+        int hashcode;
+
+        private CharacterSet(int hashcode)
+        {
+            this.hashcode = hashcode;
+        }
 
         // Abstracts methods
         public abstract bool Includes(char value);
@@ -15,6 +21,35 @@ namespace Soedeum.Dotnet.Library.Text
         public abstract int Size { get; }
 
         protected abstract void AddPairs(ICollection<Pair> pairs);
+
+
+        public override bool Equals(object other)
+        {
+            if (other is CharacterSet)
+                return this.Equals(other as CharacterSet);
+            else
+                return false;
+        }
+
+        public bool Equals(CharacterSet other)
+        {
+            return IsNull(other) ? false : IsEqualTo(other);
+        }
+
+        protected abstract bool IsEqualTo(CharacterSet other);
+
+        public static bool operator ==(CharacterSet left, CharacterSet right)
+        {
+            return IsNull(left) ? false : left.Equals(right);
+        }
+        public static bool operator !=(CharacterSet left, CharacterSet right)
+        {
+            return !(left == right);
+        }
+
+        private static bool IsNull(object T) => T == null;
+
+        public override int GetHashCode() => hashcode;
 
         public abstract IEnumerator<char> GetEnumerator();
 
@@ -24,9 +59,13 @@ namespace Soedeum.Dotnet.Library.Text
         // Classes
         private class AllCharacters : CharacterSet
         {
+            public AllCharacters() : base(AsPair.GetHashCode()) { }
+
             public override bool Includes(char value) => true;
 
             public override int Size => AsPair.Size;
+
+            protected override bool IsEqualTo(CharacterSet other) => other is AllCharacters;
 
             public override IEnumerator<char> GetEnumerator() => AsPair.GetEnumerator();
 
@@ -41,9 +80,14 @@ namespace Soedeum.Dotnet.Library.Text
 
         private class NoCharacters : CharacterSet
         {
+            public NoCharacters() : base(0) { }
+
+
             public override bool Includes(char value) => false;
 
             public override int Size => 0;
+
+            protected override bool IsEqualTo(CharacterSet other) => other is NoCharacters;
 
             public override IEnumerator<char> GetEnumerator()
             {
@@ -57,21 +101,22 @@ namespace Soedeum.Dotnet.Library.Text
             public static readonly NoCharacters Default = new NoCharacters();
         }
 
-        private class Value : CharacterSet
+        private sealed class Value : CharacterSet
         {
             public char value;
 
-            public Value(char value) => this.value = value;
+            public Value(char value) : base(value.GetHashCode()) => this.value = value;
 
+            public override bool Includes(char value) => this.value == value;
 
             public override int Size => 1;
+
+            protected override bool IsEqualTo(CharacterSet other) => (other is Value) && (value == ((Value)other).value);
 
             public override IEnumerator<char> GetEnumerator()
             {
                 yield return value;
             }
-
-            public sealed override bool Includes(char value) => this.value == value;
 
 
             public override string ToString() => GetString(value);
@@ -79,18 +124,21 @@ namespace Soedeum.Dotnet.Library.Text
             protected override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(value, value));
         }
 
-        private class Range : CharacterSet
+        private sealed class Range : CharacterSet
         {
             public Pair range;
 
 
-            public Range(char lowest, char highest) => this.range = new Pair(lowest, highest);
+            public Range(char lowest, char highest)
+                : this(new Pair(lowest, highest)) { }
 
-            public Range(Pair range) => this.range = range;
+            public Range(Pair range) : base(range.GetHashCode()) => this.range = range;
 
             public override bool Includes(char value) => range.Contains(value);
 
             public override int Size => range.Size;
+
+            protected override bool IsEqualTo(CharacterSet other) => (other is Range) && (this.range == ((Range)other).range);
 
             public override IEnumerator<char> GetEnumerator() => range.GetEnumerator();
 
@@ -100,14 +148,14 @@ namespace Soedeum.Dotnet.Library.Text
             public override string ToString() => range.ToString();
         }
 
-        private class List : CharacterSet
+        private sealed class List : CharacterSet
         {
             public SortedSet<char> list;
 
 
-            public List() => this.list = new SortedSet<char>();
+            public List() : base(0) => this.list = new SortedSet<char>();
 
-            public List(IEnumerable<char> list) => this.list = new SortedSet<char>(list);
+            public List(IEnumerable<char> list) : this() => this.Add(list);
 
 
             public override bool Includes(char value) => this.list.Contains(value);
@@ -122,10 +170,30 @@ namespace Soedeum.Dotnet.Library.Text
                     pairs.Add(new Pair(value, value));
             }
 
-            public void Add(char value) => this.list.Add(value);
+            public void Add(char value)
+            {
+                this.list.Add(value);
+                base.hashcode = HashCodeCombiner.Combiner.Combine(list);
+            }
 
-            public void Add(IEnumerable<char> list) => this.list.UnionWith(list);
+            public void Add(IEnumerable<char> list)
+            {
+                this.list.UnionWith(list);
+                base.hashcode = HashCodeCombiner.Combiner.Combine(this.list);
+            }
 
+            protected override bool IsEqualTo(CharacterSet other)
+            {
+                if (other is List)
+                {
+                    List otherList = (List)other;
+
+                    if (this.hashcode == otherList.hashcode)
+                        return this.list.SetEquals(otherList.list);
+                }
+
+                return false;
+            }
 
             public override string ToString()
             {
@@ -147,14 +215,14 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private class Union : CharacterSet
+        private sealed class Union : CharacterSet
         {
             // Use a binary search through regions (a single char a => (a, a))
             public Pair[] ranges;
 
             int size = 0;
 
-            public Union(Pair[] ranges)
+            public Union(Pair[] ranges) : base(HashCodeCombiner.Combiner.Combine(ranges))
             {
                 this.ranges = ranges;
 
@@ -178,7 +246,6 @@ namespace Soedeum.Dotnet.Library.Text
                             yield return current;
                 }
             }
-
 
             protected sealed override void AddPairs(ICollection<Pair> pairs)
             {
@@ -206,6 +273,28 @@ namespace Soedeum.Dotnet.Library.Text
                 }
 
                 return -1;
+            }
+
+            protected override bool IsEqualTo(CharacterSet other)
+            {
+                if (other is Union)
+                {
+                    var union = other as Union;
+
+                    if (this.hashcode == union.hashcode)
+                    {
+                        if (this.ranges.Length == union.ranges.Length)
+                        {
+                            for (int i = 0; i < ranges.Length; i++)
+                                if (this.ranges[i] != union.ranges[i])
+                                    return false;
+
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
 
             public override string ToString()
@@ -439,6 +528,13 @@ namespace Soedeum.Dotnet.Library.Text
 
             public bool Equals(Pair other) => (this.Lowest == other.Lowest) && (this.Highest == other.Highest);
 
+            public override bool Equals(object obj) => (obj is Pair) ? Equals((Pair)obj) : false;
+
+            public static bool operator ==(Pair left, Pair right) => left.Equals(right);
+
+            public static bool operator !=(Pair left, Pair right) => !left.Equals(right);
+
+            public override int GetHashCode() => HashCodeCombiner.Combiner.Combine(Lowest, Highest);
 
             public override string ToString() => (Size == 1) ? GetString(Lowest) : GetString(this);
 
@@ -466,6 +562,7 @@ namespace Soedeum.Dotnet.Library.Text
             a = b;
             b = temp;
         }
+
 
         // Sets (only using ASCII for now)
         public static readonly CharacterSet All = AllCharacters.Default;
@@ -501,6 +598,5 @@ namespace Soedeum.Dotnet.Library.Text
         public static readonly CharacterSet IdentifierFirst = LetterOrUnderscore;
 
         public static readonly CharacterSet IdentifierFollow = LetterOrDigitOrUnderscore;
-
     }
 }

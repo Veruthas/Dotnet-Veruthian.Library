@@ -7,6 +7,60 @@ namespace _TestConsole
     {
         public static void Test()
         {
+            TestEquality();
+        }
+
+        private static void TestEquality()
+        {
+            // Value
+            TestEquality('x', 'x');
+
+            // Range
+            var m = CharacterSet.FromRange('a', 'z');
+            var n = CharacterSet.FromRange('a', 'z');
+
+            TestEquality(m, n);
+
+            // List
+            var x = CharacterSet.FromList("Ar$");
+            var y = CharacterSet.FromList("$Ar");
+
+            TestEquality(x, y);
+
+            var p = CharacterSet.FromList("Arst$");
+            var q = CharacterSet.FromList("$Arst");
+
+            TestEquality(p, q);
+
+            // Union
+            var a = CharacterSet.FromList('A', 'B', 'C', 'D');
+            var b = CharacterSet.FromRange('E', 'H');
+
+            var ab = CharacterSet.FromUnion(a, b);
+
+            var c = CharacterSet.FromValue('I');
+            var d = CharacterSet.FromRange('J', 'W');
+            var e = CharacterSet.FromRange('V', 'Z');
+
+            var ce = CharacterSet.FromUnion(c, e);
+
+            var union0 = CharacterSet.FromUnion(a, b, c, d, e);
+            var union1 = CharacterSet.FromUnion(ab, ce, d);
+
+            TestEquality(union0, union1);
+        }
+
+        private static void TestEquality(CharacterSet union0, CharacterSet union1)
+        {
+            System.Console.WriteLine("{0} {2} {1}", union0, union1, union0 == union1 ? "==" : "!=");
+            System.Console.WriteLine(" Hashcode for union0: {0}", union0.GetHashCode());
+            System.Console.WriteLine(" Hashcode for union1: {0}", union1.GetHashCode());
+            System.Console.WriteLine(" Type 0: {0}", union0.GetType().Name);
+            System.Console.WriteLine(" Type 1: {0}", union1.GetType().Name);
+        }
+
+        private static void TestUnionFind()
+        {
             CharacterSet alpha = CharacterSet.LetterOrDigitOrUnderscore;
 
             Console.WriteLine("Set: {{{0}}}", alpha);

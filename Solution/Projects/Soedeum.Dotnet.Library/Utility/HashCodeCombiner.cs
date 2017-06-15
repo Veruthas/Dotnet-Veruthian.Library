@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Soedeum.Dotnet.Library.Utility
 {
     public class HashCodeCombiner
@@ -50,5 +52,15 @@ namespace Soedeum.Dotnet.Library.Utility
             hash = (hash * primeOffset) + e.GetHashCode();
             return hash;
         }      
+
+        public int Combine<T>(IEnumerable<T> items)
+        {
+            int hash = primeBase;
+            
+            foreach (var item in items)
+                hash = (hash * primeOffset) + item.GetHashCode();
+
+            return hash;
+        }
     }
 }
