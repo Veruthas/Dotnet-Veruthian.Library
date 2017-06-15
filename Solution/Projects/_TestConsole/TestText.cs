@@ -7,15 +7,16 @@ namespace _TestConsole
     {
         public static void Test()
         {
-            var all = CharacterSet.FromRange(char.MinValue, char.MaxValue);
+            var all = CharacterSet.Range(char.MinValue, char.MaxValue);
 
             var none = CharacterSet.None;
 
-            var union = CharacterSet.FromUnion(all, none);
+            var union = CharacterSet.Union(all, none);
             
             CharacterSetInfo(all);
             CharacterSetInfo(none);
             CharacterSetInfo(union);
+            CharacterSetInfo();
         }
 
         private static void TestEquality()
@@ -24,36 +25,36 @@ namespace _TestConsole
             TestEquality('x', 'x');
 
             // Range
-            var m = CharacterSet.FromRange('a', 'z');
-            var n = CharacterSet.FromRange('a', 'z');
+            var m = CharacterSet.Range('a', 'z');
+            var n = CharacterSet.Range('a', 'z');
 
             TestEquality(m, n);
 
             // List
-            var x = CharacterSet.FromList("Ar$");
-            var y = CharacterSet.FromList("$Ar");
+            var x = CharacterSet.List("Ar$");
+            var y = CharacterSet.List("$Ar");
 
             TestEquality(x, y);
 
-            var p = CharacterSet.FromList("Arst$");
-            var q = CharacterSet.FromList("$Arst");
+            var p = CharacterSet.List("Arst$");
+            var q = CharacterSet.List("$Arst");
 
             TestEquality(p, q);
 
             // Union
-            var a = CharacterSet.FromList('A', 'B', 'C', 'D');
-            var b = CharacterSet.FromRange('E', 'H');
+            var a = CharacterSet.List('A', 'B', 'C', 'D');
+            var b = CharacterSet.Range('E', 'H');
 
-            var ab = CharacterSet.FromUnion(a, b);
+            var ab = CharacterSet.Union(a, b);
 
-            var c = CharacterSet.FromValue('I');
-            var d = CharacterSet.FromRange('J', 'W');
-            var e = CharacterSet.FromRange('V', 'Z');
+            var c = CharacterSet.Value('I');
+            var d = CharacterSet.Range('J', 'W');
+            var e = CharacterSet.Range('V', 'Z');
 
-            var ce = CharacterSet.FromUnion(c, e);
+            var ce = CharacterSet.Union(c, e);
 
-            var union0 = CharacterSet.FromUnion(a, b, c, d, e);
-            var union1 = CharacterSet.FromUnion(ab, ce, d);
+            var union0 = CharacterSet.Union(a, b, c, d, e);
+            var union1 = CharacterSet.Union(ab, ce, d);
 
             TestEquality(union0, union1);
         }
@@ -88,16 +89,16 @@ namespace _TestConsole
 
         private static void TestUnion()
         {
-            var a = CharacterSet.FromList('A', 'B', 'C', 'D');
-            var b = CharacterSet.FromRange('E', 'H');
+            var a = CharacterSet.List('A', 'B', 'C', 'D');
+            var b = CharacterSet.Range('E', 'H');
             Unionize(a, b);
-            var ab = CharacterSet.FromUnion(a, b);
-            var c = CharacterSet.FromValue('I');
-            var d = CharacterSet.FromRange('J', 'W');
-            var e = CharacterSet.FromRange('V', 'Z');
-            var ce = CharacterSet.FromUnion(c, e);
+            var ab = CharacterSet.Union(a, b);
+            var c = CharacterSet.Value('I');
+            var d = CharacterSet.Range('J', 'W');
+            var e = CharacterSet.Range('V', 'Z');
+            var ce = CharacterSet.Union(c, e);
             Unionize(c, e);
-            var abcde = CharacterSet.FromUnion(ab, ce, d);
+            var abcde = CharacterSet.Union(ab, ce, d);
             Unionize(ab, ce, d);
         }
 
@@ -120,7 +121,7 @@ namespace _TestConsole
                 initialized = true;
             }
 
-            var union = CharacterSet.FromUnion(sets);
+            var union = CharacterSet.Union(sets);
 
             System.Console.WriteLine(" = {0}", union);
         }
@@ -135,7 +136,7 @@ namespace _TestConsole
                 {
                     var a = sets[i];
 
-                    var c = CharacterSet.FromUnion(a, b);
+                    var c = CharacterSet.Union(a, b);
 
                     Console.WriteLine("{0} + {1} = {2}", a, b, c);
                 }
