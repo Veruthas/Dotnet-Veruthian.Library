@@ -9,6 +9,7 @@ namespace Soedeum.Dotnet.Library.Text
     public abstract class CharacterSet : IEnumerable<char>, IEquatable<CharacterSet>
     {
         #region Base Class
+
         int hashcode;
 
         private CharacterSet(int hashcode)
@@ -115,11 +116,13 @@ namespace Soedeum.Dotnet.Library.Text
 
             public IEnumerator<char> GetEnumerator()
             {
-                char current = Lowest;
+                int lowest = Lowest;
+                int highest = Highest;
+                int current = lowest;
 
-                while (current <= Highest)
+                while (current <= highest)
                 {
-                    yield return current;
+                    yield return (char)current;
                     current++;
                 }
             }
@@ -579,11 +582,13 @@ namespace Soedeum.Dotnet.Library.Text
             a = b;
             b = temp;
         }
+
         #endregion
 
 
         // Sets
         #region Sets (only using ASCII for now)
+
         public static readonly CharacterSet All = CompleteSet.Default;
 
         public static readonly CharacterSet None = EmptySet.Default;
