@@ -99,5 +99,18 @@ namespace Soedeum.Dotnet.Library.Text
         {
             return -1;
         }
+
+
+        // Assumes (m, n) < (x, y)
+        // If combine == true, low will contain the combined set
+        public static bool Combine(ref CharacterRange low, CharacterRange high)
+        {
+            return false;
+        }
+
+        public static bool Simplify(CharacterRange low, CharacterRange high)
+        {
+            return false;
+        }
     }
 }
