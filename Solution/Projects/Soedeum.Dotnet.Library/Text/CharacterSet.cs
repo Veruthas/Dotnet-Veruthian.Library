@@ -22,7 +22,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public abstract int Size { get; }
 
-        protected abstract void AddPairs(ICollection<Pair> pairs);
+        protected abstract void AddPairs(ICollection<CharacterRange> pairs);
 
         protected abstract bool IsEqualTo(CharacterSet other);
 
@@ -67,68 +67,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Classes
-        #region Classes
-        protected struct Pair : IEquatable<Pair>, IComparable<Pair>, IEnumerable<char>
-        {
-            public readonly char Lowest, Highest;
-
-            public Pair(char value)
-            {
-                Lowest = Highest = value;
-            }
-
-            public Pair(char lowest, char highest)
-            {
-                this.Lowest = lowest;
-
-                this.Highest = highest;
-            }
-
-            public int Size => (Highest - Lowest) + 1;
-
-            public bool Contains(char value) => (value >= Lowest) && (value <= Highest);
-
-            public int CompareTo(Pair other)
-            {
-                if (this.Lowest < other.Lowest)
-                    return -1;
-                else if (this.Lowest > other.Lowest)
-                    return 1;
-                else if (this.Highest < other.Highest)
-                    return -1;
-                else if (this.Highest > other.Highest)
-                    return 1;
-                else
-                    return 0;
-            }
-
-            public bool Equals(Pair other) => (this.Lowest == other.Lowest) && (this.Highest == other.Highest);
-
-            public override bool Equals(object obj) => (obj is Pair) ? Equals((Pair)obj) : false;
-
-            public static bool operator ==(Pair left, Pair right) => left.Equals(right);
-
-            public static bool operator !=(Pair left, Pair right) => !left.Equals(right);
-
-            public override int GetHashCode() => HashCodeCombiner.Combiner.Combine(Lowest, Highest);
-
-            public override string ToString() => (Size == 1) ? GetString(Lowest) : GetString(this);
-
-            public IEnumerator<char> GetEnumerator()
-            {
-                int lowest = Lowest;
-                int highest = Highest;
-                int current = lowest;
-
-                while (current <= highest)
-                {
-                    yield return (char)current;
-                    current++;
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
+        #region Classes      
 
         private class CompleteSet : CharacterSet
         {
@@ -144,11 +83,11 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override string ToString() => "<all>";
 
-            protected sealed override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(char.MinValue, char.MaxValue));
+            protected sealed override void AddPairs(ICollection<CharacterRange> pairs) => pairs.Add(new CharacterRange(char.MinValue, char.MaxValue));
 
             public static readonly CompleteSet Default = new CompleteSet();
 
-            private static readonly Pair AsPair = new Pair(char.MinValue, char.MaxValue);
+            private static readonly CharacterRange AsPair = new CharacterRange(char.MinValue, char.MaxValue);
         }
 
         private class EmptySet : CharacterSet
@@ -169,7 +108,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override string ToString() => "<none>";
 
-            protected override void AddPairs(ICollection<Pair> pairs) { }
+            protected override void AddPairs(ICollection<CharacterRange> pairs) { }
 
             public static readonly EmptySet Default = new EmptySet();
         }
@@ -194,18 +133,18 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override string ToString() => GetString(value);
 
-            protected override void AddPairs(ICollection<Pair> pairs) => pairs.Add(new Pair(value, value));
+            protected override void AddPairs(ICollection<CharacterRange> pairs) => pairs.Add(new CharacterRange(value, value));
         }
 
         private sealed class RangeSet : CharacterSet
         {
-            public Pair range;
+            public CharacterRange range;
 
 
             public RangeSet(char lowest, char highest)
-                : this(new Pair(lowest, highest)) { }
+                : this(new CharacterRange(lowest, highest)) { }
 
-            public RangeSet(Pair range) : base(range.GetHashCode()) => this.range = range;
+            public RangeSet(CharacterRange range) : base(range.GetHashCode()) => this.range = range;
 
             public override bool Includes(char value) => range.Contains(value);
 
@@ -216,7 +155,7 @@ namespace Soedeum.Dotnet.Library.Text
             public override IEnumerator<char> GetEnumerator() => range.GetEnumerator();
 
 
-            protected override void AddPairs(ICollection<Pair> pairs) => pairs.Add(range);
+            protected override void AddPairs(ICollection<CharacterRange> pairs) => pairs.Add(range);
 
             public override string ToString() => range.ToString();
         }
@@ -237,10 +176,10 @@ namespace Soedeum.Dotnet.Library.Text
 
             public override IEnumerator<char> GetEnumerator() => list.GetEnumerator();
 
-            protected sealed override void AddPairs(ICollection<Pair> pairs)
+            protected sealed override void AddPairs(ICollection<CharacterRange> pairs)
             {
                 foreach (char value in list)
-                    pairs.Add(new Pair(value, value));
+                    pairs.Add(new CharacterRange(value, value));
             }
 
             public void Add(char value)
@@ -291,11 +230,11 @@ namespace Soedeum.Dotnet.Library.Text
         private sealed class UnionSet : CharacterSet
         {
             // Use a binary search through regions (a single char a => (a, a))
-            public Pair[] ranges;
+            public CharacterRange[] ranges;
 
             int size = 0;
 
-            public UnionSet(Pair[] ranges) : base(HashCodeCombiner.Combiner.Combine(ranges))
+            public UnionSet(CharacterRange[] ranges) : base(HashCodeCombiner.Combiner.Combine(ranges))
             {
                 this.ranges = ranges;
 
@@ -313,14 +252,14 @@ namespace Soedeum.Dotnet.Library.Text
                 foreach (var range in ranges)
                 {
                     if (range.Size == 1)
-                        yield return range.Lowest;
+                        yield return range.Low;
                     else
-                        for (var current = range.Lowest; current <= range.Highest; current++)
+                        for (var current = range.Low; current <= range.High; current++)
                             yield return current;
                 }
             }
 
-            protected sealed override void AddPairs(ICollection<Pair> pairs)
+            protected sealed override void AddPairs(ICollection<CharacterRange> pairs)
             {
                 foreach (var range in ranges)
                     pairs.Add(range);
@@ -337,9 +276,9 @@ namespace Soedeum.Dotnet.Library.Text
 
                     var range = ranges[current];
 
-                    if (value < range.Lowest)
+                    if (value < range.Low)
                         high = current - 1;
-                    else if (value > range.Highest)
+                    else if (value > range.High)
                         low = current + 1;
                     else
                         return current;
@@ -427,7 +366,7 @@ namespace Soedeum.Dotnet.Library.Text
         {
             ListSet newlist = new ListSet(list);
 
-            List<Pair> pairs = new List<Pair>();
+            List<CharacterRange> pairs = new List<CharacterRange>();
 
 
             int maxLength = 0;
@@ -454,7 +393,7 @@ namespace Soedeum.Dotnet.Library.Text
                     {
                         maxLength = Math.Max(maxLength, (last - lowest) + 1);
 
-                        pairs.Add(new Pair(lowest, last));
+                        pairs.Add(new CharacterRange(lowest, last));
 
                         lowest = value;
                     }
@@ -466,14 +405,14 @@ namespace Soedeum.Dotnet.Library.Text
             // Need to add range for remaining char(s)
             maxLength = Math.Max(maxLength, (last - lowest) + 1);
 
-            pairs.Add(new Pair(lowest, last));
+            pairs.Add(new CharacterRange(lowest, last));
 
             // If range is of all characters, return All
             if (pairs.Count == 1)
             {
                 var pair = pairs[0];
 
-                if (pair.Lowest == char.MinValue && pair.Highest == char.MaxValue)
+                if (pair.Low == char.MinValue && pair.High == char.MaxValue)
                     return All;
             }
 
@@ -484,24 +423,24 @@ namespace Soedeum.Dotnet.Library.Text
                 return newlist;
         }
 
-        public static CharacterSet Range(char lowest, char highest)
+        public static CharacterSet Range(char low, char high)
         {
-            if (lowest == highest)
-                return Value(lowest);
+            if (low == high)
+                return Value(low);
 
-            else if (lowest > highest)
+            else if (low > high)
                 //Swap(ref lowest, ref highest);
                 return None;
 
-            if (lowest == char.MinValue && highest == char.MaxValue)
+            if (low == char.MinValue && high == char.MaxValue)
                 return All;
             else
-                return new RangeSet(lowest, highest);
+                return new RangeSet(low, high);
         }
 
-        private static CharacterSet Range(Pair pair)
+        public static CharacterSet Range(CharacterRange pair)
         {
-            return Range(pair.Lowest, pair.Highest);
+            return Range(pair.Low, pair.High);
         }
 
         public static CharacterSet Union(params CharacterSet[] sets)
@@ -512,7 +451,7 @@ namespace Soedeum.Dotnet.Library.Text
                 return sets[0];
             else
             {
-                SortedSet<Pair> pairs = new SortedSet<Pair>();
+                SortedSet<CharacterRange> pairs = new SortedSet<CharacterRange>();
 
                 foreach (var set in sets)
                 {
@@ -522,7 +461,7 @@ namespace Soedeum.Dotnet.Library.Text
                         set.AddPairs(pairs);
                 }
 
-                Pair[] ranges = MergePairs(pairs);
+                CharacterRange[] ranges = MergePairs(pairs);
 
                 if (ranges.Length == 0)
                     return None;
@@ -533,9 +472,9 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private static Pair[] MergePairs(SortedSet<Pair> pairs)
+        private static CharacterRange[] MergePairs(SortedSet<CharacterRange> pairs)
         {
-            List<Pair> merged = new List<Pair>(pairs);
+            List<CharacterRange> merged = new List<CharacterRange>(pairs);
 
             // Nothing to merge
             if (merged.Count < 2)
@@ -544,18 +483,18 @@ namespace Soedeum.Dotnet.Library.Text
             // This assumes that for the two ranges, low <= high
             for (int i = 0; i < merged.Count - 1; i++)
             {
-                Pair low = merged[i];
-                Pair high = merged[i + 1];
+                CharacterRange low = merged[i];
+                CharacterRange high = merged[i + 1];
 
                 // There is some overlap between mn and xy
                 // The plus one is if the low set ends one before the high set
                 // EX: A-C + D-E => A-E
-                if (low.Highest + 1 >= high.Lowest)
+                if (low.High + 1 >= high.Low)
                 {
                     // The end of the range will be the whatever is higher.
-                    char newHighest = low.Highest > high.Highest ? low.Highest : high.Highest;
+                    char newHighest = low.High > high.High ? low.High : high.High;
 
-                    merged[i] = new Pair(low.Lowest, newHighest);
+                    merged[i] = new CharacterRange(low.Low, newHighest);
                     merged.RemoveAt(i + 1);
 
                     // Try to merged the same range with the next range
@@ -573,15 +512,6 @@ namespace Soedeum.Dotnet.Library.Text
         #region Helper methods        
 
         private static string GetString(char value) => string.Format("'{0}'", TextUtility.GetAsPrintable(value));
-
-        private static string GetString(Pair pair) => string.Format("('{0}' to '{1}')", TextUtility.GetAsPrintable(pair.Lowest), TextUtility.GetAsPrintable(pair.Highest));
-
-        private static void Swap(ref char a, ref char b)
-        {
-            var temp = a;
-            a = b;
-            b = temp;
-        }
 
         #endregion
 

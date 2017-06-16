@@ -15,14 +15,13 @@ rule CharRange := '(' CharValue 'to' CharValue ')' ;
 
 
 ;; Keywords
-token CharSetKeyword := 'charset';
+sub token Identifier CharSetKeyword := 'charset';
 
-token OrKeyword := 'or';
+sub token Identifier OrKeyword := 'or';
 
-token ToKeyword := 'to';
+sub token Identifier ToKeyword := 'to';
 
-token NotKeyword := 'not';
-
+sub token Identifier NotKeyword := 'not';
 
 
 token Character := '\'' (EscapeSequence or any) '\'';
