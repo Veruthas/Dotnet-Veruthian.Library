@@ -7,8 +7,12 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    // THOUGHT: Should TReader be part of the signature?
-    // It's there now to facilitate the inhertied Lexers
+    public abstract class Lexer<TToken, TType> : Lexer<TToken, TType, IReader<char>>
+        where TToken : IToken<TType>
+    {
+        public Lexer(Source[] sources) : base(sources) { }
+    }
+
     public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
         where TToken : IToken<TType>
         where TReader : IReader<char>
@@ -36,7 +40,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // Constructor
-        public Lexer(params Source[] sources)
+        public Lexer(Source[] sources)
         {
             if (sources == null || sources.Length == 0)
                 sources = new Source[] { new Source(null, EmptyEnumerable<char>.Default.GetEnumerator()) };
@@ -55,7 +59,13 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         // IEnumerator<Token>
         public void Reset() => throw new NotImplementedException();
 
-        public void Dispose() => reader.Dispose();
+        public void Dispose()
+        {
+            reader.Dispose();
+
+            foreach (Source source in sources)
+                source.Dispose();
+        }
 
 
         public TToken Current

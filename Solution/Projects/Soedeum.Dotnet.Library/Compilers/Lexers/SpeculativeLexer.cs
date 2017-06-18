@@ -5,10 +5,20 @@ using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
+    public abstract class SpeculativeLexer<TToken, TType> : Lexer<TToken, TType, ISpeculativeReader<char>>
+        where TToken : IToken<TType>
+    {
+        public SpeculativeLexer(Source[] sources) : base(sources) { }
+
+    }
+
     public abstract class SpeculativeLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char>
     {
+
+        public SpeculativeLexer(Source[] sources) : base(sources) { }
+
         protected List<TextLocation> markedLocations;
 
         protected virtual void OnRetreated(int fromPosition, int markCount)
