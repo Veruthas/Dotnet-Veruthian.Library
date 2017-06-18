@@ -7,12 +7,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TToken : IToken<TType>
         where TReader : ILookaheadReader<char>
     {        
-        protected virtual bool PeekIsEnd(int lookahead) => reader.PeekIsEnd(lookahead);
+        protected virtual bool PeekIsEnd(int lookahead) => Reader.PeekIsEnd(lookahead);
 
-        protected virtual char Peek(int lookahead) => reader.Peek(lookahead);
+        protected virtual char Peek(int lookahead) => Reader.Peek(lookahead);
 
-        protected virtual bool PeekIsIn(int lookahead, CharacterSet set) => set.Includes(reader.Peek(lookahead));
+        protected virtual bool PeekIsIn(int lookahead, CharacterSet set) => set.Includes(Reader.Peek(lookahead));
 
-        protected virtual bool PeekIs(int lookahead, char value) => reader.Peek(lookahead) == value;
+        protected virtual bool PeekIs(int lookahead, char value) => Reader.Peek(lookahead) == value;
     }
 }

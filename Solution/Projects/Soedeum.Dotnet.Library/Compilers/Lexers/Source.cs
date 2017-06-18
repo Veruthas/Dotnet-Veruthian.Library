@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public class Source
+    public class Source : IDisposable
     {
         public string Name { get; }
 
@@ -14,5 +15,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             this.Name = name;
             this.Data = data;
         }
+
+        public void Dispose() => Data?.Dispose();
     }
 }

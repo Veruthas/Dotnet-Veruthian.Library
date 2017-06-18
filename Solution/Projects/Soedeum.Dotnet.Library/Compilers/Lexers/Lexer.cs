@@ -14,25 +14,25 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TReader : IReader<char>
     {
         // Reader data        
-        protected bool initialized = false;
+        private bool initialized = false;
 
-        protected TextLocation location;
+        private Source[] sources;
 
-        protected TToken current;
+        private int sourceIndex;
 
-        protected Source[] sources;
+        private TToken current;
 
-        protected int sourceIndex;
+        private TextLocation location;
 
-        protected TReader reader;
+        private TReader reader;
 
 
         // Buffer data
-        protected bool capturing = false;
+        private bool capturing = false;
 
-        protected StringBuilder buffer = new StringBuilder();
+        private StringBuilder buffer = new StringBuilder();
 
-        protected TextLocation bufferLocation;
+        private TextLocation bufferLocation;
 
 
         // Constructor
@@ -44,6 +44,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             this.sources = sources;
 
         }
+
+
+        // Properties
+        protected TReader Reader => reader;
+
+        protected virtual TextLocation Location { get => location; set => location = value; }
 
 
         // IEnumerator<Token>
@@ -66,15 +72,18 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         object IEnumerator.Current => Current;
 
+
         // Source
         protected string SourceName { get => sources[sourceIndex].Name; }
 
 
         // Buffer code
+        protected bool IsCapturing => capturing;
+
         protected virtual void CaptureRead()
         {
             ReleaseCaptured();
-            bufferLocation = location;
+            bufferLocation = Location;
             capturing = true;
         }
 
@@ -89,7 +98,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
             else
             {
-                bufferLocation = location;
+                bufferLocation = Location;
             }
         }
 
@@ -101,27 +110,46 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             return buffer.ToString();
         }
 
+        protected virtual void SetBuffer(string data, TextLocation? location = null, bool clear = false)
+        {
+            if (clear)
+                buffer.Clear();
+
+            buffer.Append(data);
+
+            if (location.HasValue)
+                bufferLocation = location.GetValueOrDefault();
+        }
+
+        protected virtual void RemoveFromBufferEnd(int length)
+        {
+            if (length > buffer.Length)
+                ReleaseCaptured();
+            else
+                buffer.Remove(buffer.Length - length, length);
+        }
 
         protected virtual void OnRead(char item)
         {
             if (capturing)
                 buffer.Append(item);
 
-            location = location.MoveToNext(item, reader.Peek());
+            Location = Location.MoveToNext(item, Reader.Peek());
         }
 
+
         // Helper Code    
-        protected virtual bool IsEnd => reader.IsEnd;
+        protected virtual bool IsEnd => Reader.IsEnd;
 
-        protected virtual char Peek() => reader.Peek();
+        protected virtual char Peek() => Reader.Peek();
 
-        protected virtual bool PeekIsIn(CharacterSet set) => set.Includes(reader.Peek());
+        protected virtual bool PeekIsIn(CharacterSet set) => set.Includes(Reader.Peek());
 
-        protected virtual bool PeekIs(char value) => reader.Peek() == value;
+        protected virtual bool PeekIs(char value) => Reader.Peek() == value;
 
         protected virtual char Read()
         {
-            char read = reader.Read();
+            char read = Reader.Read();
 
             OnRead(read);
 
@@ -140,14 +168,14 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             initialized = true;
 
-            if (!reader.IsEnd || GetNextReader())
+            if (!Reader.IsEnd || GetNextReader())
             {
                 current = GetNextToken();
                 return true;
             }
             else
             {
-                current = CreateEofToken(SourceName, location);
+                current = CreateEofToken(SourceName, Location);
                 return false;
             }
 

@@ -17,13 +17,13 @@ namespace _TestConsole.Numb
         static void TestLexer(string program)
 
         {
-            NumbLexer lexer = new NumbLexer((run++).ToString(), program.GetSimpleReader());
+            // NumbLexer lexer = new NumbLexer((run++).ToString(), program.GetSimpleReader());
 
-            foreach (var token in lexer.GetEnumerable())
-            {
-                System.Console.WriteLine(token.ToShortString());
-            }
-            System.Console.WriteLine("--------");
+            // foreach (var token in lexer.GetEnumerable())
+            // {
+            //     System.Console.WriteLine(token.ToShortString());
+            // }
+            // System.Console.WriteLine("--------");
         }
     }
 }

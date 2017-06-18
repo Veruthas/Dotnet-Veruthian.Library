@@ -16,19 +16,16 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             if (markCount > markedLocations.Count)
                 throw new ArgumentOutOfRangeException("markCount");
 
-            if (capturing)
+            if (IsCapturing)
             {
-                int length = fromPosition - reader.Position;
+                int length = fromPosition - Reader.Position;
 
-                if (length > buffer.Length)
-                    ReleaseCaptured();
-                else
-                    buffer.Remove(buffer.Length - length, length);
+                RemoveFromBufferEnd(length);
             }
 
             int markIndex = markedLocations.Count - markCount;
             
-            this.location = markedLocations[markIndex];
+            this.Location = markedLocations[markIndex];
 
             markedLocations.RemoveRange(markIndex, markCount);
         }
@@ -37,19 +34,19 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             if (markedLocations == null)
                 markedLocations = new List<TextLocation>();
-            markedLocations.Add(this.location);
-            reader.Mark();
+            markedLocations.Add(this.Location);
+            Reader.Mark();
         }
 
         protected void Commit()
         {
-            reader.Commit();
+            Reader.Commit();
         }
 
 
         protected int Retreat()
         {
-            int fromPosition = reader.Retreat();
+            int fromPosition = Reader.Retreat();
 
             OnRetreated(fromPosition, 1);
 
@@ -58,7 +55,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected int Retreat(int marks)
         {
-            int fromPosition = reader.Retreat(marks);
+            int fromPosition = Reader.Retreat(marks);
 
             OnRetreated(fromPosition, marks);
 
@@ -67,9 +64,9 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected int RetreatAll()
         {
-            int markCount = reader.MarkCount;
+            int markCount = Reader.MarkCount;
 
-            int fromPosition = reader.RetreatAll();
+            int fromPosition = Reader.RetreatAll();
 
             OnRetreated(fromPosition, markCount);
 

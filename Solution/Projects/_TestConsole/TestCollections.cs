@@ -107,36 +107,19 @@ namespace _TestConsole
             var reader = enumerator.GetSpeculativeReader(
                     generateEndItem,
                     OnRead,
-                    ((r, s) => Console.WriteLine("Marked Position: {0}, with State: {1}", r.Position, s)),
+                    ((r) => Console.WriteLine("Marked Position: {0}, with State: {1}", r.Position)),
                     ((r) => Console.WriteLine("Committed to our speculation at Position {0}", r.Position)),
-                    ((r, from, to, s) => Console.WriteLine("Retreated from {0} to {1}!", from, to)));
+                    ((r, from, to) => Console.WriteLine("Retreated from {0} to {1}!", from, to)));
 
             TestSpeculativeReader(reader, speculateAt, retreatAt);
         }
 
         private static void TestSpeculativeReader<T>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, GenerateEndItem<T> generateEndItem = null)
         {
-            TestSpeculativeReader(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
+            TestSpeculativeReader<T>(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
         }
 
-        private static void TestSpeculativeReader<T, TState>(IEnumerator<T> enumerator, int speculateAt, int retreatAt, GenerateEndItem<T> generateEndItem = null)
-        {
-            var reader = enumerator.GetSpeculativeReader<T, TState>(
-                    generateEndItem, 
-                    OnRead,
-                    ((r, s) => Console.WriteLine("Marked Position: {0}, with State: {1}", r.Position, s)),
-                    ((r) => Console.WriteLine("Committed to our speculation at Position {0}", r.Position)),
-                    ((r, from, to, s) => Console.WriteLine("Retreated from {0} to {1}!", from, to)));
-
-            TestSpeculativeReader(reader, speculateAt, retreatAt);
-        }
-
-        private static void TestSpeculativeReader<T, TState>(IEnumerable<T> enumerable, int speculateAt, int rollbackAt, GenerateEndItem<T> generateEndItem = null)
-        {
-            TestSpeculativeReader<T, TState>(enumerable.GetEnumerator(), speculateAt, rollbackAt, generateEndItem);
-        }
-
-        private static void TestSpeculativeReader<T, TState>(ISpeculativeReader<T, TState> reader, int speculateAt, int rollbackAt)
+        private static void TestSpeculativeReader<T>(ISpeculativeReader<T> reader, int speculateAt, int rollbackAt)
         {
             bool speculated = false;
 
