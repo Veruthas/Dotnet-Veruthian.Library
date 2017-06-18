@@ -1,67 +1,72 @@
-rule Gray := {Declaration};
+grammar Gray
 
-rule Declaration := CharSetDeclaration ;
+    rule Gray := {Declaration} EOF;
 
-
-rule CharSetDeclaration := 'charset' Identifier ':=' CharList;
-
-rule CharList := CharSet {'or' CharSet};
-
-rule CharSet := Identifier or Character or CharRange or CharCompliment;
-
-rule CharCompliment := 'not' '(' CharSet ')' ;
-
-rule CharRange := '(' CharValue 'to' CharValue ')' ;
+    rule Declaration := CharSetDeclaration ;
 
 
-;; Keywords
-sub token Identifier CharSetKeyword := 'charset';
+    rule CharSetDeclaration := 'charset' Identifier ':=' CharList;
 
-sub token Identifier OrKeyword := 'or';
+    rule CharList := CharSet {'or' CharSet};
 
-sub token Identifier ToKeyword := 'to';
+    rule CharSet := Identifier or Character or CharRange or CharCompliment;
 
-sub token Identifier NotKeyword := 'not';
+    rule CharCompliment := 'not' '(' CharSet ')' ;
 
-
-token Character := '\'' (EscapeSequence or any) '\'';
-
-partial token EscapeSequence := '\\' ('n' or 'r' or 't' or '\\' or '\'' or '"' or ('x' hexdigit hexdigit hexdigit )) ;
-
-token Identifier := (alpha or '_') {alphanumeric or '_'};
-
-token IsDefinedAs := ':=';
-
-token ParenthesesStart := '(';
-
-token ParenthesesEnd := ')'
-
-token Semicolon := ';'
+    rule CharRange := '(' CharValue 'to' CharValue ')' ;
 
 
-;; Skip tokens
-skip token Whitespace := {whitespace};
+    ;; Keywords
+    sub token Identifier CharSetKeyword := 'charset';
 
-skip token Comment := ';;' {commentchar} ;
+    sub token Identifier OrKeyword := 'or';
+
+    sub token Identifier ToKeyword := 'to';
+
+    sub token Identifier NotKeyword := 'not';
+
+
+    token Character := '\'' (EscapeSequence or any) '\'';
+
+    partial token EscapeSequence := '\\' ('n' or 'r' or 't' or '\\' or '\'' or '"' or ('x' hexdigit hexdigit hexdigit )) ;
+
+    token Identifier := (alpha or '_') {alphanumeric or '_'};
+
+    token IsDefinedAs := ':=';
+
+    token ParenthesesStart := '(';
+
+    token ParenthesesEnd := ')'
+
+    token Semicolon := ';'
+
+    token EOF = '\0';
+
+    ;; Skip tokens
+    skip token Whitespace := {whitespace};
+
+    skip token Comment := ';;' {commentchar} ;
 
 
 
-charset commentchar := not (eol or eof);
+    charset commentchar := not (eol or eof);
 
-charset any := not ( eof );
+    charset any := not ( eof );
 
-charset alpha := ('a' to 'z') or ('A' to 'Z')
+    charset alpha := ('a' to 'z') or ('A' to 'Z')
 
-charset numeric := ('0' to '9')
+    charset numeric := ('0' to '9')
 
-charset alphanumeric := alpha or numeric
+    charset alphanumeric := alpha or numeric
 
-charset hexdigit := numeric or ('A' to 'F') or ('a' to 'f');
+    charset hexdigit := numeric or ('A' to 'F') or ('a' to 'f');
 
-charset eol := '\n' or '\r';
+    charset eol := '\n' or '\r';
 
-charset space := ' ' or '\t';
+    charset space := ' ' or '\t';
 
-charset whitespace := eol or space;
+    charset whitespace := eol or space;
 
-charset eof := '\0';
+    charset eof := '\0';
+
+end

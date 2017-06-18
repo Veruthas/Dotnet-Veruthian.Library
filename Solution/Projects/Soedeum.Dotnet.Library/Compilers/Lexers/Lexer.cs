@@ -225,6 +225,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected abstract string GetDefaultString(TType type);
 
+        protected abstract bool EofBetweenSources { get; }
+        
         protected abstract TToken GetNextToken();
     }
 }
