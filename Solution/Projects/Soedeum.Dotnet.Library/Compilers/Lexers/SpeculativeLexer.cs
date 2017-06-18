@@ -9,32 +9,35 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char>
     {
-        Stack<TextLocation> markedLocations;
+        protected List<TextLocation> markedLocations;
 
         protected virtual void OnRetreated(int fromPosition, int markCount)
         {
             if (markCount > markedLocations.Count)
                 throw new ArgumentOutOfRangeException("markCount");
-                
+
             if (capturing)
             {
                 int length = fromPosition - reader.Position;
 
                 if (length > buffer.Length)
-                    ReleaseRead();
+                    ReleaseCaptured();
                 else
                     buffer.Remove(buffer.Length - length, length);
             }
 
-            for (int i = 0; i < markCount - 1; i++)
-                markedLocations.Pop();
+            int markIndex = markedLocations.Count - markCount;
+            
+            this.location = markedLocations[markIndex];
 
-            this.location = markedLocations.Pop();
+            markedLocations.RemoveRange(markIndex, markCount);
         }
 
         protected void Mark()
         {
-            markedLocations.Push(this.location);
+            if (markedLocations == null)
+                markedLocations = new List<TextLocation>();
+            markedLocations.Add(this.location);
             reader.Mark();
         }
 

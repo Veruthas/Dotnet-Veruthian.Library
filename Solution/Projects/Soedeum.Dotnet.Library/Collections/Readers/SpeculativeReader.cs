@@ -19,7 +19,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
             public override string ToString()
             {
-                return string.Format("Position: {0}; Index: {1}", Position, Index, );
+                return string.Format("Position: {0}; Index: {1}", Position, Index);
             }
         }
 

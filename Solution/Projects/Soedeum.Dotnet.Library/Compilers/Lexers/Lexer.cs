@@ -27,7 +27,15 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         protected TReader reader;
 
 
+        // Buffer data
+        protected bool capturing = false;
 
+        protected StringBuilder buffer = new StringBuilder();
+
+        protected TextLocation bufferLocation;
+
+
+        // Constructor
         public Lexer(params Source[] sources)
         {
             if (sources == null || sources.Length == 0)
@@ -36,14 +44,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             this.sources = sources;
 
         }
-
-
-        // Buffer data
-        protected bool capturing = false;
-
-        protected StringBuilder buffer = new StringBuilder();
-
-        protected TextLocation bufferLocation;
 
 
         // IEnumerator<Token>
@@ -69,19 +69,28 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         // Source
         protected string SourceName { get => sources[sourceIndex].Name; }
 
+
         // Buffer code
         protected virtual void CaptureRead()
         {
-            ReleaseRead();
+            ReleaseCaptured();
             bufferLocation = location;
             capturing = true;
         }
 
-        protected virtual void ReleaseRead()
+        protected virtual void ReleaseCaptured(bool stopCapture = true)
         {
             buffer.Clear();
-            bufferLocation = default(TextLocation);
-            capturing = false;
+
+            if (stopCapture)
+            {
+                capturing = false;
+                bufferLocation = default(TextLocation);
+            }
+            else
+            {
+                bufferLocation = location;
+            }
         }
 
         protected virtual string ExtractRead()
@@ -128,7 +137,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         // Token code
         public bool MoveNext()
-        {            
+        {
             initialized = true;
 
             if (!reader.IsEnd || GetNextReader())
@@ -145,7 +154,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         }
 
         private bool GetNextReader()
-        {            
+        {
             if (sourceIndex + 1 == sources.Length)
             {
                 return false;
@@ -164,7 +173,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             var token = CreateToken(type, SourceName, bufferLocation, value);
 
             if (releaseBuffer)
-                ReleaseRead();
+                ReleaseCaptured();
 
             return token;
         }
