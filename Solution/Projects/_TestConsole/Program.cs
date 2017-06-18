@@ -11,12 +11,6 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            TestText.Test();
-
-            var s = new Dictionary<char, object>();
-            foreach(char c in CharacterSet.All)
-                s.Add(c, (int)c);
-
             Pause();
         }
 

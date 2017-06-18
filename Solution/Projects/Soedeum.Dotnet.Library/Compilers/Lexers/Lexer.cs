@@ -38,6 +38,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         private TextLocation bufferLocation;
 
+        private Dictionary<string, string> internedStrings = new Dictionary<string, string>();
+
 
         // Constructor
         public Lexer(Source[] sources)
@@ -112,12 +114,24 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
         }
 
-        protected virtual string ExtractRead()
+        protected virtual string GetCaptured()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
 
-            return buffer.ToString();
+            var captured = buffer.ToString();
+
+            if (InternStrings)
+            {
+                if (internedStrings.ContainsKey(captured))
+                    return internedStrings[captured];
+                else
+                    return internedStrings[captured] = captured;
+            }
+            else
+            {
+                return captured;
+            }
         }
 
         protected virtual void SetBuffer(string data, TextLocation? location = null, bool clear = false)
@@ -178,15 +192,26 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             initialized = true;
 
-            if (!Reader.IsEnd || GetNextReader())
+            if (!Reader.IsEnd)
             {
                 current = GetNextToken();
                 return true;
             }
             else
             {
-                current = CreateEofToken(SourceName, Location);
-                return false;
+                // Store potential eof token info
+                var source = SourceName;
+                var location = Location;
+                var value = Peek();
+
+                bool success = GetNextReader();
+
+                if (EofBetweenSources || !success)
+                    current = CreateToken(EofType, source, location, value.ToString());
+                else
+                    current = GetNextToken();
+
+                return success;
             }
 
         }
@@ -199,14 +224,19 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
             else
             {
+                this.location = default(TextLocation);
+
                 this.reader = CreateReader(sources[sourceIndex++]);
+
+                this.ReleaseCaptured();
+
                 return true;
             }
         }
 
         protected virtual TToken CreateTokenFromBuffer(TType type, bool releaseBuffer = true)
         {
-            string value = GetDefaultString(type) ?? ExtractRead();
+            string value = GetCaptured();
 
             var token = CreateToken(type, SourceName, bufferLocation, value);
 
@@ -221,12 +251,13 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected abstract TToken CreateToken(TType type, string source, TextLocation location, string value);
 
-        protected abstract TToken CreateEofToken(string source, TextLocation location);
 
-        protected abstract string GetDefaultString(TType type);
+        protected abstract TType EofType { get; }
 
         protected abstract bool EofBetweenSources { get; }
-        
+
+        protected abstract bool InternStrings { get; }
+
         protected abstract TToken GetNextToken();
     }
 }
