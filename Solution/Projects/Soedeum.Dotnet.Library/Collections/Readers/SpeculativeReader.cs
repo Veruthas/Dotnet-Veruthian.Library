@@ -35,17 +35,14 @@ namespace Soedeum.Dotnet.Library.Collections
         }
 
 
+        // Mark information
         protected List<MarkItem> Marks { get => marks; }
-
 
         protected override bool CanReset { get => !IsSpeculating; }
 
-
         public bool IsSpeculating => marks.Count != 0;
 
-
         public int MarkCount => marks.Count;
-
 
         public int GetMarkPosition(int mark) => marks[mark].Position;
 
@@ -79,6 +76,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public event SpeculationStarted<T, TState> Marked;
 
+
         // Commit
         public void Commit()
         {
@@ -100,12 +98,11 @@ namespace Soedeum.Dotnet.Library.Collections
 
 
         // Retreat
-        public void Retreat()
-        {
-            Retreat(1);
-        }
+        public int Retreat() => Retreat(1);
 
-        public void Retreat(int marks)
+        public int RetreatAll() => Retreat(MarkCount);
+
+        public int Retreat(int marks)
         {
             if (marks < -1 || marks > MarkCount)
                 throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
@@ -132,12 +129,14 @@ namespace Soedeum.Dotnet.Library.Collections
 
                 // Notify suscribers of retreat
                 OnRetreated(oldPosition, this.Position, mark.State);
-            }
-        }
 
-        public void RetreatAll()
-        {
-            Retreat(MarkCount);
+                // Get size of retreat
+                int length = (oldPosition - this.Position) + 1;
+
+                return length;
+            }
+
+            return 0;
         }
 
         protected virtual void OnRetreated(int fromPosition, int originalPosition, TState originalState)

@@ -14,6 +14,6 @@ namespace Soedeum.Dotnet.Library.Collections
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public static readonly EmptyEnumerable<T> Default = new EmptyEnumerable<T>();
+        public static readonly EmptyEnumerable<T> Default = new EmptyEnumerable<T>();    
     }
 }

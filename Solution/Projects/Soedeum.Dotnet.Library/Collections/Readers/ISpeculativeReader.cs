@@ -23,11 +23,11 @@ namespace Soedeum.Dotnet.Library.Collections
 
         void Commit();
 
-        void Retreat();
+        int Retreat();
 
-        void Retreat(int marks);
+        int Retreat(int marks);
 
-        void RetreatAll();
+        int RetreatAll();
 
 
         event SpeculationStarted<T, TState> Marked;

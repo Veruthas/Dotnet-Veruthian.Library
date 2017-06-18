@@ -14,14 +14,28 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TReader : IReader<char>
     {
         // Reader data        
-        bool initialized = false;
+        protected bool initialized = false;
 
         protected TextLocation location;
 
         protected TToken current;
 
-        protected readonly TReader reader;
+        protected Source[] sources;
 
+        protected int sourceIndex;
+
+        protected TReader reader;
+
+
+
+        public Lexer(params Source[] sources)
+        {
+            if (sources == null || sources.Length == 0)
+                sources = new Source[] { new Source(null, EmptyEnumerable<char>.Default.GetEnumerator()) };
+
+            this.sources = sources;
+
+        }
 
 
         // Buffer data
@@ -32,15 +46,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         protected TextLocation bufferLocation;
 
 
-        // Constructor
-        public Lexer(TReader reader)
-        {
-            this.reader = reader;
-
-            AttachBufferEvents();
-        }
-
-
+        // IEnumerator<Token>
         public void Reset() => throw new NotImplementedException();
 
         public void Dispose() => reader.Dispose();
@@ -60,23 +66,25 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         object IEnumerator.Current => Current;
 
+        // Source
+        protected string SourceName { get => sources[sourceIndex].Name; }
 
         // Buffer code
-        protected void CaptureRead()
+        protected virtual void CaptureRead()
         {
             ReleaseRead();
             bufferLocation = location;
             capturing = true;
         }
 
-        protected void ReleaseRead()
+        protected virtual void ReleaseRead()
         {
             buffer.Clear();
             bufferLocation = default(TextLocation);
             capturing = false;
         }
 
-        protected string ExtractRead()
+        protected virtual string ExtractRead()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
@@ -84,13 +92,8 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             return buffer.ToString();
         }
 
-        protected virtual void AttachBufferEvents()
-        {
-            reader.ItemRead += OnRead;
-        }
 
-
-        protected virtual void OnRead(IReader<char> reader, char item)
+        protected virtual void OnRead(char item)
         {
             if (capturing)
                 buffer.Append(item);
@@ -107,34 +110,58 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual bool PeekIs(char value) => reader.Peek() == value;
 
-        protected virtual char Read() => reader.Read();
+        protected virtual char Read()
+        {
+            char read = reader.Read();
 
-        protected virtual void Read(int amount) => reader.Read(amount);
+            OnRead(read);
+
+            return read;
+        }
+
+        protected void Read(int amount)
+        {
+            for (int i = 0; i < amount; i++)
+                Read();
+        }
 
 
         // Token code
-        public virtual bool MoveNext()
-        {
+        public bool MoveNext()
+        {            
             initialized = true;
 
-            if (!reader.IsEnd)
+            if (!reader.IsEnd || GetNextReader())
             {
                 current = GetNextToken();
                 return true;
             }
             else
             {
-                current = CreateEofToken(location);
+                current = CreateEofToken(SourceName, location);
                 return false;
             }
 
+        }
+
+        private bool GetNextReader()
+        {            
+            if (sourceIndex + 1 == sources.Length)
+            {
+                return false;
+            }
+            else
+            {
+                this.reader = CreateReader(sources[sourceIndex++]);
+                return true;
+            }
         }
 
         protected virtual TToken CreateTokenFromBuffer(TType type, bool releaseBuffer = true)
         {
             string value = GetDefaultString(type) ?? ExtractRead();
 
-            var token = CreateToken(type, bufferLocation, value);
+            var token = CreateToken(type, SourceName, bufferLocation, value);
 
             if (releaseBuffer)
                 ReleaseRead();
@@ -143,9 +170,11 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         }
 
         // Abstracts
-        protected abstract TToken CreateEofToken(TextLocation location);
+        protected abstract TReader CreateReader(Source source);
 
-        protected abstract TToken CreateToken(TType type, TextLocation location, string value);
+        protected abstract TToken CreateToken(TType type, string source, TextLocation location, string value);
+
+        protected abstract TToken CreateEofToken(string source, TextLocation location);
 
         protected abstract string GetDefaultString(TType type);
 

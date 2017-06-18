@@ -6,34 +6,17 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char>
     {
-        public SpeculativeLexer(TReader reader)
-            : base(reader) { }
     }
 
     public abstract class SpeculativeLexer<TToken, TType, TReader, TState> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char, TState>
     {
-        public SpeculativeLexer(TReader reader)
-            : base(reader) { }
 
-
-        protected override void AttachBufferEvents()
-        {
-            base.AttachBufferEvents();
-
-            reader.Retreated += OnRetreated;
-        }
-
-        protected virtual void OnRetreated(ISpeculativeReader<char, TState> reader,
-                                int fromPosition,
-                                int originalPosition,
-                                TState originalState)
+        protected virtual void OnRetreated(int length)
         {
             if (capturing)
             {
-                int length = fromPosition - originalPosition;
-
                 if (length > buffer.Length)
                     ReleaseRead();
                 else
@@ -41,15 +24,37 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
         }
 
-        void Mark(TState withState = default(TState)) => reader.Mark();
+        protected void Mark(TState withState = default(TState)) => reader.Mark();
 
-        void Commit() => reader.Commit();
+        protected void Commit() => reader.Commit();
 
-        void Retreat() => reader.Retreat();
 
-        void Retreat(int marks) => reader.Retreat();
+        protected int Retreat()
+        {
+            int length = reader.Retreat();
 
-        void RetreatAll() => reader.RetreatAll();
+            OnRetreated(length);
+
+            return length;
+        }
+
+        protected int Retreat(int marks)
+        {
+            int length = reader.Retreat(marks);
+
+            OnRetreated(length);
+
+            return length;
+        }
+
+        protected int RetreatAll() 
+        {
+            int length = reader.RetreatAll();
+
+            OnRetreated(length);
+
+            return length;
+        }
 
     }
 }

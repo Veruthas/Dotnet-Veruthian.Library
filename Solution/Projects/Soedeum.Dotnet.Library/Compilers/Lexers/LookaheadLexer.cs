@@ -6,11 +6,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
     public abstract class LookaheadLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ILookaheadReader<char>
-    {
-        public LookaheadLexer(TReader reader)
-            : base(reader) { }
-
-        
+    {        
         protected virtual bool PeekIsEnd(int lookahead) => reader.PeekIsEnd(lookahead);
 
         protected virtual char Peek(int lookahead) => reader.Peek(lookahead);
