@@ -1,60 +1,76 @@
+using System;
+using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {
-    public abstract class SpeculativeLexer<TToken, TType, TReader> : SpeculativeLexer<TToken, TType, TReader, object>
+    public abstract class SpeculativeLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<char>
     {
-    }
+        Stack<TextLocation> markedLocations;
 
-    public abstract class SpeculativeLexer<TToken, TType, TReader, TState> : Lexer<TToken, TType, TReader>
-        where TToken : IToken<TType>
-        where TReader : ISpeculativeReader<char, TState>
-    {
-
-        protected virtual void OnRetreated(int length)
+        protected virtual void OnRetreated(int fromPosition, int markCount)
         {
+            if (markCount > markedLocations.Count)
+                throw new ArgumentOutOfRangeException("markCount");
+                
             if (capturing)
             {
+                int length = fromPosition - reader.Position;
+
                 if (length > buffer.Length)
                     ReleaseRead();
                 else
                     buffer.Remove(buffer.Length - length, length);
             }
+
+            for (int i = 0; i < markCount - 1; i++)
+                markedLocations.Pop();
+
+            this.location = markedLocations.Pop();
         }
 
-        protected void Mark(TState withState = default(TState)) => reader.Mark();
+        protected void Mark()
+        {
+            markedLocations.Push(this.location);
+            reader.Mark();
+        }
 
-        protected void Commit() => reader.Commit();
+        protected void Commit()
+        {
+            reader.Commit();
+        }
 
 
         protected int Retreat()
         {
-            int length = reader.Retreat();
+            int fromPosition = reader.Retreat();
 
-            OnRetreated(length);
+            OnRetreated(fromPosition, 1);
 
-            return length;
+            return fromPosition;
         }
 
         protected int Retreat(int marks)
         {
-            int length = reader.Retreat(marks);
+            int fromPosition = reader.Retreat(marks);
 
-            OnRetreated(length);
+            OnRetreated(fromPosition, marks);
 
-            return length;
+            return fromPosition;
         }
 
-        protected int RetreatAll() 
+        protected int RetreatAll()
         {
-            int length = reader.RetreatAll();
+            int markCount = reader.MarkCount;
 
-            OnRetreated(length);
+            int fromPosition = reader.RetreatAll();
 
-            return length;
+            OnRetreated(fromPosition, markCount);
+
+            return fromPosition;
         }
-
     }
 }

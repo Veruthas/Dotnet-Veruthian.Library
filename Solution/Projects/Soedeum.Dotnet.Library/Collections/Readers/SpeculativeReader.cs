@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public class SpeculativeReader<T, TState> : VariableLookaheadReader<T>, ISpeculativeReader<T, TState>
+    public class SpeculativeReader<T> : VariableLookaheadReader<T>, ISpeculativeReader<T>
     {
         protected struct MarkItem
         {
@@ -11,18 +11,15 @@ namespace Soedeum.Dotnet.Library.Collections
 
             public int Index { get; set; }
 
-            public TState State { get; set; }
-
-            public MarkItem(int position, int index, TState state)
+            public MarkItem(int position, int index)
             {
                 this.Position = position;
                 this.Index = index;
-                this.State = state;
             }
 
             public override string ToString()
             {
-                return string.Format("Position: {0}; Index: {1}; State: {2}", Position, Index, ((State.Equals(null)) ? "<Null>" : State.ToString()));
+                return string.Format("Position: {0}; Index: {1}", Position, Index, );
             }
         }
 
@@ -46,35 +43,25 @@ namespace Soedeum.Dotnet.Library.Collections
 
         public int GetMarkPosition(int mark) => marks[mark].Position;
 
-        public TState GetMarkState(int mark) => marks[mark].State;
-
-        public void SetMarkState(int mark, TState state)
-        {
-            MarkItem item = marks[mark];
-
-            item.State = state;
-
-            marks[mark] = item;
-        }
 
 
         // Mark
-        public void Mark(TState withState = default(TState))
+        public void Mark()
         {
             VerifyInitialized();
 
-            marks.Add(new MarkItem(Position, Index, withState));
+            marks.Add(new MarkItem(Position, Index));
 
-            OnMarked(withState);
+            OnMarked();
         }
 
-        protected void OnMarked(TState withState)
+        protected void OnMarked()
         {
             if (Marked != null)
-                Marked(this, withState);
+                Marked(this);
         }
 
-        public event SpeculationStarted<T, TState> Marked;
+        public event SpeculationIncident<T> Marked;
 
 
         // Commit
@@ -94,7 +81,7 @@ namespace Soedeum.Dotnet.Library.Collections
                 Committed(this);
         }
 
-        public event SpeculationIncident<T, TState> Committed;
+        public event SpeculationIncident<T> Committed;
 
 
         // Retreat
@@ -128,7 +115,7 @@ namespace Soedeum.Dotnet.Library.Collections
 
 
                 // Notify suscribers of retreat
-                OnRetreated(oldPosition, this.Position, mark.State);
+                OnRetreated(oldPosition, this.Position);
 
                 // Get size of retreat
                 int length = (oldPosition - this.Position) + 1;
@@ -139,20 +126,12 @@ namespace Soedeum.Dotnet.Library.Collections
             return 0;
         }
 
-        protected virtual void OnRetreated(int fromPosition, int originalPosition, TState originalState)
+        protected virtual void OnRetreated(int fromPosition, int originalPosition)
         {
             if (Retreated != null)
-                Retreated(this, fromPosition, originalPosition, originalState);
+                Retreated(this, fromPosition, originalPosition);
         }
 
-        public event SpeculationRetreated<T, TState> Retreated;
-    }
-
-    public class SpeculativeReader<T> : SpeculativeReader<T, Object>, ISpeculativeReader<T>
-    {
-        public SpeculativeReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
-            : base(enumerator, generateEndItem)
-        {
-        }
+        public event SpeculationRetreated<T> Retreated;
     }
 }
