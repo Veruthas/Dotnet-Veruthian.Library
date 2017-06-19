@@ -99,89 +99,14 @@ namespace Soedeum.Dotnet.Library.Text
             return builder.ToString();
         }
 
-        // Sets
-        #region Sets (only using ASCII for now)
 
-        public static readonly CharSet Complete = CharRange.Complete;
+        #region RangeString
 
-        public static readonly CharSet Empty = new CharSet();
+        public string ToRangeString() => CharRange.ToRangeString(ranges);
 
-        public static readonly CharSet Null = '\0';
-
-        public static readonly CharSet NewLine = List("\n\r");
-
-        public static readonly CharSet SpaceOrTab = List(" \t");
-
-        public static readonly CharSet Whitespace = SpaceOrTab + NewLine;
-
-        public static readonly CharSet Lower = Range('a', 'z');
-
-        public static readonly CharSet Upper = Range('A', 'Z');
-
-        public static readonly CharSet Letter = Lower + Upper;
-
-        public static readonly CharSet LetterOrUnderscore = Letter + '_';
-
-        public static readonly CharSet Digit = Range('0', '9');
-
-        public static readonly CharSet LetterOrDigit = Letter + Digit;
-
-        public static readonly CharSet LetterOrDigitOrUnderscore = LetterOrDigit + '_';
-
-        public static readonly CharSet HexDigit = Union(Digit, Range('A', 'F'), Range('a', 'f'));
-
-        public static readonly CharSet Symbol = List("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
-
-        public static readonly CharSet IdentifierFirst = LetterOrUnderscore;
-
-        public static readonly CharSet IdentifierFollow = LetterOrDigitOrUnderscore;
+        public static CharSet FromRangeString(string rangeString) => new CharSet(CharRange.FromRangeString(rangeString, true));
 
         #endregion
-
-
-        // Range String Format: {Low, High}... with every character less than the one following
-        public string ToRangeString()
-        {
-            StringBuilder builder = new StringBuilder();
-
-            foreach (var range in ranges)
-            {
-                builder.Append(range.Low);
-                builder.Append(range.High);
-            }
-
-            return builder.ToString();
-        }
-
-        public static CharSet FromRangeString(string rangeString)
-        {
-            const string formatError = "RangeString must consist of a set of sorted and unoverlapping character pairs";
-
-            if (string.IsNullOrEmpty(rangeString))
-                return Empty;
-
-            if (rangeString.Length % 2 != 0)
-                throw new FormatException(formatError);
-
-            CharRange[] ranges = new CharRange[rangeString.Length / 2];
-
-            int maxChar = -1;
-
-            for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
-            {
-                char low = rangeString[i];
-                char high = rangeString[i + 1];
-
-                if (low <= maxChar || low > high)
-                    throw new FormatException(formatError);
-
-                maxChar = high;
-
-                ranges[j] = new CharRange(low, high);
-            }
-
-            return new CharSet(ranges);
-        }
 
 
         #region Constructors
@@ -280,6 +205,46 @@ namespace Soedeum.Dotnet.Library.Text
         public static CharSet Complement(CharSet set) => null;
 
         public static CharSet operator ~(CharSet set) => Complement(set);
+
+        #endregion
+
+
+        // Sets
+        #region Sets (only using ASCII for now)
+
+        public static readonly CharSet Complete = CharRange.Complete;
+
+        public static readonly CharSet Empty = new CharSet();
+
+        public static readonly CharSet Null = '\0';
+
+        public static readonly CharSet NewLine = List("\n\r");
+
+        public static readonly CharSet SpaceOrTab = List(" \t");
+
+        public static readonly CharSet Whitespace = SpaceOrTab + NewLine;
+
+        public static readonly CharSet Lower = Range('a', 'z');
+
+        public static readonly CharSet Upper = Range('A', 'Z');
+
+        public static readonly CharSet Letter = Lower + Upper;
+
+        public static readonly CharSet LetterOrUnderscore = Letter + '_';
+
+        public static readonly CharSet Digit = Range('0', '9');
+
+        public static readonly CharSet LetterOrDigit = Letter + Digit;
+
+        public static readonly CharSet LetterOrDigitOrUnderscore = LetterOrDigit + '_';
+
+        public static readonly CharSet HexDigit = Union(Digit, Range('A', 'F'), Range('a', 'f'));
+
+        public static readonly CharSet Symbol = List("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+
+        public static readonly CharSet IdentifierFirst = LetterOrUnderscore;
+
+        public static readonly CharSet IdentifierFollow = LetterOrDigitOrUnderscore;
 
         #endregion
     }

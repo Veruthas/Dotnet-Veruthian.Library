@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
@@ -56,8 +57,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly int MaxSize = ((int)char.MaxValue) + 1;
 
-        public static readonly CharRange Complete = new CharRange(char.MinValue, char.MaxValue);
-
         public bool IsComplete => this == Complete;
 
         public bool IsCharacter => Size == 1;
@@ -66,39 +65,24 @@ namespace Soedeum.Dotnet.Library.Text
         public bool Contains(char value) => (value >= Low) && (value <= High);
 
 
+        public override int GetHashCode() => total;
+
+
         public bool Equals(CharRange other) => this.total == other.total;
 
-        public override bool Equals(object obj) => (obj is CharRange) ? Equals((CharRange)obj) : false;
+        public override bool Equals(object other) => (other is CharRange) ? Equals((CharRange)other) : false;
 
         public static bool operator ==(CharRange left, CharRange right) => left.Equals(right);
 
         public static bool operator !=(CharRange left, CharRange right) => !left.Equals(right);
 
 
-        public int CompareTo(CharRange other)
-        {
-            // if (this.Low < other.Low)
-            //     return -1;
-            // else if (this.Low > other.Low)
-            //     return 1;
-            // else if (this.High < other.High)
-            //     return -1;
-            // else if (this.High > other.High)
-            //     return 1;
-            // else
-            //     return 0;            
-
-            return this.total.CompareTo(other.total);
-        }
+        public int CompareTo(CharRange other) => this.total.CompareTo(other.total);
 
 
         public static bool operator <(CharRange left, CharRange right) => left.total < right.total;
 
         public static bool operator >(CharRange left, CharRange right) => left.total > right.total;
-
-
-        public override int GetHashCode() => total;
-
 
         public override string ToString()
         {
@@ -124,8 +108,14 @@ namespace Soedeum.Dotnet.Library.Text
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
+
+        public static readonly CharRange Complete = new CharRange(char.MinValue, char.MaxValue);
+
+
         public static implicit operator CharRange(char value) => new CharRange(value);
 
+
+        #region Multiple Ranges
 
         public static int Find(CharRange[] sortedSet, char value)
         {
@@ -149,50 +139,178 @@ namespace Soedeum.Dotnet.Library.Text
             return -1;
         }
 
-        // Range Operations
+        public static string ToRangeString(CharRange[] ranges)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var range in ranges)
+            {
+                builder.Append(range.Low);
+                builder.Append(range.High);
+            }
+
+            return builder.ToString();
+        }
+
+        public static CharRange[] FromRangeString(string rangeString, bool verifyOrderedSet = false)
+        {
+            if (string.IsNullOrEmpty(rangeString))
+                return new CharRange[0];
+
+            if (rangeString.Length % 2 != 0)
+                throw new FormatException("Range string must contain character pairs. A lone character was found.");
+
+            CharRange[] ranges = new CharRange[rangeString.Length / 2];
+
+            int maxChar = -1;
+
+            for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
+            {
+                char low = rangeString[i];
+                char high = rangeString[i + 1];
+
+                if (low <= maxChar || low > high)
+                    throw new FormatException("Range string must consist of a set of sorted character pairs with no ranges in common.");
+
+                maxChar = high;
+
+                var range = new CharRange(low, high);
+
+                ranges[j] = range;
+            }
+
+            return ranges;
+        }
+
+        #endregion
+
+        #region Range Operation
 
         // Assumes a <= b
-        // 2 Possible results:
-        //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
-        //  2) Union     (a.l <= b.l) && (a.h <= b.h)   => (a.l to b.h)
-        // public static CharacterRangeResult Combine(ref CharacterRange a, ref CharacterRange b)
-        // {
-        //     if (a.High < b.Low)
-        //     {
-        //         return CharacterRangeResult.Disjoint;
-        //     }
-        //     else
-        //     {
-        //         a = new CharacterRange(a.Low, b.High);
+        public static bool Combine(CharRange a, CharRange b, out CharRange union)
+        {
+            // 2 Possible results:
+            //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
+            //  2) Union     (a.l <= b.l) && (a.h <= b.h)   => (a.l to b.h)
 
-        //         return CharacterRangeResult.Union;
-        //     }
+            if (a.High < b.Low)
+            {
+                union = default(CharRange);
 
-        // }
+                return false;
+            }
+            else
+            {
+                union = new CharRange(a.Low, b.High);
 
-        // Assumes a <= b
-        // 7 Possible results
-        //   1) Disjoint        (a.h < b.l)                   => (a.l to a.h) + (b.l to b.h)                            -- [0]: A     [1]: B        
-        
-        //   2) Overlap         (a.l < b.l) && (a.h < b.h)    => (a.l to b.l - 1) + (b.l to a.l) + (a.l + 1 to b.h)     -- [0]: A     [1]: A|B   [2]: B    
-        //   3) Contained       (a.l < b.l) && (a.h > b.h)    => (a.l to b.l - 1) + (b.l to b.h) + (b.h + 1 to a.l)     -- [0]: A     [1]: A|B   [2]: A
-        //   4) EndContained    (a.l < b.l) && (a.h = b.h)    => (a.l to b.l - 1) + (b.l to a.l)                        -- [0]: A     [1]: A|B  
+                return true;
+            }
+        }
 
-        //   5) StartContained  (a.l = b.l) && (a.h < b.h)    => (a.l to a.h) + (a.h + 1 to b.l)                        -- [0]: A|B   [1]: B
-        //   6) StartOverlap    (a.l = b.l) && (a.h > b.h)    => (a.l to b.h) + (b.h + 1 to a.h)                        -- [0]: A|B   [1]: A
-        //   7) Union           (a.l = b.l) && (a.h = b.h)    => (a.l to b.h)                                           -- [0]: A|B        
-        // public static CharacterRangeResult Split(ref CharacterRange a, ref CharacterRange b, ref CharacterRange c)
-        // {
-        //     if (a.High < b.Low)
-        //     {
-        //         return CharacterRangeResult.Disjoint;
-        //     }
-        //     else if (a.Low < b.Low)
-        //     {
+        public enum SplitResultSet
+        {
+            Neither,
+            A,
+            B,
+            AB
+        }
 
-        //     }
-        //     // Since a <= b, (a.Low == b.Low)
-        //     else
-        // }
+        public struct SplitResult
+        {
+            public SplitResultSet Type { get; }
+
+            public CharRange Range { get; }
+
+            public SplitResult(char low, char high, SplitResultSet type)
+            {
+                this.Range = new CharRange(low, high);
+                this.Type = type;
+            }
+
+            public SplitResult(int low, int high, SplitResultSet type)
+            {
+                this.Range = new CharRange((char)low, (char)high);
+                this.Type = type;
+            }
+
+            public SplitResult(CharRange range, SplitResultSet type)
+            {
+                this.Range = range;
+                this.Type = type;
+            }
+
+            public static readonly SplitResult Neither = new SplitResult();
+        }
+
+        // Assumes a <= b        
+        public bool Split(CharRange a, CharRange b, out SplitResult result0, out SplitResult result1, out SplitResult result2)
+        {
+            // 7 Possible results
+            //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_B
+            //
+            //   (a.l < b.l)
+            //    2) Overlap             (a.h < b.h)   => (a.l to b.l - 1) + (b.l to a.l) + (a.l + 1 to b.h)     -- A_AB_B
+            //    3) SuperSet            (a.h > b.h)   => (a.l to b.l - 1) + (b.l to b.h) + (b.h + 1 to a.h)     -- A_AB_A
+            //    4) SuperSetToEnd       (a.h = b.h)   => (a.l to b.l - 1) + (b.l to b.h)                        -- A_AB            
+            //
+            //   (a.l = b.l)
+            //    5) SubSetFromStart     (a.h < b.h)   => (a.l to a.h)     + (a.h + 1 to b.h)                    -- AB_B
+            //    6) SuperSetFromStart   (a.h > b.h)   => (a.l to b.h)     + (b.h + 1 to a.h)                    -- AB_A
+            //    7) Union               (a.h = b.h)   => (a.l to b.h)                                           -- AB
+
+            // [1] (a.h < b.l) | Disjoint => A_B
+            if (a.high < b.low)
+            {
+                result0 = result1 = result2 = SplitResult.Neither;
+
+                return false;
+            }
+
+            // [2-4] (a.l < b.l) => A_AB_[A|B|X]
+            else if (a.low < b.low)
+            {
+                // A => (a.l to b.l - 1)
+                result0 = new SplitResult(a.low, b.low - 1, SplitResultSet.A);
+
+
+                // AB => (b.l to MIN(a.h, b.h))
+                int ab_high = Math.Min(a.high, b.high);
+
+                result1 = new SplitResult(b.low, ab_high, SplitResultSet.AB);
+
+
+                // [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))
+                if (a.high > b.high)
+                    result2 = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
+                else if (b.high > a.high)
+                    result2 = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
+                else
+                    result2 = SplitResult.Neither;
+            }
+
+            // [5-7] (a.l == b.l) => AB_[A|B|X]_X
+            else
+            {
+                // AB => (a.l to MIN(a.h, b.h))
+                int ab_high = Math.Min(a.high, b.high);
+
+                result0 = new SplitResult(a.low, ab_high, SplitResultSet.AB);
+
+                // [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))
+                if (a.high > b.high)
+                    result1 = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
+                else if (b.high > a.high)
+                    result1 = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
+                else
+                    result1 = SplitResult.Neither;
+
+                // X
+                result2 = SplitResult.Neither;
+            }
+
+            return true;
+        }
+
+        #endregion
     }
 }
