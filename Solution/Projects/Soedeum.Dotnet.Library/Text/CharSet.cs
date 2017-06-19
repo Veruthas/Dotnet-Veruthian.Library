@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Soedeum.Dotnet.Library.Utility;
 
@@ -67,7 +68,7 @@ namespace Soedeum.Dotnet.Library.Text
         public override bool Equals(object other) => (other is CharSet) ? Equals(other) : false;
 
         public static bool operator ==(CharSet left, CharSet right) => left.Equals(right);
-        
+
         public static bool operator !=(CharSet left, CharSet right) => !left.Equals(right);
 
 
@@ -193,9 +194,15 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // From Union
-        public static CharSet Union(params CharSet[] sets) => null;
 
-        public static CharSet Union(params CharRange[] ranges) => null;
+        public static CharSet Union(params CharSet[] sets) => ReduceRanges(GetSortedRangeSet(sets));
+
+        public static CharSet Union(IEnumerable<CharSet> sets) => ReduceRanges(GetSortedRangeSet(sets));
+
+        public static CharSet Union(params CharRange[] ranges) => ReduceRanges(GetSortedRangeSet(ranges));
+
+        public static CharSet Union(IEnumerable<CharRange> ranges) => ReduceRanges(GetSortedRangeSet(ranges));
+
 
         public static implicit operator CharSet(CharSet[] sets) => Union(sets);
 
@@ -203,6 +210,63 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharSet operator +(CharSet left, CharSet right) => Union(left, right);
 
+        private static SortedSet<CharRange> GetSortedRangeSet(IEnumerable<CharSet> sets)
+        {
+            SortedSet<CharRange> list = new SortedSet<CharRange>();
+
+            foreach (var set in sets)
+                list.UnionWith(set.ranges);
+
+            return list;
+        }
+
+        private static SortedSet<CharRange> GetSortedRangeSet(IEnumerable<CharRange> ranges)
+        {
+            SortedSet<CharRange> list = new SortedSet<CharRange>(ranges);
+
+            return list;
+        }
+
+        private static CharSet ReduceRanges(SortedSet<CharRange> ranges)
+        {
+            if (ranges.Count == 0)
+                return Empty;
+            else if (ranges.Count == 1)
+            {
+                var range = ranges.ElementAt(0);
+
+                if (range.IsComplete)
+                    return Complete;
+                else
+                    return Range(range);
+            }
+            else
+            {
+                List<CharRange> list = new List<CharRange>(ranges);
+
+                for (int i = 0; i < list.Count - 1; i++)
+                {
+                    var low = list[i];
+                    var high = list[i + 1];
+
+                    if (CharRange.Combine(low, high, out var union))
+                    {
+                        list[i] = union;
+
+                        // Remove reduntant range
+                        list.RemoveAt(i + 1);
+
+                        // Try to merge new range with next range                        
+                        i--;
+                    }
+                }
+
+                if (list.Count == 1 && list[0].IsComplete)
+                    return Complete;
+                else 
+                    return new CharSet(list.ToArray());
+            }
+        }
 
         // From Complement
         public static CharSet Complement(CharSet set) => null;

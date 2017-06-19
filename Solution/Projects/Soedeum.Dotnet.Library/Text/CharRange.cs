@@ -122,6 +122,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         #region Multiple Ranges
 
+        // Find/Contains
         public static int Find(CharRange[] sortedSet, char value)
         {
             int low = 0;
@@ -144,6 +145,10 @@ namespace Soedeum.Dotnet.Library.Text
             return -1;
         }
 
+        public static bool Contains(CharRange[] sortedSet, char value) => Find(sortedSet, value) != -1;
+
+
+        // Range String
         public static string ToRangeString(CharRange[] ranges)
         {
             StringBuilder builder = new StringBuilder();
@@ -190,7 +195,6 @@ namespace Soedeum.Dotnet.Library.Text
         #endregion
 
         #region Range Operation
-
 
         // Combine
         public static bool Combine(CharRange a, CharRange b, out CharRange union)
