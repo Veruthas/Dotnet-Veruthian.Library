@@ -84,6 +84,11 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator >(CharRange left, CharRange right) => left.total > right.total;
 
+        public static bool operator <=(CharRange left, CharRange right) => left.total <= right.total;
+
+        public static bool operator >=(CharRange left, CharRange right) => left.total >= right.total;
+
+
         public override string ToString()
         {
             if (IsCharacter)
@@ -186,8 +191,17 @@ namespace Soedeum.Dotnet.Library.Text
 
         #region Range Operation
 
-        // Assumes a <= b
+
+        // Combine
         public static bool Combine(CharRange a, CharRange b, out CharRange union)
+        {
+            return (a <= b)
+                    ? OrderedCombine(a, b, out union)
+                    : OrderedCombine(b, a, out union);
+        }
+
+        // Assumes a <= b
+        public static bool OrderedCombine(CharRange a, CharRange b, out CharRange union)
         {
             // 2 Possible results:
             //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -207,6 +221,40 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
+
+        // Intersect        
+        public bool Intersect(CharRange a, CharRange b, out CharRange intersection)
+        {
+            return (a <= b)
+                    ? OrderedIntersect(a, b, out intersection)
+                    : OrderedIntersect(b, a, out intersection);
+        }
+
+        // Assumes a <= b 
+        public bool OrderedIntersect(CharRange a, CharRange b, out CharRange intersection)
+        {
+            // 2 Possible results:
+            //  1) Disojoint    (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
+            //  2) Intersection (a.l <= b.l) && (a.h <= b.h)   => (b.l to MIN(a.h, b.h))
+
+            if (a.High < b.Low)
+            {
+                intersection = default(CharRange);
+
+                return false;
+            }
+            else
+            {
+                int ab_high = Math.Min(a.high, b.high);
+
+                intersection = new CharRange(b.low, (char)ab_high);
+
+                return true;
+            }
+        }
+
+
+        // Split
         public enum SplitResultSet
         {
             Neither,
@@ -242,74 +290,62 @@ namespace Soedeum.Dotnet.Library.Text
             public static readonly SplitResult Neither = new SplitResult();
         }
 
-        // Assumes a <= b        
-        public bool Split(CharRange a, CharRange b, out SplitResult result0, out SplitResult result1, out SplitResult result2)
+        public bool Split(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        {
+            return (a <= b)
+                    ? OrderedSplit(a, b, out before, out intersection, out after)
+                    : OrderedSplit(b, a, out before, out intersection, out after);
+        }
+
+        // Assumes a <= b 
+        public bool OrderedSplit(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             // 7 Possible results
-            //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_B
+            //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_X_B
             //
             //   (a.l < b.l)
             //    2) Overlap             (a.h < b.h)   => (a.l to b.l - 1) + (b.l to a.l) + (a.l + 1 to b.h)     -- A_AB_B
             //    3) SuperSet            (a.h > b.h)   => (a.l to b.l - 1) + (b.l to b.h) + (b.h + 1 to a.h)     -- A_AB_A
-            //    4) SuperSetToEnd       (a.h = b.h)   => (a.l to b.l - 1) + (b.l to b.h)                        -- A_AB            
+            //    4) SuperSetToEnd       (a.h = b.h)   => (a.l to b.l - 1) + (b.l to b.h)                        -- A_AB_X           
             //
             //   (a.l = b.l)
-            //    5) SubSetFromStart     (a.h < b.h)   => (a.l to a.h)     + (a.h + 1 to b.h)                    -- AB_B
-            //    6) SuperSetFromStart   (a.h > b.h)   => (a.l to b.h)     + (b.h + 1 to a.h)                    -- AB_A
-            //    7) Union               (a.h = b.h)   => (a.l to b.h)                                           -- AB
+            //    5) SubSetFromStart     (a.h < b.h)   => (a.l to a.h)     + (a.h + 1 to b.h)                    -- X_AB_B
+            //    6) SuperSetFromStart   (a.h > b.h)   => (a.l to b.h)     + (b.h + 1 to a.h)                    -- X_AB_A
+            //    7) Union               (a.h = b.h)   => (a.l to b.h)                                           -- X_AB_X
 
             // [1] (a.h < b.l) | Disjoint => A_B
             if (a.high < b.low)
             {
-                result0 = result1 = result2 = SplitResult.Neither;
+                before = new SplitResult(a, SplitResultSet.A);
+
+                intersection = SplitResult.Neither;
+
+                after = new SplitResult(a, SplitResultSet.B);
 
                 return false;
             }
-
-            // [2-4] (a.l < b.l) => A_AB_[A|B|X]
-            else if (a.low < b.low)
-            {
-                // A => (a.l to b.l - 1)
-                result0 = new SplitResult(a.low, b.low - 1, SplitResultSet.A);
-
-
-                // AB => (b.l to MIN(a.h, b.h))
-                int ab_high = Math.Min(a.high, b.high);
-
-                result1 = new SplitResult(b.low, ab_high, SplitResultSet.AB);
-
-
-                // [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))
-                if (a.high > b.high)
-                    result2 = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
-                else if (b.high > a.high)
-                    result2 = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
-                else
-                    result2 = SplitResult.Neither;
-            }
-
-            // [5-7] (a.l == b.l) => AB_[A|B|X]_X
             else
             {
-                // AB => (a.l to MIN(a.h, b.h))
+                // BEFORE -> [A|X] => when a.l != b.l, (a.l to b.l - 1)
+                before = (a.low == b.low) ? SplitResult.Neither : new SplitResult(a.low, b.low - 1, SplitResultSet.A);
+
+                // INTERSECTION -> AB => (b.l to MIN(a.h, b.h))     
                 int ab_high = Math.Min(a.high, b.high);
 
-                result0 = new SplitResult(a.low, ab_high, SplitResultSet.AB);
+                intersection = new SplitResult(b.low, ab_high, SplitResultSet.AB);
 
-                // [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))
+                // AFTER -> [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))                
                 if (a.high > b.high)
-                    result1 = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
+                    after = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
                 else if (b.high > a.high)
-                    result1 = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
+                    after = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
                 else
-                    result1 = SplitResult.Neither;
+                    after = SplitResult.Neither;
 
-                // X
-                result2 = SplitResult.Neither;
+                return true;
             }
-
-            return true;
         }
+
 
         #endregion
     }

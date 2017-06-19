@@ -71,6 +71,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool operator !=(CharSet left, CharSet right) => !left.Equals(right);
 
 
+        public override int GetHashCode() => hashcode;
+
+
         public CharRange[] ToArray() => ranges.Clone() as CharRange[];
 
 
