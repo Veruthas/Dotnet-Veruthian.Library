@@ -56,9 +56,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly int MaxSize = ((int)char.MaxValue) + 1;
 
-        public static readonly CharRange All = new CharRange(char.MinValue, char.MaxValue);
+        public static readonly CharRange Complete = new CharRange(char.MinValue, char.MaxValue);
 
-        public bool IsAll => this == All;
+        public bool IsComplete => this == Complete;
 
         public bool IsCharacter => Size == 1;
 
