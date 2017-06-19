@@ -7,12 +7,38 @@ namespace _TestConsole
     {
         public static void Test()
         {
+            CharSet value = 'f';
+            TestRangeString(value);
+
+            CharSet range = CharSet.Range('a', 'z');
+            TestRangeString(range);
+
+            CharSet list0 = CharSet.List(" \t\r\n");
+            TestRangeString(list0);   
+            
+            CharSet list1 = CharSet.List("Axf143efffhg2");
+            TestRangeString(list1);
+        }
+
+        private static void TestRangeString(CharSet set)
+        {
+            Console.WriteLine("{{{0}}}", set);
+
+            string setS = set.ToRangeString();
+            Console.WriteLine("\"{0}\"", setS);
+
+            var setRS = CharSet.FromRangeString(setS);
+            Console.WriteLine("{{{0}}}", setRS);
+        }
+
+        private static void OldTest()
+        {
             var all = CharacterSet.Range(char.MinValue, char.MaxValue);
 
             var none = CharacterSet.None;
 
             var union = CharacterSet.Union(all, none);
-            
+
             CharacterSetInfo(all);
             CharacterSetInfo(none);
             CharacterSetInfo(union);
@@ -64,7 +90,7 @@ namespace _TestConsole
             System.Console.WriteLine("{{{0}}}", set);
             System.Console.WriteLine(" Type: {0}", set.GetType().Name);
             System.Console.WriteLine(" Size: {0}", set.Size);
-            System.Console.WriteLine(" Hashcode: {0}\n", set.GetHashCode());            
+            System.Console.WriteLine(" Hashcode: {0}\n", set.GetHashCode());
         }
         private static void TestEquality(CharacterSet union0, CharacterSet union1)
         {

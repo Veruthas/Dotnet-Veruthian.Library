@@ -6,13 +6,14 @@ using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public class CharSet
+    public class CharSet : IEquatable<CharSet>
     {
         readonly CharRange[] ranges;
 
         readonly int size;
 
         readonly int hashcode;
+
 
         private CharSet(params CharRange[] ranges)
         {
@@ -28,20 +29,46 @@ namespace Soedeum.Dotnet.Library.Text
         public int Size => size;
 
 
-        public bool IsComplete => size == CharRange.MaxSize;
-
         public bool IsEmpty => size == 0;
-
-        public bool IsRange => ranges.Length == 1 && size > 1;
 
         public bool IsCharacter => size == 1;
 
-        public bool IsList => ranges.Length == size;
+        public bool IsComplete => size == CharRange.MaxSize;
+
+        public bool IsRange => ranges.Length == 1 && size > 1;
+
+        public bool IsList => ranges.Length == size && size > 1;
 
 
         public bool Contains(char value) => CharRange.Find(ranges, value) != -1;
 
         public int Find(char value) => CharRange.Find(ranges, value);
+
+
+        public bool Equals(CharSet other)
+        {
+            if (this.ranges == other.ranges)
+                return true;
+
+            if (this.hashcode == other.hashcode
+                && this.size == other.size
+                && this.ranges.Length == other.ranges.Length)
+            {
+                for (int i = 0; i < ranges.Length; i++)
+                {
+                    if (this.ranges[i] != other.ranges[i])
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object other) => (other is CharSet) ? Equals(other) : false;
+
+        public static bool operator ==(CharSet left, CharSet right) => left.Equals(right);
+        
+        public static bool operator !=(CharSet left, CharSet right) => !left.Equals(right);
 
 
         public CharRange[] ToArray() => ranges.Clone() as CharRange[];
@@ -112,6 +139,51 @@ namespace Soedeum.Dotnet.Library.Text
         #endregion
 
 
+        // Range String Format: {Low, High}... with every character less than the one following
+        public string ToRangeString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var range in ranges)
+            {
+                builder.Append(range.Low);
+                builder.Append(range.High);
+            }
+
+            return builder.ToString();
+        }
+
+        public static CharSet FromRangeString(string rangeString)
+        {
+            const string formatError = "RangeString must consist of a set of sorted and unoverlapping character pairs";
+
+            if (string.IsNullOrEmpty(rangeString))
+                return Empty;
+
+            if (rangeString.Length % 2 != 0)
+                throw new FormatException(formatError);
+
+            CharRange[] ranges = new CharRange[rangeString.Length / 2];
+
+            int maxChar = -1;
+
+            for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
+            {
+                char low = rangeString[i];
+                char high = rangeString[i + 1];
+
+                if (low <= maxChar || low > high)
+                    throw new FormatException(formatError);
+
+                maxChar = high;
+
+                ranges[j] = new CharRange(low, high);
+            }
+
+            return new CharSet(ranges);
+        }
+
+
         #region Constructors
 
         // From Value
@@ -129,19 +201,73 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // From List
-        public static CharSet List(params char[] chars) => throw new NotImplementedException();
+        public static CharSet List(params char[] chars) => FromList(chars);
 
-        public static CharSet List(IEnumerable<char> chars) => throw new NotImplementedException();
+        public static CharSet List(IEnumerable<char> chars) => FromList(chars);
 
-        public static CharSet List(string chars) => throw new NotImplementedException();
+        public static CharSet List(string chars) => FromList(chars);
 
         public static implicit operator CharSet(string chars) => List(chars);
 
+        public static implicit operator CharSet(char[] chars) => List(chars);
+
+        private static CharSet FromList(IEnumerable<char> chars)
+        {
+            // Compress ranges
+            SortedSet<char> sortedChars = new SortedSet<char>(chars);
+
+            List<CharRange> ranges = new List<CharRange>();
+
+
+            if (sortedChars.Count == 0) return Empty;
+
+            if (sortedChars.Count == CharRange.MaxSize) return Complete;
+
+
+            bool started = false;
+
+            char low = '\0';
+
+            char high = '\0';
+
+            CharRange range;
+
+            foreach (char value in sortedChars)
+            {
+                if (!started)
+                {
+                    started = true;
+                    low = high = value;
+                }
+                else
+                {
+                    // Add a range if this char and previous aren't consecutive
+                    if (high + 1 != value)
+                    {
+                        range = new CharRange(low, high);
+
+                        ranges.Add(range);
+
+                        low = value;
+                    }
+
+                    high = value;
+                }
+            }
+
+            // Add range for remaining char(s)
+            range = new CharRange(low, high);
+
+            ranges.Add(range);
+
+
+            return new CharSet(ranges.ToArray());
+        }
 
         // From Union
-        public static CharSet Union(params CharSet[] sets) => throw new NotImplementedException();
+        public static CharSet Union(params CharSet[] sets) => null;
 
-        public static CharSet Union(params CharRange[] ranges) => throw new NotImplementedException();
+        public static CharSet Union(params CharRange[] ranges) => null;
 
         public static implicit operator CharSet(CharSet[] sets) => Union(sets);
 
@@ -151,7 +277,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // From Complement
-        public static CharSet Complement(CharSet set) => throw new NotImplementedException();
+        public static CharSet Complement(CharSet set) => null;
 
         public static CharSet operator ~(CharSet set) => Complement(set);
 

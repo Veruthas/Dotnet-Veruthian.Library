@@ -10,11 +10,11 @@ namespace Soedeum.Dotnet.Library.Text
     public struct CharRange : IEquatable<CharRange>, IComparable<CharRange>, IEnumerable<char>
     {
         [FieldOffsetAttribute(0)]
-        public readonly char low;
+        private readonly char low;
 
 
         [FieldOffsetAttribute(2)]
-        public readonly char high;
+        private readonly char high;
 
 
         // Total => bytes: [0-1]:low, [2-3]:high

@@ -11,9 +11,7 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            CharSet value = 'f';
-
-            CharSet range = CharSet.Range('a', 'z');
+            TestText.Test();
             
             Pause();
         }

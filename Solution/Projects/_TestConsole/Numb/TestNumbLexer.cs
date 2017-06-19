@@ -13,7 +13,7 @@ namespace _TestConsole.Numb
             TestLexer("# Algorithms for circle formula\npi := 3.1412;\nr := -1.23e3;\r\ncircumference := 2 * pi * r;\narea := pi * r ^ 2;");
         }
 
-        static int run = 0;
+        // static int run = 0;
         static void TestLexer(string program)
 
         {
