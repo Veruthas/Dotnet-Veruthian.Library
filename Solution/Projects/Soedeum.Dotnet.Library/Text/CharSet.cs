@@ -8,11 +8,11 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public class CharSet
     {
-        CharRange[] ranges;
+        readonly CharRange[] ranges;
 
-        int size;
+        readonly int size;
 
-        int hashcode;
+        readonly int hashcode;
 
         private CharSet(params CharRange[] ranges)
         {
@@ -43,6 +43,8 @@ namespace Soedeum.Dotnet.Library.Text
 
         public int Find(char value) => CharRange.Find(ranges, value);
 
+
+        public CharRange[] ToArray() => ranges.Clone() as CharRange[];
 
 
         public override string ToString()
@@ -113,17 +115,17 @@ namespace Soedeum.Dotnet.Library.Text
         #region Constructors
 
         // From Value
-        public static implicit operator CharSet(char value) => new CharSet(value);
-
         public static CharSet Value(char value) => new CharSet(value);
+
+        public static implicit operator CharSet(char value) => Value(value);
 
 
         // From Range
-        public static implicit operator CharSet(CharRange range) => new CharSet(range);
-
         public static CharSet Range(CharRange range) => new CharSet(range);
 
         public static CharSet Range(char low, char high) => new CharSet(new CharRange(low, high));
+
+        public static implicit operator CharSet(CharRange range) => Range(range);
 
 
         // From List
@@ -150,6 +152,8 @@ namespace Soedeum.Dotnet.Library.Text
 
         // From Complement
         public static CharSet Complement(CharSet set) => throw new NotImplementedException();
+
+        public static CharSet operator ~(CharSet set) => Complement(set);
 
         #endregion
     }
