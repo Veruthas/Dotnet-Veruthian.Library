@@ -19,7 +19,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual char Peek(int lookahead) => Reader.Peek(lookahead);
 
-        protected virtual bool PeekIsIn(int lookahead, CharacterSet set) => set.Includes(Reader.Peek(lookahead));
+        protected virtual bool PeekIsIn(int lookahead, CharSet set) => set.Contains(Reader.Peek(lookahead));
 
         protected virtual bool PeekIs(int lookahead, char value) => Reader.Peek(lookahead) == value;
     }

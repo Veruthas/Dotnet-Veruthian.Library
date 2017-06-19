@@ -7,9 +7,9 @@ namespace Soedeum.Dotnet.Library.Text
     public static class TextUtility
     {
         // Char Extensions
-        public static bool IsIn(this char value, CharacterSet set)
+        public static bool IsIn(this char value, CharSet set)
         {
-            return set.Includes(value);
+            return set.Contains(value);
         }
 
         // Enumerators
@@ -24,6 +24,8 @@ namespace Soedeum.Dotnet.Library.Text
                 else
                     yield return (char)read;
             }
+
+            reader.Dispose();
         }
 
         public static IEnumerator<char> GetCharEnumerator(this Stream stream, Encoding encoding = null)

@@ -49,9 +49,9 @@ namespace Soedeum.Dotnet.Library.Text
             return this.value == value;
         }
 
-        public bool Is(CharacterSet set)
+        public bool Is(CharSet set)
         {
-            return set.Includes(value);
+            return set.Contains(value);
         }
 
         public bool IsNull()

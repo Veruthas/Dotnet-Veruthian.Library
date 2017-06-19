@@ -167,7 +167,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual char Peek() => Reader.Peek();
 
-        protected virtual bool PeekIsIn(CharacterSet set) => set.Includes(Reader.Peek());
+        protected virtual bool PeekIsIn(CharSet set) => set.Contains(Reader.Peek());
 
         protected virtual bool PeekIs(char value) => Reader.Peek() == value;
 
