@@ -189,7 +189,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             TextElement current = default(TextElement);
 
-            foreach (char c in chars.GetEnumerable())
+            foreach (char c in chars.GetEnumerableAdapter())
             {
                 if (initialized)
                 {

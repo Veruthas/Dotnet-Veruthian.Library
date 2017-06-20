@@ -13,9 +13,11 @@ namespace _TestConsole
         {
             //TestText.Test();
 
-            CharSet a = "B\0" + char.MaxValue;
-            CharSet b = ~a;
-            Console.WriteLine(b);
+            var set = CharSet.LetterOrDigit;
+
+            foreach (char c in set)
+                Console.WriteLine("'{0}'", c);
+
             Pause();
         }
 

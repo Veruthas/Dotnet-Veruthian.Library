@@ -6,9 +6,9 @@ namespace Soedeum.Dotnet.Library.Collections
 {
     public static class EnumeratorUtility
     {
-        public static Enumerable<T> GetEnumerable<T>(this IEnumerator<T> enumerator)
+        public static EnumerableAdapter<T> GetEnumerableAdapter<T>(this IEnumerator<T> enumerator)
         {
-            return new Enumerable<T>(enumerator);
+            return new EnumerableAdapter<T>(enumerator);
         }
 
         // NotifyingEnumerator

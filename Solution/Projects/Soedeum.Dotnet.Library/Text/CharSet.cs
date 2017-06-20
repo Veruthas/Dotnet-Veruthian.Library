@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Collections.Enumerators;
 using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public class CharSet : IEquatable<CharSet>
+    public class CharSet : IEquatable<CharSet>, IEnumerable<char>
     {
         readonly CharRange[] ranges;
 
@@ -103,6 +105,38 @@ namespace Soedeum.Dotnet.Library.Text
             return builder.ToString();
         }
 
+        #region IEnumerable
+
+        public IEnumerator<char> GetEnumerator() => GetCharEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private IEnumerator<CharRange> GetRangeEnumerator()
+        {
+
+            foreach (var range in ranges)
+                yield return range;
+        }
+
+        private IEnumerator<char> GetCharEnumerator()
+        {
+            foreach (var range in ranges)
+            {
+                int low = range.Low;
+                int high = range.High;
+
+                for (int i = low; i <= high; i++)
+                    yield return (char)i;
+            }
+        }
+
+        public IEnumerable<char> Chars => new EnumeratorGenerator<char>(GetCharEnumerator);
+
+        public IEnumerable<CharRange> Ranges => new EnumeratorGenerator<CharRange>(GetRangeEnumerator);
+
+
+        #endregion
+
 
         #region RangeString
 
@@ -136,9 +170,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CharSet List(string chars) => FromList(chars);
 
-        public static implicit operator CharSet(string chars) => List(chars);
+        public static implicit operator CharSet(string chars) => FromList(chars);
 
-        public static implicit operator CharSet(char[] chars) => List(chars);
+        public static implicit operator CharSet(char[] chars) => FromList(chars);
 
         private static CharSet FromList(IEnumerable<char> chars)
         {
@@ -204,9 +238,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static CharSet Union(IEnumerable<CharRange> ranges) => ReduceRanges(GetSortedRangeSet(ranges));
 
 
-        public static implicit operator CharSet(CharSet[] sets) => Union(sets);
+        public static implicit operator CharSet(CharSet[] sets) => ReduceRanges(GetSortedRangeSet(sets));
 
-        public static implicit operator CharSet(CharRange[] ranges) => Union(ranges);
+        public static implicit operator CharSet(CharRange[] ranges) => ReduceRanges(GetSortedRangeSet(ranges));
 
         public static CharSet operator +(CharSet left, CharSet right) => Union(left, right);
 

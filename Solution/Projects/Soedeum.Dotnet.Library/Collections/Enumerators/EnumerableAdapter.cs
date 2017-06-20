@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Collections
 {
-    public struct Enumerable<T> : IEnumerable<T>
+    public struct EnumerableAdapter<T> : IEnumerable<T>
     {
         IEnumerator<T> enumerator;
 
-        public Enumerable(IEnumerator<T> enumerator) => this.enumerator = enumerator;
+        public EnumerableAdapter(IEnumerator<T> enumerator) => this.enumerator = enumerator;
 
         public IEnumerator<T> GetEnumerator()
         {
