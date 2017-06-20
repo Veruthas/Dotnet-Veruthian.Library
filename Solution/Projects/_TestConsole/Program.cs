@@ -10,9 +10,8 @@ namespace _TestConsole
     class Program
     {
         static void Main(string[] args)
-        {
-            //TestText.Test();
-
+        {                        
+            //TestText.Test();            
             var set = CharSet.LetterOrDigit;
 
             foreach (char c in set)

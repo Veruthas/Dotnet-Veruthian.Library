@@ -31,18 +31,20 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         private TReader reader;
 
 
-        // Buffer data
+        // String Pool
+        private TypedStringPool<TType> pool;
+
+
+        // Capture data
         private bool capturing = false;
 
-        private StringBuilder buffer = new StringBuilder();
+        private StringBuilder captured = new StringBuilder();
 
-        private TextLocation bufferLocation;
-
-        private Dictionary<string, string> internedStrings = new Dictionary<string, string>();
+        private TextLocation captureLocation;
 
 
         // Constructor
-        public Lexer(Source[] sources)
+        public Lexer(Source[] sources, TypedStringPool<TType> pool)
         {
             if (sources == null || sources.Length == 0)
                 sources = new Source[] { new Source(null, EmptyEnumerable<char>.Default.GetEnumerator()) };
@@ -67,6 +69,14 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
             foreach (Source source in sources)
                 source.Dispose();
+
+            sources = null;
+
+            reader = default(TReader);
+
+            captured = null;
+
+            pool = null;
         }
 
 
@@ -89,74 +99,67 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         protected string SourceName { get => sources[sourceIndex].Name; }
 
 
-        // Buffer code
+        // String Pool
+        protected TypedStringPool<TType> StringPool { get => pool }
+
+
+        // Capture code
         protected bool IsCapturing => capturing;
 
-        protected virtual void CaptureRead()
+        protected virtual void StartCapture()
         {
             ReleaseCaptured();
-            bufferLocation = Location;
+            captureLocation = Location;
             capturing = true;
         }
 
         protected virtual void ReleaseCaptured(bool stopCapture = true)
         {
-            buffer.Clear();
+            captured.Clear();
 
             if (stopCapture)
             {
                 capturing = false;
-                bufferLocation = default(TextLocation);
+                captureLocation = default(TextLocation);
             }
             else
             {
-                bufferLocation = Location;
+                captureLocation = Location;
             }
         }
+
+        protected virtual void RollbackCaptured(int length)
+        {
+            if (length > captured.Length)
+                ReleaseCaptured();
+            else
+                captured.Remove(captured.Length - length, length);
+        }
+
+        protected virtual TextLocation CaptureLocation { get => captureLocation; set => captureLocation = value; }
 
         protected virtual string GetCaptured()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
 
-            var captured = buffer.ToString();
+            var captured = this.captured.ToString();
 
-            if (InternStrings)
-            {
-                if (internedStrings.ContainsKey(captured))
-                    return internedStrings[captured];
-                else
-                    return internedStrings[captured] = captured;
-            }
-            else
-            {
-                return captured;
-            }
+            return captured;
         }
 
-        protected virtual void SetBuffer(string data, TextLocation? location = null, bool clear = false)
+        protected virtual void AppendToCaptured(string data, bool clear = false)
         {
             if (clear)
-                buffer.Clear();
+                captured.Clear();
 
-            buffer.Append(data);
-
-            if (location.HasValue)
-                bufferLocation = location.GetValueOrDefault();
+            captured.Append(data);
         }
 
-        protected virtual void RemoveFromBufferEnd(int length)
-        {
-            if (length > buffer.Length)
-                ReleaseCaptured();
-            else
-                buffer.Remove(buffer.Length - length, length);
-        }
-
-        protected virtual void OnRead(char item)
+        protected virtual void Capture(char item)
         {
             if (capturing)
-                buffer.Append(item);
+                captured.Append(item);
 
             Location = Location.MoveToNext(item, Reader.Peek());
         }
@@ -175,7 +178,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             char read = Reader.Read();
 
-            OnRead(read);
+            Capture(read);
 
             return read;
         }
@@ -234,11 +237,22 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             }
         }
 
-        protected virtual TToken CreateTokenFromBuffer(TType type, bool releaseBuffer = true)
+        protected virtual TToken GetCapturedToken(TType type, bool releaseBuffer = true)
         {
             string value = GetCaptured();
 
-            var token = CreateToken(type, SourceName, bufferLocation, value);
+            var pool = StringPool;
+
+            if (pool != null)
+            {
+                var result = pool.Recall(value, type);
+
+                value = result.Value;
+
+                type = result.Type;
+            }
+
+            var token = CreateToken(type, SourceName, captureLocation, value);
 
             if (releaseBuffer)
                 ReleaseCaptured();
@@ -256,7 +270,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected abstract bool EofBetweenSources { get; }
 
-        protected abstract bool InternStrings { get; }
 
         protected abstract TToken GetNextToken();
     }

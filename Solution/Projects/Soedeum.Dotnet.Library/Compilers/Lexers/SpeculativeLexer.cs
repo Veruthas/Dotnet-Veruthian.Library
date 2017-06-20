@@ -30,7 +30,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
             {
                 int length = fromPosition - Reader.Position;
 
-                RemoveFromBufferEnd(length);
+                RollbackCaptured(length);
             }
 
             int markIndex = markedLocations.Count - markCount;
