@@ -33,16 +33,16 @@ namespace _TestConsole
 
         private static void OldTest()
         {
-            var all = CharacterSet.Range(char.MinValue, char.MaxValue);
+            var all = CharSet.Range(char.MinValue, char.MaxValue);
 
-            var none = CharacterSet.None;
+            var none = CharSet.Empty;
 
-            var union = CharacterSet.Union(all, none);
+            var union = CharSet.Union(all, none);
 
-            CharacterSetInfo(all);
-            CharacterSetInfo(none);
-            CharacterSetInfo(union);
-            CharacterSetInfo(none + "ABCD");
+            CharSetInfo(all);
+            CharSetInfo(none);
+            CharSetInfo(union);
+            CharSetInfo(none + "ABCD");
         }
 
         private static void TestEquality()
@@ -51,48 +51,48 @@ namespace _TestConsole
             TestEquality('x', 'x');
 
             // Range
-            var m = CharacterSet.Range('a', 'z');
-            var n = CharacterSet.Range('a', 'z');
+            var m = CharSet.Range('a', 'z');
+            var n = CharSet.Range('a', 'z');
 
             TestEquality(m, n);
 
             // List
-            var x = CharacterSet.List("Ar$");
-            var y = CharacterSet.List("$Ar");
+            var x = CharSet.List("Ar$");
+            var y = CharSet.List("$Ar");
 
             TestEquality(x, y);
 
-            var p = CharacterSet.List("Arst$");
-            var q = CharacterSet.List("$Arst");
+            var p = CharSet.List("Arst$");
+            var q = CharSet.List("$Arst");
 
             TestEquality(p, q);
 
             // Union
-            var a = CharacterSet.List('A', 'B', 'C', 'D');
-            var b = CharacterSet.Range('E', 'H');
+            var a = CharSet.List('A', 'B', 'C', 'D');
+            var b = CharSet.Range('E', 'H');
 
-            var ab = CharacterSet.Union(a, b);
+            var ab = CharSet.Union(a, b);
 
-            var c = CharacterSet.Value('I');
-            var d = CharacterSet.Range('J', 'W');
-            var e = CharacterSet.Range('V', 'Z');
+            var c = CharSet.Value('I');
+            var d = CharSet.Range('J', 'W');
+            var e = CharSet.Range('V', 'Z');
 
-            var ce = CharacterSet.Union(c, e);
+            var ce = CharSet.Union(c, e);
 
-            var union0 = CharacterSet.Union(a, b, c, d, e);
-            var union1 = CharacterSet.Union(ab, ce, d);
+            var union0 = CharSet.Union(a, b, c, d, e);
+            var union1 = CharSet.Union(ab, ce, d);
 
             TestEquality(union0, union1);
         }
 
-        private static void CharacterSetInfo(CharacterSet set)
+        private static void CharSetInfo(CharSet set)
         {
             System.Console.WriteLine("{{{0}}}", set);
             System.Console.WriteLine(" Type: {0}", set.GetType().Name);
             System.Console.WriteLine(" Size: {0}", set.Size);
             System.Console.WriteLine(" Hashcode: {0}\n", set.GetHashCode());
         }
-        private static void TestEquality(CharacterSet union0, CharacterSet union1)
+        private static void TestEquality(CharSet union0, CharSet union1)
         {
             System.Console.WriteLine("{0} {2} {1}", union0, union1, union0 == union1 ? "==" : "!=");
             System.Console.WriteLine(" Hashcode for union0: {0}", union0.GetHashCode());
@@ -103,39 +103,39 @@ namespace _TestConsole
 
         private static void TestUnionFind()
         {
-            CharacterSet alpha = CharacterSet.LetterOrDigitOrUnderscore;
+            CharSet alpha = CharSet.LetterOrDigitOrUnderscore;
 
             Console.WriteLine("Set: {{{0}}}", alpha);
 
             foreach (char c in "Hello, I am '31' years old_.")
             {
-                Console.WriteLine("  {0} [{1}].", c, alpha.Includes(c) ? "YES" : "NO");
+                Console.WriteLine("  {0} [{1}].", c, alpha.Contains(c) ? "YES" : "NO");
             }
         }
 
         private static void TestUnion()
         {
-            var a = CharacterSet.List('A', 'B', 'C', 'D');
-            var b = CharacterSet.Range('E', 'H');
+            var a = CharSet.List('A', 'B', 'C', 'D');
+            var b = CharSet.Range('E', 'H');
             Unionize(a, b);
-            var ab = CharacterSet.Union(a, b);
-            var c = CharacterSet.Value('I');
-            var d = CharacterSet.Range('J', 'W');
-            var e = CharacterSet.Range('V', 'Z');
-            var ce = CharacterSet.Union(c, e);
+            var ab = CharSet.Union(a, b);
+            var c = CharSet.Value('I');
+            var d = CharSet.Range('J', 'W');
+            var e = CharSet.Range('V', 'Z');
+            var ce = CharSet.Union(c, e);
             Unionize(c, e);
-            var abcde = CharacterSet.Union(ab, ce, d);
+            var abcde = CharSet.Union(ab, ce, d);
             Unionize(ab, ce, d);
         }
 
-        private static void TestEnumerable(CharacterSet a)
+        private static void TestEnumerable(CharSet a)
         {
             System.Console.WriteLine("Enumerating chars in {{{0}}}", a);
-            foreach (char c in a)
-                System.Console.WriteLine("  {0}", c);
+            // foreach (char c in a)
+            //     System.Console.WriteLine("  {0}", c);
         }
 
-        private static void Unionize(params CharacterSet[] sets)
+        private static void Unionize(params CharSet[] sets)
         {
             System.Console.WriteLine("Union of sets:");
 
@@ -147,12 +147,12 @@ namespace _TestConsole
                 initialized = true;
             }
 
-            var union = CharacterSet.Union(sets);
+            var union = CharSet.Union(sets);
 
             System.Console.WriteLine(" = {0}", union);
         }
 
-        private static void UnionizePairs(params CharacterSet[] sets)
+        private static void UnionizePairs(params CharSet[] sets)
         {
             for (int i = 0; i < sets.Length; i++)
             {
@@ -162,7 +162,7 @@ namespace _TestConsole
                 {
                     var a = sets[i];
 
-                    var c = CharacterSet.Union(a, b);
+                    var c = CharSet.Union(a, b);
 
                     Console.WriteLine("{0} + {1} = {2}", a, b, c);
                 }

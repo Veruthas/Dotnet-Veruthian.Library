@@ -263,15 +263,53 @@ namespace Soedeum.Dotnet.Library.Text
 
                 if (list.Count == 1 && list[0].IsComplete)
                     return Complete;
-                else 
+                else
                     return new CharSet(list.ToArray());
             }
         }
 
         // From Complement
-        public static CharSet Complement(CharSet set) => null;
+        public static CharSet Complement(CharSet set) => FromComplement(set);
 
-        public static CharSet operator ~(CharSet set) => Complement(set);
+        public static CharSet operator ~(CharSet set) => FromComplement(set);
+
+        private static CharSet FromComplement(CharSet set)
+        {
+            // Complement just creates ranges that exclude the ranges in the set
+            // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
+
+            if (set.IsComplete) return Empty;
+
+            if (set.IsEmpty) return Complete;
+
+
+            List<CharRange> complement = new List<CharRange>();
+
+
+            int low = -1;
+
+            foreach (var range in set.ranges)
+            {
+                if (range.Low != char.MinValue)
+                {
+                    var newRange = new CharRange((char)(low + 1), (char)(range.Low - 1));
+
+                    complement.Add(newRange);
+                }
+
+                low = range.High;
+            }
+
+            if (low != char.MaxValue)
+            {
+                var newRange = new CharRange((char)(low + 1), char.MaxValue);
+
+                complement.Add(newRange);
+            }
+
+
+            return new CharSet(complement.ToArray());
+        }
 
         #endregion
 

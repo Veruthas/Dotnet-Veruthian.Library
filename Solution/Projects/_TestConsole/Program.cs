@@ -11,8 +11,11 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            TestText.Test();
-            
+            //TestText.Test();
+
+            CharSet a = "B\0" + char.MaxValue;
+            CharSet b = ~a;
+            Console.WriteLine(b);
             Pause();
         }
 
