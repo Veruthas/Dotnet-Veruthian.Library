@@ -120,7 +120,7 @@ namespace Soedeum.Dotnet.Library.Text
         public static implicit operator CharRange(char value) => new CharRange(value);
 
 
-        #region Multiple Ranges
+        #region Multiple Ranges Operations
 
         // Find/Contains
         public static int Find(CharRange[] sortedSet, char value)
@@ -149,7 +149,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Range String
-        public static string ToRangeString(CharRange[] ranges)
+        public static string ToRangeString(IEnumerable<CharRange> ranges)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -192,20 +192,155 @@ namespace Soedeum.Dotnet.Library.Text
             return ranges;
         }
 
-        #endregion
 
-        #region Range Operation
+        // From List
+        public static CharRange[] FromList(IEnumerable<char> chars)
+        {
+            SortedSet<char> sortedChars = new SortedSet<char>(chars);
+
+            return FromSet(sortedChars);
+        }
+
+        public static CharRange[] FromSet(IEnumerable<char> chars)
+        {
+            // Compress ranges
+            List<CharRange> ranges = new List<CharRange>();
+
+
+            bool started = false;
+
+
+            int low = -1;
+
+            int high = -1;
+
+
+            foreach (char value in chars)
+            {
+                if (!started)
+                {
+                    started = true;
+                    
+                    low = high = value;
+                }
+                else
+                {
+                    // Add a range if this char and previous aren't consecutive
+                    if (high + 1 != value)
+                    {
+                        var range = new CharRange((char)low, (char)high);
+
+                        ranges.Add(range);
+
+                        low = value;
+                    }
+
+                    high = value;
+                }
+            }
+
+            // No chars in list
+            if (low == -1)
+            {
+                return new CharRange[] { };
+            }
+            else
+            {
+                // Add range for remaining char(s)
+                var range = new CharRange((char)low, (char)high);
+
+                ranges.Add(range);
+
+
+                return ranges.ToArray();
+            }
+        }
+
+        // Reduced Union
+        public static CharRange[] Reduce(IEnumerable<CharRange> ranges)
+        {
+            SortedSet<CharRange> list = new SortedSet<CharRange>(ranges);
+
+            return ReduceOrdered(list);
+        }
+
+        public static CharRange[] ReduceOrdered(IEnumerable<CharRange> ranges)
+        {
+            List<CharRange> list = new List<CharRange>(ranges);
+
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                var low = list[i];
+                var high = list[i + 1];
+
+                if (CharRange.Combine(low, high, out var union))
+                {
+                    list[i] = union;
+
+                    // Remove reduntant range
+                    list.RemoveAt(i + 1);
+
+                    // Try to merge new range with next range                        
+                    i--;
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        // Complement        
+        public static CharRange[] Complement(IEnumerable<CharRange> ranges)
+        {
+            var orderedSet = Reduce(ranges);
+
+            var complement = ComplementOrderedSet(orderedSet);
+
+            return complement;
+        }
+
+        public static CharRange[] ComplementOrderedSet(IEnumerable<CharRange> ranges)
+        {
+            // Complement just creates ranges that exclude the ranges in the set
+            // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
+
+            List<CharRange> complement = new List<CharRange>();
+
+
+            int low = -1;
+
+            foreach (var range in ranges)
+            {
+                if (range.Low != char.MinValue)
+                {
+                    var newRange = new CharRange((char)(low + 1), (char)(range.Low - 1));
+
+                    complement.Add(newRange);
+                }
+
+                low = range.High;
+            }
+
+            if (low != char.MaxValue)
+            {
+                var newRange = new CharRange((char)(low + 1), char.MaxValue);
+
+                complement.Add(newRange);
+            }
+
+
+            return complement.ToArray();
+        }
+
 
         // Combine
         public static bool Combine(CharRange a, CharRange b, out CharRange union)
         {
             return (a <= b)
-                    ? OrderedCombine(a, b, out union)
-                    : OrderedCombine(b, a, out union);
+                    ? CombineOrdered(a, b, out union)
+                    : CombineOrdered(b, a, out union);
         }
 
-        // Assumes a <= b
-        public static bool OrderedCombine(CharRange a, CharRange b, out CharRange union)
+        public static bool CombineOrdered(CharRange a, CharRange b, out CharRange union)
         {
             // 2 Possible results:
             //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -230,12 +365,11 @@ namespace Soedeum.Dotnet.Library.Text
         public bool Intersect(CharRange a, CharRange b, out CharRange intersection)
         {
             return (a <= b)
-                    ? OrderedIntersect(a, b, out intersection)
-                    : OrderedIntersect(b, a, out intersection);
+                    ? IntersectOrdered(a, b, out intersection)
+                    : IntersectOrdered(b, a, out intersection);
         }
 
-        // Assumes a <= b 
-        public bool OrderedIntersect(CharRange a, CharRange b, out CharRange intersection)
+        public bool IntersectOrdered(CharRange a, CharRange b, out CharRange intersection)
         {
             // 2 Possible results:
             //  1) Disojoint    (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -297,12 +431,11 @@ namespace Soedeum.Dotnet.Library.Text
         public bool Split(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             return (a <= b)
-                    ? OrderedSplit(a, b, out before, out intersection, out after)
-                    : OrderedSplit(b, a, out before, out intersection, out after);
+                    ? SplitOrdered(a, b, out before, out intersection, out after)
+                    : SplitOrdered(b, a, out before, out intersection, out after);
         }
 
-        // Assumes a <= b 
-        public bool OrderedSplit(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public bool SplitOrdered(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             // 7 Possible results
             //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_X_B

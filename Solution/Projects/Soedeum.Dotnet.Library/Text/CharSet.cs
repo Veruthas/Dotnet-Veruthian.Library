@@ -174,132 +174,42 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static implicit operator CharSet(char[] chars) => FromList(chars);
 
-        private static CharSet FromList(IEnumerable<char> chars)
+        public static CharSet FromList(IEnumerable<char> chars)
         {
-            // Compress ranges
-            SortedSet<char> sortedChars = new SortedSet<char>(chars);
+            var ranges = CharRange.FromList(chars);
 
-            List<CharRange> ranges = new List<CharRange>();
-
-
-            if (sortedChars.Count == 0) return Empty;
-
-            if (sortedChars.Count == CharRange.MaxSize) return Complete;
-
-
-            bool started = false;
-
-            char low = '\0';
-
-            char high = '\0';
-
-            CharRange range;
-
-            foreach (char value in sortedChars)
-            {
-                if (!started)
-                {
-                    started = true;
-                    low = high = value;
-                }
-                else
-                {
-                    // Add a range if this char and previous aren't consecutive
-                    if (high + 1 != value)
-                    {
-                        range = new CharRange(low, high);
-
-                        ranges.Add(range);
-
-                        low = value;
-                    }
-
-                    high = value;
-                }
-            }
-
-            // Add range for remaining char(s)
-            range = new CharRange(low, high);
-
-            ranges.Add(range);
-
-
-            return new CharSet(ranges.ToArray());
+            return new CharSet(ranges);
         }
 
+
         // From Union
+        public static CharSet Union(params CharSet[] sets) => ReduceRanges(sets);
 
-        public static CharSet Union(params CharSet[] sets) => ReduceRanges(GetSortedRangeSet(sets));
+        public static CharSet Union(IEnumerable<CharSet> sets) => ReduceRanges(sets);
 
-        public static CharSet Union(IEnumerable<CharSet> sets) => ReduceRanges(GetSortedRangeSet(sets));
+        public static CharSet Union(params CharRange[] ranges) => ReduceRanges(ranges);
 
-        public static CharSet Union(params CharRange[] ranges) => ReduceRanges(GetSortedRangeSet(ranges));
-
-        public static CharSet Union(IEnumerable<CharRange> ranges) => ReduceRanges(GetSortedRangeSet(ranges));
-
-
-        public static implicit operator CharSet(CharSet[] sets) => ReduceRanges(GetSortedRangeSet(sets));
-
-        public static implicit operator CharSet(CharRange[] ranges) => ReduceRanges(GetSortedRangeSet(ranges));
+        public static CharSet Union(IEnumerable<CharRange> ranges) => ReduceRanges(ranges);
 
         public static CharSet operator +(CharSet left, CharSet right) => Union(left, right);
 
-        private static SortedSet<CharRange> GetSortedRangeSet(IEnumerable<CharSet> sets)
+        private static CharSet ReduceRanges(IEnumerable<CharSet> sets)
         {
             SortedSet<CharRange> list = new SortedSet<CharRange>();
 
             foreach (var set in sets)
                 list.UnionWith(set.ranges);
 
-            return list;
+            var reduced = CharRange.ReduceOrdered(list);
+
+            return new CharSet(reduced);
         }
 
-        private static SortedSet<CharRange> GetSortedRangeSet(IEnumerable<CharRange> ranges)
+        private static CharSet ReduceRanges(IEnumerable<CharRange> ranges)
         {
-            SortedSet<CharRange> list = new SortedSet<CharRange>(ranges);
+            var reduced = CharRange.Reduce(ranges);
 
-            return list;
-        }
-
-        private static CharSet ReduceRanges(SortedSet<CharRange> ranges)
-        {
-            if (ranges.Count == 0)
-                return Empty;
-            else if (ranges.Count == 1)
-            {
-                var range = ranges.ElementAt(0);
-
-                if (range.IsComplete)
-                    return Complete;
-                else
-                    return Range(range);
-            }
-            else
-            {
-                List<CharRange> list = new List<CharRange>(ranges);
-
-                for (int i = 0; i < list.Count - 1; i++)
-                {
-                    var low = list[i];
-                    var high = list[i + 1];
-
-                    if (CharRange.Combine(low, high, out var union))
-                    {
-                        list[i] = union;
-
-                        // Remove reduntant range
-                        list.RemoveAt(i + 1);
-
-                        // Try to merge new range with next range                        
-                        i--;
-                    }
-                }
-
-                if (list.Count == 1 && list[0].IsComplete)
-                    return Complete;
-                else
-                    return new CharSet(list.ToArray());
-            }
+            return new CharSet(reduced);
         }
 
         // From Complement
@@ -309,40 +219,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         private static CharSet FromComplement(CharSet set)
         {
-            // Complement just creates ranges that exclude the ranges in the set
-            // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
+            var ranges = CharRange.ComplementOrderedSet(set.ranges);
 
-            if (set.IsComplete) return Empty;
-
-            if (set.IsEmpty) return Complete;
-
-
-            List<CharRange> complement = new List<CharRange>();
-
-
-            int low = -1;
-
-            foreach (var range in set.ranges)
-            {
-                if (range.Low != char.MinValue)
-                {
-                    var newRange = new CharRange((char)(low + 1), (char)(range.Low - 1));
-
-                    complement.Add(newRange);
-                }
-
-                low = range.High;
-            }
-
-            if (low != char.MaxValue)
-            {
-                var newRange = new CharRange((char)(low + 1), char.MaxValue);
-
-                complement.Add(newRange);
-            }
-
-
-            return new CharSet(complement.ToArray());
+            return new CharSet(ranges);
         }
 
         #endregion
