@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
     public abstract class Lexer<TToken, TType> : Lexer<TToken, TType, IReader<char>>
         where TToken : IToken<TType>
     {
-        public Lexer(Source[] sources) : base(sources) { }
+        public Lexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
     }
 
     public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
@@ -100,7 +100,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // String Pool
-        protected TypedStringPool<TType> StringPool { get => pool }
+        protected TypedStringPool<TType> StringPool { get => pool; }
 
 
         // Capture code

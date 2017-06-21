@@ -8,7 +8,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
     public abstract class SpeculativeLexer<TToken, TType> : Lexer<TToken, TType, ISpeculativeReader<char>>
         where TToken : IToken<TType>
     {
-        public SpeculativeLexer(Source[] sources) : base(sources) { }
+        public SpeculativeLexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
 
     }
 
@@ -17,7 +17,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         where TReader : ISpeculativeReader<char>
     {
 
-        public SpeculativeLexer(Source[] sources) : base(sources) { }
+        public SpeculativeLexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
 
         protected List<TextLocation> markedLocations;
 
