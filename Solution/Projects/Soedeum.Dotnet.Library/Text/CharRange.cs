@@ -52,10 +52,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public char High => high;
 
+
         public int Size => (High - Low) + 1;
 
-
-        public static readonly int MaxSize = ((int)char.MaxValue) + 1;
 
         public bool IsComplete => this == Complete;
 
@@ -68,6 +67,7 @@ namespace Soedeum.Dotnet.Library.Text
         public override int GetHashCode() => total;
 
 
+        // Equality
         public bool Equals(CharRange other) => this.total == other.total;
 
         public override bool Equals(object other) => (other is CharRange) ? Equals((CharRange)other) : false;
@@ -77,8 +77,8 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool operator !=(CharRange left, CharRange right) => !left.Equals(right);
 
 
+        // Comparison
         public int CompareTo(CharRange other) => this.total.CompareTo(other.total);
-
 
         public static bool operator <(CharRange left, CharRange right) => left.total < right.total;
 
@@ -89,6 +89,7 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool operator >=(CharRange left, CharRange right) => left.total >= right.total;
 
 
+        // ToString
         public override string ToString()
         {
             if (IsCharacter)
@@ -97,6 +98,7 @@ namespace Soedeum.Dotnet.Library.Text
                 return string.Format("('{0}' to '{1}')", Low.GetAsPrintable(), High.GetAsPrintable());
         }
 
+        // Enumerator
         public IEnumerator<char> GetEnumerator()
         {
             int lowest = Low;
@@ -113,11 +115,11 @@ namespace Soedeum.Dotnet.Library.Text
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-
+        // Complete Range Constants
         public static readonly CharRange Complete = new CharRange(char.MinValue, char.MaxValue);
 
+        public const int MaxSize = ((int)char.MaxValue) + 1;
 
-        public static implicit operator CharRange(char value) => new CharRange(value);
 
 
         #region Multiple Ranges Operations
@@ -192,6 +194,8 @@ namespace Soedeum.Dotnet.Library.Text
             return ranges;
         }
 
+        // From Char
+        public static implicit operator CharRange(char value) => new CharRange(value);
 
         // From List
         public static CharRange[] FromList(IEnumerable<char> chars)
@@ -362,14 +366,14 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Intersect        
-        public bool Intersect(CharRange a, CharRange b, out CharRange intersection)
+        public static bool Intersect(CharRange a, CharRange b, out CharRange intersection)
         {
             return (a <= b)
                     ? IntersectOrdered(a, b, out intersection)
                     : IntersectOrdered(b, a, out intersection);
         }
 
-        public bool IntersectOrdered(CharRange a, CharRange b, out CharRange intersection)
+        public static bool IntersectOrdered(CharRange a, CharRange b, out CharRange intersection)
         {
             // 2 Possible results:
             //  1) Disojoint    (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -428,14 +432,14 @@ namespace Soedeum.Dotnet.Library.Text
             public static readonly SplitResult Neither = new SplitResult();
         }
 
-        public bool Split(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public static bool Split(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             return (a <= b)
                     ? SplitOrdered(a, b, out before, out intersection, out after)
                     : SplitOrdered(b, a, out before, out intersection, out after);
         }
 
-        public bool SplitOrdered(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public static bool SplitOrdered(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             // 7 Possible results
             //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_X_B
