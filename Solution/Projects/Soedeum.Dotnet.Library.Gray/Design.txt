@@ -17,13 +17,13 @@ grammar Gray
 
 
     ;; Keywords
-    sub token Identifier CharSetKeyword := 'charset';
+    explicit Identifier token CharSetKeyword := 'charset';
 
-    sub token Identifier OrKeyword := 'or';
+    explicit Identifier token OrKeyword := 'or';
 
-    sub token Identifier ToKeyword := 'to';
+    explicit Identifier token ToKeyword := 'to';
 
-    sub token Identifier NotKeyword := 'not';
+    explicit Identifier token NotKeyword := 'not';
 
 
     token Character := '\'' (EscapeSequence or any) '\'';
@@ -40,16 +40,21 @@ grammar Gray
 
     token Semicolon := ';'
 
-    token EOF = '\0';
+    token EOF = eof;
 
     ;; Skip tokens
     skip token Whitespace := {whitespace};
 
-    skip token Comment := ';;' {commentchar} ;
+    skip token LineComment := ';;' {linecommentchar} ;
+
+    skip token MultilineComment := ';-' {commentchar or ('-' notsemicolon)} '-;'  ;
 
 
+    charset linecommentchar := not (eol or eof);
 
-    charset commentchar := not (eol or eof);
+    charset commentchar := not ('-' or eof);
+
+    charset notsemicolon := not (';' or eof)
 
     charset any := not ( eof );
 
@@ -67,6 +72,5 @@ grammar Gray
 
     charset whitespace := eol or space;
 
-    charset eof := '\0';
-
+    charset eof := '\0';c
 end
