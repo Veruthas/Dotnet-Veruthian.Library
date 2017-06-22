@@ -11,22 +11,10 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            //TestText.Test();            
-            var set = CharSet.LetterOrDigit;
-
-            foreach (char c in set)
-                Console.WriteLine("'{0}'", c);
-
-            var ranges = new CharRange[] { };
-
-            var reduced = CharRange.Reduce(ranges);
-
-            var nothing = CharRange.ComplementOrderedSet(reduced);
-
-            var all = CharRange.ComplementOrderedSet(nothing);
             Pause();
         }
-
+        
+        // Comment
         static void Pause()
         {
             Console.Write("Press any key to continue...");
