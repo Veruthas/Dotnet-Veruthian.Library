@@ -150,7 +150,7 @@ namespace Soedeum.Dotnet.Library.Text
         #region Constructors
 
         // From Value
-        public static CharSet Value(char value) => new CharSet(value);
+        public static CharSet Value(char value) => new CharSet(new CharRange(value));
 
         public static implicit operator CharSet(char value) => Value(value);
 

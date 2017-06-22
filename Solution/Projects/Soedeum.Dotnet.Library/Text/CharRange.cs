@@ -8,7 +8,7 @@ using Soedeum.Dotnet.Library.Utility;
 namespace Soedeum.Dotnet.Library.Text
 {
     [StructLayout(LayoutKind.Explicit)]
-    public struct CharRange : IEquatable<CharRange>, IComparable<CharRange>, IEnumerable<char>
+    public struct CharRange : IEquatable<CharRange>, IComparable<CharRange>, IComparable<char>, IEnumerable<char>
     {
         [FieldOffsetAttribute(0)]
         private readonly char low;
@@ -61,13 +61,9 @@ namespace Soedeum.Dotnet.Library.Text
         public bool IsCharacter => Size == 1;
 
 
-        public bool Contains(char value) => (value >= Low) && (value <= High);
 
 
-        public override int GetHashCode() => total;
-
-
-        // Equality
+        // Range to Range Comparison
         public bool Equals(CharRange other) => this.total == other.total;
 
         public override bool Equals(object other) => (other is CharRange) ? Equals((CharRange)other) : false;
@@ -76,8 +72,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator !=(CharRange left, CharRange right) => !left.Equals(right);
 
-
-        // Comparison
         public int CompareTo(CharRange other) => this.total.CompareTo(other.total);
 
         public static bool operator <(CharRange left, CharRange right) => left.total < right.total;
@@ -88,6 +82,23 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator >=(CharRange left, CharRange right) => left.total >= right.total;
 
+
+        // Range to Char Comparison
+        public bool Contains(char value) => (value >= Low) && (value <= High);
+
+        public int CompareTo(char other)
+        {
+            if (other < Low)
+                return 1;
+            else if (other > High)
+                return -1;
+            else
+                return 0;
+        }
+
+
+        // GetHashCode
+        public override int GetHashCode() => total;
 
         // ToString
         public override string ToString()
@@ -132,16 +143,16 @@ namespace Soedeum.Dotnet.Library.Text
 
             while (low <= high)
             {
-                int current = (high + low) / 2;
+                int middle = (high + low) / 2;
 
-                var range = sortedSet[current];
+                var range = sortedSet[middle];
 
                 if (value < range.Low)
-                    high = current - 1;
+                    high = middle - 1;
                 else if (value > range.High)
-                    low = current + 1;
+                    low = middle + 1;
                 else
-                    return current;
+                    return middle;
             }
 
             return -1;
@@ -194,9 +205,6 @@ namespace Soedeum.Dotnet.Library.Text
             return ranges;
         }
 
-        // From Char
-        public static implicit operator CharRange(char value) => new CharRange(value);
-
         // From List
         public static CharRange[] FromList(IEnumerable<char> chars)
         {
@@ -224,7 +232,7 @@ namespace Soedeum.Dotnet.Library.Text
                 if (!started)
                 {
                     started = true;
-                    
+
                     low = high = value;
                 }
                 else
@@ -486,7 +494,6 @@ namespace Soedeum.Dotnet.Library.Text
                 return true;
             }
         }
-
 
         #endregion
     }
