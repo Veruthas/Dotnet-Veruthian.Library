@@ -62,7 +62,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public CharSequence Append(CharSequence sequence)
         {
-
+            return null;
         }
 
         public void Or(CharSequence sequence)
@@ -73,7 +73,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public CharSequence Clone()
         {
-            
+            return null;
         }
     }
 }
