@@ -10,12 +10,6 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            char c = "𐐷"[0];
-            char d = "𐐷"[1];
-
-            string s = "𐐷";
-
-            Console.WriteLine(s == "" + c );
 
             Pause();
         }

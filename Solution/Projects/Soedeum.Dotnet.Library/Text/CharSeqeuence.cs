@@ -14,6 +14,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         private class State
         {
+            public State() { }
+
+            public State(CharSet edge) => this.Edge = edge;
+
+
+
             public CharSet Edge { get; set; }
 
             public State Next { get; set; }
@@ -22,25 +28,39 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        private CharSequence(CharSet edge)
+        private CharSequence()
         {
         }
 
-        public void ToOptional()
+
+        public CharSequence ToOptional()
         {
             start.Otherwise = end;
+
+            return this;
         }
 
-        public void ToRepetition()
+        public CharSequence ToRepetition()
         {
+            start.Otherwise = end;
+
+            last.Next = start;
+
+            return this;
         }
 
-        public void Append(CharSet edge)
+        public CharSequence Append(CharSet edge)
         {
+            var state = new State(edge);
 
+            last.Next = state;
+
+            state.Next = end;
+
+            return this;
         }
 
-        public void Append(CharSequence sequence)
+        public CharSequence Append(CharSequence sequence)
         {
 
         }
@@ -48,6 +68,12 @@ namespace Soedeum.Dotnet.Library.Text
         public void Or(CharSequence sequence)
         {
 
+        }
+
+
+        public CharSequence Clone()
+        {
+            
         }
     }
 }
