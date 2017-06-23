@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
+
 namespace Soedeum.Dotnet.Library.Text
 {
     public class CharSequence
     {
         State start;
+
+        State last;
 
         State end;
 
@@ -17,13 +22,8 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        public CharSequence(CharSet edge)
+        private CharSequence(CharSet edge)
         {
-            this.start = new State();
-            start.Edge = edge;
-
-            this.end = new State();
-            this.start.Next = end;
         }
 
         public void ToOptional()
@@ -31,10 +31,8 @@ namespace Soedeum.Dotnet.Library.Text
             start.Otherwise = end;
         }
 
-        public void ToRepition()
+        public void ToRepetition()
         {
-            start.Otherwise = end;
-            start.Next = start;
         }
 
         public void Append(CharSet edge)
@@ -49,7 +47,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public void Or(CharSequence sequence)
         {
-            
+
         }
     }
 }
