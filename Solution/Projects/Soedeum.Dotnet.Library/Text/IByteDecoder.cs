@@ -10,33 +10,6 @@ namespace Soedeum.Dotnet.Library.Text
     }
 
 
-
-    public class Utf16Decoder : IByteDecoder
-    {
-        bool isLittleEndian;
-
-        ushort high, low;
-
-        bool isSurrogatePair;
-
-        bool awaitingSecondHalf;
-
-        CodePoint? result;
-
-
-        public Utf16Decoder(bool isLittleEndian = false) 
-        {
-            this.isLittleEndian = isLittleEndian;
-        }
-
-        public CodePoint? Result => throw new NotImplementedException();
-
-        public bool Process(byte value)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class Utf32Decoder : IByteDecoder
     {
         bool isLittleEndian;

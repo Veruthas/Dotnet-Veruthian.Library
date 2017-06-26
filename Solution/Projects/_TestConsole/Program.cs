@@ -33,6 +33,7 @@ namespace _TestConsole
 
             Console.WriteLine(x.ToCodePointString());
             Console.WriteLine(y.ToCodePointString());
+            
             Pause();
         }
 

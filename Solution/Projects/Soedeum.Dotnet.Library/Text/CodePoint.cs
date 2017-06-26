@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public struct CodePoint
+    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>
     {
         uint value;
 
@@ -11,8 +11,19 @@ namespace Soedeum.Dotnet.Library.Text
         private CodePoint(uint value) => this.value = value;
 
 
-        // Format (U+[Y][Y]XXXX)
-        public string ToCodePointString() => "U+" + value.ToString("X4");
+        /* Operators */
+        #region Operators
+
+        // String
+        public static string operator +(string left, CodePoint right) => left + right.ToString();
+
+        public static string operator +(CodePoint left, string right) => left.ToString() + right;
+
+        public string ToCodePointString()
+        {
+            // Format (U+[Y][Y]XXXX)
+            return "U+" + value.ToString("X4");
+        }
 
         public override string ToString()
         {
@@ -25,7 +36,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                Utf16.SplitSurrogates(value, out ushort high, out ushort low);
+                Utf16.FromUtf32(value, out ushort high, out ushort low);
 
                 result = "" + (char)high + (char)low;
             }
@@ -33,8 +44,33 @@ namespace Soedeum.Dotnet.Library.Text
             return result;
         }
 
+
+
+        // Equality
         public override int GetHashCode() => value.GetHashCode();
-        
+
+        public override bool Equals(object obj) => (obj is CodePoint) ? Equals((CodePoint)obj) : false;
+
+        public bool Equals(CodePoint other) => this.value == other.value;
+
+        public static bool operator ==(CodePoint left, CodePoint right) => left.value == right.value;
+
+        public static bool operator !=(CodePoint left, CodePoint right) => left.value == right.value;
+
+
+        // Comparison
+        public int CompareTo(CodePoint other) => this.value.CompareTo(other.value);
+
+        public static bool operator <(CodePoint left, CodePoint right) => left.value < right.value;
+
+        public static bool operator >(CodePoint left, CodePoint right) => left.value > right.value;
+
+        public static bool operator <=(CodePoint left, CodePoint right) => left.value <= right.value;
+
+        public static bool operator >=(CodePoint left, CodePoint right) => left.value >= right.value;
+
+        #endregion
+
 
         /* Constructors */
         #region Constructors        
@@ -74,7 +110,7 @@ namespace Soedeum.Dotnet.Library.Text
                 throw Errors.InvalidLowSurrogate(highSurrogate);
 
 
-            uint value = Utf16.CombineSurrogates(highSurrogate, lowSurrogate);
+            uint value = Utf16.ToUtf32(highSurrogate, lowSurrogate);
 
             return new CodePoint(value);
         }
@@ -101,6 +137,7 @@ namespace Soedeum.Dotnet.Library.Text
         #endregion
 
 
+        /* Conversion */
         #region Conversion
 
         public static explicit operator char(CodePoint value) => (char)value.value;
@@ -125,14 +162,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-
-        #region Operators
-
-        public static string operator +(string left, CodePoint right) => left + right.ToString();
-
-        public static string operator +(CodePoint left, string right) => left.ToString() + right;
-
-        #endregion
 
 
         /* Constants */

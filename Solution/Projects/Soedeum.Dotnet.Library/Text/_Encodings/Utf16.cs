@@ -1,3 +1,5 @@
+using System;
+
 namespace Soedeum.Dotnet.Library.Text
 {
     public class Utf16
@@ -20,23 +22,20 @@ namespace Soedeum.Dotnet.Library.Text
         // 0000-0011 1111-1111
         public const ushort SurrogateMask = 0x03FF;
 
+        public const int HighSurrogateOffset = 10;
+
         // 110110 wwwwxxxxxx    =>  [1]: 1101-10ww [0]: wwxx-xxxx
         public const ushort HighSurrogatePrefix = 0xD800;
 
         // 110111 yyyyyyyyyy    =>  [1]: 1101-11yy [0]: yyyy-yyyy
         public const ushort LowSurrogatePrefix = 0xDC00;
 
-        
+
         public static bool IsHighSurrogate(uint value) => (value >= HighSurrogateMin) && (value <= HighSurrogateMax);
 
         public static bool IsLowSurrogate(uint value) => (value >= LowSurrogateMin) && (value <= LowSurrogateMax);
 
         public static bool IsSurrogate(uint value) => (value >= SurrogateMin) && (value <= SurrogateMax);
-
-
-
-
-        public const int HighSurrogateOffset = 10;
 
 
         public static uint CombineSurrogates(ushort highSurrogate, ushort lowSurrogate)
@@ -64,5 +63,42 @@ namespace Soedeum.Dotnet.Library.Text
             // Clear out the high surrogate and add the low surrogate prefix
             lowSurrogate = (ushort)(LowSurrogatePrefix | (utf32 & SurrogateMask));
         }
+
+
+        public class Decoder : IByteDecoder
+        {
+            bool isLittleEndian;
+
+            ushort high, low;
+
+            bool isSurrogatePair;
+
+            bool awaitingSecondHalf;
+
+            CodePoint? result;
+
+
+            public Decoder(bool isLittleEndian = false)
+            {
+                this.isLittleEndian = isLittleEndian;
+            }
+
+            public CodePoint? Result => result;
+
+            public bool Process(byte value)
+            {
+                if (awaitingSecondHalf)
+                {
+
+                }
+                else
+                {
+
+                }
+
+                return false;
+            }
+        }
+
     }
 }
