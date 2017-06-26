@@ -30,6 +30,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         private CharSequence()
         {
+            start = last = end = null;
         }
 
 

@@ -43,18 +43,6 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        // TextElements
-        public static IEnumerator<TextElement> GetTextElements(this IEnumerator<char> chars)
-        {
-            return TextElement.EnumerateFromChars(chars);
-        }
-
-        public static IEnumerator<TextElement> GetTextElements(this IEnumerable<char> chars)
-        {
-            return TextElement.EnumerateFromChars(chars.GetEnumerator());
-        }
-
-
         // TextReaders
         public static TextReader GetTextReader(this Stream stream, Encoding encoding = null)
         {

@@ -33,6 +33,8 @@ namespace Soedeum.Dotnet.Library.Text
             return result;
         }
 
+        public override int GetHashCode() => value.GetHashCode();
+        
 
         /* Constructors */
         #region Constructors        
@@ -142,13 +144,10 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly CodePoint Replacement = new CodePoint(0xFFFD);
 
-
-
         #endregion
 
         /* Helper Classes */
         #region Helper Classes
-
 
         private static class Errors
         {

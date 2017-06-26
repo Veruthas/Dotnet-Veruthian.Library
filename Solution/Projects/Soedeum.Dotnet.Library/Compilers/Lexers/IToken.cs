@@ -8,10 +8,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
     {
         string Source { get; }
 
-        TextSpan Span { get; }
-        
+        TextLocation Location { get; }
+
+        string Value { get; }
+
         TType Type { get; }
-        
+
         bool IsOf(TType type);
 
         void VerifyIsOf(TType type);

@@ -25,7 +25,7 @@ namespace _TestConsole
         {
             TestSimpleReader("Hello, world!", (i) => '~');
             TestSimpleReader("", (i) => '~');
-            TestSimpleReader("Hello\r\n\0world!".GetTextElements(), ((i) => i + '\0'));
+            TestSimpleReader("Hello\r\n\0world!");
             TestSimpleReader(new int[] { 1, 2, 3, 4, 5 }, (i) => -1);
         }
 

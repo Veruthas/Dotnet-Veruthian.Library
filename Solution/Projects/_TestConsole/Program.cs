@@ -31,6 +31,8 @@ namespace _TestConsole
 
             Console.WriteLine(ab == xy);
 
+            Console.WriteLine(x.ToCodePointString());
+            Console.WriteLine(y.ToCodePointString());
             Pause();
         }
 
