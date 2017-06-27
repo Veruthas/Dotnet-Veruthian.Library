@@ -55,7 +55,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator ==(CodePoint left, CodePoint right) => left.value == right.value;
 
-        public static bool operator !=(CodePoint left, CodePoint right) => left.value == right.value;
+        public static bool operator !=(CodePoint left, CodePoint right) => left.value != right.value;
 
 
         // Comparison

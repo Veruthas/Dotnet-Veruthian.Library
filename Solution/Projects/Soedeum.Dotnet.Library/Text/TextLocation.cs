@@ -88,7 +88,7 @@ namespace Soedeum.Dotnet.Library.Text
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return HashCodeCombiner.Combiner.Combine(Position, Line, Column);
+            return HashCodeCreator.Combiner.Combine(Position, Line, Column);
         }
 
         public static bool operator ==(TextLocation left, TextLocation right)

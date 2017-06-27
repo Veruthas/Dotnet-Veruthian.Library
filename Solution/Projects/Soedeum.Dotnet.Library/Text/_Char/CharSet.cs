@@ -25,7 +25,7 @@ namespace Soedeum.Dotnet.Library.Text
             foreach (var range in ranges)
                 size += range.Size;
 
-            this.hashcode = HashCodeCombiner.Combiner.Combine(ranges);
+            this.hashcode = HashCodeCreator.Combiner.Combine(ranges);
         }
 
 
