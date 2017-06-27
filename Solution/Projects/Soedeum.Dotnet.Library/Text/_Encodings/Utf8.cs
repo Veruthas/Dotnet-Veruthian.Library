@@ -2,7 +2,7 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public class Utf8
+    public static class Utf8
     {
         // Leading and Trailing Code Units
         // Encoding of Utf8 CodePoints
@@ -16,7 +16,7 @@ namespace Soedeum.Dotnet.Library.Text
         // 2) 0000-0000 0000-yyyy yyxx-xxxx
         // 3) 0000-00zz zzzz-yyyy yyxx-xxxx
         // 4) 000u-uuzz zzzy-yyyy yyxx-xxxx
-        public const byte OneByteSequencePrefix = 0b0000_0000;        
+        public const byte OneByteSequencePrefix = 0b0000_0000;
         public const byte TwoByteSequencePrefix = 0b1100_0000;
         public const byte ThreeByteSequencePrefix = 0b1110_0000;
         public const byte FourByteSequencePrefix = 0b1111_0000;
@@ -31,7 +31,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         }
 
-        public class Decoder : IByteDecoder
+        public class ByteDecoder : ITransformer<byte, CodePoint?>
         {
             uint state;
 
@@ -45,6 +45,8 @@ namespace Soedeum.Dotnet.Library.Text
 
             public bool Process(byte value)
             {
+                result = null;
+
                 if (bytesRemaining == 0)
                 {
                     ProcessHeading(value);
@@ -56,12 +58,11 @@ namespace Soedeum.Dotnet.Library.Text
 
                 if (bytesRemaining == 0)
                 {
-                    result = CodePoint.FromUtf32(state);
+                    result = state;
                     return true;
                 }
                 else
                 {
-                    result = null;
                     return false;
                 }
             }

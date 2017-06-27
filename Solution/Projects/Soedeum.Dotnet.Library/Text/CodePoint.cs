@@ -36,7 +36,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                Utf16.SplitSurrogates(value, out ushort leading, out ushort trailing);
+                Utf16.FromUtf32(value, out ushort leading, out ushort trailing);
 
                 result = "" + (char)leading + (char)trailing;
             }
@@ -89,8 +89,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf16(ushort value)
         {
-            if (Utf16.IsSurrogate(value))
-                throw Errors.InvalidCharacter(value);
+            var utf32 = Utf16.ToUtf32(value);
 
             return new CodePoint(value);
         }
@@ -103,14 +102,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf16(ushort leadingSurrogate, ushort trailingSurrogate)
         {
-            if (!Utf16.IsLeadingSurrogate(leadingSurrogate))
-                throw Errors.InvalidLeadingSurrogate(leadingSurrogate);
-
-            if (!Utf16.IsLowSurrogate(trailingSurrogate))
-                throw Errors.InvalidTrailingSurrogate(leadingSurrogate);
-
-
-            uint value = Utf16.CombineSurrogates(leadingSurrogate, trailingSurrogate);
+            uint value = Utf16.ToUtf32(leadingSurrogate, trailingSurrogate);
 
             return new CodePoint(value);
         }
@@ -125,11 +117,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(uint value)
         {
-            if (value > 0x10FFFF)
-                throw Errors.CodePointOutOfRange(value);
-
-            else if (Utf32.IsInvalid(value))
-                throw Errors.InvalidCodePoint(value);
+            Utf32.Verify(value);
 
             return new CodePoint(value);
         }
@@ -175,65 +163,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-        /* Helper Classes */
-        #region Helper Classes
-
-        private static class Errors
-        {
-            public static InvalidCodePointException InvalidLeadingSurrogate(ushort value)
-            {
-                return new InvalidCodePointException(InvalidLeadingSurrogateMessage(value));
-            }
-
-            public static string InvalidLeadingSurrogateMessage(ushort value)
-            {
-                return string.Format("Invalid leading surrogate character. Must be in range (\\uD800-\\uDBFF), was \\u{0:X4}.", value);
-            }
-
-
-            public static InvalidCodePointException InvalidTrailingSurrogate(ushort value)
-            {
-                return new InvalidCodePointException(InvalidTrailingSurrogateMessage(value));
-            }
-
-            public static string InvalidTrailingSurrogateMessage(ushort value)
-            {
-                return string.Format("Invalid trailing surrogate character. Must be in range (\\uDC00-\\uDFFF), was \\u{0:X4}.", value);
-
-            }
-
-            public static InvalidCodePointException InvalidCharacter(ushort value)
-            {
-                return new InvalidCodePointException(InvalidCharacterMessage(value));
-            }
-
-            public static string InvalidCharacterMessage(ushort value)
-            {
-                return string.Format("Character cannot be a surrogate (in range \\uD800-\\uDFFF), was \\u{0:X4}", value);
-            }
-
-            public static InvalidCodePointException InvalidCodePoint(uint value)
-            {
-                return new InvalidCodePointException(CodePointOutOfRangeMessage(value));
-            }
-
-            public static string InvalidCodePointMessage(uint value)
-            {
-                return string.Format("Invalid codepoint, was U+{0:X4}", value);
-            }
-
-            public static InvalidCodePointException CodePointOutOfRange(uint value)
-            {
-                return new InvalidCodePointException(CodePointOutOfRangeMessage(value));
-            }
-
-            public static string CodePointOutOfRangeMessage(uint value)
-            {
-                return string.Format("Codepoint cannot be greater than U+10FFFF, was U+{0:X4}", value);
-            }
-        }
-
-        #endregion
     }
 
 
@@ -244,6 +173,5 @@ namespace Soedeum.Dotnet.Library.Text
         public InvalidCodePointException(string message) : base(message) { }
 
         public InvalidCodePointException(string message, System.Exception inner) : base(message, inner) { }
-
     }
 }
