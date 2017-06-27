@@ -44,7 +44,9 @@ namespace Soedeum.Dotnet.Library.Text
             return result;
         }
 
-
+        // CodeString
+        public static CodeString operator *(CodePoint value, int count) => new CodeString(value, count);
+        
 
         // Equality
         public override int GetHashCode() => value.GetHashCode();

@@ -13,7 +13,13 @@ namespace _TestConsole
         {
             var s = new CodeString('H', 'e', 'l', 'l', 'o');
             var t = new CodeString('H', 'e', 'l', 'l', 'o');
-            Console.WriteLine(s == t);
+            CodePoint u = 's';
+            var b = u * 4;
+            var c = b * 4;
+            
+            s = null;
+
+            string y = s;
 
             Pause();
         }
