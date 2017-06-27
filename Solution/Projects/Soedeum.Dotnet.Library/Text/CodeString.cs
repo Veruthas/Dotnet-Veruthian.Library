@@ -32,24 +32,14 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(CodePoint value, int count)
             : this(ReplicateCodePoint(value, count), false) { }
 
-        public CodeString(string value) { }
+        public CodeString(string value) 
+            : this(CodePoint.FromString(value), false) { }
 
-        public CodeString(string value, int start) { }
+        public CodeString(string value, int start) 
+            : this(CodePoint.FromString(value, start), false) { }
 
-        public CodeString(string value, int start, int amount) { }
-
-        private static CodePoint[] ReplicateCodePoint(CodePoint value, int count)
-        {
-            if (count < 0)
-                throw new ArgumentOutOfRangeException("amount", count, "Amount cannot be a negative number.");
-
-            CodePoint[] codepoints = new CodePoint[count];
-
-            for (int i = 0; i < count; i++)
-                codepoints[i] = value;
-
-            return codepoints;
-        }
+        public CodeString(string value, int start, int amount)
+            : this(CodePoint.FromString(value, start, amount), false) { }
 
 
         // Indexer
@@ -159,7 +149,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator >=(CodeString left, CodeString right) => Compare(left, right) != -1;
 
-        // Concatenation
+        // Combination
         public static CodeString operator +(CodeString left, CodeString right) => Combine(left, right);
 
         public static CodeString operator +(CodeString left, CodePoint right) => Combine(left, right);
@@ -239,6 +229,21 @@ namespace Soedeum.Dotnet.Library.Text
             return new CodeString(combined, false);
         }
 
+
+        // Replicate
+        private static CodePoint[] ReplicateCodePoint(CodePoint value, int count)
+        {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("amount", count, "Amount cannot be a negative number.");
+
+            CodePoint[] codepoints = new CodePoint[count];
+
+            for (int i = 0; i < count; i++)
+                codepoints[i] = value;
+
+            return codepoints;
+        }
+
         public static CodeString operator *(CodeString value, int count) => Replicate(value, count);
 
         public static CodeString Replicate(CodeString value, int count)
@@ -294,6 +299,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         public static implicit operator string(CodeString value) => value.IsNull() ? null : value.ToString();
+
 
         #endregion
 

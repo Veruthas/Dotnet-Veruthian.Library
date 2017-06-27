@@ -44,9 +44,65 @@ namespace Soedeum.Dotnet.Library.Text
             return result;
         }
 
+        // FromString
+        public static CodePoint[] FromString(string value)
+        {
+            if (value == null)
+                return null;
+            else
+                return FromString(value, 0, value.Length);
+        }
+
+        public static CodePoint[] FromString(string value, int start)
+        {
+            if (value == null)
+                return null;
+            else
+                return FromString(value, start, value.Length - start);
+        }
+
+        public static CodePoint[] FromString(string value, int start, int amount)
+        {
+            if (value == null)
+                return null;
+
+            if (start < 0 || start > value.Length)
+                throw new ArgumentOutOfRangeException("start");
+
+            if (amount < 0 || start + amount > value.Length)
+                throw new ArgumentOutOfRangeException("amount");
+
+
+            var codepoints = new CodePoint[amount];
+
+            int index = 0;
+
+
+            var decoder = new Utf16.CharDecoder();
+
+            bool result = false;
+
+            for (int i = start; i < amount; i++)
+            {
+                result = decoder.TryProcess(value[i], out var codepoint);
+
+                if (result)
+                    codepoints[index++] = codepoint;
+            }
+
+            if (!result)
+                throw new InvalidCodePointException("Missing trailing surrogate");
+
+            if (index < codepoints.Length)
+                Array.Resize(ref codepoints, index);
+
+            return codepoints;
+        }
+
+
         // CodeString
         public static CodeString operator *(CodePoint value, int count) => new CodeString(value, count);
-        
+
 
         // Equality
         public override int GetHashCode() => value.GetHashCode();
