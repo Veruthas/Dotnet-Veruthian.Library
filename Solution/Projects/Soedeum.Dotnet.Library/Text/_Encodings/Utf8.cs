@@ -4,6 +4,7 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public class Utf8
     {
+        // Leading and Trailing Code Units
         // Encoding of Utf8 CodePoints
         // 1) U+0000  to U+007F (ASCII)             -> [0] 0xxx-xxxx;
         // 2) U+0080  to U+07FF                     -> [0] 110y-yyyy; [1]: 10xx-xxxx
@@ -15,14 +16,14 @@ namespace Soedeum.Dotnet.Library.Text
         // 2) 0000-0000 0000-yyyy yyxx-xxxx
         // 3) 0000-00zz zzzz-yyyy yyxx-xxxx
         // 4) 000u-uuzz zzzy-yyyy yyxx-xxxx
-        public const byte OneByteSequencePrefix = 0b0000_0000;
-        public const byte FollowSequencePrefix = 0b1000_0000;
+        public const byte OneByteSequencePrefix = 0b0000_0000;        
         public const byte TwoByteSequencePrefix = 0b1100_0000;
         public const byte ThreeByteSequencePrefix = 0b1110_0000;
         public const byte FourByteSequencePrefix = 0b1111_0000;
 
+        public const byte TrailingUnitPrefix = 0b1000_0000;
 
-        private const int FollowSequenceOffset = 6;
+        private const int TrailingUnitOffset = 6;
 
 
         public class Encoder
@@ -122,7 +123,7 @@ namespace Soedeum.Dotnet.Library.Text
             {
 
                 // Prefix MUST be 0b10xx_xxxx
-                if ((value & ExtensionHeaderMask) != FollowSequencePrefix)
+                if ((value & ExtensionHeaderMask) != TrailingUnitPrefix)
                 {
                     Reset();
                     throw InvalidCodeUnitSequence(value);
@@ -138,7 +139,7 @@ namespace Soedeum.Dotnet.Library.Text
                 }
 
                 // shift old bits down
-                state <<= FollowSequenceOffset;
+                state <<= TrailingUnitOffset;
                 state |= bits;
 
                 bytesRemaining--;

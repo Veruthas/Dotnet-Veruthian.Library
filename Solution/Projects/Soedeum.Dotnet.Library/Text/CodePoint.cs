@@ -36,9 +36,9 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                Utf16.FromUtf32(value, out ushort high, out ushort low);
+                Utf16.SplitSurrogates(value, out ushort leading, out ushort trailing);
 
-                result = "" + (char)high + (char)low;
+                result = "" + (char)leading + (char)trailing;
             }
 
             return result;
@@ -97,20 +97,20 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // For Utf16 Surrogate Pairs (U+10000 to U+10FFFF) 
-        public static CodePoint FromUtf16(char highSurrogate, char lowSurrogate) => FromUtf16((ushort)highSurrogate, (ushort)lowSurrogate);
+        public static CodePoint FromUtf16(char leadingSurrogate, char trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
 
-        public static CodePoint FromUtf16(short highSurrogate, short lowSurrogate) => FromUtf16((ushort)highSurrogate, (ushort)lowSurrogate);
+        public static CodePoint FromUtf16(short leadingSurrogate, short trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
 
-        public static CodePoint FromUtf16(ushort highSurrogate, ushort lowSurrogate)
+        public static CodePoint FromUtf16(ushort leadingSurrogate, ushort trailingSurrogate)
         {
-            if (!Utf16.IsHighSurrogate(highSurrogate))
-                throw Errors.InvalidHighSurrogate(highSurrogate);
+            if (!Utf16.IsLeadingSurrogate(leadingSurrogate))
+                throw Errors.InvalidLeadingSurrogate(leadingSurrogate);
 
-            if (!Utf16.IsLowSurrogate(lowSurrogate))
-                throw Errors.InvalidLowSurrogate(highSurrogate);
+            if (!Utf16.IsLowSurrogate(trailingSurrogate))
+                throw Errors.InvalidTrailingSurrogate(leadingSurrogate);
 
 
-            uint value = Utf16.ToUtf32(highSurrogate, lowSurrogate);
+            uint value = Utf16.CombineSurrogates(leadingSurrogate, trailingSurrogate);
 
             return new CodePoint(value);
         }
@@ -180,25 +180,25 @@ namespace Soedeum.Dotnet.Library.Text
 
         private static class Errors
         {
-            public static InvalidCodePointException InvalidHighSurrogate(ushort value)
+            public static InvalidCodePointException InvalidLeadingSurrogate(ushort value)
             {
-                return new InvalidCodePointException(InvalidHighSurrogateMessage(value));
+                return new InvalidCodePointException(InvalidLeadingSurrogateMessage(value));
             }
 
-            public static string InvalidHighSurrogateMessage(ushort value)
+            public static string InvalidLeadingSurrogateMessage(ushort value)
             {
-                return string.Format("Invalid high surrogate character. Must be in range (\\uD800-\\uDBFF), was \\u{0:X4}.", value);
+                return string.Format("Invalid leading surrogate character. Must be in range (\\uD800-\\uDBFF), was \\u{0:X4}.", value);
             }
 
 
-            public static InvalidCodePointException InvalidLowSurrogate(ushort value)
+            public static InvalidCodePointException InvalidTrailingSurrogate(ushort value)
             {
-                return new InvalidCodePointException(InvalidLowSurrogateMessage(value));
+                return new InvalidCodePointException(InvalidTrailingSurrogateMessage(value));
             }
 
-            public static string InvalidLowSurrogateMessage(ushort value)
+            public static string InvalidTrailingSurrogateMessage(ushort value)
             {
-                return string.Format("Invalid low surrogate character. Must be in range (\\uDC00-\\uDFFF), was \\u{0:X4}.", value);
+                return string.Format("Invalid trailing surrogate character. Must be in range (\\uDC00-\\uDFFF), was \\u{0:X4}.", value);
 
             }
 
