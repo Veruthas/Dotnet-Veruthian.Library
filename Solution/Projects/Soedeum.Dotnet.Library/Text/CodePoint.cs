@@ -155,9 +155,9 @@ namespace Soedeum.Dotnet.Library.Text
         /* Constants */
         #region Constants
 
-        public static readonly CodePoint Max = new CodePoint(0x10FFFF);
+        public static readonly CodePoint MinValue = new CodePoint(0);
 
-        public static readonly CodePoint Min = new CodePoint(0);
+        public static readonly CodePoint MaxValue = new CodePoint(0x10FFFF);
 
         public static readonly CodePoint Replacement = new CodePoint(0xFFFD);
 

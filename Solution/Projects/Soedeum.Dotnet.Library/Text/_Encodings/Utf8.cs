@@ -31,21 +31,15 @@ namespace Soedeum.Dotnet.Library.Text
 
         }
 
-        public class ByteDecoder : ITransformer<byte, CodePoint?>
+        public struct ByteDecoder : ITransformer<byte, CodePoint>
         {
             uint state;
 
             int bytesRemaining;
 
-            CodePoint? result;
 
-
-            public CodePoint? Result { get => result; }
-
-
-            public bool Process(byte value)
-            {
-                result = null;
+            public bool TryProcess(byte value, out CodePoint result)
+            {                
 
                 if (bytesRemaining == 0)
                 {
@@ -59,10 +53,15 @@ namespace Soedeum.Dotnet.Library.Text
                 if (bytesRemaining == 0)
                 {
                     result = state;
+
+                    state = 0;
+                    
                     return true;
                 }
                 else
                 {
+                    result = default(CodePoint);
+
                     return false;
                 }
             }
@@ -127,6 +126,7 @@ namespace Soedeum.Dotnet.Library.Text
                 if ((value & ExtensionHeaderMask) != TrailingUnitPrefix)
                 {
                     Reset();
+
                     throw InvalidCodeUnitSequence(value);
                 }
 
@@ -136,11 +136,13 @@ namespace Soedeum.Dotnet.Library.Text
                 if (bits == 0)
                 {
                     Reset();
+
                     throw CodePointNotSmallestSequence(value);
                 }
 
                 // shift old bits down
                 state <<= TrailingUnitOffset;
+
                 state |= bits;
 
                 bytesRemaining--;
@@ -149,6 +151,7 @@ namespace Soedeum.Dotnet.Library.Text
             private void Reset()
             {
                 state = 0;
+
                 bytesRemaining = 0;
             }
 
