@@ -58,16 +58,55 @@ namespace Soedeum.Dotnet.Library.Text
 
         public class ByteDecoder : ITransformer<byte, CodePoint?>
         {
-            public ByteDecoder(bool littleEndian = false)
+            bool isLittleEndian;
+
+            uint state;
+
+            int bytesRemaining;
+
+            CodePoint? result;
+
+            public ByteDecoder(bool isLittleEndian = false)
             {
-                
+
             }
 
-            public CodePoint? Result => throw new NotImplementedException();
+            public CodePoint? Result => result;
 
             public bool Process(byte value)
             {
-                throw new NotImplementedException();
+                result = null;
+
+                if (bytesRemaining == 0)
+                    bytesRemaining = 4;
+
+                bytesRemaining--;
+
+                AddByte(value);
+
+                if (bytesRemaining == 0)
+                {
+                    result = state;
+
+                    state = 0;
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            private void AddByte(uint value)
+            {
+                if (isLittleEndian)
+                    value <<= (8 * bytesRemaining);
+                else
+                    state <<= 8;
+
+
+                state |= value;
             }
         }
     }
