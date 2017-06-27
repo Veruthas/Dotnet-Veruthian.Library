@@ -79,35 +79,43 @@ namespace Soedeum.Dotnet.Library.Text
             return value;
         }
 
-        public static void FromUtf32(uint utf32, out char leadingSurrogate, out char trailingSurrogate)
+        public static int FromUtf32(uint utf32, out char leadingSurrogate, out char trailingSurrogate)
         {
-            FromUtf32(utf32, out ushort leading, out ushort trailing);
+            int result = FromUtf32(utf32, out ushort leading, out ushort trailing);
 
             leadingSurrogate = (char)leading;
 
             trailingSurrogate = (char)trailing;
+
+            return result;
         }
 
-        public static void FromUtf32(uint utf32, out short leadingSurrogate, out short trailingSurrogate)
+        public static int FromUtf32(uint utf32, out short leadingSurrogate, out short trailingSurrogate)
         {
-            FromUtf32(utf32, out ushort leading, out ushort trailing);
+            int result = FromUtf32(utf32, out ushort leading, out ushort trailing);
 
             leadingSurrogate = (short)leading;
 
             trailingSurrogate = (short)trailing;
+
+            return result;
         }
 
-        public static void FromUtf32(uint utf32, out ushort leadingSurrogate, out ushort trailingSurrogate)
+        public static int FromUtf32(uint utf32, out ushort leadingSurrogate, out ushort trailingSurrogate)
         {
             if (utf32 < Utf32.MaxCodePoint)
             {
                 leadingSurrogate = (ushort)utf32;
 
                 trailingSurrogate = 0;
+
+                return 1;
             }
             else
             {
                 SplitSurrogates(utf32, out leadingSurrogate, out trailingSurrogate);
+
+                return 2;
             }
         }
 
@@ -171,7 +179,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-        public class ByteDecoder : ITransformer<byte, CodePoint?>
+        public struct ByteDecoder : ITransformer<byte, CodePoint>
         {
             bool isLittleEndian;
 
@@ -179,23 +187,20 @@ namespace Soedeum.Dotnet.Library.Text
 
             ushort current;
 
-            CodePoint? result;
 
 
-            public ByteDecoder(bool isLittleEndian = false)
+            public ByteDecoder(bool isLittleEndian) : this()
             {
                 this.isLittleEndian = isLittleEndian;
             }
 
-            public CodePoint? Result => result;
-
-            public bool Process(byte value)
+            public bool TryProcess(byte value, out CodePoint result)
             {
-                result = null;
-                
                 if (current == 0)
                 {
                     AddFirstByte(value);
+
+                    result = default(CodePoint);
 
                     return false;
                 }
@@ -203,11 +208,11 @@ namespace Soedeum.Dotnet.Library.Text
                 {
                     AddSecondByte(value);
 
-                    return ProcessResult();
+                    return ProcessResult(out result);
                 }
             }
 
-            
+
             private void AddFirstByte(byte value)
             {
                 if (isLittleEndian)
@@ -235,17 +240,17 @@ namespace Soedeum.Dotnet.Library.Text
                 }
             }
 
-            private bool ProcessResult()
+            private bool ProcessResult(out CodePoint result)
             {
                 if (leadingSurrogate != 0)
                 {
                     if (IsTrailingSurrogate(current))
                     {
-                        uint value = ToUtf32(leadingSurrogate, current);
+                        result = ToUtf32(leadingSurrogate, current);
 
                         current = leadingSurrogate = 0;
 
-                        result = value;                        
+                        return true;
                     }
                     else
                     {
@@ -265,30 +270,26 @@ namespace Soedeum.Dotnet.Library.Text
                     result = current;
 
                     current = 0;
-                }
 
-                return true;
+                    return true;
+                }
             }
         }
 
-        public class CharDecoder : ITransformer<char, CodePoint?>
+        public struct CharDecoder : ITransformer<char, CodePoint>
         {
-            CodePoint? result;
-
             char leadingSurrogate;
 
-            public CodePoint? Result => result;
-
-            public bool Process(char value)
+            public bool TryProcess(char value, out CodePoint result)
             {
-                result = null;
-
                 // Finished
                 if (leadingSurrogate == default(char))
                 {
                     if (IsLeadingSurrogate(value))
                     {
                         leadingSurrogate = value;
+
+                        result = default(CodePoint);
 
                         return false;
                     }

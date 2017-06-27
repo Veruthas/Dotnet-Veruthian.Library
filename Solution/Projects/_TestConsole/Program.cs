@@ -8,9 +8,10 @@ using Soedeum.Dotnet.Library.Text;
 namespace _TestConsole
 {
     class Program
-    {        
+    {
         static void Main(string[] args)
         {
+<<<<<<< HEAD
             var s = new CodeString('H', 'e', 'l', 'l', 'o');
             var t = new CodeString('H', 'e', 'l', 'l', 'o');
             CodePoint u = 's';
@@ -21,6 +22,8 @@ namespace _TestConsole
 
             string y = s;
 
+=======
+>>>>>>> 67f3c30c1001bc603989912cc878b6bdeef58b03
             Pause();
         }
 

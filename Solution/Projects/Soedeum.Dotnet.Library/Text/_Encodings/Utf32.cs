@@ -56,7 +56,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-        public class ByteDecoder : ITransformer<byte, CodePoint?>
+        public struct ByteDecoder : ITransformer<byte, CodePoint>
         {
             bool isLittleEndian;
 
@@ -64,19 +64,14 @@ namespace Soedeum.Dotnet.Library.Text
 
             int bytesRemaining;
 
-            CodePoint? result;
 
-            public ByteDecoder(bool isLittleEndian = false)
+            public ByteDecoder(bool isLittleEndian) : this()
             {
-
+                this.isLittleEndian = isLittleEndian;
             }
 
-            public CodePoint? Result => result;
-
-            public bool Process(byte value)
+            public bool TryProcess(byte value, out CodePoint result)
             {
-                result = null;
-
                 if (bytesRemaining == 0)
                     bytesRemaining = 4;
 
@@ -94,6 +89,8 @@ namespace Soedeum.Dotnet.Library.Text
                 }
                 else
                 {
+                    result = default(CodePoint);
+
                     return false;
                 }
             }
