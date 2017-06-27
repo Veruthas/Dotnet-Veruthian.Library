@@ -32,6 +32,12 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(CodePoint value, int count)
             : this(ReplicateCodePoint(value, count), false) { }
 
+        public CodeString(string value) { }
+
+        public CodeString(string value, int start) { }
+
+        public CodeString(string value, int start, int amount) { }
+
         private static CodePoint[] ReplicateCodePoint(CodePoint value, int count)
         {
             if (count < 0)
@@ -51,8 +57,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public int Length => codepoints.Length;
 
-
-
+        public bool IsEmpty => Length == 0;
 
 
         /* Operators */
@@ -90,15 +95,69 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public static bool operator ==(CodeString left, CodeString right) => left.Equals(right);
+        public static bool IsEqualTo(CodeString left, CodeString right)
+        {
+            if (left.IsNull())
+                return right.IsNull();
+            else
+                return left.Equals(right);
+        }
 
-        public static bool operator !=(CodeString left, CodeString right) => !left.Equals(right);
+        public static bool operator ==(CodeString left, CodeString right) => IsEqualTo(left, right);
+
+        public static bool operator !=(CodeString left, CodeString right) => !IsEqualTo(left, right);
 
         // Comparison
         public int CompareTo(CodeString other)
         {
-            throw new NotImplementedException();
+            // Treat null like empty
+            if (other == null)
+                return 1;
+
+            int length = Math.Min(this.Length, other.Length);
+
+            for (int i = 0; i < length; i++)
+            {
+                var thispoint = this.codepoints[i];
+                var otherpoint = other.codepoints[i];
+
+                var result = thispoint.CompareTo(otherpoint);
+
+                if (result != 0)
+                    return result;
+            }
+
+            // All codepoints that line up match up, so we have to sort by length
+            if (this.Length < other.Length)
+                return -1;
+            else if (this.Length > other.Length)
+                return +1;
+            else
+                return 0;
         }
+
+        public static int Compare(CodeString left, CodeString right)
+        {
+            if (left.IsNull())
+            {
+                if (right.IsNull())
+                    return 0;
+                else
+                    return -1;
+            }
+            else
+            {
+                return left.CompareTo(right);
+            }
+        }
+
+        public static bool operator <(CodeString left, CodeString right) => Compare(left, right) == -1;
+
+        public static bool operator >(CodeString left, CodeString right) => Compare(left, right) == +1;
+
+        public static bool operator <=(CodeString left, CodeString right) => Compare(left, right) != +1;
+
+        public static bool operator >=(CodeString left, CodeString right) => Compare(left, right) != -1;
 
         // Concatenation
         public static CodeString operator +(CodeString left, CodeString right) => Combine(left, right);
@@ -114,7 +173,7 @@ namespace Soedeum.Dotnet.Library.Text
                 return right;
 
             if (right == null)
-                return left;
+                return null;
 
             var combined = new CodePoint[left.Length + right.Length];
 
@@ -192,6 +251,36 @@ namespace Soedeum.Dotnet.Library.Text
             return Combine(values);
         }
 
+        // SubString
+        public CodeString Substring(int start) => Substring(start, Length - start);
+
+        public CodeString Substring(int start, int amount)
+        {
+            if (start < 0 || start > Length)
+                throw new ArgumentOutOfRangeException("start");
+
+            if (start + amount > Length)
+                throw new ArgumentOutOfRangeException("amount");
+
+            var subpoints = new CodePoint[amount];
+
+            for (int i = 0, s = start; i < amount; i++, s++)
+                subpoints[i] = codepoints[s];
+
+            return new CodeString(subpoints, false);
+        }
+
+        public CodeString Reverse()
+        {
+            var reversed = new CodePoint[Length];
+
+            for (int i = 0, r = Length - 1; i < Length; i++, r--)
+                reversed[i] = codepoints[r];
+
+            return new CodeString(reversed, false);
+        }
+
+
         // String
         public override string ToString()
         {
@@ -216,5 +305,9 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+        // Constants
+        public static readonly CodeString Empty = new CodeString(new CodePoint[] { }, false);
     }
 }
