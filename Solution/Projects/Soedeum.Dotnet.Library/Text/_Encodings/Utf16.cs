@@ -103,7 +103,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static int FromUtf32(uint utf32, out ushort leadingSurrogate, out ushort trailingSurrogate)
         {
-            if (utf32 < Utf32.MaxCodePoint)
+            if (utf32 < Utf32.SupplementaryPlanePrefix)
             {
                 leadingSurrogate = (ushort)utf32;
 
@@ -188,7 +188,6 @@ namespace Soedeum.Dotnet.Library.Text
             ushort current;
 
 
-
             public ByteDecoder(bool isLittleEndian) : this()
             {
                 this.isLittleEndian = isLittleEndian;
@@ -198,7 +197,7 @@ namespace Soedeum.Dotnet.Library.Text
             {
                 if (current == 0)
                 {
-                    AddFirstByte(value);
+                    AddByte(value, !isLittleEndian);
 
                     result = default(CodePoint);
 
@@ -206,43 +205,50 @@ namespace Soedeum.Dotnet.Library.Text
                 }
                 else
                 {
-                    AddSecondByte(value);
+                    AddByte(value, isLittleEndian);
 
                     return ProcessResult(out result);
                 }
             }
 
-
-            private void AddFirstByte(byte value)
+            private void AddByte(ushort value, bool shift)
             {
-                if (isLittleEndian)
-                {
-                    current = value;
-                }
-                else
-                {
-                    ushort high = value;
-                    high <<= 8;
-                }
-            }
+                if (shift)
+                    value <<= 8;
 
-            private void AddSecondByte(byte value)
-            {
-                if (isLittleEndian)
-                {
-                    ushort high = value;
-                    high <<= 8;
-                    current |= high;
-                }
-                else
-                {
-                    current |= value;
-                }
+                current |= value;
             }
 
             private bool ProcessResult(out CodePoint result)
             {
-                if (leadingSurrogate != 0)
+                if (leadingSurrogate == 0)
+                {
+                    if (IsLeadingSurrogate(current))
+                    {
+                        leadingSurrogate = current;
+
+                        result = default(CodePoint);
+
+                        current = 0;
+
+                        return false;
+                    }
+                    else if (IsTrailingSurrogate(current))
+                    {
+                        current = 0;
+
+                        throw MissingLeadingSurrogate(current);
+                    }
+                    else
+                    {
+                        result = current;
+
+                        current = 0;
+
+                        return true;
+                    }
+                }
+                else
                 {
                     if (IsTrailingSurrogate(current))
                     {
@@ -258,20 +264,6 @@ namespace Soedeum.Dotnet.Library.Text
 
                         throw InvalidTrailingSurrogate(current);
                     }
-                }
-                else if (IsTrailingSurrogate(current))
-                {
-                    current = 0;
-
-                    throw MissingLeadingSurrogate(current);
-                }
-                else
-                {
-                    result = current;
-
-                    current = 0;
-
-                    return true;
                 }
             }
         }

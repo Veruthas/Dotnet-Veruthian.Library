@@ -80,7 +80,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             var decoder = new Utf16.CharDecoder();
 
-            bool result = false;
+            bool result = true;
 
             for (int i = start; i < amount; i++)
             {

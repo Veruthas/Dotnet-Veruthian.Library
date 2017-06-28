@@ -43,11 +43,11 @@ namespace Soedeum.Dotnet.Library.Text
 
                 if (bytesRemaining == 0)
                 {
-                    ProcessHeading(value);
+                    ProcessLeading(value);
                 }
                 else
                 {
-                    ProcessExtension(value);
+                    ProcessTrailing(value);
                 }
 
                 if (bytesRemaining == 0)
@@ -95,7 +95,7 @@ namespace Soedeum.Dotnet.Library.Text
                 -1
             };
 
-            private void ProcessHeading(byte value)
+            private void ProcessLeading(byte value)
             {
                 // 0xxx-xxxx, 110x-xxxx, 1110-xxxx, 1111-0xxx
 
@@ -114,31 +114,31 @@ namespace Soedeum.Dotnet.Library.Text
 
             // Extension
 
-            private const byte ExtensionHeaderMask = 0b1100_0000;
+            private const byte TrailingHeaderMask = 0b1100_0000;
 
-            private const byte ExtensionMask = 0b0011_1111;
+            private const byte TrailingMask = 0b0011_1111;
 
 
-            private void ProcessExtension(byte value)
+            private void ProcessTrailing(byte value)
             {
 
                 // Prefix MUST be 0b10xx_xxxx
-                if ((value & ExtensionHeaderMask) != TrailingUnitPrefix)
+                if ((value & TrailingHeaderMask) != TrailingUnitPrefix)
                 {
                     Reset();
 
                     throw InvalidCodeUnitSequence(value);
                 }
 
-                uint bits = (uint)(value & ExtensionMask);
+                uint bits = (uint)(value & TrailingMask);
 
                 // Bits cannot be 0 (Utf8 must be encoded in smallest possible form)
-                if (bits == 0)
-                {
-                    Reset();
+                // if (bits == 0)
+                // {
+                //     Reset();
 
-                    throw CodePointNotSmallestSequence(value);
-                }
+                //     throw CodePointNotSmallestSequence(value);
+                // }
 
                 // shift old bits down
                 state <<= TrailingUnitOffset;

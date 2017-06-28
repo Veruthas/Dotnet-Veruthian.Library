@@ -79,9 +79,9 @@ namespace Soedeum.Dotnet.Library.Text
             public bool TryProcess(byte value, out CodePoint result)
             {
                 if (bytesRemaining == 0)
-                    bytesRemaining = 4;
-
-                bytesRemaining--;
+                    bytesRemaining = 3;
+                else
+                    bytesRemaining--;
 
                 AddByte(value);
 
