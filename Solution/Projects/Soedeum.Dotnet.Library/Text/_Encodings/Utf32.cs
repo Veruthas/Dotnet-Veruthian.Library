@@ -8,6 +8,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public const uint MaxCodePoint = 0x10FFFF;
 
+
+        public const uint InvalidCharacterStart = 0xFDD0;
+
+        public const uint InvalidCharacterEnd = 0xFDEF;
+
+
         public static bool IsValid(uint value) => !IsDisallowed(value);
 
         public static bool IsInvalid(uint value) => IsDisallowed(value) || IsOutOfRange(value);
@@ -16,7 +22,7 @@ namespace Soedeum.Dotnet.Library.Text
         {
             return ((value & 0xFFFE) == 0xFFFE)
                     || (Utf16.IsSurrogate(value))
-                    || (value >= 0xFDD0 && value <= 0xFDEF);
+                    || (value >= InvalidCharacterStart && value <= InvalidCharacterEnd);
         }
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
