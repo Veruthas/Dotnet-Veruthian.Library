@@ -14,6 +14,56 @@ namespace Soedeum.Dotnet.Library.Text
         /* Operators */
         #region Operators
 
+        // Problem: we want to ignore invalid codepoints, such as U+xxFFFE, U+xxFFFF, U+D800..U+DFFF, U+FDD0..U+FDEF
+        
+        // Distance between two CodePoints
+        public static int operator -(CodePoint left, CodePoint right)
+        {
+            if (left < right)
+                throw new InvalidOperationException("Subtrahend must be smaller than minuend.");
+
+            return 0;
+        }
+
+        // Get CodePoint 
+        public static CodePoint operator +(CodePoint value, int offset)
+        {
+            return 0;
+        }
+
+        public static CodePoint operator -(CodePoint value, int offset)
+        {
+            return 0;
+        }
+
+        public static CodePoint operator ++(CodePoint left)
+        {
+            return left + 1;
+        }
+
+        public static CodePoint operator --(CodePoint left)
+        {
+            return left - 1;
+        }
+
+        private static CodePoint Increment(CodePoint value)
+        {
+            uint nextValue = value.value + 1;
+
+            // xFFFD => (x+1)0000
+            if ((value & 0xFFFE) == 0xFFFE)
+            {
+                return new CodePoint(nextValue + 2);
+            }
+
+        }
+
+        private static CodePoint Decrement(CodePoint value)
+        {
+
+        }
+
+
         // String
         public static string operator +(string left, CodePoint right) => left + right.ToString();
 

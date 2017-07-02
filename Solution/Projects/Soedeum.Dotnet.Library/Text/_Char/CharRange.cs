@@ -19,6 +19,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Total => bytes: [0-1]:low, [2-3]:high
+        // Problem! this only works on little-endian machines
         // Allows for easy comparison
         [FieldOffsetAttribute(0)]
         private readonly int total;
