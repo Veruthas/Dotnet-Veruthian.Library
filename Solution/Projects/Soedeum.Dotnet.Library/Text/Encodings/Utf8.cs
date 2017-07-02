@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Encodings
 {
     public static class Utf8
     {
@@ -25,20 +25,15 @@ namespace Soedeum.Dotnet.Library.Text
 
         private const int TrailingUnitOffset = 6;
 
-
-        public class Encoder
-        {
-
-        }
-
-        public struct ByteDecoder : ITransformer<byte, CodePoint>
+        
+        public struct ByteDecoder : ITransformer<byte, uint>
         {
             uint state;
 
             int bytesRemaining;
 
 
-            public bool TryProcess(byte value, out CodePoint result)
+            public bool TryProcess(byte value, out uint result)
             {                
 
                 if (bytesRemaining == 0)
@@ -60,7 +55,7 @@ namespace Soedeum.Dotnet.Library.Text
                 }
                 else
                 {
-                    result = default(CodePoint);
+                    result = default(uint);
 
                     return false;
                 }
@@ -121,7 +116,6 @@ namespace Soedeum.Dotnet.Library.Text
 
             private void ProcessTrailing(byte value)
             {
-
                 // Prefix MUST be 0b10xx_xxxx
                 if ((value & TrailingHeaderMask) != TrailingUnitPrefix)
                 {

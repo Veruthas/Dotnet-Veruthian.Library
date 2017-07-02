@@ -29,17 +29,18 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
-        public CodeString(CodePoint value, int count)
+
+        public CodeString(CodePoint value, int count, bool validate = false)
             : this(ReplicateCodePoint(value, count), false) { }
 
-        public CodeString(string value) 
-            : this(CodePoint.FromString(value), false) { }
+        public CodeString(string value, bool validate = false)
+            : this(value.ToCodePoints(), false) { }
 
-        public CodeString(string value, int start) 
-            : this(CodePoint.FromString(value, start), false) { }
+        public CodeString(string value, int start, bool validate = false)
+            : this(value.ToCodePoints(start), false) { }
 
-        public CodeString(string value, int start, int amount)
-            : this(CodePoint.FromString(value, start, amount), false) { }
+        public CodeString(string value, int start, int amount, bool validate = false)
+            : this(value.ToCodePoints(start, amount), false) { }
 
 
         // Indexer
@@ -52,6 +53,26 @@ namespace Soedeum.Dotnet.Library.Text
 
         /* Operators */
         #region Operators
+
+        // Validation
+        public bool IsValid
+        {
+            get
+            {
+                foreach (var codepoint in codepoints)
+                    if (codepoint.IsInvalid)
+                        return false;
+
+                return true;
+            }
+        }
+
+        public void Validate()
+        {
+            foreach (var codepoint in codepoints)
+                codepoint.VerifyIsValid();
+        }
+
 
         // Equality
         public override int GetHashCode() => hashcode;
@@ -203,7 +224,9 @@ namespace Soedeum.Dotnet.Library.Text
             return new CodeString(combined, false);
         }
 
-        public static CodeString Combine(params CodeString[] values)
+        public static CodeString Combine(params CodeString[] values) => Combine(values);
+
+        public static CodeString Combine(IEnumerable<CodeString> values)
         {
             int length = 0;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
 {
@@ -11,57 +12,15 @@ namespace Soedeum.Dotnet.Library.Text
         private CodePoint(uint value) => this.value = value;
 
 
+        public bool IsInvalid => Utf32.IsInvalid(value);
+
+        public bool IsValid => Utf32.IsValid(value);
+
+        public void VerifyIsValid() => Utf32.VerifyValid(value);
+                
+
         /* Operators */
         #region Operators
-
-        // Problem: we want to ignore invalid codepoints, such as U+xxFFFE, U+xxFFFF, U+D800..U+DFFF, U+FDD0..U+FDEF
-        
-        // Distance between two CodePoints
-        public static int operator -(CodePoint left, CodePoint right)
-        {
-            if (left < right)
-                throw new InvalidOperationException("Subtrahend must be smaller than minuend.");
-
-            return 0;
-        }
-
-        // Get CodePoint 
-        public static CodePoint operator +(CodePoint value, int offset)
-        {
-            return 0;
-        }
-
-        public static CodePoint operator -(CodePoint value, int offset)
-        {
-            return 0;
-        }
-
-        public static CodePoint operator ++(CodePoint left)
-        {
-            return left + 1;
-        }
-
-        public static CodePoint operator --(CodePoint left)
-        {
-            return left - 1;
-        }
-
-        private static CodePoint Increment(CodePoint value)
-        {
-            uint nextValue = value.value + 1;
-
-            // xFFFD => (x+1)0000
-            if ((value & 0xFFFE) == 0xFFFE)
-            {
-                return new CodePoint(nextValue + 2);
-            }
-
-        }
-
-        private static CodePoint Decrement(CodePoint value)
-        {
-
-        }
 
 
         // String
@@ -92,61 +51,6 @@ namespace Soedeum.Dotnet.Library.Text
             }
 
             return result;
-        }
-
-        // FromString
-        public static CodePoint[] FromString(string value)
-        {
-            if (value == null)
-                return null;
-            else
-                return FromString(value, 0, value.Length);
-        }
-
-        public static CodePoint[] FromString(string value, int start)
-        {
-            if (value == null)
-                return null;
-            else
-                return FromString(value, start, value.Length - start);
-        }
-
-        public static CodePoint[] FromString(string value, int start, int amount)
-        {
-            if (value == null)
-                return null;
-
-            if (start < 0 || start > value.Length)
-                throw new ArgumentOutOfRangeException("start");
-
-            if (amount < 0 || start + amount > value.Length)
-                throw new ArgumentOutOfRangeException("amount");
-
-
-            var codepoints = new CodePoint[amount];
-
-            int index = 0;
-
-
-            var decoder = new Utf16.CharDecoder();
-
-            bool result = true;
-
-            for (int i = start; i < amount; i++)
-            {
-                result = decoder.TryProcess(value[i], out var codepoint);
-
-                if (result)
-                    codepoints[index++] = codepoint;
-            }
-
-            if (!result)
-                throw new InvalidCodePointException("Missing trailing surrogate");
-
-            if (index < codepoints.Length)
-                Array.Resize(ref codepoints, index);
-
-            return codepoints;
         }
 
 
@@ -225,7 +129,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(uint value)
         {
-            Utf32.Verify(value);
+            Utf32.VerifyInRange(value);
 
             return new CodePoint(value);
         }
@@ -263,6 +167,8 @@ namespace Soedeum.Dotnet.Library.Text
         /* Constants */
         #region Constants
 
+        public static readonly CodePoint Default = new CodePoint(0);
+        
         public static readonly CodePoint MinValue = new CodePoint(0);
 
         public static readonly CodePoint MaxValue = new CodePoint(0x10FFFF);

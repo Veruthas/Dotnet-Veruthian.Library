@@ -29,6 +29,8 @@ namespace _TestConsole
             var c32 = new CodeString(b32.AsUtf32CodePoints(true));
 
 
+    Encoding.Unicode.to            
+
             Pause();
         }
 

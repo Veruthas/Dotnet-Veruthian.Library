@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Encodings
 {
     public static class Utf32
     {
@@ -14,9 +15,11 @@ namespace Soedeum.Dotnet.Library.Text
         public const uint InvalidCharacterEnd = 0xFDEF;
 
 
-        public static bool IsValid(uint value) => !IsDisallowed(value);
+        public static bool IsValid(uint value) => !IsInvalid(value);
 
         public static bool IsInvalid(uint value) => IsDisallowed(value) || IsOutOfRange(value);
+
+        public static bool IsAllowed(uint value) => !IsDisallowed(value);
 
         public static bool IsDisallowed(uint value)
         {
@@ -27,14 +30,23 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
 
-        public static void Verify(uint value)
+        public static void VerifyValid(uint value)
+        {
+            VerifyInRange(value);
+
+            VerifyAllowed(value);
+        }
+
+        public static void VerifyAllowed(uint value)
+        {
+            if (IsDisallowed(value))
+                throw InvalidCodePoint(value);
+        }
+
+        public static void VerifyInRange(uint value)
         {
             if (IsOutOfRange(value))
                 throw CodePointOutOfRange(value);
-
-            else if (IsDisallowed(value))
-                throw InvalidCodePoint(value);
-
         }
 
         #region Errors
@@ -62,7 +74,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-        public struct ByteDecoder : ITransformer<byte, CodePoint>
+        public struct ByteDecoder : ITransformer<byte, uint>
         {
             bool isLittleEndian;
 
@@ -76,7 +88,7 @@ namespace Soedeum.Dotnet.Library.Text
                 this.isLittleEndian = isLittleEndian;
             }
 
-            public bool TryProcess(byte value, out CodePoint result)
+            public bool TryProcess(byte value, out uint result)
             {
                 if (bytesRemaining == 0)
                     bytesRemaining = 3;
@@ -95,7 +107,7 @@ namespace Soedeum.Dotnet.Library.Text
                 }
                 else
                 {
-                    result = default(CodePoint);
+                    result = default(uint);
 
                     return false;
                 }

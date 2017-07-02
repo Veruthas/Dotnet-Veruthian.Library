@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Encodings
 {
     public static class Utf16
     {
@@ -65,7 +65,7 @@ namespace Soedeum.Dotnet.Library.Text
             return CombineSurrogates(leadingSurrogate, trailingSurrogate);
         }
 
-        private static uint CombineSurrogates(ushort leadingSurrogate, ushort trailingSurrogate)
+        public static uint CombineSurrogates(ushort leadingSurrogate, ushort trailingSurrogate)
         {
             // Remove high surrogate prefix, and shift left
             uint high = ((uint)leadingSurrogate & SurrogateMask) << LeadingSurrogateOffset;
@@ -119,7 +119,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private static void SplitSurrogates(uint utf32, out ushort leadingSurrogate, out ushort trailingSurrogate)
+        public static void SplitSurrogates(uint utf32, out ushort leadingSurrogate, out ushort trailingSurrogate)
         {
             // Get rid of the Supplemental-Multilingual-Plane prefix
             utf32 -= Utf32.SupplementaryPlanePrefix;
@@ -179,7 +179,10 @@ namespace Soedeum.Dotnet.Library.Text
 
         #endregion
 
-        public struct ByteDecoder : ITransformer<byte, CodePoint>
+
+
+
+        public struct ByteDecoder : ITransformer<byte, uint>
         {
             bool isLittleEndian;
 
@@ -193,13 +196,13 @@ namespace Soedeum.Dotnet.Library.Text
                 this.isLittleEndian = isLittleEndian;
             }
 
-            public bool TryProcess(byte value, out CodePoint result)
+            public bool TryProcess(byte value, out uint result)
             {
-                if (current == 0)
+                if (current == default(ushort))
                 {
                     AddByte(value, !isLittleEndian);
 
-                    result = default(CodePoint);
+                    result = default(uint);
 
                     return false;
                 }
@@ -219,23 +222,23 @@ namespace Soedeum.Dotnet.Library.Text
                 current |= value;
             }
 
-            private bool ProcessResult(out CodePoint result)
+            private bool ProcessResult(out uint result)
             {
-                if (leadingSurrogate == 0)
+                if (leadingSurrogate == default(ushort))
                 {
                     if (IsLeadingSurrogate(current))
                     {
                         leadingSurrogate = current;
 
-                        result = default(CodePoint);
+                        result = default(ushort);
 
-                        current = 0;
+                        current = default(ushort);
 
                         return false;
                     }
                     else if (IsTrailingSurrogate(current))
                     {
-                        current = 0;
+                        current = default(ushort);
 
                         throw MissingLeadingSurrogate(current);
                     }
@@ -243,7 +246,7 @@ namespace Soedeum.Dotnet.Library.Text
                     {
                         result = current;
 
-                        current = 0;
+                        current = default(ushort);
 
                         return true;
                     }
@@ -254,13 +257,13 @@ namespace Soedeum.Dotnet.Library.Text
                     {
                         result = ToUtf32(leadingSurrogate, current);
 
-                        current = leadingSurrogate = 0;
+                        current = leadingSurrogate = default(ushort);
 
                         return true;
                     }
                     else
                     {
-                        current = leadingSurrogate = 0;
+                        current = leadingSurrogate = default(ushort);
 
                         throw InvalidTrailingSurrogate(current);
                     }
@@ -268,11 +271,11 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        public struct CharDecoder : ITransformer<char, CodePoint>
+        public struct CharDecoder : ITransformer<char, uint>
         {
             char leadingSurrogate;
 
-            public bool TryProcess(char value, out CodePoint result)
+            public bool TryProcess(char value, out uint result)
             {
                 // Finished
                 if (leadingSurrogate == default(char))
@@ -281,7 +284,7 @@ namespace Soedeum.Dotnet.Library.Text
                     {
                         leadingSurrogate = value;
 
-                        result = default(CodePoint);
+                        result = default(uint);
 
                         return false;
                     }

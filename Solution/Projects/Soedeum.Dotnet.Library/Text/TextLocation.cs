@@ -64,6 +64,52 @@ namespace Soedeum.Dotnet.Library.Text
             return result;
         }
 
+        static readonly CodePoint Null = '\0';
+        static readonly CodePoint Cr = '\r';
+        static readonly CodePoint Cr = '\r';
+
+        public TextLocation MoveToNext(CodePoint current, CodePoint next, bool acceptNulls = true)
+        {
+
+            switch (current)
+            {
+                case '\0':
+                    return (acceptNulls) ? this + 1 : this;
+
+                case '\n':
+                    return this.IncrementLine();
+
+                case '\r':
+                    return ((char)next == '\n') ? this + 1 : this.IncrementLine();
+
+                default:
+                    return this + 1;
+            }
+        }
+
+        public TextLocation MoveThrough(CodePoint current, CodeString following, bool acceptNulls = true)
+        {
+            TextLocation result = this;
+
+            foreach (char next in following)
+            {
+                result = result.MoveToNext(current, next, acceptNulls);
+
+                current = next;
+            }
+
+            return result;
+        }
+
+
+        // HashCode
+        public override int GetHashCode()
+        {
+            return HashCodeCreator.Combiner.Combine(Position, Line, Column);
+        }
+
+        // Equals
+        public override bool Equals(object obj) => (obj is TextLocation) ? Equals((TextLocation)obj) : false;
 
         public bool Equals(TextLocation position)
         {
@@ -72,24 +118,6 @@ namespace Soedeum.Dotnet.Library.Text
                    (this.column == position.column);
         }
 
-        // override object.Equals
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            var position = (TextLocation)obj;
-
-            return this.Equals(position);
-        }
-
-        // override object.GetHashCode
-        public override int GetHashCode()
-        {
-            return HashCodeCreator.Combiner.Combine(Position, Line, Column);
-        }
 
         public static bool operator ==(TextLocation left, TextLocation right)
         {
@@ -116,6 +144,6 @@ namespace Soedeum.Dotnet.Library.Text
         public override string ToString()
         {
             return string.Format("Position: {0}; Line: {1}; Column: {2}", Position, Line, Column);
-        }        
+        }
     }
 }
