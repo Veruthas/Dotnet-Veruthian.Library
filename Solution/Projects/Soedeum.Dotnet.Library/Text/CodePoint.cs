@@ -9,18 +9,54 @@ namespace Soedeum.Dotnet.Library.Text
         uint value;
 
 
-        private CodePoint(uint value) => this.value = value;
+        private CodePoint(uint value)
+        {
+            Utf32.VerifyInRange(value);
+
+            this.value = value;
+        }
 
 
         public bool IsInvalid => Utf32.IsInvalid(value);
 
         public bool IsValid => Utf32.IsValid(value);
 
-        public void VerifyIsValid() => Utf32.VerifyValid(value);
-                
+        public void VerifyIsValid() => Utf32.VerifyIsValid(value);
+
 
         /* Operators */
         #region Operators
+
+        // Difference
+        public static int operator -(CodePoint left, CodePoint right) => (int)left.value - (int)right.value;
+
+        public static CodePoint operator +(CodePoint codepoint, int offset)
+        {
+            int value = (int)codepoint.value;
+
+            value += offset;
+
+            if (value < 0)
+                throw new InvalidCodePointException(Utf32.CodePointOutOfRangeMessage(value));
+
+            return new CodePoint((uint)value);
+        }
+
+        public static CodePoint operator -(CodePoint codepoint, int offset)
+        {
+            int value = (int)codepoint.value;
+
+            value -= offset;
+
+            if (value < 0)
+                throw new InvalidCodePointException(Utf32.CodePointOutOfRangeMessage(value));
+
+            return new CodePoint((uint)value);
+        }
+
+        public static CodePoint operator ++(CodePoint codepoint) => codepoint + 1;
+
+        public static CodePoint operator --(CodePoint codepoint) => codepoint - 1;
 
 
         // String
@@ -129,8 +165,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(uint value)
         {
-            Utf32.VerifyInRange(value);
-
             return new CodePoint(value);
         }
 
@@ -168,7 +202,7 @@ namespace Soedeum.Dotnet.Library.Text
         #region Constants
 
         public static readonly CodePoint Default = new CodePoint(0);
-        
+
         public static readonly CodePoint MinValue = new CodePoint(0);
 
         public static readonly CodePoint MaxValue = new CodePoint(0x10FFFF);

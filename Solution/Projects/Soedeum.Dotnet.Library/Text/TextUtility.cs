@@ -125,8 +125,11 @@ namespace Soedeum.Dotnet.Library.Text
                     codepoints[index++] = codepoint;
             }
 
+
+            // Hack? If missing trailing surrogate, error
             if (!result)
-                throw new InvalidCodePointException("Missing trailing surrogate");
+                decoder.TryProcess('\0', out var codepoint);
+
 
             if (index < codepoints.Length)
                 Array.Resize(ref codepoints, index);

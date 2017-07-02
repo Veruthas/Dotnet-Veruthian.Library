@@ -38,6 +38,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         public static bool IsSurrogate(uint value) => (value >= SurrogateMin) && (value <= SurrogateMax);
 
 
+        // To Utf32
         public static uint ToUtf32(char value) => ToUtf32((ushort)value);
 
         public static uint ToUtf32(short value) => ToUtf32((ushort)value);
@@ -79,6 +80,8 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return value;
         }
 
+
+        // From Utf32
         public static int FromUtf32(uint utf32, out char leadingSurrogate, out char trailingSurrogate)
         {
             int result = FromUtf32(utf32, out ushort leading, out ushort trailing);
@@ -139,7 +142,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return new InvalidCodePointException(InvalidLeadingSurrogateMessage(value));
         }
 
-        private static string InvalidLeadingSurrogateMessage(ushort value)
+        public static string InvalidLeadingSurrogateMessage(ushort value)
         {
             return string.Format("Invalid leading surrogate character. Must be in range (\\uD800-\\uDBFF), was \\u{0:X4}.", value);
         }
@@ -150,7 +153,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return new InvalidCodePointException(InvalidTrailingSurrogateMessage(value));
         }
 
-        private static string InvalidTrailingSurrogateMessage(ushort value)
+        public static string InvalidTrailingSurrogateMessage(ushort value)
         {
             return string.Format("Invalid trailing surrogate character. Must be in range (\\uDC00-\\uDFFF), was \\u{0:X4}.", value);
 
@@ -161,7 +164,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             throw new InvalidCastException(MissingLeadingSurrogateMessage(value));
         }
 
-        private static string MissingLeadingSurrogateMessage(ushort value)
+        public static string MissingLeadingSurrogateMessage(ushort value)
         {
             return string.Format("Missing leading surrogate; found trailing surrogate {0:X4}.", value);
 
@@ -172,13 +175,12 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return new InvalidCodePointException(InvalidCharacterMessage(value));
         }
 
-        private static string InvalidCharacterMessage(ushort value)
+        public static string InvalidCharacterMessage(ushort value)
         {
             return string.Format("Character cannot be a surrogate (in range \\uD800-\\uDFFF), was \\u{0:X4}", value);
         }
 
         #endregion
-
 
 
 

@@ -32,54 +32,26 @@ namespace Soedeum.Dotnet.Library.Text
             return new TextLocation(this.position + lengthToEnd, this.line + 1, 0);
         }
 
-        public TextLocation MoveToNext(char current, char next, bool acceptNulls = true)
-        {
-            switch (current)
-            {
-                case '\0':
-                    return (acceptNulls) ? this + 1 : this;
 
-                case '\n':
-                    return this.IncrementLine();
+        const uint Null = (uint)'\0';
 
-                case '\r':
-                    return (next == '\n') ? this + 1 : this.IncrementLine();
+        const uint Lf = (uint)'\n';
 
-                default:
-                    return this + 1;
-            }
-        }
+        const uint Cr = (uint)'\r';
 
-        public TextLocation MoveThrough(char current, string following, bool acceptNulls = true)
-        {
-            TextLocation result = this;
-
-            foreach (char next in following)
-            {
-                result = result.MoveToNext(current, next, acceptNulls);
-
-                current = next;
-            }
-
-            return result;
-        }
-
-        static readonly CodePoint Null = '\0';
-        static readonly CodePoint Cr = '\r';
-        static readonly CodePoint Cr = '\r';
 
         public TextLocation MoveToNext(CodePoint current, CodePoint next, bool acceptNulls = true)
         {
 
-            switch (current)
+            switch ((uint)current)
             {
-                case '\0':
+                case Null:
                     return (acceptNulls) ? this + 1 : this;
 
-                case '\n':
+                case Lf:
                     return this.IncrementLine();
 
-                case '\r':
+                case Cr:
                     return ((char)next == '\n') ? this + 1 : this.IncrementLine();
 
                 default:

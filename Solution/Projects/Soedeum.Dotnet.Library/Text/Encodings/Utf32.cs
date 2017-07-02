@@ -7,16 +7,19 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
     {
         public const uint SupplementaryPlanePrefix = 0x10000;
 
+        public const uint MinCodePoint = 0x0;
+
         public const uint MaxCodePoint = 0x10FFFF;
 
+        
+        public const uint DisallowedCharacterStart = 0xFDD0;
 
-        public const uint InvalidCharacterStart = 0xFDD0;
-
-        public const uint InvalidCharacterEnd = 0xFDEF;
+        public const uint DisallowedCharacterEnd = 0xFDEF;
 
 
         public static bool IsValid(uint value) => !IsInvalid(value);
 
+        
         public static bool IsInvalid(uint value) => IsDisallowed(value) || IsOutOfRange(value);
 
         public static bool IsAllowed(uint value) => !IsDisallowed(value);
@@ -25,12 +28,15 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         {
             return ((value & 0xFFFE) == 0xFFFE)
                     || (Utf16.IsSurrogate(value))
-                    || (value >= InvalidCharacterStart && value <= InvalidCharacterEnd);
+                    || (value >= DisallowedCharacterStart && value <= DisallowedCharacterEnd);
         }
+
+        public static bool IsInRange(uint value) => (value <= MaxCodePoint);
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
 
-        public static void VerifyValid(uint value)
+
+        public static void VerifyIsValid(uint value)
         {
             VerifyInRange(value);
 
@@ -53,10 +59,10 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         private static InvalidCodePointException CodePointOutOfRange(uint value)
         {
-            return new InvalidCodePointException(CodePointOutOfRangeMessage(value));
+            return new InvalidCodePointException(CodePointOutOfRangeMessage((int)value));
         }
 
-        private static string CodePointOutOfRangeMessage(uint value)
+        public static string CodePointOutOfRangeMessage(int value)
         {
             return string.Format("Codepoint cannot be greater than U+10FFFF, was U+{0:X4}", value);
         }
@@ -67,7 +73,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return new InvalidCodePointException(InvalidCodePointMessage(value));
         }
 
-        private static string InvalidCodePointMessage(uint value)
+        public static string InvalidCodePointMessage(uint value)
         {
             return string.Format("Invalid codepoint, was U+{0:X4}", value);
         }
