@@ -27,7 +27,10 @@ namespace _TestConsole
             // byte[] b32 = Encoding.UTF32.GetBytes(s);
 
             // var c32 = new CodeString(b32.AsUtf32CodePoints(true));
-            
+
+            CodePoint x = '\uD801';
+
+            Console.WriteLine(x.ToString());
 
             Pause();
         }

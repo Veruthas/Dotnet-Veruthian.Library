@@ -12,54 +12,53 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         public const uint MaxCodePoint = 0x10FFFF;
 
         
-        public const uint DisallowedCharacterStart = 0xFDD0;
+        public const uint NonCharacterStart = 0xFDD0;
 
-        public const uint DisallowedCharacterEnd = 0xFDEF;
+        public const uint NonCharacterEnd = 0xFDEF;
 
 
         public static bool IsValid(uint value) => !IsInvalid(value);
 
-        
-        public static bool IsInvalid(uint value) => IsDisallowed(value) || IsOutOfRange(value);
-
-        public static bool IsAllowed(uint value) => !IsDisallowed(value);
-
-        public static bool IsDisallowed(uint value)
+        public static bool IsInvalid(uint value)
         {
             return ((value & 0xFFFE) == 0xFFFE)
                     || (Utf16.IsSurrogate(value))
-                    || (value >= DisallowedCharacterStart && value <= DisallowedCharacterEnd);
+                    || (value >= NonCharacterStart && value <= NonCharacterEnd);
         }
-
+        
         public static bool IsInRange(uint value) => (value <= MaxCodePoint);
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
 
+        public static bool IsInRange(int value) => (value >= 0) && (value <= MaxCodePoint);
+
+        public static bool IsOutOfRange(int value) => (value < 0) || (value > MaxCodePoint);
+
 
         public static void VerifyIsValid(uint value)
         {
-            VerifyInRange(value);
-
-            VerifyAllowed(value);
-        }
-
-        public static void VerifyAllowed(uint value)
-        {
-            if (IsDisallowed(value))
+            if (IsValid(value))
                 throw InvalidCodePoint(value);
         }
 
         public static void VerifyInRange(uint value)
         {
             if (IsOutOfRange(value))
+                throw CodePointOutOfRange((int)value);
+        }
+
+        public static void VerifyInRange(int value)
+        {
+            if (IsOutOfRange(value))
                 throw CodePointOutOfRange(value);
         }
 
+
         #region Errors
 
-        private static InvalidCodePointException CodePointOutOfRange(uint value)
+        private static InvalidCodePointException CodePointOutOfRange(int value)
         {
-            return new InvalidCodePointException(CodePointOutOfRangeMessage((int)value));
+            return new InvalidCodePointException(CodePointOutOfRangeMessage(value));
         }
 
         public static string CodePointOutOfRangeMessage(int value)

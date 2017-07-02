@@ -16,10 +16,16 @@ namespace Soedeum.Dotnet.Library.Text
             this.value = value;
         }
 
+        private CodePoint(int value)
+        {
+            Utf32.VerifyInRange(value);
 
-        public bool IsInvalid => Utf32.IsInvalid(value);
+            this.value = (uint)value;
+        }
 
         public bool IsValid => Utf32.IsValid(value);
+
+        public bool IsInvalid => Utf32.IsInvalid(value);
 
         public void VerifyIsValid() => Utf32.VerifyIsValid(value);
 
@@ -34,12 +40,9 @@ namespace Soedeum.Dotnet.Library.Text
         {
             int value = (int)codepoint.value;
 
-            value += offset;
+            value += offset;            
 
-            if (value < 0)
-                throw new InvalidCodePointException(Utf32.CodePointOutOfRangeMessage(value));
-
-            return new CodePoint((uint)value);
+            return new CodePoint(value);
         }
 
         public static CodePoint operator -(CodePoint codepoint, int offset)
@@ -48,10 +51,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             value -= offset;
 
-            if (value < 0)
-                throw new InvalidCodePointException(Utf32.CodePointOutOfRangeMessage(value));
-
-            return new CodePoint((uint)value);
+            return new CodePoint(value);
         }
 
         public static CodePoint operator ++(CodePoint codepoint) => codepoint + 1;
@@ -137,9 +137,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf16(ushort value)
         {
-            var utf32 = Utf16.ToUtf32(value);
+            uint utf32 = value;
 
-            return new CodePoint(value);
+            return new CodePoint(utf32);
         }
 
 
@@ -150,9 +150,12 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf16(ushort leadingSurrogate, ushort trailingSurrogate)
         {
-            uint value = Utf16.ToUtf32(leadingSurrogate, trailingSurrogate);
+            uint utf32;
 
-            return new CodePoint(value);
+            utf32 = Utf16.ToUtf32(leadingSurrogate, trailingSurrogate);
+
+
+            return new CodePoint(utf32);
         }
 
         // For Utf32
@@ -161,12 +164,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static implicit operator CodePoint(uint value) => FromUtf32(value);
 
 
-        public static CodePoint FromUtf32(int value) => FromUtf32((uint)value);
+        public static CodePoint FromUtf32(int value) => new CodePoint(value);
 
-        public static CodePoint FromUtf32(uint value)
-        {
-            return new CodePoint(value);
-        }
+        public static CodePoint FromUtf32(uint value) => new CodePoint(value);
 
         #endregion
 
