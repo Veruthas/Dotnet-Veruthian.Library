@@ -31,16 +31,16 @@ namespace Soedeum.Dotnet.Library.Text
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
 
-        public CodeString(CodePoint value, int count, bool validate = false)
+        public CodeString(CodePoint value, int count)
             : this(ReplicateCodePoint(value, count), false) { }
 
-        public CodeString(string value, bool validate = false)
+        public CodeString(string value)
             : this(value.ToCodePoints(), false) { }
 
-        public CodeString(string value, int start, bool validate = false)
+        public CodeString(string value, int start)
             : this(value.ToCodePoints(start), false) { }
 
-        public CodeString(string value, int start, int amount, bool validate = false)
+        public CodeString(string value, int start, int amount)
             : this(value.ToCodePoints(start, amount), false) { }
 
 
@@ -316,7 +316,9 @@ namespace Soedeum.Dotnet.Library.Text
                 else
                     initialized = true;
 
-                yield return new CodeString(value == null ? Empty : new CodeString(value.ToString()));
+                var result = value == null ? Empty : new CodeString(value.ToString());
+
+                yield return result;
             }
         }
 
