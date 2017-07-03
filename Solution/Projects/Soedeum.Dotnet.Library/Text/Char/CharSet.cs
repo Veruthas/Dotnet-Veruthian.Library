@@ -6,7 +6,7 @@ using System.Text;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Utility;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Char
 {
     public class CharSet : IEquatable<CharSet>, IEnumerable<char>
     {

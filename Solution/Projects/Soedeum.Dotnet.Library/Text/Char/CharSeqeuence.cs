@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Char
 {
     public class CharSequence
     {
