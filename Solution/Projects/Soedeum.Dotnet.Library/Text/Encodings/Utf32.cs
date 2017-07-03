@@ -30,6 +30,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
 
+
         public static bool IsInRange(int value) => (value >= 0) && (value <= MaxCodePoint);
 
         public static bool IsOutOfRange(int value) => (value < 0) || (value > MaxCodePoint);

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Soedeum.Dotnet.Library.Utility;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Char
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct CharRange : IEquatable<CharRange>, IComparable<CharRange>, IComparable<char>, IEnumerable<char>

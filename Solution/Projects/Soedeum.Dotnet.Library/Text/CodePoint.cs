@@ -36,6 +36,7 @@ namespace Soedeum.Dotnet.Library.Text
         // Difference
         public static int operator -(CodePoint left, CodePoint right) => (int)left.value - (int)right.value;
 
+
         public static CodePoint operator +(CodePoint codepoint, int offset)
         {
             int value = (int)codepoint.value;
@@ -195,7 +196,6 @@ namespace Soedeum.Dotnet.Library.Text
         public static explicit operator string(CodePoint value) => value.ToString();
 
         #endregion
-
 
 
         /* Constants */

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
@@ -117,6 +118,8 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool operator ==(CodeString left, CodeString right) => IsEqualTo(left, right);
 
         public static bool operator !=(CodeString left, CodeString right) => !IsEqualTo(left, right);
+
+        public static bool IsNullOrEmpty(CodeString value) => value == null || value.IsEmpty;
 
         // Comparison
         public int CompareTo(CodeString other)
@@ -279,6 +282,45 @@ namespace Soedeum.Dotnet.Library.Text
             return Combine(values);
         }
 
+        // Join
+        public static CodeString Join(CodeString separator, params CodeString[] values) => Join(separator, values);
+
+        public static CodeString Join(CodeString separator, IEnumerable<CodeString> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+
+        public static CodeString Join(CodeString separator, IEnumerable<object> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+
+
+        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<CodeString> values)
+        {
+            bool initialized = false;
+
+            foreach (var value in values)
+            {
+                if (initialized)
+                    yield return separator;
+                else
+                    initialized = true;
+
+                yield return value;
+            }
+        }
+
+        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<object> values)
+        {
+            bool initialized = false;
+
+            foreach (var value in values)
+            {
+                if (initialized)
+                    yield return separator;
+                else
+                    initialized = true;
+
+                yield return new CodeString(value == null ? Empty : new CodeString(value.ToString()));
+            }
+        }
+
+
         // SubString
         public CodeString Substring(int start) => Substring(start, Length - start);
 
@@ -327,6 +369,8 @@ namespace Soedeum.Dotnet.Library.Text
         #endregion
 
         // Enumerator
+        public CodePoint[] ToCodePointArray() => (CodePoint[])codepoints.Clone();
+
         public IEnumerator<CodePoint> GetEnumerator()
         {
             foreach (CodePoint codepoint in codepoints)
