@@ -6,172 +6,174 @@ namespace Soedeum.Dotnet.Library.Numerics
 {
     public struct ByteEnumerable : IEnumerable<byte>
     {
-        byte value;
+        ulong bytes;
 
-        public ByteEnumerable(byte value) => this.value = value;
-        
-        public IEnumerator<byte> GetEnumerator()
+        int length;
+
+        private ByteEnumerable(ulong bytes, int length)
         {
-            yield return value;
+            this.bytes = bytes;
+            
+            this.length = length;            
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
 
-public struct ShortEnumerable : IEnumerable<byte>
-    {
-        const int maxBytes = 2;
+        private const int ByteOffset0 = 0;
+        private const int ByteOffset1 = 8;
+        private const int ByteOffset2 = 16;
+        private const int ByteOffset3 = 24;
+        private const int ByteOffset4 = 32;
+        private const int ByteOffset5 = 40;
+        private const int ByteOffset6 = 48;
+        private const int ByteOffset7 = 56;
 
-        uint value;
 
-        bool littleEndian;
-
-        int bytes;
-
-        public ShortEnumerable(uint value, int bytes = maxBytes, bool littleEndian = true)
+        // Bytes
+        public ByteEnumerable(byte value)
         {
-            this.value = value;
+            length = 1;
 
-            this.bytes = Math.Max(maxBytes, bytes);
+            bytes = value;
+        }
+        public ByteEnumerable(byte value0, byte value1)
+        {
+            length = 2;
 
-            this.littleEndian = littleEndian;
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2)
+        {
+            length = 3;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2, byte value3)
+        {
+            length = 4;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2, byte value3, byte value4)
+        {
+            length = 5;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3)
+                | ((ulong)value4 << ByteOffset4);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5)
+        {
+            length = 6;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3)
+                | ((ulong)value4 << ByteOffset4)
+                | ((ulong)value5 << ByteOffset5);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6)
+        {
+            length = 7;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3)
+                | ((ulong)value4 << ByteOffset4)
+                | ((ulong)value5 << ByteOffset5)
+                | ((ulong)value6 << ByteOffset6);
+        }
+        public ByteEnumerable(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6, byte value7)
+        {
+            length = 8;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3)
+                | ((ulong)value4 << ByteOffset4)
+                | ((ulong)value5 << ByteOffset5)
+                | ((ulong)value6 << ByteOffset6)
+                | ((ulong)value7 << ByteOffset7);
+        }
+        public ByteEnumerable(int length, byte value0 = 0, byte value1 = 0, byte value2 = 0, byte value3 = 0, byte value4 = 0, byte value5 = 0, byte value6 = 0, byte value7 = 0)
+        {
+            this.length = length;
+
+            bytes = ((ulong)value0)
+                | ((ulong)value1 << ByteOffset1)
+                | ((ulong)value2 << ByteOffset2)
+                | ((ulong)value3 << ByteOffset3)
+                | ((ulong)value4 << ByteOffset4)
+                | ((ulong)value5 << ByteOffset5)
+                | ((ulong)value6 << ByteOffset6)
+                | ((ulong)value7 << ByteOffset7);
         }
 
-        public IEnumerator<byte> GetEnumerator()
+        public ByteEnumerable(uint value)
         {
-            uint mask = 0xFF;
 
-            uint value = this.value;
+        }
 
-            if (littleEndian)
+        public ByteEnumerable(uint value)
+        {
+
+        }
+
+        public ByteEnumerable(long value, ByteOrder order)
+            : this((ulong)value, order) { }
+
+        public ByteEnumerable(ulong value, ByteOrder order)
+        {
+            byte value0, value1, value2, value3, value4, value5, value6, value7;
+
+            if (order == ByteOrder.LittleEndian)
             {
-                for (int i = 0; i < bytes; i++)
-                {
-                    value >>= (8 * i);
-
-                    var result = (byte)(value & mask);
-
-                    yield return result;
-                }
+                value0 = (byte)((value >> ByteOffset0) & 0xFF);
+                value1 = (byte)((value >> ByteOffset1) & 0xFF);
+                value2 = (byte)((value >> ByteOffset2) & 0xFF);
+                value3 = (byte)((value >> ByteOffset3) & 0xFF);
+                value4 = (byte)((value >> ByteOffset4) & 0xFF);
+                value5 = (byte)((value >> ByteOffset5) & 0xFF);
+                value6 = (byte)((value >> ByteOffset6) & 0xFF);
+                value7 = (byte)((value >> ByteOffset7) & 0xFF);
             }
             else
             {
-                for (int i = bytes - 1; i >= 0; i--)
-                {
-                    value >>= (8 * i);
-
-                    var result = (byte)(value & mask);
-
-                    yield return result;
-                }
+                value0 = (byte)((value >> ByteOffset7) & 0xFF);
+                value1 = (byte)((value >> ByteOffset6) & 0xFF);
+                value2 = (byte)((value >> ByteOffset5) & 0xFF);
+                value3 = (byte)((value >> ByteOffset4) & 0xFF);
+                value4 = (byte)((value >> ByteOffset3) & 0xFF);
+                value5 = (byte)((value >> ByteOffset2) & 0xFF);
+                value6 = (byte)((value >> ByteOffset1) & 0xFF);
+                value7 = (byte)((value >> ByteOffset0) & 0xFF);
             }
 
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
-
-    public struct IntEnumerable : IEnumerable<byte>
-    {
-        const int maxBytes = 4;
-        
-        uint value;
-
-        bool littleEndian;
-
-        int bytes;
-
-        public IntEnumerable(uint value, int bytes = maxBytes, bool littleEndian = true)
-        {
-            this.value = value;
-
-            this.bytes = Math.Max(maxBytes, bytes);
-
-            this.littleEndian = littleEndian;
+            this = new ByteEnumerable(value0, value1, value2, value3, value4, value5, value6, value7);
         }
 
         public IEnumerator<byte> GetEnumerator()
         {
-            uint mask = 0xFF;
+            ulong bytes = this.bytes;
 
-            uint value = this.value;
-
-            if (littleEndian)
+            for (int i = 0; i < length; i++)
             {
-                for (int i = 0; i < bytes; i++)
-                {
-                    value >>= (8 * i);
+                byte value = (byte)(bytes & 0xFF);
 
-                    var result = (byte)(value & mask);
+                bytes >>= 8;
 
-                    yield return result;
-                }
+                yield return value;
             }
-            else
-            {
-                for (int i = bytes - 1; i >= 0; i--)
-                {
-                    value >>= (8 * i);
-
-                    var result = (byte)(value & mask);
-
-                    yield return result;
-                }
-            }
-
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
-
-    public struct LongEnumerable : IEnumerable<byte>
-    {
-        const int maxBytes = 8;
-
-        uint value;
-
-        bool littleEndian;
-
-        int bytes;
-
-        public LongEnumerable(uint value, int bytes = maxBytes, bool littleEndian = true)
-        {
-            this.value = value;
-
-            this.bytes = Math.Max(maxBytes, bytes);
-
-            this.littleEndian = littleEndian;
-        }
-
-        public IEnumerator<byte> GetEnumerator()
-        {
-            uint mask = 0xFF;
-
-            uint value = this.value;
-
-            if (littleEndian)
-            {
-                for (int i = 0; i < bytes; i++)
-                {
-                    value >>= (8 * i);
-
-                    var result = (byte)(value & mask);
-
-                    yield return result;
-                }
-            }
-            else
-            {
-                for (int i = bytes - 1; i >= 0; i--)
-                {
-                    value >>= (8 * i);
-
-                    var result = (byte)(value & mask);
-
-                    yield return result;
-                }
-            }
-
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
