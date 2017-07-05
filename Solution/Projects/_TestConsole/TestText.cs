@@ -1,5 +1,6 @@
 using System;
 using Soedeum.Dotnet.Library.Text;
+using Soedeum.Dotnet.Library.Text.Char;
 
 namespace _TestConsole
 {

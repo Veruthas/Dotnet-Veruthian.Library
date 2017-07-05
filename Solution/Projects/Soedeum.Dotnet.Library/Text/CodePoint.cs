@@ -23,11 +23,11 @@ namespace Soedeum.Dotnet.Library.Text
             this.value = (uint)value;
         }
 
-        public bool IsValid => Utf32.IsAssigned(value);
+        public bool IsValid => Utf32.IsValid(value);
 
-        public bool IsInvalid => Utf32.IsUnassigned(value);
+        public bool IsInvalid => Utf32.IsInvalid(value);
 
-        public void VerifyIsValid() => Utf32.VerifyIsAssigned(value);
+        public void VerifyIsValid() => Utf32.VerifyIsValid(value);
 
 
         /* Operators */

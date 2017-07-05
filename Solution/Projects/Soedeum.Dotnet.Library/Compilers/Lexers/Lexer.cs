@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Text;
+using Soedeum.Dotnet.Library.Text.Char;
 
 namespace Soedeum.Dotnet.Library.Compilers.Lexers
 {

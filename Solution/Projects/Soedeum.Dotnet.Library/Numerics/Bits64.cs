@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Soedeum.Dotnet.Library.Numerics
 {
@@ -20,6 +21,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         public Bits64(byte value0)
         {
             this.length = 1;
+
             this.value = value0;
         }
         public Bits64(byte value0, byte value1)
@@ -155,12 +157,11 @@ namespace Soedeum.Dotnet.Library.Numerics
             this.value = value;
         }
 
-        // General
-        public Bits64(int byteCount)
+        public Bits64(ulong value, int byteCount)
         {
             this.length = Math.Min(byteCount, MaxByteCount);
 
-            this.value = 0;
+            this.value = value;
         }
 
         #endregion
@@ -168,12 +169,31 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public const int MaxByteCount = 8;
 
+        public static readonly Bits64 Empty = new Bits64();
+
+        public static readonly Bits64 Min = new Bits64(0ul, 8);
+
+        public static readonly Bits64 Max = new Bits64(ulong.MaxValue, 8);
+
 
         // Bits
         public int BitCount => length * 8;
 
         public bool GetBit(int index) => ((value >> index) & 0x1) == 1;
 
+        public void SetBit(int index, bool value)
+        {
+            ulong mask = 0x1ul << index;
+
+            ulong newValue;
+
+            if (value)
+                newValue = this.value | mask;
+            else
+                newValue = this.value & ~mask;
+
+            this.value = newValue & masks[this.length];
+        }
 
         // Byte
         public int ByteCount => length;
@@ -195,6 +215,36 @@ namespace Soedeum.Dotnet.Library.Numerics
             int offset = ByteOffset * index;
 
             return (byte)((value >> offset) & ByteMask);
+        }
+
+        public void SetByte(int index, byte value)
+        {
+            int offset = ByteOffset * index;
+
+            ulong mask = ByteMask << offset;
+
+            ulong newValue = this.value & ~mask;
+
+            newValue |= ((ulong)value << offset);
+
+            this.value = newValue & masks[this.length];
+        }
+
+        // Try to optimize
+        public void Reverse()
+        {
+            ulong newValue = 0;
+
+            for (int i = 0; i < length; i++)
+            {
+                ulong value = (this.value >> (ByteOffset * i)) & ByteMask;
+
+                value <<= (ByteOffset * length);
+
+                newValue |= value;
+            }
+
+            this.value = newValue;
         }
 
         // Short
@@ -235,5 +285,24 @@ namespace Soedeum.Dotnet.Library.Numerics
         // Long
         public ulong GetLong() => value;
 
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            bool initialized = false;
+
+            for (int i = ByteCount - 1; i >= 0; i--)
+            {
+                if (initialized)
+                    builder.Append('-');
+                else
+                    initialized = true;
+
+                builder.Append(string.Format("{0:X2}", GetByte(i)));
+            }
+
+            return builder.ToString();
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Soedeum.Dotnet.Library;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Numerics;
 using Soedeum.Dotnet.Library.Text;
 
 namespace _TestConsole
@@ -27,7 +28,8 @@ namespace _TestConsole
             // byte[] b32 = Encoding.UTF32.GetBytes(s);
 
             // var c32 = new CodeString(b32.AsUtf32CodePoints(true));
-            
+
+            Bits64 bits = new Bits64(0x12, 0x34, 0x56);
 
             Pause();
         }
