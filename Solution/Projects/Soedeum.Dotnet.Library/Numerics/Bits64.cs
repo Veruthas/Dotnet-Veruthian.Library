@@ -7,9 +7,9 @@ namespace Soedeum.Dotnet.Library.Numerics
     {
         static ulong[] masks = { 0x0, 0xFF, 0xFFFF, 0xFF_FFFF, 0xFFFF_FFFF, 0xFF_FFFF_FFFF, 0xFFFF_FFFF_FFFF, 0xFF_FFFF_FFFF_FFFF, 0xFFFF_FFFF_FFFF_FFFF };
 
-        ulong value;
+        readonly ulong value;
 
-        int length;
+        readonly int length;
 
 
         /* Constructors */
@@ -161,7 +161,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             this.length = Math.Min(byteCount, MaxByteCount);
 
-            this.value = value;
+            this.value = value & masks[length];
         }
 
         #endregion
@@ -181,7 +181,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public bool GetBit(int index) => ((value >> index) & 0x1) == 1;
 
-        public void SetBit(int index, bool value)
+        public Bits64 SetBit(int index, bool value)
         {
             ulong mask = 0x1ul << index;
 
@@ -192,34 +192,80 @@ namespace Soedeum.Dotnet.Library.Numerics
             else
                 newValue = this.value & ~mask;
 
-            this.value = newValue & masks[this.length];
+            return new Bits64(newValue, this.length);
         }
+
+        // Nibble
+        public const int NibbleBitCount = 4;
+
+        public const ulong NibbleMask = 0xF;
+
+        public int NibbleCount => length * 2;
+
+        public byte GetNibble(int index)
+        {
+            int offset = NibbleBitCount * index;
+
+            return (byte)((value >> offset) & NibbleMask);
+        }
+
+        public Bits64 SetNibble(int index, byte value)
+        {
+            int offset = NibbleBitCount * index;
+
+            ulong mask = NibbleMask << offset;
+
+            ulong newValue = this.value & ~mask;
+
+            newValue |= ((ulong)value << offset);
+
+            return new Bits64(newValue, this.length);
+        }
+
+        public Bits64 ReverseNibbles()
+        {
+            ulong newValue = 0;
+
+            int length = NibbleCount;
+
+            for (int i = 0; i < length; i++)
+            {
+                ulong value = (this.value >> (NibbleBitCount * i)) & NibbleMask;
+
+                value <<= (NibbleBitCount * (length - i - 1));
+
+                newValue |= value;
+            }
+
+            return new Bits64(newValue, this.length);
+        }
+
 
         // Byte
         public int ByteCount => length;
 
-        private const int ByteOffset = 8;
-        private const int ByteOffset0 = ByteOffset * 0;
-        private const int ByteOffset1 = ByteOffset * 1;
-        private const int ByteOffset2 = ByteOffset * 2;
-        private const int ByteOffset3 = ByteOffset * 3;
-        private const int ByteOffset4 = ByteOffset * 4;
-        private const int ByteOffset5 = ByteOffset * 5;
-        private const int ByteOffset6 = ByteOffset * 6;
-        private const int ByteOffset7 = ByteOffset * 7;
+        private const int ByteBitCount = 8;
+        private const int ByteOffset0 = ByteBitCount * 0;
+        private const int ByteOffset1 = ByteBitCount * 1;
+        private const int ByteOffset2 = ByteBitCount * 2;
+        private const int ByteOffset3 = ByteBitCount * 3;
+        private const int ByteOffset4 = ByteBitCount * 4;
+        private const int ByteOffset5 = ByteBitCount * 5;
+        private const int ByteOffset6 = ByteBitCount * 6;
+        private const int ByteOffset7 = ByteBitCount * 7;
 
         private const ulong ByteMask = 0xFF;
 
         public byte GetByte(int index)
         {
-            int offset = ByteOffset * index;
+            int offset = ByteBitCount * index;
 
             return (byte)((value >> offset) & ByteMask);
         }
 
-        public void SetByte(int index, byte value)
+        public Bits64 SetByte(int index, byte value)
         {
-            int offset = ByteOffset * index;
+            int offset = ByteBitCount * index;
 
             ulong mask = ByteMask << offset;
 
@@ -227,48 +273,81 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             newValue |= ((ulong)value << offset);
 
-            this.value = newValue & masks[this.length];
+            return new Bits64(newValue, this.length);
         }
 
-        // Try to optimize
-        public void Reverse()
+        public Bits64 ReverseBytes()
         {
             ulong newValue = 0;
 
+            int length = ByteCount;
+
             for (int i = 0; i < length; i++)
             {
-                ulong value = (this.value >> (ByteOffset * i)) & ByteMask;
+                ulong value = (this.value >> (ByteBitCount * i)) & ByteMask;
 
-                value <<= (ByteOffset * length);
+                value <<= (ByteBitCount * (length - i - 1));
 
                 newValue |= value;
             }
 
-            this.value = newValue;
+            return new Bits64(newValue, this.length);
         }
+
 
         // Short
         public int ShortCount => length / 2 + ((length % 2 == 0) ? 0 : 1);
 
-        private const int ShortOffset = 16;
-        private const int ShortOffset0 = ShortOffset * 0;
-        private const int ShortOffset1 = ShortOffset * 1;
-        private const int ShortOffset2 = ShortOffset * 2;
-        private const int ShortOffset3 = ShortOffset * 3;
+        private const int ShortBitCount = 16;
+        private const int ShortOffset0 = ShortBitCount * 0;
+        private const int ShortOffset1 = ShortBitCount * 1;
+        private const int ShortOffset2 = ShortBitCount * 2;
+        private const int ShortOffset3 = ShortBitCount * 3;
 
         private const ulong ShortMask = 0xFFFF;
 
         public ushort GetShort(int index)
         {
-            int offset = ByteOffset * index;
+            int offset = ByteBitCount * index;
 
             return (ushort)((value >> offset) & ShortMask);
         }
 
+        public Bits64 SetShort(int index, ushort value)
+        {
+            int offset = ShortBitCount * index;
+
+            ulong mask = ShortMask << offset;
+
+            ulong newValue = this.value & ~mask;
+
+            newValue |= ((ulong)value << offset);
+
+            return new Bits64(newValue, this.length);
+        }
+
+        public Bits64 ReverseShorts()
+        {
+            ulong newValue = 0;
+
+            int length = ShortCount;
+
+            for (int i = 0; i < length; i++)
+            {
+                ulong value = (this.value >> (ShortBitCount * i)) & ShortMask;
+
+                value <<= (ShortBitCount * (length - i - 1));
+
+                newValue |= value;
+            }
+
+            return new Bits64(newValue, this.length);
+        }
+
         // Int
-        private const int IntOffset = 16;
-        private const int IntOffset0 = IntOffset * 0;
-        private const int IntOffset1 = IntOffset * 1;
+        private const int IntBitCount = 16;
+        private const int IntOffset0 = IntBitCount * 0;
+        private const int IntOffset1 = IntBitCount * 1;
 
         private const ulong IntMask = 0xFFFF;
 
@@ -277,15 +356,58 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public uint GetInt(int index)
         {
-            int offset = ByteOffset * index;
+            int offset = ByteBitCount * index;
 
             return (uint)((value >> offset) & IntMask);
+        }
+
+        public Bits64 SetInt(int index, uint value)
+        {
+            int offset = IntBitCount * index;
+
+            ulong mask = IntMask << offset;
+
+            ulong newValue = this.value & ~mask;
+
+            newValue |= ((ulong)value << offset);
+
+            return new Bits64(newValue, this.length);
+        }
+
+        public Bits64 ReverseInts()
+        {
+            ulong newValue = 0;
+
+            int length = IntCount;
+
+            for (int i = 0; i < length; i++)
+            {
+                ulong value = (this.value >> (IntBitCount * i)) & IntMask;
+
+                value <<= (IntBitCount * (length - i - 1));
+
+                newValue |= value;
+            }
+
+            return new Bits64(newValue, this.length);
         }
 
         // Long
         public ulong GetLong() => value;
 
 
+        // Operations
+        public Bits64 Invert()
+        {
+            ulong newValue = ~this.value;
+
+            return new Bits64(newValue, this.length);
+        }
+
+        public static Bits64 operator ~(Bits64 value) => value.Invert();
+
+
+        // ToString()
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();

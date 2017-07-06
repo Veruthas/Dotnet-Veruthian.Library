@@ -29,7 +29,10 @@ namespace _TestConsole
 
             // var c32 = new CodeString(b32.AsUtf32CodePoints(true));
 
-            Bits64 bits = new Bits64(0x12, 0x34, 0x56);
+            Bits64 bits = new Bits64(0x89, 0x67, 0x45);
+
+            var bits0 = bits.ReverseBytes();
+            var bits1 = bits.ReverseNibbles();
 
             Pause();
         }
