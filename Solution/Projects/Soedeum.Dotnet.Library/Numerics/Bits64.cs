@@ -406,7 +406,35 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public static Bits64 operator ~(Bits64 value) => value.Invert();
 
+        public static Bits64 operator &(Bits64 left, Bits64 right)
+        {
+            ulong result = left.value & right.value;
 
+            int length = Math.Max(left.length, right.length);
+
+            return new Bits64(result, length);
+        }
+
+        public static Bits64 operator |(Bits64 left, Bits64 right)
+        {
+            ulong result = left.value | right.value;
+
+            int length = Math.Max(left.length, right.length);
+
+            return new Bits64(result, length);
+        }
+
+        public static Bits64 operator ^(Bits64 left, Bits64 right)
+        {
+            ulong result = left.value ^ right.value;
+
+            int length = Math.Max(left.length, right.length);
+
+            return new Bits64(result, length);
+        }
+
+
+        
         // ToString()
         public override string ToString()
         {
