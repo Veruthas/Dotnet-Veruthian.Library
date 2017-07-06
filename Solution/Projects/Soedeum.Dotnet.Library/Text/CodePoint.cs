@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Soedeum.Dotnet.Library.Numerics;
 using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
@@ -41,7 +42,7 @@ namespace Soedeum.Dotnet.Library.Text
         {
             int value = (int)codepoint.value;
 
-            value += offset;            
+            value += offset;
 
             return new CodePoint(value);
         }
@@ -124,6 +125,12 @@ namespace Soedeum.Dotnet.Library.Text
         /* Constructors */
         #region Constructors        
 
+        // For Utf8
+        public static CodePoint FromUtf8(byte[] value, int index = 0) => FromUtf8(value, ref index);
+
+        public static CodePoint FromUtf8(byte[] value, ref int index) => throw new NotImplementedException();
+
+
         // For Utf16 (U+0000 to U+D7FF, U+E000 to U+FFFF)                
         public static implicit operator CodePoint(char value) => FromUtf16(value);
 
@@ -159,6 +166,27 @@ namespace Soedeum.Dotnet.Library.Text
             return new CodePoint(utf32);
         }
 
+        // For Utf16
+        public static CodePoint FromUtf16(short[] value, int index = 0) => FromUtf16(value, ref index);
+
+        public static CodePoint FromUtf16(short[] value, ref int index) => throw new NotImplementedException();
+
+
+        public static CodePoint FromUtf16(ushort[] value, int index = 0) => FromUtf16(value, ref index);
+
+        public static CodePoint FromUtf16(ushort[] value, ref int index) => throw new NotImplementedException();
+
+
+        public static CodePoint FromUtf16(char[] value, int index = 0) => FromUtf16(value, ref index);
+
+        public static CodePoint FromUtf16(char[] value, ref int index) => throw new NotImplementedException();
+
+
+        public static CodePoint FromUtf16(byte[] value, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf16(value, ref index, endianness);
+
+        public static CodePoint FromUtf16(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian) => throw new NotImplementedException();
+
+
         // For Utf32
         public static implicit operator CodePoint(int value) => FromUtf32(value);
 
@@ -168,6 +196,41 @@ namespace Soedeum.Dotnet.Library.Text
         public static CodePoint FromUtf32(int value) => new CodePoint(value);
 
         public static CodePoint FromUtf32(uint value) => new CodePoint(value);
+
+        public static CodePoint FromUtf32(byte[] value, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf32(value, ref index, endianness);
+
+        public static CodePoint FromUtf32(byte[] value, ref int index, ByteOrder endianness= ByteOrder.LittleEndian) => throw new NotImplementedException();
+
+
+        // FromString
+        public static implicit operator CodePoint(string value) => FromString(value);
+
+        public static CodePoint FromString(string value, int index = 0) => FromString(value, ref index);
+
+        public static CodePoint FromString(string value, ref int index)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            if (index >= value.Length)
+                throw new ArgumentOutOfRangeException("index", "Index is out of range of string.");
+
+            char c = value[index++];
+
+            if (Utf16.IsLeadingSurrogate(c))
+            {
+                if (index >= value.Length)
+                    throw new ArgumentOutOfRangeException("index", "Index is out of range of string.");
+
+                char d = value[index++];
+
+                return CodePoint.FromUtf16(c, d);
+            }
+            else
+            {
+                return CodePoint.FromUtf16(c);
+            }
+        }
 
         #endregion
 

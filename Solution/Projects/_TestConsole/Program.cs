@@ -6,6 +6,7 @@ using Soedeum.Dotnet.Library;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Numerics;
 using Soedeum.Dotnet.Library.Text;
+using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace _TestConsole
 {
@@ -29,10 +30,29 @@ namespace _TestConsole
 
             // var c32 = new CodeString(b32.AsUtf32CodePoints(true));
 
-            Bits64 bits = new Bits64(0x89, 0x67, 0x45);
 
-            var bits0 = bits.ReverseBytes();
-            var bits1 = bits.ReverseNibbles();
+            var d = new Utf32.ByteDecoder(ByteOrder.LittleEndian);
+
+            var e = new Utf32.ByteEncoder(ByteOrder.LittleEndian);
+
+            CodePoint c0 = "𠱓", c1 = default(CodePoint);
+
+            bool result = e.TryProcess(c0, out Bits64 bits);
+
+            for (int i = 0; i < bits.ByteCount; i++)
+            {
+                var value = bits.GetByte(i);
+
+                result = d.TryProcess(value, out uint u1);
+
+                if (result)
+                {
+                    c1 = u1;
+                    break;
+                }
+            }
+
+            Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
 
             Pause();
         }

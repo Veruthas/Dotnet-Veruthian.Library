@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Soedeum.Dotnet.Library.Numerics;
 
 namespace Soedeum.Dotnet.Library.Text.Encodings
 {
@@ -11,7 +12,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         public const uint MaxCodePoint = 0x10FFFF;
 
-        
+
         public const uint NonCharacterStart = 0xFDD0;
 
         public const uint NonCharacterEnd = 0xFDEF;
@@ -25,7 +26,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     || (Utf16.IsSurrogate(value))
                     || (value >= NonCharacterStart && value <= NonCharacterEnd);
         }
-        
+
         public static bool IsInRange(uint value) => (value <= MaxCodePoint);
 
         public static bool IsOutOfRange(uint value) => (value > MaxCodePoint);
@@ -80,6 +81,26 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         #endregion
 
+        public struct ByteEncoder : ITransformer<CodePoint, Bits64>
+        {
+            bool reverse;
+
+            public ByteEncoder(ByteOrder endianness)
+            {
+                reverse = (endianness == ByteOrder.BigEndian);
+            }
+
+            public bool TryProcess(CodePoint value, out Bits64 result)
+            {
+                result = new Bits64((uint)value);
+
+                if (reverse)
+                    result = result.ReverseBytes();
+
+                return true;
+            }
+        }
+
         public struct ByteDecoder : ITransformer<byte, uint>
         {
             bool isLittleEndian;
@@ -89,10 +110,11 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             int bytesRemaining;
 
 
-            public ByteDecoder(bool isLittleEndian) : this()
+            public ByteDecoder(ByteOrder endianness) : this()
             {
-                this.isLittleEndian = isLittleEndian;
+                this.isLittleEndian = endianness == ByteOrder.LittleEndian;
             }
+
 
             public bool TryProcess(byte value, out uint result)
             {
@@ -122,7 +144,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             private void AddByte(uint value)
             {
                 if (isLittleEndian)
-                    value <<= (8 * bytesRemaining);
+                    value <<= (8 * (3 - bytesRemaining));
                 else
                     state <<= 8;
 

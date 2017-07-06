@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Numerics;
 using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
@@ -39,27 +40,27 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Utf16 -> CodePoint
-        public static EnumerableAdapter<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, bool littleEndian = false)
+        public static EnumerableAdapter<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return new EnumerableAdapter<CodePoint>(AsUtf16CodePoints(bytes.GetEnumerator(), littleEndian));
+            return new EnumerableAdapter<CodePoint>(AsUtf16CodePoints(bytes.GetEnumerator(), endianness));
         }
-        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerator<byte> bytes, bool littleEndian = false)
+        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            var decoder = new Utf16.ByteDecoder(littleEndian);
+            var decoder = new Utf16.ByteDecoder(endianness);
 
             return DecodeValues(bytes, decoder, "Ill-formed Utf16.");
         }
 
 
         // Utf32 -> CodePoint
-        public static EnumerableAdapter<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, bool littleEndian = false)
+        public static EnumerableAdapter<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return new EnumerableAdapter<CodePoint>(AsUtf32CodePoints(bytes.GetEnumerator(), littleEndian));
+            return new EnumerableAdapter<CodePoint>(AsUtf32CodePoints(bytes.GetEnumerator(), endianness));
         }
 
-        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerator<byte> bytes, bool littleEndian = false)
+        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            var decoder = new Utf32.ByteDecoder(littleEndian);
+            var decoder = new Utf32.ByteDecoder(endianness);
 
             return DecodeValues(bytes, decoder, "Ill-formed Utf32.");
         }

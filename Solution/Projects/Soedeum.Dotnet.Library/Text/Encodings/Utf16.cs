@@ -1,4 +1,5 @@
 using System;
+using Soedeum.Dotnet.Library.Numerics;
 
 namespace Soedeum.Dotnet.Library.Text.Encodings
 {
@@ -193,9 +194,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             ushort current;
 
 
-            public ByteDecoder(bool isLittleEndian) : this()
+            public ByteDecoder(ByteOrder endianness) : this()
             {
-                this.isLittleEndian = isLittleEndian;
+                this.isLittleEndian = endianness == ByteOrder.LittleEndian;
             }
 
             public bool TryProcess(byte value, out uint result)
