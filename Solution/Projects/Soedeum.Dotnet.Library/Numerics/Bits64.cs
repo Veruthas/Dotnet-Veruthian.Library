@@ -225,7 +225,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         public Bits64 ReverseNibbles()
-        {
+        {            
             ulong newValue = 0;
 
             int length = NibbleCount;
@@ -295,6 +295,19 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
+        public Bits64 ReverseByteNibbles()
+        {
+            const ulong mask0 = 0x0F0F_0F0F_0F0F_0F0F;
+            const ulong mask1 = 0xF0F0_F0F0_F0F0_F0F0;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+
+            ulong newValue = (value0 << NibbleBitCount) | (value1 >> NibbleBitCount);
+
+            return new Bits64(newValue, this.length);
+        }
+
         // Short
         public int ShortCount => length / 2 + ((length % 2 == 0) ? 0 : 1);
 
@@ -347,18 +360,18 @@ namespace Soedeum.Dotnet.Library.Numerics
         public Bits64 ReverseShortBytes()
         {
             const ulong mask0 = 0x00FF_00FF_00FF_00FF;
-            const ulong mask1 = 0xFF00_FF00_FF00_FF00;            
+            const ulong mask1 = 0xFF00_FF00_FF00_FF00;
 
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
             ulong newValue = (value0 << ByteBitCount) | (value1 >> ByteBitCount);
-            
+
             return new Bits64(newValue, this.length);
         }
 
         // Int
-        private const int IntBitCount = 16;
+        private const int IntBitCount = 32;
         private const int IntOffset0 = IntBitCount * 0;
         private const int IntOffset1 = IntBitCount * 1;
 
@@ -405,20 +418,76 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
-        public uint[] ToIntArray()
+        public Bits64 ReverseIntShorts()
         {
-            uint[] values = new uint[ShortCount];
+            const ulong mask0 = 0x0000_FFFF_0000_FFFF;
+            const ulong mask1 = 0xFFFF_0000_FFFF_0000;
 
-            for (int i = 0; i < IntCount; i++)
-                values[i] = GetInt(i);
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
 
-            return values;
+            ulong newValue = (value0 << ShortBitCount) | (value1 >> ShortBitCount);
+
+            return new Bits64(newValue, this.length);
         }
 
+        public Bits64 ReverseIntBytes()
+        {
+            const ulong mask0 = 0x0000_00FF_0000_00FF;
+            const ulong mask1 = 0x0000_FF00_0000_FF00;
+            const ulong mask2 = 0x00FF_0000_00FF_0000;
+            const ulong mask3 = 0xFF00_0000_FF00_0000;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+            ulong value2 = this.value & mask2;
+            ulong value3 = this.value & mask3;
+
+            ulong newValue = (value0 << ByteOffset3)
+                            | (value1 << ByteOffset1)
+                            | (value2 >> ByteOffset1)
+                            | (value3 >> ByteOffset3);
+
+            return new Bits64(newValue, this.length);
+        }
 
         // Long
         public ulong GetLong() => value;
 
+        public Bits64 SetLong(ulong value) => new Bits64(value, this.length);
+
+        public Bits64 ReverseLongShorts()
+        {
+            const ulong mask0 = 0x0000_0000_0000_FFFF;
+            const ulong mask1 = 0x0000_0000_FFFF_0000;
+            const ulong mask2 = 0x0000_FFFF_0000_0000;
+            const ulong mask3 = 0xFFFF_0000_0000_0000;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+            ulong value2 = this.value & mask2;
+            ulong value3 = this.value & mask3;
+
+            ulong newValue = (value0 << ShortOffset3)
+                            | (value1 << ShortOffset1)
+                            | (value2 >> ShortOffset1)
+                            | (value3 >> ShortOffset3);
+
+            return new Bits64(newValue, this.length);
+        }
+
+        public Bits64 ReverseLongInts()
+        {
+            const ulong mask0 = 0x0000_0000_FFFF_FFFF;
+            const ulong mask1 = 0xFFFF_FFFF_0000_0000;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+
+            ulong newValue = (value0 << IntBitCount) | (value1 >> IntBitCount);
+
+            return new Bits64(newValue, this.length);
+        }
 
         // Operations
         public Bits64 Invert()

@@ -52,20 +52,38 @@ namespace _TestConsole
             //     }
             // }
 
-            Bits64 s = new Bits64(0x90, 0xAB, 0xcCD, 0x2);
+            // Bits64 s = new Bits64(0x90, 0xAB, 0xcCD, 0x2);
+
+            // CodePoint c0 = "𠱓";
+
+            // var bits = c0.ToUtf32();
+
+            // byte[] x = { 0x32, bits.GetByte(0), bits.GetByte(1), bits.GetByte(2), bits.GetByte(3) };
+
+
+            // //CodePoint c1 = CodePoint.FromUtf32(bits, ByteOrder.BigEndian);
+
+            // CodePoint c1 = CodePoint.FromUtf32(x, 1);
+
+            // Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
+
+            var a = new Bits64(0x0123456789ABCDEF);
             
-            CodePoint c0 = "𠱓";
+            var b = a.ReverseShortBytes();
 
-            var bits = c0.ToUtf32();
+            var c = a.ReverseIntBytes();
 
-            byte[] x = { 0x32, bits.GetByte(0), bits.GetByte(1), bits.GetByte(2), bits.GetByte(3) };
+            var d = a.ReverseIntShorts();
 
+            var e = a.ReverseByteNibbles();
 
-            //CodePoint c1 = CodePoint.FromUtf32(bits, ByteOrder.BigEndian);
+            var f = a.ReverseLongInts();
+            
+            var g = a.ReverseLongShorts();
 
-            CodePoint c1 = CodePoint.FromUtf32(x, 1);
-
-            Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
+            var h = a.ReverseNibbles();
+            
+            var i = a.ReverseBytes();
 
             Pause();
         }
