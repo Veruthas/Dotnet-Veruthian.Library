@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Soedeum.Dotnet.Library.Numerics
@@ -240,7 +242,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
-
         // Byte
         public int ByteCount => length;
 
@@ -294,7 +295,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
-
         // Short
         public int ShortCount => length / 2 + ((length % 2 == 0) ? 0 : 1);
 
@@ -344,6 +344,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
+
         // Int
         private const int IntBitCount = 16;
         private const int IntOffset0 = IntBitCount * 0;
@@ -392,6 +393,17 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
+        public uint[] ToIntArray()
+        {
+            uint[] values = new uint[ShortCount];
+
+            for (int i = 0; i < IntCount; i++)
+                values[i] = GetInt(i);
+
+            return values;
+        }
+
+
         // Long
         public ulong GetLong() => value;
 
@@ -434,7 +446,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
 
-        
+
         // ToString()
         public override string ToString()
         {

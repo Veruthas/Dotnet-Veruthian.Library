@@ -184,6 +184,13 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         #endregion
 
 
+        public struct ByteEncoder : ITransformer<CodePoint, Bits64>
+        {
+            public bool TryProcess(CodePoint value, out Bits64 result)
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         public struct ByteDecoder : ITransformer<byte, uint>
         {

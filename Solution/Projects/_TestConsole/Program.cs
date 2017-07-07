@@ -31,26 +31,37 @@ namespace _TestConsole
             // var c32 = new CodeString(b32.AsUtf32CodePoints(true));
 
 
-            var d = new Utf32.ByteDecoder(ByteOrder.LittleEndian);
+            // var d = new Utf32.ByteDecoder(ByteOrder.BigEndian);
 
-            var e = new Utf32.ByteEncoder(ByteOrder.LittleEndian);
+            // var e = new Utf32.ByteEncoder(ByteOrder.BigEndian);
 
-            CodePoint c0 = "𠱓", c1 = default(CodePoint);
+            // CodePoint c0 = "𠱓", c1 = default(CodePoint);
 
-            bool result = e.TryProcess(c0, out Bits64 bits);
+            // bool result = e.TryProcess(c0, out Bits64 bits);
 
-            for (int i = 0; i < bits.ByteCount; i++)
-            {
-                var value = bits.GetByte(i);
+            // for (int i = 0; i < bits.ByteCount; i++)
+            // {
+            //     var value = bits.GetByte(i);
 
-                result = d.TryProcess(value, out uint u1);
+            //     result = d.TryProcess(value, out uint u1);
 
-                if (result)
-                {
-                    c1 = u1;
-                    break;
-                }
-            }
+            //     if (result)
+            //     {
+            //         c1 = u1;
+            //         break;
+            //     }
+            // }
+
+            CodePoint c0 = "𠱓";
+
+            var bits = c0.ToUtf32();
+
+            byte[] x = { 0x32, bits.GetByte(0), bits.GetByte(1), bits.GetByte(2), bits.GetByte(3) };
+
+
+            //CodePoint c1 = CodePoint.FromUtf32(bits, ByteOrder.BigEndian);
+
+            CodePoint c1 = CodePoint.FromUtf32(x, 1);
 
             Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
 

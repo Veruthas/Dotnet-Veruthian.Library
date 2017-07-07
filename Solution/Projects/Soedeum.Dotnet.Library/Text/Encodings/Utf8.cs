@@ -1,4 +1,5 @@
 using System;
+using Soedeum.Dotnet.Library.Numerics;
 
 namespace Soedeum.Dotnet.Library.Text.Encodings
 {
@@ -25,7 +26,15 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         private const int TrailingUnitOffset = 6;
 
-        
+
+        public struct ByteEncoder : ITransformer<CodePoint, Bits64>
+        {
+            public bool TryProcess(CodePoint value, out Bits64 result)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public struct ByteDecoder : ITransformer<byte, uint>
         {
             uint state;
@@ -34,7 +43,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
 
             public bool TryProcess(byte value, out uint result)
-            {                
+            {
 
                 if (bytesRemaining == 0)
                 {
@@ -50,7 +59,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     result = state;
 
                     state = 0;
-                    
+
                     return true;
                 }
                 else

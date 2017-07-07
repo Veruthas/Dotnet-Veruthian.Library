@@ -85,12 +85,12 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         {
             bool reverse;
 
-            public ByteEncoder(ByteOrder endianness)
-            {
-                reverse = (endianness == ByteOrder.BigEndian);
-            }
+            public ByteEncoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
 
-            public bool TryProcess(CodePoint value, out Bits64 result)
+
+            public bool TryProcess(CodePoint value, out Bits64 result) => Encode(value, out result, reverse);
+
+            public static bool Encode(CodePoint value, out Bits64 result, bool reverse)
             {
                 result = new Bits64((uint)value);
 
@@ -98,6 +98,18 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     result = result.ReverseBytes();
 
                 return true;
+            }
+
+            public static bool Encode(CodePoint value, out Bits64 result, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return Encode(value, out result, endianness == ByteOrder.BigEndian);
+            }
+
+            public static Bits64 Encode(CodePoint value, ByteOrder endianness)
+            {
+                Encode(value, out Bits64 result, endianness);
+
+                return result;
             }
         }
 

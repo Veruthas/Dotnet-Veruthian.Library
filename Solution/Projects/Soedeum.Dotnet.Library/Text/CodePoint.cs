@@ -31,6 +31,11 @@ namespace Soedeum.Dotnet.Library.Text
         public void VerifyIsValid() => Utf32.VerifyIsValid(value);
 
 
+        public bool IsInBmp => value < 0x10000;
+
+        public bool IsInSmp => value >= 0x10000;
+
+
         /* Operators */
         #region Operators
 
@@ -197,9 +202,38 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(uint value) => new CodePoint(value);
 
+        public static CodePoint FromUtf32(Bits64 bits, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            var decoder = new Utf32.ByteDecoder(endianness);
+
+            uint result = 0;
+
+            for (int i = 0; i < 4; i++)
+            {
+                var value = bits.GetByte(i);
+
+                decoder.TryProcess(value, out result);
+            }
+
+            return new CodePoint(result);
+        }
+
         public static CodePoint FromUtf32(byte[] value, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf32(value, ref index, endianness);
 
-        public static CodePoint FromUtf32(byte[] value, ref int index, ByteOrder endianness= ByteOrder.LittleEndian) => throw new NotImplementedException();
+        public static CodePoint FromUtf32(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            if (index + 4 >= value.Length)
+                throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process to Utf32");
+
+            var decoder = new Utf32.ByteDecoder(endianness);
+
+            decoder.TryProcess(value[index++], out var result);
+            decoder.TryProcess(value[index++], out result);
+            decoder.TryProcess(value[index++], out result);
+            decoder.TryProcess(value[index++], out result);
+
+            return new CodePoint(result);
+        }
 
 
         // FromString
@@ -257,6 +291,20 @@ namespace Soedeum.Dotnet.Library.Text
         public static implicit operator long(CodePoint value) => value.value;
 
         public static explicit operator string(CodePoint value) => value.ToString();
+
+
+        public Bits64 ToUtf8()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Bits64 ToUtf16(ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Bits64 ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.ByteEncoder.Encode(this, endianness);
+
 
         #endregion
 
