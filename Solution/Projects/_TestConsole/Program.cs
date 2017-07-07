@@ -52,6 +52,8 @@ namespace _TestConsole
             //     }
             // }
 
+            Bits64 s = new Bits64(0x90, 0xAB, 0xcCD, 0x2);
+            
             CodePoint c0 = "𠱓";
 
             var bits = c0.ToUtf32();

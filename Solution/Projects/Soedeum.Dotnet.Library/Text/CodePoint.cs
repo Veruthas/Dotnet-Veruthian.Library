@@ -222,7 +222,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            if (index + 4 >= value.Length)
+            if (index + 4 > value.Length)
                 throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process to Utf32");
 
             var decoder = new Utf32.ByteDecoder(endianness);

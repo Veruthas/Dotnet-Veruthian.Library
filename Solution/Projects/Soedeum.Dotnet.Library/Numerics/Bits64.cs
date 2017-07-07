@@ -344,6 +344,18 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new Bits64(newValue, this.length);
         }
 
+        public Bits64 ReverseShortBytes()
+        {
+            const ulong mask0 = 0x00FF_00FF_00FF_00FF;
+            const ulong mask1 = 0xFF00_FF00_FF00_FF00;            
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+
+            ulong newValue = (value0 << ByteBitCount) | (value1 >> ByteBitCount);
+            
+            return new Bits64(newValue, this.length);
+        }
 
         // Int
         private const int IntBitCount = 16;
