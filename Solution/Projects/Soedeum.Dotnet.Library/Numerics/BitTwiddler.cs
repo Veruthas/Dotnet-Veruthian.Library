@@ -7,11 +7,15 @@ namespace Soedeum.Dotnet.Library.Numerics
 {
     public struct BitTwiddler
     {
-        static ulong[] masks = GetBitMasks();
+
+        /* Constants */
+        #region Constants
+
+        static readonly ulong[] masks = GetBitMasks();
 
         static ulong[] GetBitMasks()
         {
-            ulong[] masks = new ulong[64];
+            ulong[] masks = new ulong[65];
 
             for (int i = 0; i < 64; i++)
             {
@@ -21,11 +25,13 @@ namespace Soedeum.Dotnet.Library.Numerics
                 }
             }
 
+            masks[64] = ulong.MaxValue;
+
             return masks;
         }
 
-        /* Constants */
-        #region Constants
+        static BitTwiddler() => masks = GetBitMasks();
+
 
         // Count
         public const int BitsPerNibble = 4;
@@ -92,6 +98,23 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // Offsets
+        public const int NibbleOffset0 = BitsPerNibble * 0;
+        public const int NibbleOffset1 = BitsPerNibble * 1;
+        public const int NibbleOffset2 = BitsPerNibble * 2;
+        public const int NibbleOffset3 = BitsPerNibble * 3;
+        public const int NibbleOffset4 = BitsPerNibble * 4;
+        public const int NibbleOffset5 = BitsPerNibble * 5;
+        public const int NibbleOffset6 = BitsPerNibble * 6;
+        public const int NibbleOffset7 = BitsPerNibble * 7;
+        public const int NibbleOffset8 = BitsPerNibble * 8;
+        public const int NibbleOffset9 = BitsPerNibble * 9;
+        public const int NibbleOffset10 = BitsPerNibble * 10;
+        public const int NibbleOffset11 = BitsPerNibble * 11;
+        public const int NibbleOffset12 = BitsPerNibble * 12;
+        public const int NibbleOffset13 = BitsPerNibble * 13;
+        public const int NibbleOffset14 = BitsPerNibble * 14;
+        public const int NibbleOffset15 = BitsPerNibble * 15;
+
         public const int ByteOffset0 = BitsPerByte * 0;
         public const int ByteOffset1 = BitsPerByte * 1;
         public const int ByteOffset2 = BitsPerByte * 2;
@@ -129,9 +152,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         private BitTwiddler(ulong value, int bitCount)
         {
-            this.value = value & masks[bitCount];
+            unchecked
+            {
+                ulong mask = masks[bitCount];
 
-            this.bitCount = bitCount;
+                this.value = value & mask;
+
+                this.bitCount = bitCount;
+            }
         }
 
         // Bytes
@@ -460,25 +488,24 @@ namespace Soedeum.Dotnet.Library.Numerics
         public BitTwiddler SetInt(int index, uint value) => SetValue(index, BitsPerInt, IntMask, value);
 
         public BitTwiddler SetLong(ulong value) => new BitTwiddler(value, this.bitCount);
-        
+
         #endregion
 
 
         /* Operations */
         #region Operations
 
+
         // Reverse
-        public BitTwiddler ReverseNibbles()
+        private BitTwiddler NaiveReverse(int itemCount, int bitsPerItem, ulong itemMask)
         {
             ulong newValue = 0;
 
-            int length = NibbleCount;
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < itemCount; i++)
             {
-                ulong value = (this.value >> (BitsPerNibble * i)) & NibbleMask;
+                ulong value = (this.value >> bitsPerItem * i) & itemMask;
 
-                value <<= (BitsPerNibble * (length - i - 1));
+                value <<= (bitsPerItem * (itemCount - i - 1));
 
                 newValue |= value;
             }
@@ -486,23 +513,16 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler ReverseBytes()
-        {
-            ulong newValue = 0;
+        public BitTwiddler ReverseBits() => NaiveReverse(BitCount, 1, BitMask);
 
-            int length = ByteCount;
+        public BitTwiddler ReverseNibbles() => NaiveReverse(NibbleCount, BitsPerNibble, NibbleMask);
 
-            for (int i = 0; i < length; i++)
-            {
-                ulong value = (this.value >> (BitsPerByte * i)) & ByteMask;
+        public BitTwiddler ReverseBytes() => NaiveReverse(ByteCount, BitsPerByte, ByteMask);
 
-                value <<= (BitsPerByte * (length - i - 1));
+        public BitTwiddler ReverseShorts() => NaiveReverse(ShortCount, BitsPerShort, ShortMask);
 
-                newValue |= value;
-            }
+        public BitTwiddler ReverseInts() => NaiveReverse(IntCount, BitsPerInt, IntMask);
 
-            return new BitTwiddler(newValue, this.bitCount);
-        }
 
         public BitTwiddler ReverseByteNibbles()
         {
@@ -517,21 +537,22 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-
-        public BitTwiddler ReverseShorts()
+        public BitTwiddler ReverseShortNibbles()
         {
-            ulong newValue = 0;
+            const ulong mask0 = 0x000F_000F_000F_000F;
+            const ulong mask1 = 0x00F0_00F0_00F0_00F0;
+            const ulong mask2 = 0x0F00_0F00_0F00_0F00;
+            const ulong mask3 = 0xF000_F000_F000_F000;
 
-            int length = ShortCount;
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+            ulong value2 = this.value & mask2;
+            ulong value3 = this.value & mask3;
 
-            for (int i = 0; i < length; i++)
-            {
-                ulong value = (this.value >> (BitsPerShort * i)) & ShortMask;
-
-                value <<= (BitsPerShort * (length - i - 1));
-
-                newValue |= value;
-            }
+            ulong newValue = (value0 << NibbleOffset3)
+                            | (value1 << NibbleOffset1)
+                            | (value2 >> NibbleOffset1)
+                            | (value3 >> NibbleOffset3);
 
             return new BitTwiddler(newValue, this.bitCount);
         }
@@ -545,37 +566,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             ulong value1 = this.value & mask1;
 
             ulong newValue = (value0 << BitsPerByte) | (value1 >> BitsPerByte);
-
-            return new BitTwiddler(newValue, this.bitCount);
-        }
-
-        public BitTwiddler ReverseInts()
-        {
-            ulong newValue = 0;
-
-            int length = IntCount;
-
-            for (int i = 0; i < length; i++)
-            {
-                ulong value = (this.value >> (BitsPerInt * i)) & IntMask;
-
-                value <<= (BitsPerInt * (length - i - 1));
-
-                newValue |= value;
-            }
-
-            return new BitTwiddler(newValue, this.bitCount);
-        }
-
-        public BitTwiddler ReverseIntShorts()
-        {
-            const ulong mask0 = 0x0000_FFFF_0000_FFFF;
-            const ulong mask1 = 0xFFFF_0000_FFFF_0000;
-
-            ulong value0 = this.value & mask0;
-            ulong value1 = this.value & mask1;
-
-            ulong newValue = (value0 << BitsPerShort) | (value1 >> BitsPerShort);
 
             return new BitTwiddler(newValue, this.bitCount);
         }
@@ -600,38 +590,19 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler ReverseLongShorts()
+        public BitTwiddler ReverseIntShorts()
         {
-            const ulong mask0 = 0x0000_0000_0000_FFFF;
-            const ulong mask1 = 0x0000_0000_FFFF_0000;
-            const ulong mask2 = 0x0000_FFFF_0000_0000;
-            const ulong mask3 = 0xFFFF_0000_0000_0000;
-
-            ulong value0 = this.value & mask0;
-            ulong value1 = this.value & mask1;
-            ulong value2 = this.value & mask2;
-            ulong value3 = this.value & mask3;
-
-            ulong newValue = (value0 << ShortOffset3)
-                            | (value1 << ShortOffset1)
-                            | (value2 >> ShortOffset1)
-                            | (value3 >> ShortOffset3);
-
-            return new BitTwiddler(newValue, this.bitCount);
-        }
-
-        public BitTwiddler ReverseLongInts()
-        {
-            const ulong mask0 = 0x0000_0000_FFFF_FFFF;
-            const ulong mask1 = 0xFFFF_FFFF_0000_0000;
+            const ulong mask0 = 0x0000_FFFF_0000_FFFF;
+            const ulong mask1 = 0xFFFF_0000_FFFF_0000;
 
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
-            ulong newValue = (value0 << BitsPerInt) | (value1 >> BitsPerInt);
+            ulong newValue = (value0 << BitsPerShort) | (value1 >> BitsPerShort);
 
             return new BitTwiddler(newValue, this.bitCount);
         }
+
 
         // Invert
         public BitTwiddler Invert()
@@ -676,7 +647,31 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // ToString()
-        public override string ToString()
+        public string ToBinaryString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            bool initialized = false;
+
+            for (int i = NibbleCount - 1; i >= 0; i--)
+            {
+                if (initialized)
+                    builder.Append(i % 2 == 1 ? '_' : '-');
+                else
+                    initialized = true;
+
+                builder.Append(nibbleStrings[GetNibble(i)]);
+            }
+
+            return builder.ToString();
+        }
+
+        static readonly string[] nibbleStrings = { "0000", "0001", "0010", "0011",
+                                                   "0100", "0101", "0110", "0111",
+                                                   "1000", "1001", "1010", "1011",
+                                                   "1100", "1101", "1110", "1111"};
+
+        public string ToHexString()
         {
             StringBuilder builder = new StringBuilder();
 
@@ -694,5 +689,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return builder.ToString();
         }
+
+        public override string ToString() => ToHexString();
     }
 }

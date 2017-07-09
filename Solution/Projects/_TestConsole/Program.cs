@@ -67,7 +67,7 @@ namespace _TestConsole
 
             // Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
 
-            // var a = new FromByte(0x0123456789ABCDEF);
+            var a = BitTwiddler.FromLong(0x0123456789ABCDEF);
             
             // var b = a.ReverseShortBytes();
 
