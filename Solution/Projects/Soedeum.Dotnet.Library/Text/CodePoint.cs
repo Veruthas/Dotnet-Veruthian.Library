@@ -202,7 +202,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf32(uint value) => new CodePoint(value);
 
-        public static CodePoint FromUtf32(Bits64 bits, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static CodePoint FromUtf32(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
 
@@ -293,17 +293,17 @@ namespace Soedeum.Dotnet.Library.Text
         public static explicit operator string(CodePoint value) => value.ToString();
 
 
-        public Bits64 ToUtf8()
+        public BitTwiddler ToUtf8()
         {
             throw new NotImplementedException();
         }
 
-        public Bits64 ToUtf16(ByteOrder endianness = ByteOrder.LittleEndian)
+        public BitTwiddler ToUtf16(ByteOrder endianness = ByteOrder.LittleEndian)
         {
             throw new NotImplementedException();
         }
 
-        public Bits64 ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.ByteEncoder.Encode(this, endianness);
+        public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.ByteEncoder.Encode(this, endianness);
 
 
         #endregion
