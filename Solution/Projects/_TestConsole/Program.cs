@@ -85,19 +85,26 @@ namespace _TestConsole
 
             // var i = a.ReverseBytes();
 
-            var a = BitTwiddler.FromByte(0xAB);
 
-            var b = a.ReverseNibbleBits();
+            // var a = BitTwiddler.FromByte(0xAB);
 
-            var c = a >> -1;
+            // var b = a.ReverseNibbleBits();
 
-            var d = a << 1;
+            // var c = a >> -1;
 
-            var e = a.ChangeBitCount(24);
+            // var d = a << 1;
 
-            var f = BitTwiddler.FromByte(0xAC);
+            // var e = a.ChangeBitCount(24);
 
-            var g = a - f;
+            // var f = BitTwiddler.FromByte(0xAC);
+
+            // var g = a - f;
+
+            var a = BitTwiddler.FromBytes(0b1011, 0b1101, 0b0011);
+
+            var b = a.ToBitString();
+            
+            var c = a.ToBitString(3, "-");
 
             Pause();
         }

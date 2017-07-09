@@ -162,6 +162,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
+
         // Bytes
         public static implicit operator BitTwiddler(byte value) => FromByte(value);
 
@@ -358,7 +359,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             return FromShort((ushort)value);
         }
-        
+
         public static BitTwiddler FromChars(char value0, char value1)
         {
             return FromShorts((ushort)value0, (ushort)value1);
@@ -458,6 +459,22 @@ namespace Soedeum.Dotnet.Library.Numerics
             return (value >> offset) & itemMask;
         }
 
+        public ulong GetBits(int bitsPerItem, int itemIndex = 0)
+        {
+            unchecked
+            {
+                ulong itemMask;
+
+                if (bitsPerItem >= MaxBitCount)
+                    itemMask = ulong.MaxValue;
+                else
+                    itemMask = (BitMask << bitsPerItem) - 1;
+
+                return GetValue(itemIndex, bitsPerItem, itemMask);
+
+            }
+        }
+
         public bool GetBit(int bitIndex = 0) => ((value >> bitIndex) & BitMask) == 1;
 
         public byte GetNibble(int nibbleIndex = 0) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
@@ -493,6 +510,21 @@ namespace Soedeum.Dotnet.Library.Numerics
             newValue |= ((ulong)value << offset);
 
             return new BitTwiddler(newValue, this.bitCount);
+        }
+
+        public BitTwiddler SetBits(ulong value, int bitsPerItem, int itemIndex = 0)
+        {
+            unchecked
+            {
+                ulong itemMask;
+
+                if (bitsPerItem >= MaxBitCount)
+                    itemMask = ulong.MaxValue;
+                else
+                    itemMask = (BitMask << bitsPerItem) - 1;
+
+                return SetValue(itemIndex, bitsPerItem, itemMask, value);
+            }
         }
 
         public BitTwiddler SetBit(bool value, int bitIndex = 0)
@@ -823,7 +855,44 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // ToString()
-        public string ToBinaryString()
+        public string ToBitString(int bitsPerRegion = 4, string regionSeparator = "-", int bitCount = -1)
+        {
+            if (bitCount == -1)
+                bitCount = this.bitCount;
+
+            if (bitsPerRegion <= 0)
+                bitsPerRegion = 64;
+
+            StringBuilder builder = new StringBuilder();
+
+            int bitsPassed = bitCount % bitsPerRegion;
+
+            bool initialized = false;
+
+            for (int i = bitCount - 1; i >= 0; i--)
+            {
+                if (bitsPassed == 0)
+                {
+                    if (initialized)
+                        builder.Append(regionSeparator);
+
+                    bitsPassed = bitsPerRegion - 1;
+                }
+                else
+                {
+                    bitsPassed--;
+                }
+
+                initialized = true;
+
+
+                builder.Append(GetBit(i) ? '1' : '0');
+            }
+
+            return builder.ToString();
+        }
+
+        public string ToBinaryString(string nibbleSeparator = "-", string byteSeparator = "_")
         {
             StringBuilder builder = new StringBuilder();
 
@@ -832,7 +901,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             for (int i = NibbleCount - 1; i >= 0; i--)
             {
                 if (initialized)
-                    builder.Append(i % 2 == 1 ? '_' : '-');
+                    builder.Append(i % 2 == 1 ? byteSeparator : nibbleSeparator);
                 else
                     initialized = true;
 
@@ -847,7 +916,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                                                    "1000", "1001", "1010", "1011",
                                                    "1100", "1101", "1110", "1111"};
 
-        public string ToHexString()
+
+        public string ToHexString(string byteSeparator = "-")
         {
             StringBuilder builder = new StringBuilder();
 
@@ -856,7 +926,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             for (int i = ByteCount - 1; i >= 0; i--)
             {
                 if (initialized)
-                    builder.Append('-');
+                    builder.Append(byteSeparator);
                 else
                     initialized = true;
 
