@@ -447,6 +447,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public BitTwiddler ChangeBitCount(int bitCount) => new BitTwiddler(this.value, Math.Min(bitCount, MaxBitCount));
 
+        public BitTwiddler ChangeNibbleCount(int nibbleCount) => ChangeBitCount(nibbleCount * BitsPerNibble);
+
+        public BitTwiddler ChangeByteCount(int byteCount) => ChangeBitCount(byteCount * BitsPerByte);
+
+        public BitTwiddler ChangeShortCount(int shortCount) => ChangeBitCount(shortCount * BitsPerShort);
+
+        public BitTwiddler ChangeIntCount(int intCount) => ChangeBitCount(intCount * BitsPerInt);
+
         #endregion
 
 
@@ -994,6 +1002,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
-        public override string ToString() => ToHexString(); // ToHexString();
+        public override string ToString() => ToBinaryString(); // ToHexString();
     }
 }

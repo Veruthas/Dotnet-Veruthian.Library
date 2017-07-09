@@ -100,9 +100,11 @@ namespace _TestConsole
 
             // var g = a - f;
 
-            var a = BitTwiddler.FromShort(0b1100_1101_1010_1100);
+            var a = BitTwiddler.FromShort(0b0000_1101_1010_1100);
 
-            var b = a.ReverseByteBits();
+            var b = a.ChangeNibbleCount(3);
+
+            var c = a.ReverseByteBits();
 
             Pause();
         }
