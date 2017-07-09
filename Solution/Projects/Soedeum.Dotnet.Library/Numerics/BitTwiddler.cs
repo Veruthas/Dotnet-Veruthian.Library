@@ -643,6 +643,27 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(result, length);
         }
 
+        // Shift
+        public static BitTwiddler operator >>(BitTwiddler value, int amount)
+        {
+            if (amount >= MaxBitCount)
+                return new BitTwiddler(0, value.bitCount);
+            else if (amount < 0)
+                return value << -amount;
+            else
+                return new BitTwiddler(value.value >> amount, value.bitCount);
+        }
+
+        public static BitTwiddler operator <<(BitTwiddler value, int amount)
+        {
+            if (amount >= MaxBitCount)
+                return new BitTwiddler(0, value.bitCount);
+            else if (amount < 0)
+                return value >> -amount;
+            else
+                return new BitTwiddler(value.value << amount, value.bitCount);
+        }
+
         #endregion
 
 
