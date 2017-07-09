@@ -353,6 +353,24 @@ namespace Soedeum.Dotnet.Library.Numerics
             return FromShorts((ushort)value0, (ushort)value1, (ushort)value2, (ushort)value3);
         }
 
+        // Char
+        public static BitTwiddler FromChar(char value)
+        {
+            return FromShort((ushort)value);
+        }
+        
+        public static BitTwiddler FromChars(char value0, char value1)
+        {
+            return FromShorts((ushort)value0, (ushort)value1);
+        }
+        public static BitTwiddler FromChars(char value0, char value1, char value2)
+        {
+            return FromShorts((ushort)value0, (ushort)value1, (ushort)value2);
+        }
+        public static BitTwiddler FromChars(char value0, char value1, char value2, char value3)
+        {
+            return FromShorts((ushort)value0, (ushort)value1, (ushort)value2, (ushort)value3);
+        }
 
         // UInt
         public static implicit operator BitTwiddler(uint value) => FromInt(value);
@@ -419,6 +437,8 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public int ShortCount => (bitCount + BitsPerShort - 1) / BitsPerShort;
 
+        public int CharCount => ShortCount;
+
         public int IntCount => (bitCount + BitsPerInt - 1) / BitsPerInt;
 
 
@@ -431,43 +451,53 @@ namespace Soedeum.Dotnet.Library.Numerics
         #region Access and Modification
 
         // Get
-        private ulong GetValue(int index, int bits, ulong mask)
+        private ulong GetValue(int itemIndex, int bitsPerItem, ulong itemMask)
         {
-            int offset = index * bits;
+            int offset = itemIndex * bitsPerItem;
 
-            return (value >> offset) & mask;
+            return (value >> offset) & itemMask;
         }
 
-        public bool GetBit(int bitIndex) => ((value >> bitIndex) & BitMask) == 1;
+        public bool GetBit(int bitIndex = 0) => ((value >> bitIndex) & BitMask) == 1;
 
-        public byte GetNibble(int nibbleIndex) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
+        public byte GetNibble(int nibbleIndex = 0) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
 
-        public byte GetByte(int byteIndex) => (byte)GetValue(byteIndex, BitsPerByte, ByteMask);
+        public byte GetByte(int byteIndex = 0) => (byte)GetValue(byteIndex, BitsPerByte, ByteMask);
 
-        public ushort GetShort(int shortIndex) => (ushort)GetValue(shortIndex, BitsPerShort, ShortMask);
+        public sbyte GetSignedByte(int byteIndex = 0) => (sbyte)GetByte(byteIndex);
 
-        public uint GetInt(int intIndex) => (uint)GetValue(intIndex, BitsPerInt, IntMask);
+        public ushort GetShort(int shortIndex = 0) => (ushort)GetValue(shortIndex, BitsPerShort, ShortMask);
+
+        public short GetSignedShort(int shortIndex = 0) => (short)GetShort(shortIndex);
+
+        public char GetChar(int shortIndex = 0) => (char)GetShort(shortIndex);
+
+        public uint GetInt(int intIndex = 0) => (uint)GetValue(intIndex, BitsPerInt, IntMask);
+
+        public int GetSignedInt(int intIndex = 0) => (int)GetInt(intIndex);
 
         public ulong GetLong() => value;
 
+        public long GetSignedLong() => (long)value;
+
 
         // Set
-        public BitTwiddler SetValue(int index, int bits, ulong mask, ulong value)
+        private BitTwiddler SetValue(int itemIndex, int bitsPerItem, ulong itemMask, ulong value)
         {
-            int offset = bits * index;
+            int offset = bitsPerItem * itemIndex;
 
-            mask <<= offset;
+            itemMask <<= offset;
 
-            ulong newValue = this.value & ~mask;
+            ulong newValue = this.value & ~itemMask;
 
             newValue |= ((ulong)value << offset);
 
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler SetBit(int index, bool value)
+        public BitTwiddler SetBit(bool value, int bitIndex = 0)
         {
-            ulong mask = BitMask << index;
+            ulong mask = BitMask << bitIndex;
 
             ulong newValue;
 
@@ -479,15 +509,25 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler SetNibble(int index, byte value) => SetValue(index, BitsPerNibble, NibbleMask, value);
+        public BitTwiddler SetNibble(byte value, int nibbleIndex = 0) => SetValue(nibbleIndex, BitsPerNibble, NibbleMask, value);
 
-        public BitTwiddler SetByte(int index, byte value) => SetValue(index, BitsPerByte, ByteMask, value);
+        public BitTwiddler SetByte(byte value, int byteIndex = 0) => SetValue(byteIndex, BitsPerByte, ByteMask, value);
 
-        public BitTwiddler SetShort(int index, ushort value) => SetValue(index, BitsPerShort, ShortMask, value);
+        public BitTwiddler SetSignedByte(sbyte value, int byteIndex = 0) => SetByte((byte)value, byteIndex);
 
-        public BitTwiddler SetInt(int index, uint value) => SetValue(index, BitsPerInt, IntMask, value);
+        public BitTwiddler SetShort(ushort value, int shortIndex = 0) => SetValue(shortIndex, BitsPerShort, ShortMask, value);
+
+        public BitTwiddler SetSignedShort(short value, int shortIndex = 0) => SetShort((ushort)value, shortIndex);
+
+        public BitTwiddler SetChar(char value, int charIndex = 0) => SetShort((ushort)value, charIndex);
+
+        public BitTwiddler SetInt(uint value, int intIndex = 0) => SetValue(intIndex, BitsPerInt, IntMask, value);
+
+        public BitTwiddler SetSignedInt(int value, int intIndex = 0) => SetInt((uint)value, intIndex);
 
         public BitTwiddler SetLong(ulong value) => new BitTwiddler(value, this.bitCount);
+
+        public BitTwiddler SetSignedLong(long value) => SetLong((ulong)value);
 
         #endregion
 
@@ -698,6 +738,87 @@ namespace Soedeum.Dotnet.Library.Numerics
                 return new BitTwiddler(value.value << amount, value.bitCount);
         }
 
+
+        public static BitTwiddler operator ++(BitTwiddler value)
+        {
+            unchecked
+            {
+                ulong newValue = value.value + 1;
+
+                return new BitTwiddler(newValue, value.bitCount);
+            }
+        }
+
+        public static BitTwiddler operator --(BitTwiddler value)
+        {
+            unchecked
+            {
+                ulong newValue = value.value - 1;
+
+                return new BitTwiddler(newValue, value.bitCount);
+            }
+        }
+
+        public static BitTwiddler operator +(BitTwiddler left, BitTwiddler right)
+        {
+            unchecked
+            {
+                ulong newValue = left.value + right.value;
+
+                int newBitCount = Math.Max(left.bitCount, right.bitCount);
+
+                return new BitTwiddler(newValue, newBitCount);
+            }
+        }
+
+        public static BitTwiddler operator -(BitTwiddler left, BitTwiddler right)
+        {
+            unchecked
+            {
+                ulong newValue = left.value - right.value;
+
+                int newBitCount = Math.Max(left.bitCount, right.bitCount);
+
+                return new BitTwiddler(newValue, newBitCount);
+            }
+        }
+
+        public static BitTwiddler operator *(BitTwiddler left, BitTwiddler right)
+        {
+            unchecked
+            {
+                ulong newValue = left.value * right.value;
+
+                int newBitCount = Math.Max(left.bitCount, right.bitCount);
+
+                return new BitTwiddler(newValue, newBitCount);
+            }
+        }
+
+        public static BitTwiddler operator /(BitTwiddler left, BitTwiddler right)
+        {
+            unchecked
+            {
+                ulong newValue = left.value / right.value;
+
+                int newBitCount = Math.Max(left.bitCount, right.bitCount);
+
+                return new BitTwiddler(newValue, newBitCount);
+            }
+        }
+
+        public static BitTwiddler operator %(BitTwiddler left, BitTwiddler right)
+        {
+            unchecked
+            {
+                ulong newValue = left.value % right.value;
+
+                int newBitCount = Math.Max(left.bitCount, right.bitCount);
+
+                return new BitTwiddler(newValue, newBitCount);
+            }
+        }
+
         #endregion
 
 
@@ -745,6 +866,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
-        public override string ToString() => ToBinaryString(); // ToHexString();
+        public override string ToString() => ToHexString(); // ToHexString();
     }
 }

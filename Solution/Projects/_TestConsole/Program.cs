@@ -93,6 +93,12 @@ namespace _TestConsole
 
             var d = a << 1;
 
+            var e = a.ChangeBitCount(24);
+
+            var f = BitTwiddler.FromByte(0xAC);
+
+            var g = a - f;
+
             Pause();
         }
 
