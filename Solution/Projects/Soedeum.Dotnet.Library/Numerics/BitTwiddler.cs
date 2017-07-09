@@ -430,6 +430,8 @@ namespace Soedeum.Dotnet.Library.Numerics
         /* Counts */
         #region Counts
 
+        public int RegionCount(int bitsPerRegion) => (bitCount + bitsPerRegion - 1) / bitsPerRegion;
+
         public int BitCount => bitCount;
 
         public int NibbleCount => (bitCount + BitsPerNibble - 1) / BitsPerNibble;
@@ -459,7 +461,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             return (value >> offset) & itemMask;
         }
 
-        public ulong GetBits(int bitsPerItem, int itemIndex = 0)
+        public ulong GetRegion(int bitsPerItem, int itemIndex = 0)
         {
             unchecked
             {
@@ -512,7 +514,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler SetBits(ulong value, int bitsPerItem, int itemIndex = 0)
+        public BitTwiddler SetRegion(ulong value, int bitsPerItem, int itemIndex = 0)
         {
             unchecked
             {
@@ -596,6 +598,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         public BitTwiddler ReverseInts() => NaiveReverse(IntCount, BitsPerInt, IntMask);
 
 
+        // Nibble
         public BitTwiddler ReverseNibbleBits()
         {
             const ulong mask0 = 0x1111_1111_1111_1111;
@@ -616,18 +619,10 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-
+        // Byte
         public BitTwiddler ReverseByteBits()
         {
-            const ulong mask0 = 0x0F0F_0F0F_0F0F_0F0F;
-            const ulong mask1 = 0xF0F0_F0F0_F0F0_F0F0;
-
-            ulong value0 = this.value & mask0;
-            ulong value1 = this.value & mask1;
-
-            ulong newValue = (value0 << BitsPerNibble) | (value1 >> BitsPerNibble);
-
-            return new BitTwiddler(newValue, this.bitCount);
+            return this.ReverseNibbleBits().ReverseByteNibbles();
         }
 
         public BitTwiddler ReverseByteNibbles()
@@ -643,6 +638,12 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
+
+        // Short
+        public BitTwiddler ReverseShortBits()
+        {
+            return this.ReverseNibbleBits().ReverseShortNibbles();
+        }
         public BitTwiddler ReverseShortNibbles()
         {
             const ulong mask0 = 0x000F_000F_000F_000F;
@@ -676,6 +677,15 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
+        // Int
+        public BitTwiddler ReverseIntBits()
+        {
+            return this.ReverseByteBits().ReverseIntBytes();
+        }
+        public BitTwiddler ReverseIntNibbles()
+        {
+            return this.ReverseByteNibbles().ReverseIntBytes();
+        }
         public BitTwiddler ReverseIntBytes()
         {
             const ulong mask0 = 0x0000_00FF_0000_00FF;
@@ -709,6 +719,54 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
+        // Long
+        public BitTwiddler ReverseLongBits()
+        {
+            return NaiveReverse(MaxBitCount, 1, BitMask);
+        }
+
+        public BitTwiddler ReverseLongNibbles()
+        {
+            return NaiveReverse(MaxBitCount, BitsPerNibble, NibbleMask);
+        }
+
+        public BitTwiddler ReverseLongBytes()
+        {
+            return NaiveReverse(MaxBitCount, BitsPerByte, ByteMask);
+        }
+
+        public BitTwiddler ReverseLongShorts()
+        {
+            const ulong mask0 = 0x0000_0000_0000_FFFF;
+            const ulong mask1 = 0x0000_0000_FFFF_0000;
+            const ulong mask2 = 0x0000_FFFF_0000_0000;
+            const ulong mask3 = 0xFFFF_0000_0000_0000;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+            ulong value2 = this.value & mask2;
+            ulong value3 = this.value & mask3;
+
+            ulong newValue = (value0 << ShortOffset3)
+                            | (value1 << ShortOffset1)
+                            | (value2 >> ShortOffset1)
+                            | (value3 >> ShortOffset3);
+
+            return new BitTwiddler(newValue, this.bitCount);
+        }
+
+        public BitTwiddler ReverseLongInts()
+        {
+            const ulong mask0 = 0x0000_0000_FFFF_FFFF;
+            const ulong mask1 = 0xFFFF_FFFF_0000_0000;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+
+            ulong newValue = (value0 << BitsPerInt) | (value1 >> BitsPerInt);
+
+            return new BitTwiddler(newValue, this.bitCount);
+        }
 
         // Invert
         public BitTwiddler Invert()

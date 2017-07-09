@@ -100,11 +100,9 @@ namespace _TestConsole
 
             // var g = a - f;
 
-            var a = BitTwiddler.FromBytes(0b1011, 0b1101, 0b0011);
+            var a = BitTwiddler.FromShort(0b1100_1101_1010_1100);
 
-            var b = a.ToBitString();
-            
-            var c = a.ToBitString(3, "-");
+            var b = a.ReverseByteBits();
 
             Pause();
         }
