@@ -1002,6 +1002,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
-        public override string ToString() => ToBinaryString(); // ToHexString();
+        public override string ToString() => ToHexString();
     }
 }
