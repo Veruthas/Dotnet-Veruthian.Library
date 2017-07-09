@@ -30,7 +30,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             return masks;
         }
 
-        static BitTwiddler() => masks = GetBitMasks();
+        //static BitTwiddler() => masks = GetBitMasks();
 
 
         // Count
@@ -958,6 +958,12 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
+
+        static readonly string[] nibbleStrings = { "0000", "0001", "0010", "0011",
+                                                   "0100", "0101", "0110", "0111",
+                                                   "1000", "1001", "1010", "1011",
+                                                   "1100", "1101", "1110", "1111"};
+
         public string ToBinaryString(string nibbleSeparator = "-", string byteSeparator = "_")
         {
             StringBuilder builder = new StringBuilder();
@@ -976,11 +982,6 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return builder.ToString();
         }
-
-        static readonly string[] nibbleStrings = { "0000", "0001", "0010", "0011",
-                                                   "0100", "0101", "0110", "0111",
-                                                   "1000", "1001", "1010", "1011",
-                                                   "1100", "1101", "1110", "1111"};
 
 
         public string ToHexString(string byteSeparator = "-")
