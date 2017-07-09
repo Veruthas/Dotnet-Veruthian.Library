@@ -67,23 +67,23 @@ namespace _TestConsole
 
             // Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
 
-            var a = new BitTwiddler(0x0123456789ABCDEF);
+            // var a = new FromByte(0x0123456789ABCDEF);
             
-            var b = a.ReverseShortBytes();
+            // var b = a.ReverseShortBytes();
 
-            var c = a.ReverseIntBytes();
+            // var c = a.ReverseIntBytes();
 
-            var d = a.ReverseIntShorts();
+            // var d = a.ReverseIntShorts();
 
-            var e = a.ReverseByteNibbles();
+            // var e = a.ReverseByteNibbles();
 
-            var f = a.ReverseLongInts();
+            // var f = a.ReverseLongInts();
             
-            var g = a.ReverseLongShorts();
+            // var g = a.ReverseLongShorts();
 
-            var h = a.ReverseNibbles();
+            // var h = a.ReverseNibbles();
             
-            var i = a.ReverseBytes();
+            // var i = a.ReverseBytes();
 
             Pause();
         }

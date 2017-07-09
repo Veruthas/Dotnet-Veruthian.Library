@@ -24,86 +24,197 @@ namespace Soedeum.Dotnet.Library.Numerics
             return masks;
         }
 
+        /* Constants */
+        #region Constants
+
+        // Count
+        public const int BitsPerNibble = 4;
+
+        public const int BitsPerByte = 8;
+
+        public const int BitsPerShort = 16;
+
+        public const int BitsPerInt = 32;
+
+        public const int BitsPerLong = 64;
+
+
+        public const int NibblesPerByte = BitsPerByte / BitsPerNibble;
+
+        public const int NibblesPerShort = BitsPerShort / BitsPerNibble;
+
+        public const int NibblesPerInt = BitsPerInt / BitsPerNibble;
+
+        public const int NibblesPerLong = BitsPerLong / BitsPerNibble;
+
+
+        public const int BytesPerShort = BitsPerShort / BitsPerByte;
+
+        public const int BytesPerInt = BitsPerInt / BitsPerByte;
+
+        public const int BytesPerLong = BitsPerLong / BitsPerByte;
+
+
+        public const int ShortsPerInt = BitsPerInt / BitsPerShort;
+
+        public const int ShortsPerLong = BitsPerLong / BitsPerShort;
+
+
+        public const int IntsPerLong = BitsPerInt / BitsPerLong;
+
+
+        // Max
+        public const int MaxBitCount = 64;
+
+        public const int MaxNibbleCount = MaxBitCount / BitsPerNibble;
+
+        public const int MaxByteCount = MaxBitCount / BitsPerByte;
+
+        public const int MaxShortCount = MaxBitCount / BitsPerShort;
+
+        public const int MaxIntCount = MaxBitCount / BitsPerInt;
+
+        public const int MaxLongCount = MaxBitCount / BitsPerLong;
+
+
+        // Masks
+        public const ulong BitMask = 0x1;
+
+        public const ulong NibbleMask = 0xF;
+
+        public const ulong ByteMask = 0xFF;
+
+        public const ulong ShortMask = 0xFFFF;
+
+        public const ulong IntMask = 0xFFFF_FFFF;
+
+        public const ulong LongMask = 0xFFFF_FFFF_FFFF_FFFF;
+
+
+        // Offsets
+        public const int ByteOffset0 = BitsPerByte * 0;
+        public const int ByteOffset1 = BitsPerByte * 1;
+        public const int ByteOffset2 = BitsPerByte * 2;
+        public const int ByteOffset3 = BitsPerByte * 3;
+        public const int ByteOffset4 = BitsPerByte * 4;
+        public const int ByteOffset5 = BitsPerByte * 5;
+        public const int ByteOffset6 = BitsPerByte * 6;
+        public const int ByteOffset7 = BitsPerByte * 7;
+
+        public const int ShortOffset0 = BitsPerShort * 0;
+        public const int ShortOffset1 = BitsPerShort * 1;
+        public const int ShortOffset2 = BitsPerShort * 2;
+        public const int ShortOffset3 = BitsPerShort * 3;
+
+        private const int IntOffset0 = BitsPerInt * 0;
+        private const int IntOffset1 = BitsPerInt * 1;
+
+
+        // General
+        public static readonly BitTwiddler Empty = new BitTwiddler();
+
+        public static readonly BitTwiddler MinLong = new BitTwiddler(0ul, BitsPerLong);
+
+        public static readonly BitTwiddler MaxLong = new BitTwiddler(ulong.MaxValue, BitsPerLong);
+
+        #endregion
 
         readonly ulong value;
 
-        readonly int length;
+        readonly int bitCount;
 
 
         /* Constructors */
         #region Constructors
 
+        private BitTwiddler(ulong value, int bitCount)
+        {
+            this.value = value & masks[bitCount];
+
+            this.bitCount = bitCount;
+        }
+
         // Bytes
-        public static implicit operator BitTwiddler(byte value) => new BitTwiddler(value);
+        public static implicit operator BitTwiddler(byte value) => FromByte(value);
 
-        public BitTwiddler(byte value0)
+        public static BitTwiddler FromByte(byte value)
         {
-            this.length = 1;
+            int length = BitsPerByte * 1;
 
-            this.value = value0;
+            return new BitTwiddler(value, length);
         }
-        public BitTwiddler(byte value0, byte value1)
+        public static BitTwiddler FromBytes(byte value0, byte value1)
         {
-            this.length = 2;
-
-            this.value = (ulong)value0
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2)
-        {
-            this.length = 3;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 2;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2, byte value3)
-        {
-            this.length = 4;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 3;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2, byte value3)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2)
                 | ((ulong)value3 << ByteOffset3);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2, byte value3, byte value4)
-        {
-            this.length = 5;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 4;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2, byte value3, byte value4)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2)
                 | ((ulong)value3 << ByteOffset3)
                 | ((ulong)value4 << ByteOffset4);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5)
-        {
-            this.length = 6;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 5;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2)
                 | ((ulong)value3 << ByteOffset3)
                 | ((ulong)value4 << ByteOffset4)
                 | ((ulong)value5 << ByteOffset5);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6)
-        {
-            this.length = 7;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 6;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2)
                 | ((ulong)value3 << ByteOffset3)
                 | ((ulong)value4 << ByteOffset4)
                 | ((ulong)value5 << ByteOffset5)
                 | ((ulong)value6 << ByteOffset6);
-        }
-        public BitTwiddler(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6, byte value7)
-        {
-            this.length = 8;
 
-            this.value = (ulong)value0
+            int length = BitsPerByte * 7;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromBytes(byte value0, byte value1, byte value2, byte value3, byte value4, byte value5, byte value6, byte value7)
+        {
+            ulong value = (ulong)value0
                 | ((ulong)value1 << ByteOffset1)
                 | ((ulong)value2 << ByteOffset2)
                 | ((ulong)value3 << ByteOffset3)
@@ -111,97 +222,224 @@ namespace Soedeum.Dotnet.Library.Numerics
                 | ((ulong)value5 << ByteOffset5)
                 | ((ulong)value6 << ByteOffset6)
                 | ((ulong)value7 << ByteOffset7);
+
+            int length = BitsPerByte * 8;
+
+            return new BitTwiddler(value, length);
         }
 
-        // Short
-        public static implicit operator BitTwiddler(ushort value) => new BitTwiddler(value);
+        // Sbyte
+        public static implicit operator BitTwiddler(sbyte value) => FromByte(value);
 
-        public BitTwiddler(ushort value0)
+        public static BitTwiddler FromByte(sbyte value)
         {
-            this.length = 2;
-
-            this.value = (ulong)value0;
+            return FromByte((byte)value);
         }
-        public BitTwiddler(ushort value0, ushort value1)
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1)
         {
-            this.length = 4;
+            return FromBytes((byte)value0, (byte)value1);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2, sbyte value3)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2, sbyte value3, sbyte value4)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3, (byte)value4);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2, sbyte value3, sbyte value4, sbyte value5)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3, (byte)value4, (byte)value5);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2, sbyte value3, sbyte value4, sbyte value5, sbyte value6)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3, (byte)value4, (byte)value5, (byte)value6);
+        }
+        public static BitTwiddler FromBytes(sbyte value0, sbyte value1, sbyte value2, sbyte value3, sbyte value4, sbyte value5, sbyte value6, sbyte value7)
+        {
+            return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3, (byte)value4, (byte)value5, (byte)value6, (byte)value7);
+        }
 
-            this.value = (ulong)value0
+
+        // UShort
+        public static implicit operator BitTwiddler(ushort value) => FromShort(value);
+
+        public static BitTwiddler FromShort(ushort value)
+        {
+            int length = BitsPerShort * 1;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromShorts(ushort value0, ushort value1)
+        {
+            ulong value = (ulong)value0
                     | ((ulong)value1 << ShortOffset1);
-        }
-        public BitTwiddler(ushort value0, ushort value1, ushort value2)
-        {
-            this.length = 6;
 
-            this.value = (ulong)value0
+            int length = BitsPerShort * 2;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromShorts(ushort value0, ushort value1, ushort value2)
+        {
+            ulong value = (ulong)value0
                     | ((ulong)value1 << ShortOffset1)
                     | ((ulong)value2 << ShortOffset2);
-        }
-        public BitTwiddler(ushort value0, ushort value1, ushort value2, ushort value3)
-        {
-            this.length = 8;
 
-            this.value = (ulong)value0
+            int length = BitsPerShort * 3;
+
+            return new BitTwiddler(value, length);
+        }
+        public static BitTwiddler FromShorts(ushort value0, ushort value1, ushort value2, ushort value3)
+        {
+            ulong value = (ulong)value0
                     | ((ulong)value1 << ShortOffset1)
                     | ((ulong)value2 << ShortOffset2)
                     | ((ulong)value3 << ShortOffset3);
+
+            int length = BitsPerShort * 4;
+
+            return new BitTwiddler(value, length);
+        }
+
+        // Short
+        public static implicit operator BitTwiddler(short value) => FromShort(value);
+
+        public static BitTwiddler FromShort(short value)
+        {
+            return FromShort((ushort)value);
+        }
+        public static BitTwiddler FromShorts(short value0, short value1)
+        {
+            return FromShorts((ushort)value0, (ushort)value1);
+        }
+        public static BitTwiddler FromShorts(short value0, short value1, short value2)
+        {
+            return FromShorts((ushort)value0, (ushort)value1, (ushort)value2);
+        }
+        public static BitTwiddler FromShorts(short value0, short value1, short value2, short value3)
+        {
+            return FromShorts((ushort)value0, (ushort)value1, (ushort)value2, (ushort)value3);
+        }
+
+
+        // UInt
+        public static implicit operator BitTwiddler(uint value) => FromInt(value);
+
+        public static BitTwiddler FromInt(uint value)
+        {
+            int length = BitsPerInt * 1;
+
+            return new BitTwiddler(value, length);
+        }
+
+        public static BitTwiddler FromInts(uint value0, uint value1)
+        {
+            ulong value = (ulong)value0
+                    | ((ulong)value1 << IntOffset1);
+
+            int length = BitsPerInt * 2;
+
+            return new BitTwiddler(value, length);
         }
 
         // Int
-        public static implicit operator BitTwiddler(uint value) => new BitTwiddler();
+        public static implicit operator BitTwiddler(int value) => FromInt(value);
 
-        public BitTwiddler(uint value0)
+        public static BitTwiddler FromInt(int value)
         {
-            this.length = 4;
-
-            this.value = (ulong)value0;
+            return FromInt((uint)value);
+        }
+        public static BitTwiddler FromInts(int value0, int value1)
+        {
+            return FromInts((uint)value0, (uint)value1);
         }
 
-        public BitTwiddler(uint value0, uint value1)
-        {
-            this.length = 8;
 
-            this.value = (ulong)value0
-                    | ((ulong)value1 << IntOffset1);
+        // ULong
+        public static implicit operator BitTwiddler(ulong value) => FromLong(value);
+
+        public static BitTwiddler FromLong(ulong value)
+        {
+            int length = BitsPerLong;
+
+            return new BitTwiddler(value, length);
         }
 
         // Long
-        public static implicit operator BitTwiddler(ulong value) => new BitTwiddler(value);
+        public static implicit operator BitTwiddler(long value) => FromLong(value);
 
-        public BitTwiddler(ulong value)
+        public static BitTwiddler FromLong(long value)
         {
-            this.length = 8;
-
-            this.value = value;
-        }
-
-        public BitTwiddler(ulong value, int byteCount)
-        {
-            this.length = Math.Min(byteCount, MaxByteCount);
-
-            this.value = value & masks[length];
+            return FromLong((ulong)value);
         }
 
         #endregion
 
 
-        public const int MaxByteCount = 8;
+        /* Counts */
+        #region Counts
 
-        public static readonly BitTwiddler Empty = new BitTwiddler();
+        public int BitCount => bitCount;
 
-        public static readonly BitTwiddler Min = new BitTwiddler(0ul, 8);
+        public int NibbleCount => (bitCount + BitsPerNibble - 1) / BitsPerNibble;
 
-        public static readonly BitTwiddler Max = new BitTwiddler(ulong.MaxValue, 8);
+        public int ByteCount => (bitCount + BitsPerByte - 1) / BitsPerByte;
+
+        public int ShortCount => (bitCount + BitsPerShort - 1) / BitsPerShort;
+
+        public int IntCount => (bitCount + BitsPerInt - 1) / BitsPerInt;
 
 
-        // Bits
-        public int BitCount => length * 8;
+        public BitTwiddler ChangeBitCount(int bitCount) => new BitTwiddler(this.value, Math.Min(bitCount, MaxBitCount));
 
-        public bool GetBit(int index) => ((value >> index) & 0x1) == 1;
+        #endregion
+
+
+        /* Access and Modification */
+        #region Access and Modification
+
+        // Get
+        private ulong GetValue(int index, int bits, ulong mask)
+        {
+            int offset = index * bits;
+
+            return (value >> offset) & mask;
+        }
+
+        public bool GetBit(int bitIndex) => ((value >> bitIndex) & BitMask) == 1;
+
+        public byte GetNibble(int nibbleIndex) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
+
+        public byte GetByte(int byteIndex) => (byte)GetValue(byteIndex, BitsPerByte, ByteMask);
+
+        public ushort GetShort(int shortIndex) => (ushort)GetValue(shortIndex, BitsPerShort, ShortMask);
+
+        public uint GetInt(int intIndex) => (uint)GetValue(intIndex, BitsPerInt, IntMask);
+
+        public ulong GetLong() => value;
+
+
+        // Set
+        public BitTwiddler SetValue(int index, int bits, ulong mask, ulong value)
+        {
+            int offset = bits * index;
+
+            mask <<= offset;
+
+            ulong newValue = this.value & ~mask;
+
+            newValue |= ((ulong)value << offset);
+
+            return new BitTwiddler(newValue, this.bitCount);
+        }
 
         public BitTwiddler SetBit(int index, bool value)
         {
-            ulong mask = 0x1ul << index;
+            ulong mask = BitMask << index;
 
             ulong newValue;
 
@@ -210,36 +448,26 @@ namespace Soedeum.Dotnet.Library.Numerics
             else
                 newValue = this.value & ~mask;
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
-        // Nibble
-        public const int NibbleBitCount = 4;
+        public BitTwiddler SetNibble(int index, byte value) => SetValue(index, BitsPerNibble, NibbleMask, value);
 
-        public const ulong NibbleMask = 0xF;
+        public BitTwiddler SetByte(int index, byte value) => SetValue(index, BitsPerByte, ByteMask, value);
 
-        public int NibbleCount => length * 2;
+        public BitTwiddler SetShort(int index, ushort value) => SetValue(index, BitsPerShort, ShortMask, value);
 
-        public byte GetNibble(int index)
-        {
-            int offset = NibbleBitCount * index;
+        public BitTwiddler SetInt(int index, uint value) => SetValue(index, BitsPerInt, IntMask, value);
 
-            return (byte)((value >> offset) & NibbleMask);
-        }
+        public BitTwiddler SetLong(ulong value) => new BitTwiddler(value, this.bitCount);
+        
+        #endregion
 
-        public BitTwiddler SetNibble(int index, byte value)
-        {
-            int offset = NibbleBitCount * index;
 
-            ulong mask = NibbleMask << offset;
+        /* Operations */
+        #region Operations
 
-            ulong newValue = this.value & ~mask;
-
-            newValue |= ((ulong)value << offset);
-
-            return new BitTwiddler(newValue, this.length);
-        }
-
+        // Reverse
         public BitTwiddler ReverseNibbles()
         {
             ulong newValue = 0;
@@ -248,49 +476,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             for (int i = 0; i < length; i++)
             {
-                ulong value = (this.value >> (NibbleBitCount * i)) & NibbleMask;
+                ulong value = (this.value >> (BitsPerNibble * i)) & NibbleMask;
 
-                value <<= (NibbleBitCount * (length - i - 1));
+                value <<= (BitsPerNibble * (length - i - 1));
 
                 newValue |= value;
             }
 
-            return new BitTwiddler(newValue, this.length);
-        }
-
-        // Byte
-        public int ByteCount => length;
-
-        private const int ByteBitCount = 8;
-        private const int ByteOffset0 = ByteBitCount * 0;
-        private const int ByteOffset1 = ByteBitCount * 1;
-        private const int ByteOffset2 = ByteBitCount * 2;
-        private const int ByteOffset3 = ByteBitCount * 3;
-        private const int ByteOffset4 = ByteBitCount * 4;
-        private const int ByteOffset5 = ByteBitCount * 5;
-        private const int ByteOffset6 = ByteBitCount * 6;
-        private const int ByteOffset7 = ByteBitCount * 7;
-
-        private const ulong ByteMask = 0xFF;
-
-        public byte GetByte(int index)
-        {
-            int offset = ByteBitCount * index;
-
-            return (byte)((value >> offset) & ByteMask);
-        }
-
-        public BitTwiddler SetByte(int index, byte value)
-        {
-            int offset = ByteBitCount * index;
-
-            ulong mask = ByteMask << offset;
-
-            ulong newValue = this.value & ~mask;
-
-            newValue |= ((ulong)value << offset);
-
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseBytes()
@@ -301,14 +494,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             for (int i = 0; i < length; i++)
             {
-                ulong value = (this.value >> (ByteBitCount * i)) & ByteMask;
+                ulong value = (this.value >> (BitsPerByte * i)) & ByteMask;
 
-                value <<= (ByteBitCount * (length - i - 1));
+                value <<= (BitsPerByte * (length - i - 1));
 
                 newValue |= value;
             }
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseByteNibbles()
@@ -319,41 +512,11 @@ namespace Soedeum.Dotnet.Library.Numerics
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
-            ulong newValue = (value0 << NibbleBitCount) | (value1 >> NibbleBitCount);
+            ulong newValue = (value0 << BitsPerNibble) | (value1 >> BitsPerNibble);
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
-        // Short
-        public int ShortCount => length / 2 + ((length % 2 == 0) ? 0 : 1);
-
-        private const int ShortBitCount = 16;
-        private const int ShortOffset0 = ShortBitCount * 0;
-        private const int ShortOffset1 = ShortBitCount * 1;
-        private const int ShortOffset2 = ShortBitCount * 2;
-        private const int ShortOffset3 = ShortBitCount * 3;
-
-        private const ulong ShortMask = 0xFFFF;
-
-        public ushort GetShort(int index)
-        {
-            int offset = ByteBitCount * index;
-
-            return (ushort)((value >> offset) & ShortMask);
-        }
-
-        public BitTwiddler SetShort(int index, ushort value)
-        {
-            int offset = ShortBitCount * index;
-
-            ulong mask = ShortMask << offset;
-
-            ulong newValue = this.value & ~mask;
-
-            newValue |= ((ulong)value << offset);
-
-            return new BitTwiddler(newValue, this.length);
-        }
 
         public BitTwiddler ReverseShorts()
         {
@@ -363,14 +526,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             for (int i = 0; i < length; i++)
             {
-                ulong value = (this.value >> (ShortBitCount * i)) & ShortMask;
+                ulong value = (this.value >> (BitsPerShort * i)) & ShortMask;
 
-                value <<= (ShortBitCount * (length - i - 1));
+                value <<= (BitsPerShort * (length - i - 1));
 
                 newValue |= value;
             }
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseShortBytes()
@@ -381,39 +544,9 @@ namespace Soedeum.Dotnet.Library.Numerics
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
-            ulong newValue = (value0 << ByteBitCount) | (value1 >> ByteBitCount);
+            ulong newValue = (value0 << BitsPerByte) | (value1 >> BitsPerByte);
 
-            return new BitTwiddler(newValue, this.length);
-        }
-
-        // Int
-        private const int IntBitCount = 32;
-        private const int IntOffset0 = IntBitCount * 0;
-        private const int IntOffset1 = IntBitCount * 1;
-
-        private const ulong IntMask = 0xFFFF;
-
-
-        public int IntCount => length / 4 + ((length % 4 == 0) ? 0 : 1);
-
-        public uint GetInt(int index)
-        {
-            int offset = ByteBitCount * index;
-
-            return (uint)((value >> offset) & IntMask);
-        }
-
-        public BitTwiddler SetInt(int index, uint value)
-        {
-            int offset = IntBitCount * index;
-
-            ulong mask = IntMask << offset;
-
-            ulong newValue = this.value & ~mask;
-
-            newValue |= ((ulong)value << offset);
-
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseInts()
@@ -424,14 +557,14 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             for (int i = 0; i < length; i++)
             {
-                ulong value = (this.value >> (IntBitCount * i)) & IntMask;
+                ulong value = (this.value >> (BitsPerInt * i)) & IntMask;
 
-                value <<= (IntBitCount * (length - i - 1));
+                value <<= (BitsPerInt * (length - i - 1));
 
                 newValue |= value;
             }
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseIntShorts()
@@ -442,9 +575,9 @@ namespace Soedeum.Dotnet.Library.Numerics
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
-            ulong newValue = (value0 << ShortBitCount) | (value1 >> ShortBitCount);
+            ulong newValue = (value0 << BitsPerShort) | (value1 >> BitsPerShort);
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseIntBytes()
@@ -464,13 +597,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                             | (value2 >> ByteOffset1)
                             | (value3 >> ByteOffset3);
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
-
-        // Long
-        public ulong GetLong() => value;
-
-        public BitTwiddler SetLong(ulong value) => new BitTwiddler(value, this.length);
 
         public BitTwiddler ReverseLongShorts()
         {
@@ -489,7 +617,7 @@ namespace Soedeum.Dotnet.Library.Numerics
                             | (value2 >> ShortOffset1)
                             | (value3 >> ShortOffset3);
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public BitTwiddler ReverseLongInts()
@@ -500,26 +628,28 @@ namespace Soedeum.Dotnet.Library.Numerics
             ulong value0 = this.value & mask0;
             ulong value1 = this.value & mask1;
 
-            ulong newValue = (value0 << IntBitCount) | (value1 >> IntBitCount);
+            ulong newValue = (value0 << BitsPerInt) | (value1 >> BitsPerInt);
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
-        // Operations
+        // Invert
         public BitTwiddler Invert()
         {
             ulong newValue = ~this.value;
 
-            return new BitTwiddler(newValue, this.length);
+            return new BitTwiddler(newValue, this.bitCount);
         }
 
         public static BitTwiddler operator ~(BitTwiddler value) => value.Invert();
 
+
+        // Logical
         public static BitTwiddler operator &(BitTwiddler left, BitTwiddler right)
         {
             ulong result = left.value & right.value;
 
-            int length = Math.Max(left.length, right.length);
+            int length = Math.Max(left.bitCount, right.bitCount);
 
             return new BitTwiddler(result, length);
         }
@@ -528,7 +658,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             ulong result = left.value | right.value;
 
-            int length = Math.Max(left.length, right.length);
+            int length = Math.Max(left.bitCount, right.bitCount);
 
             return new BitTwiddler(result, length);
         }
@@ -537,11 +667,12 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             ulong result = left.value ^ right.value;
 
-            int length = Math.Max(left.length, right.length);
+            int length = Math.Max(left.bitCount, right.bitCount);
 
             return new BitTwiddler(result, length);
         }
 
+        #endregion
 
 
         // ToString()

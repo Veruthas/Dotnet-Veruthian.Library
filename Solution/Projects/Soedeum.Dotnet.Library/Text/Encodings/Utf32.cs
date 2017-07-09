@@ -92,7 +92,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
             public static bool Encode(CodePoint value, out BitTwiddler result, bool reverse)
             {
-                result = new BitTwiddler((uint)value);
+                result = BitTwiddler.FromInt((uint)value);
 
                 if (reverse)
                     result = result.ReverseBytes();
