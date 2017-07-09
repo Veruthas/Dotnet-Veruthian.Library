@@ -524,6 +524,40 @@ namespace Soedeum.Dotnet.Library.Numerics
         public BitTwiddler ReverseInts() => NaiveReverse(IntCount, BitsPerInt, IntMask);
 
 
+        public BitTwiddler ReverseNibbleBits()
+        {
+            const ulong mask0 = 0x1111_1111_1111_1111;
+            const ulong mask1 = 0x2222_2222_2222_2222;
+            const ulong mask2 = 0x4444_4444_4444_4444;
+            const ulong mask3 = 0x8888_8888_8888_8888;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+            ulong value2 = this.value & mask2;
+            ulong value3 = this.value & mask3;
+
+            ulong newValue = (value0 << 3)
+                            | (value1 << 1)
+                            | (value2 >> 1)
+                            | (value3 >> 3);
+
+            return new BitTwiddler(newValue, this.bitCount);
+        }
+
+
+        public BitTwiddler ReverseByteBits()
+        {
+            const ulong mask0 = 0x0F0F_0F0F_0F0F_0F0F;
+            const ulong mask1 = 0xF0F0_F0F0_F0F0_F0F0;
+
+            ulong value0 = this.value & mask0;
+            ulong value1 = this.value & mask1;
+
+            ulong newValue = (value0 << BitsPerNibble) | (value1 >> BitsPerNibble);
+
+            return new BitTwiddler(newValue, this.bitCount);
+        }
+
         public BitTwiddler ReverseByteNibbles()
         {
             const ulong mask0 = 0x0F0F_0F0F_0F0F_0F0F;
@@ -711,6 +745,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
-        public override string ToString() => ToHexString();
+        public override string ToString() => ToBinaryString(); // ToHexString();
     }
 }

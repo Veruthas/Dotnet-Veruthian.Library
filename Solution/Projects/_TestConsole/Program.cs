@@ -67,8 +67,8 @@ namespace _TestConsole
 
             // Console.WriteLine("'{0}' == '{1}' ? {2}", c0, c1, c0 == c1);
 
-            var a = BitTwiddler.FromLong(0x0123456789ABCDEF);
-            
+            //var a = BitTwiddler.FromLong(0x0123456789ABCDEF);
+
             // var b = a.ReverseShortBytes();
 
             // var c = a.ReverseIntBytes();
@@ -78,12 +78,20 @@ namespace _TestConsole
             // var e = a.ReverseByteNibbles();
 
             // var f = a.ReverseLongInts();
-            
+
             // var g = a.ReverseLongShorts();
 
             // var h = a.ReverseNibbles();
-            
+
             // var i = a.ReverseBytes();
+
+            var a = BitTwiddler.FromByte(0xAB);
+
+            var b = a.ReverseNibbleBits();
+
+            var c = a >> -1;
+
+            var d = a << 1;
 
             Pause();
         }
