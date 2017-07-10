@@ -81,11 +81,11 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         #endregion
 
-        public struct ByteEncoder : ITransformer<CodePoint, BitTwiddler>
+        public struct Encoder : ITransformer<CodePoint, BitTwiddler>
         {
             bool reverse;
 
-            public ByteEncoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
+            public Encoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
 
 
             public bool TryProcess(CodePoint value, out BitTwiddler result) => Encode(value, out result, reverse);
@@ -110,6 +110,14 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 Encode(value, out BitTwiddler result, endianness);
 
                 return result;
+            }
+        }
+
+        public struct Decoder : ITransformer<BitTwiddler, CodePoint>
+        {
+            public bool TryProcess(BitTwiddler value, out CodePoint result)
+            {
+                throw new NotImplementedException();
             }
         }
 

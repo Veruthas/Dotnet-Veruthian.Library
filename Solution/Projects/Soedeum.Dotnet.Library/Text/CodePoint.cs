@@ -303,7 +303,7 @@ namespace Soedeum.Dotnet.Library.Text
             throw new NotImplementedException();
         }
 
-        public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.ByteEncoder.Encode(this, endianness);
+        public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
 
         #endregion
