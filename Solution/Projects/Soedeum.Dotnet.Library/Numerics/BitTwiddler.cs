@@ -607,7 +607,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // Nibble
-        public BitTwiddler ReverseNibbleBits()
+        public BitTwiddler ReverseBitsInNibbles()
         {
             const ulong mask0 = 0x1111_1111_1111_1111;
             const ulong mask1 = 0x2222_2222_2222_2222;
@@ -628,12 +628,11 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         // Byte
-        public BitTwiddler ReverseByteBits()
+        public BitTwiddler ReverseBitsInBytes()
         {
-            return this.ReverseNibbleBits().ReverseByteNibbles();
+            return this.ReverseBitsInNibbles().ReverseNibblesInBytes();
         }
-
-        public BitTwiddler ReverseByteNibbles()
+        public BitTwiddler ReverseNibblesInBytes()
         {
             const ulong mask0 = 0x0F0F_0F0F_0F0F_0F0F;
             const ulong mask1 = 0xF0F0_F0F0_F0F0_F0F0;
@@ -648,11 +647,11 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // Short
-        public BitTwiddler ReverseShortBits()
+        public BitTwiddler ReverseBitsInShorts()
         {
-            return this.ReverseNibbleBits().ReverseShortNibbles();
+            return this.ReverseBitsInNibbles().ReverseNibblesInShorts();
         }
-        public BitTwiddler ReverseShortNibbles()
+        public BitTwiddler ReverseNibblesInShorts()
         {
             const ulong mask0 = 0x000F_000F_000F_000F;
             const ulong mask1 = 0x00F0_00F0_00F0_00F0;
@@ -671,8 +670,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return new BitTwiddler(newValue, this.bitCount);
         }
-
-        public BitTwiddler ReverseShortBytes()
+        public BitTwiddler ReverseBytesInShorts()
         {
             const ulong mask0 = 0x00FF_00FF_00FF_00FF;
             const ulong mask1 = 0xFF00_FF00_FF00_FF00;
@@ -686,15 +684,15 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         // Int
-        public BitTwiddler ReverseIntBits()
+        public BitTwiddler ReverseBitsInInts()
         {
-            return this.ReverseByteBits().ReverseIntBytes();
+            return this.ReverseBitsInBytes().ReverseBytesInInts();
         }
-        public BitTwiddler ReverseIntNibbles()
+        public BitTwiddler ReverseNibblesInInts()
         {
-            return this.ReverseByteNibbles().ReverseIntBytes();
+            return this.ReverseNibblesInBytes().ReverseBytesInInts();
         }
-        public BitTwiddler ReverseIntBytes()
+        public BitTwiddler ReverseBytesInInts()
         {
             const ulong mask0 = 0x0000_00FF_0000_00FF;
             const ulong mask1 = 0x0000_FF00_0000_FF00;
@@ -713,8 +711,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return new BitTwiddler(newValue, this.bitCount);
         }
-
-        public BitTwiddler ReverseIntShorts()
+        public BitTwiddler ReverseShortsInInts()
         {
             const ulong mask0 = 0x0000_FFFF_0000_FFFF;
             const ulong mask1 = 0xFFFF_0000_FFFF_0000;
@@ -728,22 +725,19 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         // Long
-        public BitTwiddler ReverseLongBits()
+        public BitTwiddler ReverseBitsInLong()
         {
             return NaiveReverse(MaxBitCount, 1, BitMask);
         }
-
-        public BitTwiddler ReverseLongNibbles()
+        public BitTwiddler ReverseNibblesInLong()
         {
             return NaiveReverse(MaxBitCount, BitsPerNibble, NibbleMask);
         }
-
-        public BitTwiddler ReverseLongBytes()
+        public BitTwiddler ReverseBytesInLong()
         {
             return NaiveReverse(MaxBitCount, BitsPerByte, ByteMask);
         }
-
-        public BitTwiddler ReverseLongShorts()
+        public BitTwiddler ReverseShortsInLong()
         {
             const ulong mask0 = 0x0000_0000_0000_FFFF;
             const ulong mask1 = 0x0000_0000_FFFF_0000;
@@ -762,8 +756,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return new BitTwiddler(newValue, this.bitCount);
         }
-
-        public BitTwiddler ReverseLongInts()
+        public BitTwiddler ReverseIntsInLong()
         {
             const ulong mask0 = 0x0000_0000_FFFF_FFFF;
             const ulong mask1 = 0xFFFF_FFFF_0000_0000;

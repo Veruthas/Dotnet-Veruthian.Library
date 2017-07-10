@@ -101,12 +101,8 @@ namespace _TestConsole
             // var g = a - f;
 
             BitTwiddler.DefaultAsBinaryString();
-            
-            var a = BitTwiddler.FromShort(0b0000_1101_1010_1100);
 
-            var b = a.ChangeNibbleCount(3);
-
-            var c = a.ReverseByteBits();
+            BitTwiddler a = 0xFEDCBA9876543210;
 
             Pause();
         }
