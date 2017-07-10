@@ -788,6 +788,8 @@ namespace Soedeum.Dotnet.Library.Numerics
 
 
         // Logical
+        public BitTwiddler And(BitTwiddler value) => this & value;
+
         public static BitTwiddler operator &(BitTwiddler left, BitTwiddler right)
         {
             ulong result = left.value & right.value;
@@ -797,6 +799,8 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(result, length);
         }
 
+        public BitTwiddler Or(BitTwiddler value) => this | value;
+
         public static BitTwiddler operator |(BitTwiddler left, BitTwiddler right)
         {
             ulong result = left.value | right.value;
@@ -805,6 +809,8 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return new BitTwiddler(result, length);
         }
+
+        public BitTwiddler Xor(BitTwiddler value) => this ^ value;
 
         public static BitTwiddler operator ^(BitTwiddler left, BitTwiddler right)
         {
@@ -816,6 +822,8 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         // Shift
+        public BitTwiddler ShiftLeft(int amount) => this >> amount;
+
         public static BitTwiddler operator >>(BitTwiddler value, int amount)
         {
             if (amount >= MaxBitCount)
@@ -825,6 +833,8 @@ namespace Soedeum.Dotnet.Library.Numerics
             else
                 return new BitTwiddler(value.value >> amount, value.bitCount);
         }
+
+        public BitTwiddler ShiftRight(int amount) => this << amount;
 
         public static BitTwiddler operator <<(BitTwiddler value, int amount)
         {
@@ -837,6 +847,8 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
 
+        public BitTwiddler Increment() => this++;
+
         public static BitTwiddler operator ++(BitTwiddler value)
         {
             unchecked
@@ -847,6 +859,8 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
+        public BitTwiddler Decrement() => this--;
+
         public static BitTwiddler operator --(BitTwiddler value)
         {
             unchecked
@@ -856,6 +870,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                 return new BitTwiddler(newValue, value.bitCount);
             }
         }
+
+        public BitTwiddler Add(BitTwiddler value) => this + value;
 
         public static BitTwiddler operator +(BitTwiddler left, BitTwiddler right)
         {
@@ -869,6 +885,8 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
+        public BitTwiddler Subtract(BitTwiddler value) => this - value;
+
         public static BitTwiddler operator -(BitTwiddler left, BitTwiddler right)
         {
             unchecked
@@ -880,6 +898,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                 return new BitTwiddler(newValue, newBitCount);
             }
         }
+
+        public BitTwiddler MultiplyBy(BitTwiddler value) => this * value;
 
         public static BitTwiddler operator *(BitTwiddler left, BitTwiddler right)
         {
@@ -893,6 +913,8 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
+        public BitTwiddler DivideBy(BitTwiddler value) => this / value;
+
         public static BitTwiddler operator /(BitTwiddler left, BitTwiddler right)
         {
             unchecked
@@ -904,6 +926,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                 return new BitTwiddler(newValue, newBitCount);
             }
         }
+
+        public BitTwiddler Modulus(BitTwiddler value) => this % value;
 
         public static BitTwiddler operator %(BitTwiddler left, BitTwiddler right)
         {
@@ -917,6 +941,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
+        // TODO: Signed arithmetic/Sign extension for arbitrarty bitregions
         #endregion
 
 
@@ -1003,6 +1028,12 @@ namespace Soedeum.Dotnet.Library.Numerics
             return builder.ToString();
         }
 
-        public override string ToString() => ToHexString();
+        public override string ToString() => hex ? ToHexString() : ToBinaryString();
+
+        private static bool hex;
+
+        public static void DefaultAsHexString() => hex = true;
+
+        public static bool DefaultAsBinaryString() => hex = false;
     }
 }
