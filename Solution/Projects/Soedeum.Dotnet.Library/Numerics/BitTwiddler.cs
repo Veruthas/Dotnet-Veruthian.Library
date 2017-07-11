@@ -30,8 +30,6 @@ namespace Soedeum.Dotnet.Library.Numerics
             return masks;
         }
 
-        //static BitTwiddler() => masks = GetBitMasks();
-
 
         // Count
         public const int BitsPerNibble = 4;
@@ -162,8 +160,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             }
         }
 
-
-        // Bytes
+        // Bytes        
         public static implicit operator BitTwiddler(byte value) => FromByte(value);
 
         public static BitTwiddler FromByte(byte value)
@@ -487,7 +484,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public bool GetBit(int bitIndex = 0) => ((value >> bitIndex) & BitMask) == 1;
 
-        public byte GetNibble(int nibbleIndex = 0) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
+        public Nibble GetNibble(int nibbleIndex = 0) => (byte)GetValue(nibbleIndex, BitsPerNibble, NibbleMask);
 
         public byte GetByte(int byteIndex = 0) => (byte)GetValue(byteIndex, BitsPerByte, ByteMask);
 
@@ -551,7 +548,7 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(newValue, this.bitCount);
         }
 
-        public BitTwiddler SetNibble(byte value, int nibbleIndex = 0) => SetValue(nibbleIndex, BitsPerNibble, NibbleMask, value);
+        public BitTwiddler SetNibble(Nibble value, int nibbleIndex = 0) => SetValue(nibbleIndex, BitsPerNibble, NibbleMask, value);
 
         public BitTwiddler SetByte(byte value, int byteIndex = 0) => SetValue(byteIndex, BitsPerByte, ByteMask, value);
 
