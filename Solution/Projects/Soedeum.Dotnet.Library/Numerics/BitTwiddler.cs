@@ -1020,7 +1020,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         public override string ToString() => hex ? ToHexString() : ToBinaryString();
 
-        private static bool hex;
+        private static bool hex = true;
 
         public static void DefaultAsHexString() => hex = true;
 
