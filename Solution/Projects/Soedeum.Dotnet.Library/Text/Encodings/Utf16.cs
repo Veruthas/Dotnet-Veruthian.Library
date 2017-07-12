@@ -192,7 +192,16 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
             public bool TryProcess(CodePoint value, out BitTwiddler result)
             {
-                throw new NotImplementedException();
+                uint utf32 = value;
+
+                int units = FromUtf32(utf32, out ushort leadingSurrogate, out ushort trailingSurrogate);
+
+                result = (units == 1) ? BitTwiddler.FromShort(leadingSurrogate) : BitTwiddler.FromShorts(leadingSurrogate, trailingSurrogate);
+
+                if (reverse)
+                    result.ReverseBytesInShorts();
+                    
+                return true;
             }
         }
 
