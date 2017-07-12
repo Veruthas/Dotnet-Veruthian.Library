@@ -188,9 +188,13 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         {
             bool reverse;
 
-            public Encoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
+            public Encoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
 
-            public bool TryProcess(CodePoint value, out BitTwiddler result)
+
+            public bool TryProcess(CodePoint value, out BitTwiddler result) => TryProcess(value, out result, reverse);
+
+
+            private static bool TryProcess(CodePoint value, out BitTwiddler result, bool reverse)
             {
                 uint utf32 = value;
 
@@ -200,8 +204,20 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
                 if (reverse)
                     result.ReverseBytesInShorts();
-                    
+
                 return true;
+            }
+
+            public static bool TryProcess(CodePoint value, out BitTwiddler result, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
+            }
+
+            public static BitTwiddler Process(CodePoint value, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                TryProcess(value, out var result, endianness);
+
+                return result;
             }
         }
 

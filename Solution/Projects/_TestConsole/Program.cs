@@ -18,7 +18,7 @@ namespace _TestConsole
 
             var c = CodePoint.FromString(s, 0);
 
-            var d = Utf32.Encoder.Process(c, ByteOrder.BigEndian);
+            var d = Utf16.Encoder.Process(c, ByteOrder.LittleEndian);
 
             var e = Utf32.Decoder.Process(d.ReverseBytes(), ByteOrder.LittleEndian);
 
