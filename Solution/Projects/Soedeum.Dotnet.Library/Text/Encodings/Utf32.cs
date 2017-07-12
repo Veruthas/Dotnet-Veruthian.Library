@@ -88,9 +88,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             public Encoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
 
 
-            public bool TryProcess(CodePoint value, out BitTwiddler result) => Encode(value, out result, reverse);
+            public bool TryProcess(CodePoint value, out BitTwiddler result) => TryProcess(value, out result, reverse);
 
-            public static bool Encode(CodePoint value, out BitTwiddler result, bool reverse)
+            private static bool TryProcess(CodePoint value, out BitTwiddler result, bool reverse)
             {
                 result = BitTwiddler.FromInt((uint)value);
 
@@ -100,14 +100,14 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 return true;
             }
 
-            public static bool Encode(CodePoint value, out BitTwiddler result, ByteOrder endianness = ByteOrder.LittleEndian)
+            public static bool TryProcess(CodePoint value, out BitTwiddler result, ByteOrder endianness = ByteOrder.LittleEndian)
             {
-                return Encode(value, out result, endianness == ByteOrder.BigEndian);
+                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
             }
 
-            public static BitTwiddler Encode(CodePoint value, ByteOrder endianness)
+            public static BitTwiddler Process(CodePoint value, ByteOrder endianness = ByteOrder.LittleEndian)
             {
-                Encode(value, out BitTwiddler result, endianness);
+                TryProcess(value, out BitTwiddler result, endianness);
 
                 return result;
             }
@@ -115,9 +115,32 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         public struct Decoder : ITransformer<BitTwiddler, CodePoint>
         {
-            public bool TryProcess(BitTwiddler value, out CodePoint result)
+            bool reverse;
+
+            public Decoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
+
+            public bool TryProcess(BitTwiddler value, out CodePoint result) => TryProces(value, out result, reverse);
+
+            private static bool TryProces(BitTwiddler value, out CodePoint result, bool reverse)
             {
-                throw new NotImplementedException();
+                if (reverse)
+                    value = value.ReverseBytesInInts();
+
+                result = CodePoint.FromUtf32(value.GetInt());
+
+                return true;
+            }
+
+            public static bool TryProcess(BitTwiddler value, out CodePoint result, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return TryProces(value, out result, endianness == ByteOrder.BigEndian);
+            }
+
+            public static CodePoint Process(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                TryProcess(value, out CodePoint result, endianness);
+
+                return result;
             }
         }
 

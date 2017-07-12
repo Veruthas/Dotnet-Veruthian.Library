@@ -186,6 +186,10 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         public struct Encoder : ITransformer<CodePoint, BitTwiddler>
         {
+            bool reverse;
+
+            public Encoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
+
             public bool TryProcess(CodePoint value, out BitTwiddler result)
             {
                 throw new NotImplementedException();
