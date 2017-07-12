@@ -352,6 +352,8 @@ namespace Soedeum.Dotnet.Library.Numerics
         }
 
         // Char
+        public static implicit operator BitTwiddler(char value) => FromChar(value);
+        
         public static BitTwiddler FromChar(char value)
         {
             return FromShort((ushort)value);
