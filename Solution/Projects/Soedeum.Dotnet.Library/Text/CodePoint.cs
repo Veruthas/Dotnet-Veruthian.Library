@@ -130,13 +130,15 @@ namespace Soedeum.Dotnet.Library.Text
         /* Constructors */
         #region Constructors        
 
-        // For Utf8
+        // Utf8
+        public static CodePoint FromUtf8(BitTwiddler bits) => Utf8.Decoder.Decode(bits);
+
         public static CodePoint FromUtf8(byte[] value, int index = 0) => FromUtf8(value, ref index);
 
         public static CodePoint FromUtf8(byte[] value, ref int index) => throw new NotImplementedException();
 
 
-        // For Utf16 (U+0000 to U+D7FF, U+E000 to U+FFFF)                
+        // Utf16        
         public static implicit operator CodePoint(char value) => FromUtf16(value);
 
         public static implicit operator CodePoint(short value) => FromUtf16(value);
@@ -156,7 +158,9 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        // For Utf16 Surrogate Pairs (U+10000 to U+10FFFF) 
+        public static CodePoint FromUtf16(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => Utf16.Decoder.Decode(bits, endianness);
+
+
         public static CodePoint FromUtf16(char leadingSurrogate, char trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
 
         public static CodePoint FromUtf16(short leadingSurrogate, short trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
@@ -171,7 +175,6 @@ namespace Soedeum.Dotnet.Library.Text
             return new CodePoint(utf32);
         }
 
-        // For Utf16
         public static CodePoint FromUtf16(short[] value, int index = 0) => FromUtf16(value, ref index);
 
         public static CodePoint FromUtf16(short[] value, ref int index) => throw new NotImplementedException();
@@ -192,7 +195,7 @@ namespace Soedeum.Dotnet.Library.Text
         public static CodePoint FromUtf16(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian) => throw new NotImplementedException();
 
 
-        // For Utf32
+        // Utf32
         public static implicit operator CodePoint(int value) => FromUtf32(value);
 
         public static implicit operator CodePoint(uint value) => FromUtf32(value);
@@ -279,15 +282,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static explicit operator string(CodePoint value) => value.ToString();
 
 
-        public BitTwiddler ToUtf8()
-        {
-            throw new NotImplementedException();
-        }
+        public BitTwiddler ToUtf8() => Utf8.Encoder.Encode(this);
 
-        public BitTwiddler ToUtf16(ByteOrder endianness = ByteOrder.LittleEndian)
-        {
-            throw new NotImplementedException();
-        }
+        public BitTwiddler ToUtf16(ByteOrder endianness = ByteOrder.LittleEndian) => Utf16.Encoder.Encode(this, endianness);
 
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
