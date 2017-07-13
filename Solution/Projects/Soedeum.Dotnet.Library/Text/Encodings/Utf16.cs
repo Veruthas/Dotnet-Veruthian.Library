@@ -203,7 +203,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 result = (units == 1) ? BitTwiddler.FromShort(leadingSurrogate) : BitTwiddler.FromShorts(leadingSurrogate, trailingSurrogate);
 
                 if (reverse)
-                    result.ReverseBytesInShorts();
+                    result = result.ReverseBytesInShorts();
 
                 return true;
             }
@@ -223,9 +223,46 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         public struct Decoder : ITransformer<BitTwiddler, CodePoint>
         {
-            public bool TryProcess(BitTwiddler value, out CodePoint result)
+            bool reverse;
+
+            public Decoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
+
+            public bool TryProcess(BitTwiddler value, out CodePoint result) => TryProcess(value, out result, reverse);
+
+            private static bool TryProcess(BitTwiddler value, out CodePoint result, bool reverse)
             {
-                throw new NotImplementedException();
+                if (reverse)
+                    value = value.ReverseBytesInShorts();
+
+                char leading = value.GetChar(0);
+
+                if (IsLeadingSurrogate(leading))
+                {
+                    char trailing = value.GetChar(1);
+
+                    if (IsTrailingSurrogate(trailing))                    
+                        result = CodePoint.FromUtf16(leading, trailing);                    
+                    else                    
+                        throw new InvalidCodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");                    
+                }
+                else
+                {
+                    result = CodePoint.FromUtf16(leading);
+                }
+
+                return true;
+            }
+
+            public static bool TryProcess(BitTwiddler value, out CodePoint result, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
+            }
+
+            public static CodePoint Process(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                TryProcess(value, out var result, endianness);
+
+                return result;
             }
         }
 
