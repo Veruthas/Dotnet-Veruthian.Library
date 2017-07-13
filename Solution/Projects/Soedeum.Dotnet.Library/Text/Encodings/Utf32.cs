@@ -81,70 +81,55 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         #endregion
 
-        public struct Encoder : ITransformer<CodePoint, BitTwiddler>
+        public struct Encoder : ITransformer<uint, BitTwiddler>
         {
             bool reverse;
 
             public Encoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
 
 
-            public bool TryProcess(CodePoint value, out BitTwiddler result) => TryProcess(value, out result, reverse);
+            public BitTwiddler Process(uint value) => Encode(value, reverse);
 
-            private static bool TryProcess(CodePoint value, out BitTwiddler result, bool reverse)
+            private static BitTwiddler Encode(uint value, bool reverse)
             {
-                result = BitTwiddler.FromInt((uint)value);
+                var result = BitTwiddler.FromInt((uint)value);
 
                 if (reverse)
                     result = result.ReverseBytes();
 
-                return true;
-            }
-
-            public static bool TryProcess(CodePoint value, out BitTwiddler result, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
-            }
-
-            public static BitTwiddler Process(CodePoint value, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                TryProcess(value, out BitTwiddler result, endianness);
-
                 return result;
+            }
+
+            public static BitTwiddler Encode(uint value, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return Encode(value, endianness == ByteOrder.BigEndian);
             }
         }
 
-        public struct Decoder : ITransformer<BitTwiddler, CodePoint>
+        public struct Decoder : ITransformer<BitTwiddler, uint>
         {
             bool reverse;
 
             public Decoder(ByteOrder endianness) => reverse = (endianness == ByteOrder.BigEndian);
 
-            public bool TryProcess(BitTwiddler value, out CodePoint result) => TryProces(value, out result, reverse);
+            public uint Process(BitTwiddler value) => Decode(value, reverse);
 
-            private static bool TryProces(BitTwiddler value, out CodePoint result, bool reverse)
+            private static uint Decode(BitTwiddler value, bool reverse)
             {
                 if (reverse)
                     value = value.ReverseBytesInInts();
 
-                result = CodePoint.FromUtf32(value.GetInt());
-
-                return true;
+                return CodePoint.FromUtf32(value.GetInt());
             }
 
-            public static bool TryProcess(BitTwiddler value, out CodePoint result, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                return TryProces(value, out result, endianness == ByteOrder.BigEndian);
-            }
 
-            public static CodePoint Process(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
+            public static uint Decode(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
             {
-                TryProcess(value, out CodePoint result, endianness);
-
-                return result;
+                return Decode(value, endianness == ByteOrder.BigEndian);
             }
         }
 
-        public struct ByteDecoder : ITransformer<byte, uint>
+        public struct ByteDecoder : ITransformer<byte, uint?>
         {
             bool isLittleEndian;
 
@@ -159,7 +144,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             }
 
 
-            public bool TryProcess(byte value, out uint result)
+            public uint? Process(byte value)
             {
                 if (bytesRemaining == 0)
                     bytesRemaining = 3;
@@ -170,17 +155,15 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
                 if (bytesRemaining == 0)
                 {
-                    result = state;
+                    var result = state;
 
                     state = 0;
 
-                    return true;
+                    return result;
                 }
                 else
                 {
-                    result = default(uint);
-
-                    return false;
+                    return null;
                 }
             }
 

@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         // 1) U+0000  to U+007F (ASCII)             -> [0] 0xxx-xxxx;
         // 2) U+0080  to U+07FF                     -> [0] 110y-yyyy; [1]: 10xx-xxxx
         // 3) U+0800  to U+D7FF, U+E000 to U+FFFF   -> [0] 1110-zzzz; [1]: 10yy-yyyy; [2]: 10xx-xxxx
-        // 4) U+10000 to U+10FFFF                   -> [0] 1111-0uuu; [1]: 10zz-zzzz; [2]: 10xx-xxxx; [3]: 10xx-xxxx
+        // 4) U+10000 to U+10FFFF                   -> [0] 1111-0uuu; [1]: 10zz-zzzz; [2]: 10yy-yyyy; [3]: 10xx-xxxx
         //
         // Converted
         // 1) 0000-0000 0000-0000 0xxx-xxxx
@@ -22,68 +22,19 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         public const byte ThreeByteSequencePrefix = 0b1110_0000;
         public const byte FourByteSequencePrefix = 0b1111_0000;
 
+        public const uint MaxOneByteSequence = 0x7F;
+        public const uint MaxTwoByteSequence = 0x7FF;
+        public const uint MaxThreeByteSequence = 0xFFFF;
+        public const uint MaxFourByteSequence = 0x10FFFF;
+
+
         public const byte TrailingUnitPrefix = 0b1000_0000;
 
         private const int TrailingUnitOffset = 6;
 
 
-        public struct Encoder : ITransformer<CodePoint, BitTwiddler>
-        {
-            public bool TryProcess(CodePoint value, out BitTwiddler result)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public struct Decoder : ITransformer<BitTwiddler, CodePoint>
-        {
-            public bool TryProcess(BitTwiddler value, out CodePoint result)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public struct ByteDecoder : ITransformer<byte, uint>
-        {
-            uint state;
-
-            int bytesRemaining;
-
-
-            public bool TryProcess(byte value, out uint result)
-            {
-
-                if (bytesRemaining == 0)
-                {
-                    ProcessLeading(value);
-                }
-                else
-                {
-                    ProcessTrailing(value);
-                }
-
-                if (bytesRemaining == 0)
-                {
-                    result = state;
-
-                    state = 0;
-
-                    return true;
-                }
-                else
-                {
-                    result = default(uint);
-
-                    return false;
-                }
-            }
-
-            // Heading
-
-            // Use 32 bit state to discover amount
-            static readonly uint[] masks = new uint[4] { 0b0111_1111, 0b0001_1111, 0b0000_1111, 0b0000_0111 };
-
-            static readonly int[] sequenceLengths = new int[32]{
+        /* Header */
+        static readonly int[] sequenceLengths = new int[32]{
             // 0xxxx = 1  Byte Sequence (0000-0..0111-1)
                 0, 0, 0, 0,
                 0, 0, 0, 0,
@@ -107,56 +58,158 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 -1
             };
 
-            private void ProcessLeading(byte value)
+        static readonly uint[] masks = new uint[4] { 0b0111_1111, 0b0001_1111, 0b0000_1111, 0b0000_0111 };
+
+        public static bool ProcessLeading(byte value, out uint result, out int bytesRemaining)
+        {
+            // 0xxx-xxxx, 110x-xxxx, 1110-xxxx, 1111-0xxx
+
+            // First 5 bits tell the sequence length
+            int length = sequenceLengths[(value >> 3)];
+
+            if (length == -1)
+                throw InvalidCodeUnitSequence(value);
+
+            uint mask = masks[length];
+
+            result = value & mask;
+
+            bytesRemaining = length;
+
+            return bytesRemaining == 0;
+        }
+
+        /* Trailing */
+        private const byte TrailingHeaderMask = 0b1100_0000;
+
+        private const byte TrailingMask = 0b0011_1111;
+
+        public static bool ProcessTrailing(byte value, ref uint result, ref int bytesRemaining)
+        {
+            // Prefix MUST be 0b10xx_xxxx
+            if ((value & TrailingHeaderMask) != TrailingUnitPrefix)
+                throw InvalidCodeUnitSequence(value);
+
+            uint bits = (uint)(value & TrailingMask);
+
+            // Bits cannot be 0 (Utf8 must be encoded in smallest possible form)
+            // if (bits == 0)
+            // {
+            //     Reset();
+
+            //     throw CodePointNotSmallestSequence(value);
+            // }
+
+            // shift old bits down
+            result <<= TrailingUnitOffset;
+
+            result |= bits;
+
+            bytesRemaining--;
+
+            return bytesRemaining == 0;
+        }
+
+        private static Exception CodePointNotSmallestSequence(byte value)
+        {
+            string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
+            return new InvalidCodePointException(string.Format(message, value.ToString()));
+        }
+
+        private static Exception InvalidCodeUnitSequence(byte value)
+        {
+            string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
+            return new InvalidCodePointException(string.Format(message, value.ToString()));
+        }
+
+
+        public struct Encoder : ITransformer<uint, BitTwiddler>
+        {
+            public BitTwiddler Process(uint value) => Encode(value);
+
+            // 1) U+0000  to U+007F (ASCII)             -> [0] 0xxx-xxxx;
+            // 2) U+0080  to U+07FF                     -> [0] 110y-yyyy; [1]: 10xx-xxxx
+            // 3) U+0800  to U+D7FF, U+E000 to U+FFFF   -> [0] 1110-zzzz; [1]: 10yy-yyyy; [2]: 10xx-xxxx
+            // 4) U+10000 to U+10FFFF                   -> [0] 1111-0uuu; [1]: 10zz-zzzz; [2]: 10yy-yyyy; [3]: 10xx-xxxx
+            public static BitTwiddler Encode(uint value)
             {
-                // 0xxx-xxxx, 110x-xxxx, 1110-xxxx, 1111-0xxx
+                if (value <= MaxOneByteSequence)
+                {
+                    return BitTwiddler.FromByte((byte)value);
+                }
+                else if (value <= MaxTwoByteSequence)
+                {
+                    byte byte0 = (byte)((value >> 8) | TrailingUnitPrefix);
+                    byte byte1 = (byte)((value >> 8) | TrailingUnitPrefix); ;
 
-                // First 5 bits tell the sequence length
-                int length = sequenceLengths[(value >> 3)];
+                    return BitTwiddler.FromBytes(byte0, byte1);
+                }
+                else if (value < MaxThreeByteSequence)
+                {
 
-                if (length == -1)
-                    throw InvalidCodeUnitSequence(value);
+                }
+                else 
+                {
 
-                uint mask = masks[length];
-
-                state = value & mask;
-
-                bytesRemaining = length;
+                }
             }
+        }
 
-            // Extension
+        public struct Decoder : ITransformer<BitTwiddler, uint>
+        {
+            public uint Process(BitTwiddler value) => Decode(value);
 
-            private const byte TrailingHeaderMask = 0b1100_0000;
-
-            private const byte TrailingMask = 0b0011_1111;
-
-
-            private void ProcessTrailing(byte value)
+            public static uint Decode(BitTwiddler value)
             {
-                // Prefix MUST be 0b10xx_xxxx
-                if ((value & TrailingHeaderMask) != TrailingUnitPrefix)
+                uint result;
+
+                int bytesRemaining;
+
+                int i = 0;
+
+                if (!ProcessLeading(value.GetByte(i++), out result, out bytesRemaining))
+                    while (!ProcessTrailing(value.GetByte(i++), ref result, ref bytesRemaining)) ;
+
+                return result;
+            }
+        }
+
+        public struct ByteDecoder : ITransformer<byte, uint?>
+        {
+            uint state;
+
+            int bytesRemaining;
+
+
+            public uint? Process(byte value)
+            {
+                try
+                {
+                    if (bytesRemaining == 0)
+                        ProcessLeading(value, out state, out bytesRemaining);
+                    else
+                        ProcessTrailing(value, ref state, ref bytesRemaining);
+
+
+                    if (bytesRemaining == 0)
+                    {
+                        var result = state;
+
+                        state = 0;
+
+                        return result;
+
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch
                 {
                     Reset();
-
-                    throw InvalidCodeUnitSequence(value);
+                    throw;
                 }
-
-                uint bits = (uint)(value & TrailingMask);
-
-                // Bits cannot be 0 (Utf8 must be encoded in smallest possible form)
-                // if (bits == 0)
-                // {
-                //     Reset();
-
-                //     throw CodePointNotSmallestSequence(value);
-                // }
-
-                // shift old bits down
-                state <<= TrailingUnitOffset;
-
-                state |= bits;
-
-                bytesRemaining--;
             }
 
             private void Reset()
@@ -164,18 +217,6 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 state = 0;
 
                 bytesRemaining = 0;
-            }
-
-            private Exception CodePointNotSmallestSequence(byte value)
-            {
-                string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
-                return new InvalidCodePointException(string.Format(message, value.ToString()));
-            }
-
-            private static Exception InvalidCodeUnitSequence(byte value)
-            {
-                string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
-                return new InvalidCodePointException(string.Format(message, value.ToString()));
             }
         }
     }

@@ -184,52 +184,48 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         #endregion
 
 
-        public struct Encoder : ITransformer<CodePoint, BitTwiddler>
+        public struct Encoder : ITransformer<uint, BitTwiddler>
         {
             bool reverse;
 
             public Encoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
 
 
-            public bool TryProcess(CodePoint value, out BitTwiddler result) => TryProcess(value, out result, reverse);
+            public BitTwiddler Process(uint value) => Encode(value, reverse);
 
 
-            private static bool TryProcess(CodePoint value, out BitTwiddler result, bool reverse)
+            private static BitTwiddler Encode(uint value, bool reverse)
             {
-                uint utf32 = value;
+                int units = FromUtf32(value, out ushort leadingSurrogate, out ushort trailingSurrogate);
 
-                int units = FromUtf32(utf32, out ushort leadingSurrogate, out ushort trailingSurrogate);
+                BitTwiddler result;
 
-                result = (units == 1) ? BitTwiddler.FromShort(leadingSurrogate) : BitTwiddler.FromShorts(leadingSurrogate, trailingSurrogate);
+                if (units == 1)
+                    result = BitTwiddler.FromShort(leadingSurrogate);
+                else
+                    result = BitTwiddler.FromShorts(leadingSurrogate, trailingSurrogate);
 
                 if (reverse)
                     result = result.ReverseBytesInShorts();
 
-                return true;
-            }
-
-            public static bool TryProcess(CodePoint value, out BitTwiddler result, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
-            }
-
-            public static BitTwiddler Process(CodePoint value, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                TryProcess(value, out var result, endianness);
-
                 return result;
+            }
+
+            public static BitTwiddler Encode(uint value, ByteOrder endianness = ByteOrder.LittleEndian)
+            {
+                return Encode(value, endianness == ByteOrder.BigEndian);
             }
         }
 
-        public struct Decoder : ITransformer<BitTwiddler, CodePoint>
+        public struct Decoder : ITransformer<BitTwiddler, uint>
         {
             bool reverse;
 
             public Decoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
 
-            public bool TryProcess(BitTwiddler value, out CodePoint result) => TryProcess(value, out result, reverse);
+            public uint Process(BitTwiddler value) => Decode(value, reverse);
 
-            private static bool TryProcess(BitTwiddler value, out CodePoint result, bool reverse)
+            private static uint Decode(BitTwiddler value, bool reverse)
             {
                 if (reverse)
                     value = value.ReverseBytesInShorts();
@@ -240,33 +236,25 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 {
                     char trailing = value.GetChar(1);
 
-                    if (IsTrailingSurrogate(trailing))                    
-                        result = CodePoint.FromUtf16(leading, trailing);                    
-                    else                    
-                        throw new InvalidCodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");                    
+                    if (IsTrailingSurrogate(trailing))
+                        return CombineSurrogates(leading, trailing);
+                    else
+                        throw new InvalidCodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
                 }
                 else
                 {
-                    result = CodePoint.FromUtf16(leading);
+                    return leading;
                 }
-
-                return true;
             }
 
-            public static bool TryProcess(BitTwiddler value, out CodePoint result, ByteOrder endianness = ByteOrder.LittleEndian)
-            {
-                return TryProcess(value, out result, endianness == ByteOrder.BigEndian);
-            }
 
-            public static CodePoint Process(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
+            public static CodePoint Decode(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
             {
-                TryProcess(value, out var result, endianness);
-
-                return result;
+                return Decode(value, endianness == ByteOrder.BigEndian);
             }
         }
 
-        public struct ByteDecoder : ITransformer<byte, uint>
+        public struct ByteDecoder : ITransformer<byte, uint?>
         {
             bool isLittleEndian;
 
@@ -280,21 +268,22 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 this.isLittleEndian = endianness == ByteOrder.LittleEndian;
             }
 
-            public bool TryProcess(byte value, out uint result)
+            public uint? Process(byte value)
             {
                 if (current == default(ushort))
                 {
                     AddByte(value, !isLittleEndian);
 
-                    result = default(uint);
-
-                    return false;
+                    return null;
                 }
                 else
                 {
                     AddByte(value, isLittleEndian);
 
-                    return ProcessResult(out result);
+                    if (ProcessResult(out var result))
+                        return result;
+                    else
+                        return null;
                 }
             }
 
@@ -355,11 +344,11 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             }
         }
 
-        public struct CharDecoder : ITransformer<char, uint>
+        public struct CharDecoder : ITransformer<char, uint?>
         {
             char leadingSurrogate;
 
-            public bool TryProcess(char value, out uint result)
+            public uint? Process(char value)
             {
                 // Finished
                 if (leadingSurrogate == default(char))
@@ -368,9 +357,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     {
                         leadingSurrogate = value;
 
-                        result = default(uint);
-
-                        return false;
+                        return null;
                     }
                     else if (IsTrailingSurrogate(value))
                     {
@@ -378,18 +365,18 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     }
                     else
                     {
-                        result = ToUtf32(value);
+                        var result = ToUtf32(value);
 
-                        return true;
+                        return result;
                     }
                 }
                 else if (IsTrailingSurrogate(value))
                 {
-                    result = CombineSurrogates(leadingSurrogate, value);
+                    var result = CombineSurrogates(leadingSurrogate, value);
 
                     leadingSurrogate = default(char);
 
-                    return true;
+                    return result;
                 }
                 else
                 {
