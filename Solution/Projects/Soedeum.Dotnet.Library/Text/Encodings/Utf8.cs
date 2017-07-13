@@ -17,23 +17,34 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         // 2) 0000-0000 0000-yyyy yyxx-xxxx
         // 3) 0000-00zz zzzz-yyyy yyxx-xxxx
         // 4) 000u-uuzz zzzy-yyyy yyxx-xxxx
-        public const byte OneByteSequencePrefix = 0b0000_0000;
-        public const byte TwoByteSequencePrefix = 0b1100_0000;
-        public const byte ThreeByteSequencePrefix = 0b1110_0000;
-        public const byte FourByteSequencePrefix = 0b1111_0000;
+        public const byte OneUnitLeadingPrefix = 0b0000_0000;
+        public const byte TwoUnitLeadingPrefix = 0b1100_0000;
+        public const byte ThreeUnitLeadingPrefix = 0b1110_0000;
+        public const byte FourUnitLeadingPrefix = 0b1111_0000;
 
-        public const uint MaxOneByteSequence = 0x7F;
-        public const uint MaxTwoByteSequence = 0x7FF;
-        public const uint MaxThreeByteSequence = 0xFFFF;
-        public const uint MaxFourByteSequence = 0x10FFFF;
+        public const byte OneUnitLeadingMask = 0b0111_1111;
+        public const byte TwoUnitLeadingMask = 0b0001_1111;
+        public const byte ThreeUnitLeadingMask = 0b0000_1111;
+        public const byte FourUnitLeadingMask = 0b0000_0111;
+
+        public const uint OneUnitMaxCodePoint = 0x7F;
+        public const uint TwoUnitMaxCodePoint = 0x7FF;
+        public const uint ThreeUnitMaxCodePoint = 0xFFFF;
+        public const uint FourUnitMaxCodePoint = 0x10FFFF;
 
 
+        private const byte TrailingUnitPrefixMask = 0b1100_0000;
         public const byte TrailingUnitPrefix = 0b1000_0000;
+        public const byte TrailingUnitMask = 0b0011_1111;
 
-        private const int TrailingUnitOffset = 6;
+        private const int TrailingUnitSize = 6;
+
+        private const int TrailingUnitOffset0 = TrailingUnitSize * 0;
+        private const int TrailingUnitOffset1 = TrailingUnitSize * 1;
+        private const int TrailingUnitOffset2 = TrailingUnitSize * 2;
+        private const int TrailingUnitOffset3 = TrailingUnitSize * 3;
 
 
-        /* Header */
         static readonly int[] sequenceLengths = new int[32]{
             // 0xxxx = 1  Byte Sequence (0000-0..0111-1)
                 0, 0, 0, 0,
@@ -58,7 +69,10 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 -1
             };
 
-        static readonly uint[] masks = new uint[4] { 0b0111_1111, 0b0001_1111, 0b0000_1111, 0b0000_0111 };
+        static readonly uint[] masks = new uint[4] { OneUnitLeadingMask,
+                                                     TwoUnitLeadingMask,
+                                                     ThreeUnitLeadingMask,
+                                                     FourUnitLeadingMask };
 
         public static bool ProcessLeading(byte value, out uint result, out int bytesRemaining)
         {
@@ -79,18 +93,13 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             return bytesRemaining == 0;
         }
 
-        /* Trailing */
-        private const byte TrailingHeaderMask = 0b1100_0000;
-
-        private const byte TrailingMask = 0b0011_1111;
-
         public static bool ProcessTrailing(byte value, ref uint result, ref int bytesRemaining)
         {
             // Prefix MUST be 0b10xx_xxxx
-            if ((value & TrailingHeaderMask) != TrailingUnitPrefix)
+            if ((value & TrailingUnitPrefixMask) != TrailingUnitPrefix)
                 throw InvalidCodeUnitSequence(value);
 
-            uint bits = (uint)(value & TrailingMask);
+            uint bits = (uint)(value & TrailingUnitMask);
 
             // Bits cannot be 0 (Utf8 must be encoded in smallest possible form)
             // if (bits == 0)
@@ -101,7 +110,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             // }
 
             // shift old bits down
-            result <<= TrailingUnitOffset;
+            result <<= TrailingUnitSize;
 
             result |= bits;
 
@@ -113,14 +122,16 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         private static Exception CodePointNotSmallestSequence(byte value)
         {
             string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
-            return new InvalidCodePointException(string.Format(message, value.ToString()));
+
+            return new CodePointException(string.Format(message, value.ToString()));
         }
 
         private static Exception InvalidCodeUnitSequence(byte value)
         {
             string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
-            return new InvalidCodePointException(string.Format(message, value.ToString()));
+            return new CodePointException(string.Format(message, value.ToString()));
         }
+
 
 
         public struct Encoder : ITransformer<uint, BitTwiddler>
@@ -131,26 +142,46 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             // 2) U+0080  to U+07FF                     -> [0] 110y-yyyy; [1]: 10xx-xxxx
             // 3) U+0800  to U+D7FF, U+E000 to U+FFFF   -> [0] 1110-zzzz; [1]: 10yy-yyyy; [2]: 10xx-xxxx
             // 4) U+10000 to U+10FFFF                   -> [0] 1111-0uuu; [1]: 10zz-zzzz; [2]: 10yy-yyyy; [3]: 10xx-xxxx
+            // Converted
+            // 1) 0000-0000 0000-0000 0xxx-xxxx
+            // 2) 0000-0000 0000-0yyy yyxx-xxxx
+            // 3) 0000-0000 zzzz-yyyy yyxx-xxxx
+            // 4) 000u-uuzz zzzz-yyyy yyxx-xxxx
             public static BitTwiddler Encode(uint value)
             {
-                if (value <= MaxOneByteSequence)
+                if (value <= OneUnitMaxCodePoint)
                 {
-                    return BitTwiddler.FromByte((byte)value);
-                }
-                else if (value <= MaxTwoByteSequence)
-                {
-                    byte byte0 = (byte)((value >> 8) | TrailingUnitPrefix);
-                    byte byte1 = (byte)((value >> 8) | TrailingUnitPrefix); ;
+                    uint unit0 = value;
 
-                    return BitTwiddler.FromBytes(byte0, byte1);
+                    return BitTwiddler.FromByte((byte)unit0);
                 }
-                else if (value < MaxThreeByteSequence)
+                else if (value <= TwoUnitMaxCodePoint)
                 {
+                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit1 = ((value >> TrailingUnitOffset1) & TwoUnitLeadingMask) | TwoUnitLeadingPrefix;
 
+                    return BitTwiddler.FromBytes((byte)unit0, (byte)unit1);
                 }
-                else 
+                else if (value <= ThreeUnitMaxCodePoint)
                 {
+                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit1 = ((value >> TrailingUnitOffset1) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit2 = ((value >> TrailingUnitOffset2) & ThreeUnitLeadingMask) | ThreeUnitLeadingPrefix;
 
+                    return BitTwiddler.FromBytes((byte)unit0, (byte)unit1, (byte)unit2);
+                }
+                else if (value <= FourUnitMaxCodePoint)
+                {
+                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit1 = ((value >> TrailingUnitOffset1) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit2 = ((value >> TrailingUnitOffset2) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit3 = ((value >> TrailingUnitOffset3) & FourUnitLeadingMask) | FourUnitLeadingPrefix; ;
+
+                    return BitTwiddler.FromBytes((byte)unit0, (byte)unit1, (byte)unit2, (byte)unit3);
+                }
+                else
+                {
+                    throw new CodePointException(Utf32.CodePointOutOfRangeMessage((int)value));
                 }
             }
         }
@@ -165,10 +196,10 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
                 int bytesRemaining;
 
-                int i = 0;
+                int i = value.ByteCount - 1;
 
-                if (!ProcessLeading(value.GetByte(i++), out result, out bytesRemaining))
-                    while (!ProcessTrailing(value.GetByte(i++), ref result, ref bytesRemaining)) ;
+                if (!ProcessLeading(value.GetByte(i--), out result, out bytesRemaining))
+                    while (!ProcessTrailing(value.GetByte(i--), ref result, ref bytesRemaining)) ;
 
                 return result;
             }

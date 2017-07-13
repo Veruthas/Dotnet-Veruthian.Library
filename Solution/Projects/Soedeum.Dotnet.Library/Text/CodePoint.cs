@@ -213,12 +213,12 @@ namespace Soedeum.Dotnet.Library.Text
 
             var decoder = new Utf32.ByteDecoder(endianness);
 
-            decoder.TryProcess(value[index++], out var result);
-            decoder.TryProcess(value[index++], out result);
-            decoder.TryProcess(value[index++], out result);
-            decoder.TryProcess(value[index++], out result);
+            decoder.Process(value[index++]);
+            decoder.Process(value[index++]);
+            decoder.Process(value[index++]);
+            var result = decoder.Process(value[index++]);
 
-            return new CodePoint(result);
+            return new CodePoint(result.GetValueOrDefault());
         }
 
 
@@ -311,12 +311,12 @@ namespace Soedeum.Dotnet.Library.Text
     }
 
 
-    public class InvalidCodePointException : System.Exception
+    public class CodePointException : System.Exception
     {
-        public InvalidCodePointException() { }
+        public CodePointException() { }
 
-        public InvalidCodePointException(string message) : base(message) { }
+        public CodePointException(string message) : base(message) { }
 
-        public InvalidCodePointException(string message, System.Exception inner) : base(message, inner) { }
+        public CodePointException(string message, System.Exception inner) : base(message, inner) { }
     }
 }

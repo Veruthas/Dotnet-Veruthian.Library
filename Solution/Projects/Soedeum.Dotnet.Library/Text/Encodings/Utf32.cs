@@ -58,9 +58,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         #region Errors
 
-        private static InvalidCodePointException CodePointOutOfRange(int value)
+        private static CodePointException CodePointOutOfRange(int value)
         {
-            return new InvalidCodePointException(CodePointOutOfRangeMessage(value));
+            return new CodePointException(CodePointOutOfRangeMessage(value));
         }
 
         public static string CodePointOutOfRangeMessage(int value)
@@ -69,9 +69,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         }
 
 
-        private static InvalidCodePointException InvalidCodePoint(uint value)
+        private static CodePointException InvalidCodePoint(uint value)
         {
-            return new InvalidCodePointException(InvalidCodePointMessage(value));
+            return new CodePointException(InvalidCodePointMessage(value));
         }
 
         public static string InvalidCodePointMessage(uint value)

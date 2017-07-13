@@ -138,9 +138,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         #region Errors
 
-        private static InvalidCodePointException InvalidLeadingSurrogate(ushort value)
+        private static CodePointException InvalidLeadingSurrogate(ushort value)
         {
-            return new InvalidCodePointException(InvalidLeadingSurrogateMessage(value));
+            return new CodePointException(InvalidLeadingSurrogateMessage(value));
         }
 
         public static string InvalidLeadingSurrogateMessage(ushort value)
@@ -149,9 +149,9 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
         }
 
 
-        private static InvalidCodePointException InvalidTrailingSurrogate(ushort value)
+        private static CodePointException InvalidTrailingSurrogate(ushort value)
         {
-            return new InvalidCodePointException(InvalidTrailingSurrogateMessage(value));
+            return new CodePointException(InvalidTrailingSurrogateMessage(value));
         }
 
         public static string InvalidTrailingSurrogateMessage(ushort value)
@@ -171,9 +171,20 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
         }
 
-        private static InvalidCodePointException InvalidCharacter(ushort value)
+        private static InvalidCastException MissingTrailingSurrogate()
         {
-            return new InvalidCodePointException(InvalidCharacterMessage(value));
+            throw new InvalidCastException(MissingTrailingSurrogateMessage());
+        }
+
+        public static string MissingTrailingSurrogateMessage()
+        {
+            return string.Format("Missing trailing surrogate.");
+        }
+
+
+        private static CodePointException InvalidCharacter(ushort value)
+        {
+            return new CodePointException(InvalidCharacterMessage(value));
         }
 
         public static string InvalidCharacterMessage(ushort value)
@@ -239,7 +250,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                     if (IsTrailingSurrogate(trailing))
                         return CombineSurrogates(leading, trailing);
                     else
-                        throw new InvalidCodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
+                        throw new CodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
                 }
                 else
                 {

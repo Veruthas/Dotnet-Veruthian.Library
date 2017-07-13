@@ -10,20 +10,20 @@ namespace Soedeum.Dotnet.Library.Text
     {
         // Decode to CodePoint
         public static IEnumerator<CodePoint> DecodeValues<T, TDecoder>(IEnumerator<T> items, TDecoder decoder, string onIncomplete)
-            where TDecoder : ITransformer<T, uint>
+            where TDecoder : ITransformer<T, uint?>
         {
-            bool result = true;
+            uint? result = 0;
 
             while (items.MoveNext())
             {
-                result = decoder.TryProcess(items.Current, out var codepoint);
+                result = decoder.Process(items.Current);
 
-                if (result)
-                    yield return codepoint;
+                if (result != null)
+                    yield return result.GetValueOrDefault();
             }
 
-            if (!result)
-                throw new InvalidCodePointException(onIncomplete);
+            if (result == null)
+                throw new CodePointException(onIncomplete);
         }
 
         // Utf8 -> CodePoint
@@ -71,7 +71,7 @@ namespace Soedeum.Dotnet.Library.Text
         {
             var decoder = new Utf16.CharDecoder();
 
-            return DecodeValues(chars, decoder, "Missing trailing surrogate.");
+            return DecodeValues(chars, decoder, Utf16.MissingTrailingSurrogateMessage());
         }
 
         public static EnumerableAdapter<CodePoint> ToCodePoints(this IEnumerable<char> chars)
@@ -120,16 +120,15 @@ namespace Soedeum.Dotnet.Library.Text
 
             for (int i = start; i < amount; i++)
             {
-                result = decoder.TryProcess(value[i], out var codepoint);
+                var codepoint = decoder.Process(value[i]);
 
-                if (result)
-                    codepoints[index++] = codepoint;
+                if (codepoint != null)
+                    codepoints[index++] = codepoint.GetValueOrDefault();
             }
 
 
-            // Hack? If missing trailing surrogate, error
             if (!result)
-                decoder.TryProcess('\0', out var codepoint);
+                throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
 
 
             if (index < codepoints.Length)
