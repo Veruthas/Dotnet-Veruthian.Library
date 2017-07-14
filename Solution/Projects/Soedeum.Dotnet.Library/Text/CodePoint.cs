@@ -192,7 +192,30 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePoint FromUtf16(byte[] value, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf16(value, ref index, endianness);
 
-        public static CodePoint FromUtf16(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian) => throw new NotImplementedException();
+        public static CodePoint FromUtf16(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            var decoder = new Utf16.ByteDecoder(endianness);
+
+            if (index + 2 > value.Length)
+                throw new ArgumentOutOfRangeException("index", "Need at least 2 bytes to process Utf16");
+
+            decoder.Process(value[index++]);
+            var result = decoder.Process(value[index++]);
+
+            if (result == null)
+            {
+                if (index + 2 > value.Length)
+                    throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process Utf16 surrogate pair");
+
+                decoder.Process(value[index++]);
+                result = decoder.Process(value[index++]);
+
+                if (result == null)
+                    throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
+            }
+
+            return result.GetValueOrDefault();
+        }
 
 
         // Utf32
@@ -212,7 +235,7 @@ namespace Soedeum.Dotnet.Library.Text
         public static CodePoint FromUtf32(byte[] value, ref int index, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             if (index + 4 > value.Length)
-                throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process to Utf32");
+                throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process Utf32");
 
             var decoder = new Utf32.ByteDecoder(endianness);
 

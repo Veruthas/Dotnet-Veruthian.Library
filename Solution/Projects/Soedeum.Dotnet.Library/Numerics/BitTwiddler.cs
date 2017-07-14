@@ -159,6 +159,8 @@ namespace Soedeum.Dotnet.Library.Numerics
                 this.bitCount = bitCount;
             }
         }
+        // Bits        
+
 
         // Bytes        
         public static implicit operator BitTwiddler(byte value) => FromByte(value);
@@ -260,7 +262,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             if (index < 0 || index > bytes.Length)
                 throw new ArgumentOutOfRangeException("index");
-            if (index + length > bytes.Length)
+            if (length < 0 || index + length > bytes.Length)
                 throw new ArgumentOutOfRangeException("length");
 
             int byteCount = Math.Min(length, MaxByteCount);
@@ -272,6 +274,29 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             return result;
         }
+
+        public static BitTwiddler FromBytes(IEnumerable<byte> bytes, int length) => FromBytes(bytes.GetEnumerator(), length);
+
+
+        public static BitTwiddler FromBytes(IEnumerator<byte> bytes, int length)
+        {
+            if (length < 0)
+                throw new ArgumentOutOfRangeException("length");
+
+            int byteCount = Math.Min(length, MaxByteCount);
+
+            var result = BitTwiddler.WithByteCount(byteCount);
+
+            for (int i = 0; i < byteCount; i++)
+            {
+                bytes.MoveNext();
+
+                result = result.SetByte(bytes.Current);
+            }
+
+            return result;
+        }
+
 
         // Sbyte
         public static implicit operator BitTwiddler(sbyte value) => FromByte(value);
@@ -315,7 +340,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         {
             if (index < 0 || index > bytes.Length)
                 throw new ArgumentOutOfRangeException("index");
-            if (index + length > bytes.Length)
+            if (length < 0 || index + length > bytes.Length)
                 throw new ArgumentOutOfRangeException("length");
 
             int byteCount = Math.Min(length, MaxByteCount);
@@ -324,6 +349,25 @@ namespace Soedeum.Dotnet.Library.Numerics
 
             for (int i = 0; i < byteCount; i++)
                 result = result.SetSignedByte(bytes[i], i);
+
+            return result;
+        }
+
+        public static BitTwiddler FromBytes(IEnumerable<sbyte> bytes, int length) => FromBytes(bytes.GetEnumerator(), length);
+
+
+        public static BitTwiddler FromBytes(IEnumerator<sbyte> bytes, int length)
+        {
+            int byteCount = CorrectByteCount(length);
+
+            var result = BitTwiddler.WithByteCount(byteCount);
+
+            for (int i = 0; i < byteCount; i++)
+            {
+                bytes.MoveNext();
+
+                result = result.SetSignedByte(bytes.Current);
+            }
 
             return result;
         }
@@ -481,6 +525,17 @@ namespace Soedeum.Dotnet.Library.Numerics
         /* Counts */
         #region Counts
 
+        private static int CorrectBitCount(int bitCount) => (bitCount < 0) ? 0 : (bitCount > MaxBitCount) ? MaxBitCount : bitCount;
+
+        private static int CorrectNibbleCount(int nibbleCount) => (nibbleCount < 0) ? 0 : (nibbleCount > MaxByteCount) ? MaxByteCount : nibbleCount;
+
+        private static int CorrectByteCount(int byteCount) => (byteCount < 0) ? 0 : (byteCount > MaxByteCount) ? MaxByteCount : byteCount;
+
+        private static int CorrectShortCount(int shortCount) => (shortCount < 0) ? 0 : (shortCount > MaxByteCount) ? MaxByteCount : shortCount;
+
+        private static int CorrectIntCount(int intCount) => (intCount < 0) ? 0 : (intCount > MaxByteCount) ? MaxByteCount : intCount;
+
+
         public int RegionCount(int bitsPerRegion) => (bitCount + bitsPerRegion - 1) / bitsPerRegion;
 
         public int BitCount => bitCount;
@@ -496,7 +551,7 @@ namespace Soedeum.Dotnet.Library.Numerics
         public int IntCount => (bitCount + BitsPerInt - 1) / BitsPerInt;
 
 
-        public BitTwiddler ChangeBitCount(int bitCount) => new BitTwiddler(this.value, Math.Min(bitCount, MaxBitCount));
+        public BitTwiddler ChangeBitCount(int bitCount) => new BitTwiddler(this.value, CorrectBitCount(bitCount));
 
         public BitTwiddler ChangeNibbleCount(int nibbleCount) => ChangeBitCount(nibbleCount * BitsPerNibble);
 
