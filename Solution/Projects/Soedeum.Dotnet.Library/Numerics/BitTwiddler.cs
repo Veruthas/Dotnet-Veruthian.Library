@@ -254,6 +254,25 @@ namespace Soedeum.Dotnet.Library.Numerics
             return new BitTwiddler(value, length);
         }
 
+        public static BitTwiddler FromBytes(byte[] bytes) => FromBytes(bytes, 0, bytes.Length);
+
+        public static BitTwiddler FromBytes(byte[] bytes, int index, int length)
+        {
+            if (index < 0 || index > bytes.Length)
+                throw new ArgumentOutOfRangeException("index");
+            if (index + length > bytes.Length)
+                throw new ArgumentOutOfRangeException("length");
+
+            int byteCount = Math.Min(length, MaxByteCount);
+
+            var result = BitTwiddler.WithByteCount(byteCount);
+
+            for (int i = 0; i < byteCount; i++)
+                result = result.SetByte(bytes[i], i);
+
+            return result;
+        }
+
         // Sbyte
         public static implicit operator BitTwiddler(sbyte value) => FromByte(value);
 
@@ -290,6 +309,24 @@ namespace Soedeum.Dotnet.Library.Numerics
             return FromBytes((byte)value0, (byte)value1, (byte)value2, (byte)value3, (byte)value4, (byte)value5, (byte)value6, (byte)value7);
         }
 
+        public static BitTwiddler FromBytes(sbyte[] bytes) => FromBytes(bytes, 0, bytes.Length);
+
+        public static BitTwiddler FromBytes(sbyte[] bytes, int index, int length)
+        {
+            if (index < 0 || index > bytes.Length)
+                throw new ArgumentOutOfRangeException("index");
+            if (index + length > bytes.Length)
+                throw new ArgumentOutOfRangeException("length");
+
+            int byteCount = Math.Min(length, MaxByteCount);
+
+            var result = BitTwiddler.WithByteCount(byteCount);
+
+            for (int i = 0; i < byteCount; i++)
+                result = result.SetSignedByte(bytes[i], i);
+
+            return result;
+        }
 
         // UShort
         public static implicit operator BitTwiddler(ushort value) => FromShort(value);
@@ -353,7 +390,7 @@ namespace Soedeum.Dotnet.Library.Numerics
 
         // Char
         public static implicit operator BitTwiddler(char value) => FromChar(value);
-        
+
         public static BitTwiddler FromChar(char value)
         {
             return FromShort((ushort)value);
@@ -423,6 +460,21 @@ namespace Soedeum.Dotnet.Library.Numerics
             return FromLong((ulong)value);
         }
 
+
+        // Count
+        public static BitTwiddler WithBitCount(int bitCount) => new BitTwiddler().ChangeBitCount(bitCount);
+
+        public static BitTwiddler WithNibbleCount(int nibbleCount) => new BitTwiddler().ChangeNibbleCount(nibbleCount);
+
+        public static BitTwiddler WithByteCount(int byteCount) => new BitTwiddler().ChangeByteCount(byteCount);
+
+        public static BitTwiddler WithShortCount(int shortCount) => new BitTwiddler().ChangeShortCount(shortCount);
+
+        public static BitTwiddler WithCharCount(int charCount) => new BitTwiddler().ChangeCharCount(charCount);
+
+        public static BitTwiddler WithIntCount(int intCount) => new BitTwiddler().ChangeIntCount(intCount);
+
+
         #endregion
 
 
@@ -451,6 +503,8 @@ namespace Soedeum.Dotnet.Library.Numerics
         public BitTwiddler ChangeByteCount(int byteCount) => ChangeBitCount(byteCount * BitsPerByte);
 
         public BitTwiddler ChangeShortCount(int shortCount) => ChangeBitCount(shortCount * BitsPerShort);
+
+        public BitTwiddler ChangeCharCount(int charCount) => ChangeBitCount(charCount * BitsPerShort);
 
         public BitTwiddler ChangeIntCount(int intCount) => ChangeBitCount(intCount * BitsPerInt);
 

@@ -157,25 +157,25 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
                 }
                 else if (value <= TwoUnitMaxCodePoint)
                 {
-                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
-                    uint unit1 = ((value >> TrailingUnitOffset1) & TwoUnitLeadingMask) | TwoUnitLeadingPrefix;
+                    uint unit0 = ((value >> TrailingUnitOffset1) & TwoUnitLeadingMask) | TwoUnitLeadingPrefix;
+                    uint unit1 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
 
                     return BitTwiddler.FromBytes((byte)unit0, (byte)unit1);
                 }
                 else if (value <= ThreeUnitMaxCodePoint)
                 {
-                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit0 = ((value >> TrailingUnitOffset2) & ThreeUnitLeadingMask) | ThreeUnitLeadingPrefix;
                     uint unit1 = ((value >> TrailingUnitOffset1) & TrailingUnitMask) | TrailingUnitPrefix;
-                    uint unit2 = ((value >> TrailingUnitOffset2) & ThreeUnitLeadingMask) | ThreeUnitLeadingPrefix;
+                    uint unit2 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
 
                     return BitTwiddler.FromBytes((byte)unit0, (byte)unit1, (byte)unit2);
                 }
                 else if (value <= FourUnitMaxCodePoint)
                 {
-                    uint unit0 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
-                    uint unit1 = ((value >> TrailingUnitOffset1) & TrailingUnitMask) | TrailingUnitPrefix;
-                    uint unit2 = ((value >> TrailingUnitOffset2) & TrailingUnitMask) | TrailingUnitPrefix;
-                    uint unit3 = ((value >> TrailingUnitOffset3) & FourUnitLeadingMask) | FourUnitLeadingPrefix; ;
+                    uint unit0 = ((value >> TrailingUnitOffset3) & FourUnitLeadingMask) | FourUnitLeadingPrefix;
+                    uint unit1 = ((value >> TrailingUnitOffset2) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit2 = ((value >> TrailingUnitOffset1) & TrailingUnitMask) | TrailingUnitPrefix;
+                    uint unit3 = ((value >> TrailingUnitOffset0) & TrailingUnitMask) | TrailingUnitPrefix;
 
                     return BitTwiddler.FromBytes((byte)unit0, (byte)unit1, (byte)unit2, (byte)unit3);
                 }
@@ -196,10 +196,10 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
 
                 int bytesRemaining;
 
-                int i = value.ByteCount - 1;
+                int i = 0;
 
-                if (!ProcessLeading(value.GetByte(i--), out result, out bytesRemaining))
-                    while (!ProcessTrailing(value.GetByte(i--), ref result, ref bytesRemaining)) ;
+                if (!ProcessLeading(value.GetByte(i++), out result, out bytesRemaining))
+                    while (!ProcessTrailing(value.GetByte(i++), ref result, ref bytesRemaining)) ;
 
                 return result;
             }
