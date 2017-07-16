@@ -2,16 +2,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Soedeum.Dotnet.Library.Text.Char
+namespace Soedeum.Dotnet.Library.Text
 {
     public static class CharUtility
     {
-        // Char Extensions
-        public static bool IsIn(this char value, CharSet set)
-        {
-            return set.Contains(value);
-        }
-
         // Enumerators
         public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
         {

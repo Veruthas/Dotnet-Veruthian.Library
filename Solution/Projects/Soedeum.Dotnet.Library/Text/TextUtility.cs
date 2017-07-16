@@ -144,5 +144,33 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         public static bool IsNullOrEmpty(this CodeString value) => CodeString.IsNullOrEmpty(value);
+
+
+
+        // CodeString
+        public static CodeString ToCodeString(this IEnumerable<CodePoint> codepoints)
+        {
+            return new CodeString(codepoints);
+        }
+
+        public static CodeString ToCodeString(this IEnumerable<char> chars)
+        {
+            return new CodeString(ToCodePoints(chars));
+        }
+
+        public static CodeString ToCodeString(this string value)
+        {
+            return new CodeString(ToCodePoints(value));
+        }
+
+        public static CodeString ToCodeString(this string value, int start)
+        {
+            return new CodeString(ToCodePoints(value, start));
+        }
+
+        public static CodeString ToCodeString(this string value, int start, int amount)
+        {
+            return new CodeString(ToCodePoints(value, start, amount));
+        }
     }
 }
