@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Text;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public interface IToken<TType>
     {
@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         TextLocation Location { get; }
 
-        string Value { get; }
+        CodeString Value { get; }
 
         TType Type { get; }
 

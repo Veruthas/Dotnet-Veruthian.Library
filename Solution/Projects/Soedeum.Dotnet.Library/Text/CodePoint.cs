@@ -381,7 +381,8 @@ namespace Soedeum.Dotnet.Library.Text
 
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
-
+        public CodeString ToCodeString() => new CodeString(this);
+        
         #endregion
 
 

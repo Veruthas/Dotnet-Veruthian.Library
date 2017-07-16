@@ -24,6 +24,9 @@ namespace Soedeum.Dotnet.Library.Text
                 this.codepoints = codepoints;
         }
 
+        public CodeString(CodePoint codepoint)
+            : this(new[] { codepoint }, false) { }
+
         public CodeString(params CodePoint[] codepoints)
             : this(codepoints, true) { }
 

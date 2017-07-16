@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Text;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public class Token<TType> : IToken<TType>
     {
@@ -10,12 +10,12 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         TextLocation location;
 
-        string value;
+        CodeString value;
 
         TType type;
 
 
-        public Token(string source, TextLocation location, string value, TType type)
+        public Token(string source, TextLocation location, CodeString value, TType type)
         {
             this.source = source;
 
@@ -30,7 +30,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         public TextLocation Location => location;
 
-        public string Value => value;
+        public CodeString Value => value;
 
         public TType Type => type;
 
