@@ -77,7 +77,7 @@ namespace Soedeum.Dotnet.Library.Text
         // HashCode
         public override int GetHashCode()
         {
-            return HashCodeCreator.Combiner.Combine(Position, Line, Column);
+            return HashCodes.Default.Combine(Position, Line, Column);
         }
 
         // Equals

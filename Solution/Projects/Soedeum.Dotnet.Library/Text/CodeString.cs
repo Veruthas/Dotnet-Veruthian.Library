@@ -16,7 +16,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         private CodeString(CodePoint[] codepoints, bool clone)
         {
-            this.hashcode = HashCodeCreator.Combiner.Combine(codepoints);
+            this.hashcode = HashCodes.Default.Combine(codepoints);
 
             if (clone)
                 this.codepoints = (CodePoint[])codepoints.Clone();
