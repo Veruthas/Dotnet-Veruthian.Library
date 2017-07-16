@@ -259,7 +259,7 @@ namespace Soedeum.Dotnet.Library.Text.Encodings
             }
 
 
-            public static CodePoint Decode(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
+            public static uint Decode(BitTwiddler value, ByteOrder endianness = ByteOrder.LittleEndian)
             {
                 return Decode(value, endianness == ByteOrder.BigEndian);
             }

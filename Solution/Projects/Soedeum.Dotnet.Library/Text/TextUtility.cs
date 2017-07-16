@@ -19,7 +19,7 @@ namespace Soedeum.Dotnet.Library.Text
                 result = decoder.Process(items.Current);
 
                 if (result != null)
-                    yield return result.GetValueOrDefault();
+                    yield return (CodePoint)result.GetValueOrDefault();
             }
 
             if (result == null)
@@ -120,10 +120,10 @@ namespace Soedeum.Dotnet.Library.Text
 
             for (int i = start; i < amount; i++)
             {
-                var codepoint = decoder.Process(value[i]);
+                var utf32 = decoder.Process(value[i]);
 
-                if (codepoint != null)
-                    codepoints[index++] = codepoint.GetValueOrDefault();
+                if (utf32 != null)
+                    codepoints[index++] = (CodePoint)utf32.GetValueOrDefault();
             }
 
 

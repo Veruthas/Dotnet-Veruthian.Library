@@ -131,7 +131,7 @@ namespace Soedeum.Dotnet.Library.Text
         #region Constructors        
 
         // Utf8
-        public static CodePoint FromUtf8(BitTwiddler bits) => Utf8.Decoder.Decode(bits);
+        public static CodePoint FromUtf8(BitTwiddler bits) => new CodePoint(Utf8.Decoder.Decode(bits));
 
         public static CodePoint FromUtf8(byte[] value, int index = 0) => FromUtf8(value, ref index);
 
@@ -142,19 +142,19 @@ namespace Soedeum.Dotnet.Library.Text
 
             var leading = value[index++];
 
-            if (!Utf8.ProcessLeading(leading, out var result, out var bytesRemaining))            
-                while (Utf8.ProcessTrailing(leading, ref result, ref bytesRemaining));
+            if (!Utf8.ProcessLeading(leading, out var result, out var bytesRemaining))
+                while (Utf8.ProcessTrailing(leading, ref result, ref bytesRemaining)) ;
 
-            return result;
+            return new CodePoint(result);
         }
 
 
         // Utf16        
         public static implicit operator CodePoint(char value) => FromUtf16(value);
 
-        public static implicit operator CodePoint(short value) => FromUtf16(value);
+        public static explicit operator CodePoint(short value) => FromUtf16(value);
 
-        public static implicit operator CodePoint(ushort value) => FromUtf16(value);
+        public static explicit operator CodePoint(ushort value) => FromUtf16(value);
 
 
         public static CodePoint FromUtf16(short value) => FromUtf16((ushort)value);
@@ -169,7 +169,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
-        public static CodePoint FromUtf16(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => Utf16.Decoder.Decode(bits, endianness);
+        public static CodePoint FromUtf16(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => new CodePoint(Utf16.Decoder.Decode(bits, endianness));
 
 
         public static CodePoint FromUtf16(char leadingSurrogate, char trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
@@ -205,7 +205,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                return value;
+                return new CodePoint(value);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                return value;
+                return new CodePoint(value);
             }
         }
 
@@ -284,21 +284,24 @@ namespace Soedeum.Dotnet.Library.Text
                     throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
             }
 
-            return result.GetValueOrDefault();
+            return new CodePoint(result.GetValueOrDefault());
         }
 
 
         // Utf32
-        public static implicit operator CodePoint(int value) => FromUtf32(value);
+        public static explicit operator CodePoint(int value) => FromUtf32(value);
 
-        public static implicit operator CodePoint(uint value) => FromUtf32(value);
+        public static explicit operator CodePoint(uint value) => FromUtf32(value);
+        
+        public static explicit operator CodePoint(long value) => FromUtf32(value);
 
+        public static explicit operator CodePoint(ulong value) => FromUtf32(value);
 
         public static CodePoint FromUtf32(int value) => new CodePoint(value);
 
         public static CodePoint FromUtf32(uint value) => new CodePoint(value);
 
-        public static CodePoint FromUtf32(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Decoder.Decode(bits, endianness);
+        public static CodePoint FromUtf32(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => new CodePoint(Utf32.Decoder.Decode(bits, endianness));
 
         public static CodePoint FromUtf32(byte[] array, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf32(array, ref index, endianness);
 
@@ -382,7 +385,7 @@ namespace Soedeum.Dotnet.Library.Text
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
         public CodeString ToCodeString() => new CodeString(this);
-        
+
         #endregion
 
 

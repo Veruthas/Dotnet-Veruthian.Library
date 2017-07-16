@@ -18,7 +18,7 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeRange(CodePoint value)
         {
             low = high = value;
-            
+
             total = (((uint)value) << 32) | ((uint)value);
         }
 
@@ -68,6 +68,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public int CompareTo(CodeRange other) => this.total.CompareTo(other.total);
 
+        
         public static bool operator <(CodeRange left, CodeRange right) => left.total < right.total;
 
         public static bool operator >(CodeRange left, CodeRange right) => left.total > right.total;
@@ -106,11 +107,9 @@ namespace Soedeum.Dotnet.Library.Text
         // Enumerator
         public IEnumerator<CodePoint> GetEnumerator()
         {
-            var lowest = low;
-            var highest = high;
-            var current = lowest;
+            var current = low;
 
-            while (current <= highest)
+            while (current <= high)
             {
                 yield return current;
                 current++;
@@ -133,7 +132,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static int Find(CodeRange[] sortedSet, CodePoint value)
         {
             int low = 0;
+
             int high = sortedSet.Length - 1;
+
 
             while (low <= high)
             {
@@ -204,10 +205,10 @@ namespace Soedeum.Dotnet.Library.Text
         {
             SortedSet<CodePoint> sortedChars = new SortedSet<CodePoint>(points);
 
-            return FromSet(sortedChars);
+            return FromOrderedSet(sortedChars);
         }
 
-        public static CodeRange[] FromSet(IEnumerable<CodePoint> points)
+        public static CodeRange[] FromOrderedSet(IEnumerable<CodePoint> points)
         {
             // Compress ranges
             List<CodeRange> ranges = new List<CodeRange>();
@@ -216,12 +217,12 @@ namespace Soedeum.Dotnet.Library.Text
             bool started = false;
 
 
-            int low = -1;
+            CodePoint low = default(CodePoint);
 
-            int high = -1;
+            CodePoint high = default(CodePoint);
 
 
-            foreach (char value in points)
+            foreach (var value in points)
             {
                 if (!started)
                 {
@@ -246,14 +247,14 @@ namespace Soedeum.Dotnet.Library.Text
             }
 
             // No chars in list
-            if (low == -1)
+            if (!started)
             {
                 return new CodeRange[] { };
             }
             else
             {
-                // Add range for remaining char(s)
-                var range = new CodeRange((char)low, (char)high);
+                // Add range for remaining points(s)
+                var range = new CodeRange(low, high);
 
                 ranges.Add(range);
 
@@ -304,7 +305,17 @@ namespace Soedeum.Dotnet.Library.Text
             return complement;
         }
 
-        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges)
+        public static CodeRange[] Complement(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
+        {
+            var orderedSet = Reduce(ranges);
+
+            var complement = ComplementOrderedSet(orderedSet, min, max);
+
+            return complement;
+        }
+        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges) => ComplementOrderedSet(ranges, CodePoint.MinValue, CodePoint.MaxValue);
+
+        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
         {
             // Complement just creates ranges that exclude the ranges in the set
             // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
@@ -316,9 +327,9 @@ namespace Soedeum.Dotnet.Library.Text
 
             foreach (var range in ranges)
             {
-                if (range.Low != char.MinValue)
+                if (range.Low != min)
                 {
-                    var newRange = new CodeRange((char)(low + 1), (char)(range.Low - 1));
+                    var newRange = new CodeRange((CodePoint)(low + 1), range.Low - 1);
 
                     complement.Add(newRange);
                 }
@@ -326,9 +337,9 @@ namespace Soedeum.Dotnet.Library.Text
                 low = range.High;
             }
 
-            if (low != char.MaxValue)
+            if (low != max)
             {
-                var newRange = new CodeRange((char)(low + 1), char.MaxValue);
+                var newRange = new CodeRange((CodePoint)(low + 1), max);
 
                 complement.Add(newRange);
             }
@@ -336,7 +347,6 @@ namespace Soedeum.Dotnet.Library.Text
 
             return complement.ToArray();
         }
-
 
         // Combine
         public static bool Combine(CodeRange a, CodeRange b, out CodeRange union)
@@ -467,7 +477,7 @@ namespace Soedeum.Dotnet.Library.Text
                 before = (a.low == b.low) ? SplitResult.Neither : new SplitResult(a.low, b.low - 1, SplitResultSet.A);
 
                 // INTERSECTION -> AB => (b.l to MIN(a.h, b.h))     
-                int ab_high = Math.Min(a.high, b.high);
+                CodePoint ab_high = (CodePoint)Math.Min(a.high, b.high);
 
                 intersection = new SplitResult(b.low, ab_high, SplitResultSet.AB);
 

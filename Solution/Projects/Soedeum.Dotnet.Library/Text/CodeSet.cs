@@ -7,7 +7,7 @@ using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-public class CodeSet : IEquatable<CodeSet>, IEnumerable<CodePoint>
+public class CodeSet : IEquatable<CodeSet>
     {
         readonly CodeRange[] ranges;
 
@@ -105,10 +105,6 @@ public class CodeSet : IEquatable<CodeSet>, IEnumerable<CodePoint>
 
         #region IEnumerable
 
-        public IEnumerator<CodePoint> GetEnumerator() => GetCharEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         private IEnumerator<CodeRange> GetRangeEnumerator()
         {
 
@@ -128,7 +124,7 @@ public class CodeSet : IEquatable<CodeSet>, IEnumerable<CodePoint>
             }
         }
 
-        public IEnumerable<CodePoint> Chars => new EnumeratorGenerator<CodePoint>(GetCharEnumerator);
+        public IEnumerable<CodePoint> CodePoints => new EnumeratorGenerator<CodePoint>(GetCharEnumerator);
 
         public IEnumerable<CodeRange> Ranges => new EnumeratorGenerator<CodeRange>(GetRangeEnumerator);
 
@@ -223,6 +219,28 @@ public class CodeSet : IEquatable<CodeSet>, IEnumerable<CodePoint>
 
             return new CodeSet(ranges);
         }
+
+
+        // Subtraction
+        public static CodeSet Remove(CodeSet source, CodeSet removing)
+        {
+            // For each range in source, remove range in value;
+            var sourceRanges = source.ranges;
+
+            var removingRanges = removing.ranges;
+
+            for (int r = 0; r < removingRanges.Length; r++)
+            {
+                for (int s = 0; s < sourceRanges.Length; s++)
+                {
+                    
+                }
+            }
+
+            return source;
+        }
+
+        public static CodeSet operator -(CodeSet left, CodeSet right) => Remove(left, right);
 
         #endregion
 
