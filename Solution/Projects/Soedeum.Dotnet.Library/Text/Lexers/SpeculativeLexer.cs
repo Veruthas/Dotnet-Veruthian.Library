@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Text;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
-    public abstract class SpeculativeLexer<TToken, TType> : Lexer<TToken, TType, ISpeculativeReader<char>>
+    public abstract class SpeculativeLexer<TToken, TType> : Lexer<TToken, TType, ISpeculativeReader<CodePoint>>
         where TToken : IToken<TType>
     {
-        public SpeculativeLexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
+        public SpeculativeLexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
 
     }
 
     public abstract class SpeculativeLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
-        where TReader : ISpeculativeReader<char>
+        where TReader : ISpeculativeReader<CodePoint>
     {
 
-        public SpeculativeLexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
+        public SpeculativeLexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
 
         protected List<TextLocation> markedLocations;
 
@@ -44,7 +44,9 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         {
             if (markedLocations == null)
                 markedLocations = new List<TextLocation>();
+
             markedLocations.Add(this.Location);
+            
             Reader.Mark();
         }
 

@@ -1,203 +1,176 @@
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Numerics;
+using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
 {
     public static class TextUtility
     {
-        // Char Extensions
-        public static bool IsIn(this char value, CharSet set)
+        // Decode to CodePoint
+        public static IEnumerator<CodePoint> DecodeValues<T, TDecoder>(IEnumerator<T> items, TDecoder decoder, string onIncomplete)
+            where TDecoder : ITransformer<T, uint?>
         {
-            return set.Contains(value);
-        }
+            uint? result = 0;
 
-        // Enumerators
-        public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
-        {
-            while (true)
+            while (items.MoveNext())
             {
-                int read = reader.Read();
+                result = decoder.Process(items.Current);
 
-                if (read == -1)
-                    break;
-                else
-                    yield return (char)read;
+                if (result != null)
+                    yield return result.GetValueOrDefault();
             }
 
-            reader.Dispose();
+            if (result == null)
+                throw new CodePointException(onIncomplete);
         }
 
-        public static IEnumerator<char> GetCharEnumerator(this Stream stream, Encoding encoding = null)
+        // Utf8 -> CodePoint
+        public static EnumerableAdapter<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
         {
-            var reader = GetTextReader(stream, encoding);
-
-            return GetCharEnumerator(reader);
+            return new EnumerableAdapter<CodePoint>(AsUtf8CodePoints(bytes.GetEnumerator()));
         }
 
-        public static IEnumerator<char> GetCharEnumerator(string filepath, Encoding encoding = null)
+        public static IEnumerator<CodePoint> AsUtf8CodePoints(this IEnumerator<byte> bytes)
         {
-            var reader = GetTextReader(filepath, encoding);
+            var decoder = new Utf8.ByteDecoder();
 
-            return GetCharEnumerator(reader);
+            return DecodeValues(bytes, decoder, "Ill-formed Utf8.");
+        }
+
+        // Utf16 -> CodePoint
+        public static EnumerableAdapter<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            return new EnumerableAdapter<CodePoint>(AsUtf16CodePoints(bytes.GetEnumerator(), endianness));
+        }
+        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            var decoder = new Utf16.ByteDecoder(endianness);
+
+            return DecodeValues(bytes, decoder, "Ill-formed Utf16.");
         }
 
 
-        // TextElements
-        public static IEnumerator<TextElement> GetTextElements(this IEnumerator<char> chars)
+        // Utf32 -> CodePoint
+        public static EnumerableAdapter<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return TextElement.EnumerateFromChars(chars);
+            return new EnumerableAdapter<CodePoint>(AsUtf32CodePoints(bytes.GetEnumerator(), endianness));
         }
 
-        public static IEnumerator<TextElement> GetTextElements(this IEnumerable<char> chars)
+        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return TextElement.EnumerateFromChars(chars.GetEnumerator());
+            var decoder = new Utf32.ByteDecoder(endianness);
+
+            return DecodeValues(bytes, decoder, "Ill-formed Utf32.");
         }
 
 
-        // TextReaders
-        public static TextReader GetTextReader(this Stream stream, Encoding encoding = null)
+        // Char -> CodePoint
+        public static IEnumerator<CodePoint> ToCodePoints(this IEnumerator<char> chars)
         {
-            return (encoding == null) ? new StreamReader(stream) : new StreamReader(stream, encoding);
+            var decoder = new Utf16.CharDecoder();
+
+            return DecodeValues(chars, decoder, Utf16.MissingTrailingSurrogateMessage());
         }
 
-        public static TextReader GetTextReader(string filepath, Encoding encoding = null)
+        public static EnumerableAdapter<CodePoint> ToCodePoints(this IEnumerable<char> chars)
         {
-            var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-
-            return GetTextReader(stream, encoding);
+            return new EnumerableAdapter<CodePoint>(ToCodePoints(chars.GetEnumerator()));
         }
 
-        // Printable Chars
-        public static string GetAsPrintable(this char value)
+
+        // String -> CodePoint[]
+        public static CodePoint[] ToCodePoints(this string value)
         {
-            switch (value)
+            if (value == null)
+                return null;
+            else
+                return ToCodePoints(value, 0, value.Length);
+        }
+
+        public static CodePoint[] ToCodePoints(this string value, int start)
+        {
+            if (value == null)
+                return null;
+            else
+                return ToCodePoints(value, start, value.Length - start);
+        }
+
+        public static CodePoint[] ToCodePoints(this string value, int start, int amount)
+        {
+            if (value == null)
+                return null;
+
+            if (start < 0 || start > value.Length)
+                throw new ArgumentOutOfRangeException("start");
+
+            if (amount < 0 || start + amount > value.Length)
+                throw new ArgumentOutOfRangeException("amount");
+
+
+            var codepoints = new CodePoint[amount];
+
+            int index = 0;
+
+
+            var decoder = new Utf16.CharDecoder();
+
+            bool result = true;
+
+            for (int i = start; i < amount; i++)
             {
-                case '\n':
-                    return "\\n";
-                case '\r':
-                    return "\\r";
-                case '\t':
-                    return "\\t";
-                case '\0':
-                    return "\\0";
-                default:
-                    return value.ToString();
+                var codepoint = decoder.Process(value[i]);
+
+                if (codepoint != null)
+                    codepoints[index++] = codepoint.GetValueOrDefault();
             }
-        }
 
-        public static string GetAsPrintable(this string value)
-        {
-            var builder = new StringBuilder();
 
-            foreach (char c in value)
-                builder.Append(GetAsPrintable(c));
+            if (!result)
+                throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
 
-            return builder.ToString();
+
+            if (index < codepoints.Length)
+                Array.Resize(ref codepoints, index);
+
+            return codepoints;
         }
 
 
-        // LineEndings
-        public static string GetAsString(this LineEnding ending)
+        public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
+
+        public static bool IsNullOrWhitespace(this string value) => string.IsNullOrWhiteSpace(value);
+
+
+        public static bool IsNullOrEmpty(this CodeString value) => CodeString.IsNullOrEmpty(value);
+
+
+
+        // CodeString
+        public static CodeString ToCodeString(this IEnumerable<CodePoint> codepoints)
         {
-            switch (ending)
-            {
-                case LineEnding.Null:
-                    return "\0";
-                case LineEnding.Lf:
-                    return "\n";
-                case LineEnding.Cr:
-                    return "\r";
-                case LineEnding.CrLf:
-                    return "\r\n";
-                default:
-                    return "\0";
-            }
+            return new CodeString(codepoints);
         }
 
-        public static int GetSize(this LineEnding ending)
+        public static CodeString ToCodeString(this IEnumerable<char> chars)
         {
-            switch (ending)
-            {
-                case LineEnding.Null:
-                    return 1;
-                case LineEnding.Lf:
-                case LineEnding.Cr:
-                    return 1;
-                case LineEnding.CrLf:
-                    return 2;
-                default:
-                    return 0;
-            }
+            return new CodeString(ToCodePoints(chars));
         }
 
-        public static string GetAsPrintable(this LineEnding ending)
+        public static CodeString ToCodeString(this string value)
         {
-            switch (ending)
-            {
-                case LineEnding.Null:
-                    return "\\0";
-                case LineEnding.Lf:
-                    return "\\n";
-                case LineEnding.Cr:
-                    return "\\r";
-                case LineEnding.CrLf:
-                    return "\\r\\n";
-                default:
-                    return "\\0";
-            }
+            return new CodeString(ToCodePoints(value));
         }
 
-        public static string GetShortName(this LineEnding ending)
+        public static CodeString ToCodeString(this string value, int start)
         {
-            switch (ending)
-            {
-                case LineEnding.Null:
-                    return "Null";
-                case LineEnding.Lf:
-                    return "Lf";
-                case LineEnding.Cr:
-                    return "Cr";
-                case LineEnding.CrLf:
-                    return "CrLf";
-                default:
-                    return "?";
-            }
+            return new CodeString(ToCodePoints(value, start));
         }
 
-        public static string GetLongName(this LineEnding ending)
+        public static CodeString ToCodeString(this string value, int start, int amount)
         {
-            switch (ending)
-            {
-                case LineEnding.Null:
-                    return "Null";
-                case LineEnding.Lf:
-                    return "LineFeed";
-                case LineEnding.Cr:
-                    return "CarriageReturn";
-                case LineEnding.CrLf:
-                    return "CarriageReturnLineFeed";
-                default:
-                    return "Unknown";
-            }
-        }
-
-
-        public static LineEnding GetLineEnding(string ending)
-        {
-            switch (ending)
-            {
-                case "\n":
-                    return LineEnding.Lf;
-                case "\r":
-                    return LineEnding.Cr;
-                case "\r\n":
-                    return LineEnding.CrLf;
-                case "\0":
-                    return LineEnding.Null;
-                default:
-                    return LineEnding.Null;
-            }
+            return new CodeString(ToCodePoints(value, start, amount));
         }
     }
 }

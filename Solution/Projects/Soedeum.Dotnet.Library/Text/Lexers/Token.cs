@@ -2,29 +2,35 @@ using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Text;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public class Token<TType> : IToken<TType>
     {
         string source;
 
-        TextSpan span;
+        TextLocation location;
+
+        CodeString value;
 
         TType type;
 
 
-        public Token(string source, TextSpan span, TType type)
+        public Token(string source, TextLocation location, CodeString value, TType type)
         {
             this.source = source;
 
-            this.span = span;
+            this.location = location;
+
+            this.value = value;
 
             this.type = type;
         }
 
         public string Source => source;
 
-        public TextSpan Span => span;
+        public TextLocation Location => location;
+
+        public CodeString Value => value;
 
         public TType Type => type;
 
@@ -44,11 +50,11 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         public override string ToString()
         {
-            return string.Format("Type: '{0}'; Source: '{1}'; {2}", type, source, span.ToString());
+            return string.Format("Type: '{0}'; Source: '{1}'; Location: {2}; Value:", type, source, location.ToString(), value);
         }
         public virtual string ToShortString()
         {
-            return string.Format("Type: '{0}'; Value: '{2}'", type, source, span.Text);
+            return string.Format("Type: '{0}'; Value: '{2}'", type, value);
         }
     }
 }

@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Text;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public interface IToken<TType>
     {
         string Source { get; }
 
-        TextSpan Span { get; }
-        
+        TextLocation Location { get; }
+
+        CodeString Value { get; }
+
         TType Type { get; }
-        
+
         bool IsOf(TType type);
 
         void VerifyIsOf(TType type);

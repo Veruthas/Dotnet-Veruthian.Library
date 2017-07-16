@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public class Source : IDisposable
     {
         public string Name { get; }
 
-        public IEnumerator<char> Data { get; }
+        public IEnumerator<CodePoint> Data { get; }
 
 
-        public Source(string name, IEnumerator<char> data)
+        public Source(string name, IEnumerator<CodePoint> data)
         {
             this.Name = name;
             this.Data = data;

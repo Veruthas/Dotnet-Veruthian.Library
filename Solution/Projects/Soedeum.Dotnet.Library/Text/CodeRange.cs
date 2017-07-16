@@ -1,56 +1,50 @@
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    [StructLayout(LayoutKind.Explicit)]
-    public struct CharRange : IEquatable<CharRange>, IComparable<CharRange>, IComparable<char>, IEnumerable<char>
+    public struct CodeRange : IEquatable<CodeRange>, IComparable<CodeRange>, IComparable<CodePoint>, IEnumerable<CodePoint>
     {
-        [FieldOffsetAttribute(0)]
-        private readonly char low;
+        private readonly CodePoint low;
+
+        private readonly CodePoint high;
+
+        // Total => bytes: [0-3]:low, [4-7]:high
+        private readonly ulong total;
 
 
-        [FieldOffsetAttribute(2)]
-        private readonly char high;
-
-
-        // Total => bytes: [0-1]:low, [2-3]:high
-        // Allows for easy comparison
-        [FieldOffsetAttribute(0)]
-        private readonly int total;
-
-
-        public CharRange(char value)
+        public CodeRange(CodePoint value)
         {
-            total = 0;
             low = high = value;
+            
+            total = (((uint)value) << 32) | ((uint)value);
         }
 
-        public CharRange(char low, char high)
+        public CodeRange(CodePoint low, CodePoint high)
         {
-            total = 0;
-
             if (low > high)
             {
                 this.low = high;
 
                 this.high = low;
+
+                total = (((uint)low) << 32) | ((uint)high);
             }
             else
             {
                 this.low = low;
 
                 this.high = high;
+
+                total = (((uint)high) << 32) | ((uint)low);
             }
         }
 
-        public char Low => low;
+        public CodePoint Low => low;
 
-        public char High => high;
+        public CodePoint High => high;
 
 
         public int Size => (High - Low) + 1;
@@ -64,29 +58,29 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Range to Range Comparison
-        public bool Equals(CharRange other) => this.total == other.total;
+        public bool Equals(CodeRange other) => this.total == other.total;
 
-        public override bool Equals(object other) => (other is CharRange) ? Equals((CharRange)other) : false;
+        public override bool Equals(object other) => (other is CodeRange) ? Equals((CodeRange)other) : false;
 
-        public static bool operator ==(CharRange left, CharRange right) => left.Equals(right);
+        public static bool operator ==(CodeRange left, CodeRange right) => left.Equals(right);
 
-        public static bool operator !=(CharRange left, CharRange right) => !left.Equals(right);
+        public static bool operator !=(CodeRange left, CodeRange right) => !left.Equals(right);
 
-        public int CompareTo(CharRange other) => this.total.CompareTo(other.total);
+        public int CompareTo(CodeRange other) => this.total.CompareTo(other.total);
 
-        public static bool operator <(CharRange left, CharRange right) => left.total < right.total;
+        public static bool operator <(CodeRange left, CodeRange right) => left.total < right.total;
 
-        public static bool operator >(CharRange left, CharRange right) => left.total > right.total;
+        public static bool operator >(CodeRange left, CodeRange right) => left.total > right.total;
 
-        public static bool operator <=(CharRange left, CharRange right) => left.total <= right.total;
+        public static bool operator <=(CodeRange left, CodeRange right) => left.total <= right.total;
 
-        public static bool operator >=(CharRange left, CharRange right) => left.total >= right.total;
+        public static bool operator >=(CodeRange left, CodeRange right) => left.total >= right.total;
 
 
         // Range to Char Comparison
-        public bool Contains(char value) => (value >= Low) && (value <= High);
+        public bool Contains(CodePoint value) => (value >= Low) && (value <= High);
 
-        public int CompareTo(char other)
+        public int CompareTo(CodePoint other)
         {
             if (other < Low)
                 return 1;
@@ -98,27 +92,27 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // GetHashCode
-        public override int GetHashCode() => total;
+        public override int GetHashCode() => total.GetHashCode();
 
         // ToString
         public override string ToString()
         {
             if (IsCharacter)
-                return string.Format("'{0}'", Low.GetAsPrintable());
+                return string.Format("'{0}'", Low.ToString());
             else
-                return string.Format("('{0}' to '{1}')", Low.GetAsPrintable(), High.GetAsPrintable());
+                return string.Format("('{0}' to '{1}')", Low.ToString(), High.ToString());
         }
 
         // Enumerator
-        public IEnumerator<char> GetEnumerator()
+        public IEnumerator<CodePoint> GetEnumerator()
         {
-            int lowest = Low;
-            int highest = High;
-            int current = lowest;
+            var lowest = low;
+            var highest = high;
+            var current = lowest;
 
             while (current <= highest)
             {
-                yield return (char)current;
+                yield return current;
                 current++;
             }
         }
@@ -127,16 +121,16 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Complete Range Constants
-        public static readonly CharRange Complete = new CharRange(char.MinValue, char.MaxValue);
+        public static readonly CodeRange Complete = new CodeRange(CodePoint.MinValue, CodePoint.MaxValue);
 
-        public const int MaxSize = ((int)char.MaxValue) + 1;
+        public const int MaxSize = (int)Encodings.Utf32.MaxCodePoint;
 
 
 
         #region Multiple Ranges Operations
 
         // Find/Contains
-        public static int Find(CharRange[] sortedSet, char value)
+        public static int Find(CodeRange[] sortedSet, CodePoint value)
         {
             int low = 0;
             int high = sortedSet.Length - 1;
@@ -158,65 +152,65 @@ namespace Soedeum.Dotnet.Library.Text
             return -1;
         }
 
-        public static bool Contains(CharRange[] sortedSet, char value) => Find(sortedSet, value) != -1;
+        public static bool Contains(CodeRange[] sortedSet, CodePoint value) => Find(sortedSet, value) != -1;
 
 
         // Range String
-        public static string ToRangeString(IEnumerable<CharRange> ranges)
-        {
-            StringBuilder builder = new StringBuilder();
+        // public static string ToRangeString(IEnumerable<CodeRange> ranges)
+        // {
+        //     StringBuilder builder = new StringBuilder();
 
-            foreach (var range in ranges)
-            {
-                builder.Append(range.Low);
-                builder.Append(range.High);
-            }
+        //     foreach (var range in ranges)
+        //     {
+        //         builder.Append(range.Low);
+        //         builder.Append(range.High);
+        //     }
 
-            return builder.ToString();
-        }
+        //     return builder.ToString();
+        // }
 
-        public static CharRange[] FromRangeString(string rangeString, bool verifyOrderedSet = false)
-        {
-            if (string.IsNullOrEmpty(rangeString))
-                return new CharRange[0];
+        // public static CharRange[] FromRangeString(string rangeString, bool verifyOrderedSet = false)
+        // {
+        //     if (string.IsNullOrEmpty(rangeString))
+        //         return new CharRange[0];
 
-            if (rangeString.Length % 2 != 0)
-                throw new FormatException("Range string must contain character pairs. A lone character was found.");
+        //     if (rangeString.Length % 2 != 0)
+        //         throw new FormatException("Range string must contain character pairs. A lone character was found.");
 
-            CharRange[] ranges = new CharRange[rangeString.Length / 2];
+        //     CharRange[] ranges = new CharRange[rangeString.Length / 2];
 
-            int maxChar = -1;
+        //     int maxChar = -1;
 
-            for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
-            {
-                char low = rangeString[i];
-                char high = rangeString[i + 1];
+        //     for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
+        //     {
+        //         char low = rangeString[i];
+        //         char high = rangeString[i + 1];
 
-                if (low <= maxChar || low > high)
-                    throw new FormatException("Range string must consist of a set of sorted character pairs with no ranges in common.");
+        //         if (low <= maxChar || low > high)
+        //             throw new FormatException("Range string must consist of a set of sorted character pairs with no ranges in common.");
 
-                maxChar = high;
+        //         maxChar = high;
 
-                var range = new CharRange(low, high);
+        //         var range = new CharRange(low, high);
 
-                ranges[j] = range;
-            }
+        //         ranges[j] = range;
+        //     }
 
-            return ranges;
-        }
+        //     return ranges;
+        // }
 
         // From List
-        public static CharRange[] FromList(IEnumerable<char> chars)
+        public static CodeRange[] FromList(IEnumerable<CodePoint> points)
         {
-            SortedSet<char> sortedChars = new SortedSet<char>(chars);
+            SortedSet<CodePoint> sortedChars = new SortedSet<CodePoint>(points);
 
             return FromSet(sortedChars);
         }
 
-        public static CharRange[] FromSet(IEnumerable<char> chars)
+        public static CodeRange[] FromSet(IEnumerable<CodePoint> points)
         {
             // Compress ranges
-            List<CharRange> ranges = new List<CharRange>();
+            List<CodeRange> ranges = new List<CodeRange>();
 
 
             bool started = false;
@@ -227,7 +221,7 @@ namespace Soedeum.Dotnet.Library.Text
             int high = -1;
 
 
-            foreach (char value in chars)
+            foreach (char value in points)
             {
                 if (!started)
                 {
@@ -240,7 +234,7 @@ namespace Soedeum.Dotnet.Library.Text
                     // Add a range if this char and previous aren't consecutive
                     if (high + 1 != value)
                     {
-                        var range = new CharRange((char)low, (char)high);
+                        var range = new CodeRange(low, high);
 
                         ranges.Add(range);
 
@@ -254,12 +248,12 @@ namespace Soedeum.Dotnet.Library.Text
             // No chars in list
             if (low == -1)
             {
-                return new CharRange[] { };
+                return new CodeRange[] { };
             }
             else
             {
                 // Add range for remaining char(s)
-                var range = new CharRange((char)low, (char)high);
+                var range = new CodeRange((char)low, (char)high);
 
                 ranges.Add(range);
 
@@ -269,23 +263,23 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Reduced Union
-        public static CharRange[] Reduce(IEnumerable<CharRange> ranges)
+        public static CodeRange[] Reduce(IEnumerable<CodeRange> ranges)
         {
-            SortedSet<CharRange> list = new SortedSet<CharRange>(ranges);
+            SortedSet<CodeRange> list = new SortedSet<CodeRange>(ranges);
 
             return ReduceOrdered(list);
         }
 
-        public static CharRange[] ReduceOrdered(IEnumerable<CharRange> ranges)
+        public static CodeRange[] ReduceOrdered(IEnumerable<CodeRange> ranges)
         {
-            List<CharRange> list = new List<CharRange>(ranges);
+            List<CodeRange> list = new List<CodeRange>(ranges);
 
             for (int i = 0; i < list.Count - 1; i++)
             {
                 var low = list[i];
                 var high = list[i + 1];
 
-                if (CharRange.Combine(low, high, out var union))
+                if (CodeRange.Combine(low, high, out var union))
                 {
                     list[i] = union;
 
@@ -301,7 +295,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Complement        
-        public static CharRange[] Complement(IEnumerable<CharRange> ranges)
+        public static CodeRange[] Complement(IEnumerable<CodeRange> ranges)
         {
             var orderedSet = Reduce(ranges);
 
@@ -310,12 +304,12 @@ namespace Soedeum.Dotnet.Library.Text
             return complement;
         }
 
-        public static CharRange[] ComplementOrderedSet(IEnumerable<CharRange> ranges)
+        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges)
         {
             // Complement just creates ranges that exclude the ranges in the set
             // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
 
-            List<CharRange> complement = new List<CharRange>();
+            List<CodeRange> complement = new List<CodeRange>();
 
 
             int low = -1;
@@ -324,7 +318,7 @@ namespace Soedeum.Dotnet.Library.Text
             {
                 if (range.Low != char.MinValue)
                 {
-                    var newRange = new CharRange((char)(low + 1), (char)(range.Low - 1));
+                    var newRange = new CodeRange((char)(low + 1), (char)(range.Low - 1));
 
                     complement.Add(newRange);
                 }
@@ -334,7 +328,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             if (low != char.MaxValue)
             {
-                var newRange = new CharRange((char)(low + 1), char.MaxValue);
+                var newRange = new CodeRange((char)(low + 1), char.MaxValue);
 
                 complement.Add(newRange);
             }
@@ -345,14 +339,14 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Combine
-        public static bool Combine(CharRange a, CharRange b, out CharRange union)
+        public static bool Combine(CodeRange a, CodeRange b, out CodeRange union)
         {
             return (a <= b)
                     ? CombineOrdered(a, b, out union)
                     : CombineOrdered(b, a, out union);
         }
 
-        public static bool CombineOrdered(CharRange a, CharRange b, out CharRange union)
+        public static bool CombineOrdered(CodeRange a, CodeRange b, out CodeRange union)
         {
             // 2 Possible results:
             //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -360,13 +354,13 @@ namespace Soedeum.Dotnet.Library.Text
 
             if (a.High < b.Low)
             {
-                union = default(CharRange);
+                union = default(CodeRange);
 
                 return false;
             }
             else
             {
-                union = new CharRange(a.Low, b.High);
+                union = new CodeRange(a.Low, b.High);
 
                 return true;
             }
@@ -374,14 +368,14 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Intersect        
-        public static bool Intersect(CharRange a, CharRange b, out CharRange intersection)
+        public static bool Intersect(CodeRange a, CodeRange b, out CodeRange intersection)
         {
             return (a <= b)
                     ? IntersectOrdered(a, b, out intersection)
                     : IntersectOrdered(b, a, out intersection);
         }
 
-        public static bool IntersectOrdered(CharRange a, CharRange b, out CharRange intersection)
+        public static bool IntersectOrdered(CodeRange a, CodeRange b, out CodeRange intersection)
         {
             // 2 Possible results:
             //  1) Disojoint    (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
@@ -389,7 +383,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             if (a.High < b.Low)
             {
-                intersection = default(CharRange);
+                intersection = default(CodeRange);
 
                 return false;
             }
@@ -397,7 +391,7 @@ namespace Soedeum.Dotnet.Library.Text
             {
                 int ab_high = Math.Min(a.high, b.high);
 
-                intersection = new CharRange(b.low, (char)ab_high);
+                intersection = new CodeRange(b.low, (char)ab_high);
 
                 return true;
             }
@@ -417,21 +411,15 @@ namespace Soedeum.Dotnet.Library.Text
         {
             public SplitResultSet Type { get; }
 
-            public CharRange Range { get; }
+            public CodeRange Range { get; }
 
-            public SplitResult(char low, char high, SplitResultSet type)
+            public SplitResult(CodePoint low, CodePoint high, SplitResultSet type)
             {
-                this.Range = new CharRange(low, high);
+                this.Range = new CodeRange(low, high);
                 this.Type = type;
             }
 
-            public SplitResult(int low, int high, SplitResultSet type)
-            {
-                this.Range = new CharRange((char)low, (char)high);
-                this.Type = type;
-            }
-
-            public SplitResult(CharRange range, SplitResultSet type)
+            public SplitResult(CodeRange range, SplitResultSet type)
             {
                 this.Range = range;
                 this.Type = type;
@@ -440,14 +428,14 @@ namespace Soedeum.Dotnet.Library.Text
             public static readonly SplitResult Neither = new SplitResult();
         }
 
-        public static bool Split(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public static bool Split(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             return (a <= b)
                     ? SplitOrdered(a, b, out before, out intersection, out after)
                     : SplitOrdered(b, a, out before, out intersection, out after);
         }
 
-        public static bool SplitOrdered(CharRange a, CharRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public static bool SplitOrdered(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             // 7 Possible results
             //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_X_B

@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
     public class TokenTypeMismatchException<TType> : System.Exception
     {

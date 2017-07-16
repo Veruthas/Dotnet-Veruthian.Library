@@ -2,14 +2,14 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Utility
 {
-    public class HashCodeCombiner
+    public class HashCodeCreator
     {
-        public static readonly HashCodeCombiner Combiner = new HashCodeCombiner();
+        public static readonly HashCodeCreator Combiner = new HashCodeCreator();
 
         private readonly int primeBase;
         private readonly int primeOffset;
 
-        public HashCodeCombiner(int primeBase = 269, int primeOffset = 47)
+        public HashCodeCreator(int primeBase = 269, int primeOffset = 47)
         {
             this.primeBase = primeBase;
             this.primeOffset = primeOffset;

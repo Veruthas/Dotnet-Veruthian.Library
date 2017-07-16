@@ -1,21 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Soedeum.Dotnet.Library.Collections;
 using Soedeum.Dotnet.Library.Text;
+using Soedeum.Dotnet.Library.Text.Char;
 
-namespace Soedeum.Dotnet.Library.Compilers.Lexers
+namespace Soedeum.Dotnet.Library.Text.Lexers
 {
-    public abstract class Lexer<TToken, TType> : Lexer<TToken, TType, IReader<char>>
+    public abstract class Lexer<TToken, TType> : Lexer<TToken, TType, IReader<CodePoint>>
         where TToken : IToken<TType>
     {
-        public Lexer(Source[] sources, TypedStringPool<TType> pool) : base(sources, pool) { }
+        public Lexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
     }
 
     public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
         where TToken : IToken<TType>
-        where TReader : IReader<char>
+        where TReader : IReader<CodePoint>
     {
         // Reader data        
         private bool initialized = false;
@@ -32,22 +32,22 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // String Pool
-        private TypedStringPool<TType> pool;
+        private TypedCodeStringPool<TType> pool;
 
 
         // Capture data
         private bool capturing = false;
 
-        private StringBuilder captured = new StringBuilder();
+        private List<CodePoint> captured = new List<CodePoint>();
 
         private TextLocation captureLocation;
 
 
         // Constructor
-        public Lexer(Source[] sources, TypedStringPool<TType> pool)
+        public Lexer(Source[] sources, TypedCodeStringPool<TType> pool)
         {
             if (sources == null || sources.Length == 0)
-                sources = new Source[] { new Source(null, EmptyEnumerable<char>.Default.GetEnumerator()) };
+                sources = new Source[] { new Source(null, EmptyEnumerable<CodePoint>.Default.GetEnumerator()) };
 
             this.sources = sources;
 
@@ -82,7 +82,6 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         public TToken Current
         {
-
             get
             {
                 if (!initialized)
@@ -100,7 +99,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
 
         // String Pool
-        protected TypedStringPool<TType> StringPool { get => pool; }
+        protected TypedCodeStringPool<TType> CodeStringPool { get => pool; }
 
 
         // Capture code
@@ -130,36 +129,37 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual void RollbackCaptured(int length)
         {
-            if (length > captured.Length)
+            if (length > captured.Count)
                 ReleaseCaptured();
             else
-                captured.Remove(captured.Length - length, length);
+                captured.RemoveRange(captured.Count - length, length);
         }
 
         protected virtual TextLocation CaptureLocation { get => captureLocation; set => captureLocation = value; }
 
-        protected virtual string GetCaptured()
+        protected virtual CodeString GetCaptured()
         {
             if (!capturing)
                 throw new InvalidOperationException("Buffer is not capturing!");
 
-            var captured = this.captured.ToString();
+            var captured = this.captured.ToCodeString();
 
             return captured;
         }
 
-        protected virtual void AppendToCaptured(string data, bool clear = false)
+        protected virtual void AppendToCaptured(CodeString data, bool clear = false)
         {
             if (clear)
                 captured.Clear();
 
-            captured.Append(data);
+            foreach (var point in data)
+                captured.Add(point);
         }
 
-        protected virtual void Capture(char item)
+        protected virtual void Capture(CodePoint item)
         {
             if (capturing)
-                captured.Append(item);
+                captured.Add(item);
 
             Location = Location.MoveToNext(item, Reader.Peek());
         }
@@ -168,15 +168,15 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         // Helper Code    
         protected virtual bool IsEnd => Reader.IsEnd;
 
-        protected virtual char Peek() => Reader.Peek();
+        protected virtual CodePoint Peek() => Reader.Peek();
 
-        protected virtual bool PeekIsIn(CharSet set) => set.Contains(Reader.Peek());
+        protected virtual bool PeekIsIn(CodeSet set) => set.Contains(Reader.Peek());
 
-        protected virtual bool PeekIs(char value) => Reader.Peek() == value;
+        protected virtual bool PeekIs(CodePoint value) => Reader.Peek() == value;
 
-        protected virtual char Read()
+        protected virtual CodePoint Read()
         {
-            char read = Reader.Read();
+            var read = Reader.Read();
 
             Capture(read);
 
@@ -210,7 +210,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
                 bool success = GetNextReader();
 
                 if (EofBetweenSources || !success)
-                    current = CreateToken(EofType, source, location, value.ToString());
+                    current = CreateToken(EofType, source, location, value.ToCodeString());
                 else
                     current = GetNextToken();
 
@@ -239,9 +239,9 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
 
         protected virtual TToken GetCapturedToken(TType type, bool releaseBuffer = true)
         {
-            string value = GetCaptured();
+            CodeString value = GetCaptured();
 
-            var pool = StringPool;
+            var pool = CodeStringPool;
 
             if (pool != null)
             {
@@ -263,7 +263,7 @@ namespace Soedeum.Dotnet.Library.Compilers.Lexers
         // Abstracts
         protected abstract TReader CreateReader(Source source);
 
-        protected abstract TToken CreateToken(TType type, string source, TextLocation location, string value);
+        protected abstract TToken CreateToken(TType type, string source, TextLocation location, CodeString value);
 
 
         protected abstract TType EofType { get; }
