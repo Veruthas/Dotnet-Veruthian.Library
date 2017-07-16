@@ -7,11 +7,12 @@ grammar Gray
 
     rule CharSetDeclaration := 'charset' Identifier ':=' CharList;
 
-    rule CharList := CharSet {'or' CharSet};
+    rule CharList := CharSet {CharSetOperator CharSet};
 
-    rule CharSet := Identifier or Character or CharRange or CharCompliment;
+    rule CharSetOperator := '+' or '-';
 
-    rule CharCompliment := 'not' '(' CharSet ')' ;
+    rule CharSet := Identifier or Character or CharRange ;
+
 
     rule CharRange := '(' CharValue 'to' CharValue ')' ;
 
@@ -19,18 +20,27 @@ grammar Gray
     ;; Keywords
     explicit Identifier token CharSetKeyword := 'charset';
 
-    explicit Identifier token OrKeyword := 'or';
-
     explicit Identifier token ToKeyword := 'to';
-
-    explicit Identifier token NotKeyword := 'not';
 
 
     token Character := '\'' (EscapeSequence or any) '\'';
 
-    partial token EscapeSequence := '\\' ('n' or 'r' or 't' or '\\' or '\'' or '"' or ('x' hexdigit hexdigit hexdigit )) ;
+    partial token EscapeSequence := '\\' ('0' 
+                                        or 'n' 
+                                        or 'r' 
+                                        or 't' 
+                                        or '\\' 
+                                        or '\'' 
+                                        or '"' 
+                                        or ('x' hexdigit hexdigit ) 
+                                        or ('u' hexdigit hexdigit hexdigit hexdigit) 
+                                        or ('+' hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit));
 
     token Identifier := (alpha or '_') {alphanumeric or '_'};
+
+    token Union  := '+';
+
+    token Difference := '-';
 
     token IsDefinedAs := ':=';
 
@@ -42,35 +52,30 @@ grammar Gray
 
     token EOF = eof;
 
-    ;; Skip tokens
+    ;; Skip tokens     
+    
     skip token Whitespace := {whitespace};
-
-    skip token LineComment := ';;' {linecommentchar} ;
-
-    skip token MultilineComment := ';-' {commentchar or ('-' notsemicolon)} '-;'  ;
+    
+    skip token LineComment := ';;' {notEnd};  
 
 
-    charset linecommentchar := not (eol or eof);
+    charset any := ('\0' to '\+10FFFF');
 
-    charset commentchar := not ('-' or eof);
+    charset notEnd := any - eol - eof;
 
-    charset notsemicolon := not (';' or eof)
+    charset alpha := ('a' to 'z') + ('A' to 'Z');
 
-    charset any := not ( eof );
+    charset numeric := ('0' to '9');
 
-    charset alpha := ('a' to 'z') or ('A' to 'Z')
+    charset alphanumeric := alpha + numeric;
 
-    charset numeric := ('0' to '9')
+    charset hexdigit := numeric + ('A' to 'F') + ('a' to 'f');
 
-    charset alphanumeric := alpha or numeric
+    charset eol := '\n' + '\r';
 
-    charset hexdigit := numeric or ('A' to 'F') or ('a' to 'f');
+    charset space := ' ' + '\t';
 
-    charset eol := '\n' or '\r';
+    charset whitespace := eol + space;
 
-    charset space := ' ' or '\t';
-
-    charset whitespace := eol or space;
-
-    charset eof := '\0';c
+    charset eof := '\0';
 end
