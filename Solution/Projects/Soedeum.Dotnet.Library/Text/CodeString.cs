@@ -33,7 +33,9 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
-
+        public CodeString(List<CodePoint> codepoints)
+            : this(codepoints.ToArray(), false) { }
+            
         public CodeString(CodePoint value, int count)
             : this(ReplicateCodePoint(value, count), false) { }
 

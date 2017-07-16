@@ -292,7 +292,7 @@ namespace Soedeum.Dotnet.Library.Text
         public static explicit operator CodePoint(int value) => FromUtf32(value);
 
         public static explicit operator CodePoint(uint value) => FromUtf32(value);
-        
+
         public static explicit operator CodePoint(long value) => FromUtf32(value);
 
         public static explicit operator CodePoint(ulong value) => FromUtf32(value);
@@ -375,7 +375,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static implicit operator long(CodePoint value) => value.value;
 
-        public static explicit operator string(CodePoint value) => value.ToString();
+        public static implicit operator string(CodePoint value) => value.ToString();
+
+        public static implicit operator CodeString(CodePoint value) => value.ToCodeString();
 
 
         public BitTwiddler ToUtf8() => Utf8.Encoder.Encode(this);

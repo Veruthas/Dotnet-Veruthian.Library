@@ -19,26 +19,26 @@ namespace Soedeum.Dotnet.Library.Text
         {
             low = high = value;
 
-            total = (((uint)value) << 32) | ((uint)value);
+            total = (((ulong)value) << 32) | ((ulong)value);
         }
 
-        public CodeRange(CodePoint low, CodePoint high)
+        public CodeRange(CodePoint a, CodePoint b)
         {
-            if (low > high)
+            if (a > b)
             {
-                this.low = high;
+                this.low = b;
 
-                this.high = low;
+                this.high = a;
 
-                total = (((uint)low) << 32) | ((uint)high);
+                total = (((ulong)b) << 32) | ((ulong)a);
             }
             else
             {
-                this.low = low;
+                this.low = a;
 
-                this.high = high;
+                this.high = b;
 
-                total = (((uint)high) << 32) | ((uint)low);
+                total = (((ulong)a) << 32) | ((ulong)b);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public int CompareTo(CodeRange other) => this.total.CompareTo(other.total);
 
-        
+
         public static bool operator <(CodeRange left, CodeRange right) => left.total < right.total;
 
         public static bool operator >(CodeRange left, CodeRange right) => left.total > right.total;
@@ -91,6 +91,7 @@ namespace Soedeum.Dotnet.Library.Text
                 return 0;
         }
 
+        private string TotalHexString => Convert.ToString((long)total, 16);
 
         // GetHashCode
         public override int GetHashCode() => total.GetHashCode();
@@ -421,6 +422,15 @@ namespace Soedeum.Dotnet.Library.Text
         {
             public SplitResultSet Type { get; }
 
+            public bool IsNeither => Type == SplitResultSet.Neither;
+
+            public bool IsA => Type == SplitResultSet.A;
+
+            public bool IsB => Type == SplitResultSet.B;
+
+            public bool IsAB => Type == SplitResultSet.AB;
+
+
             public CodeRange Range { get; }
 
             public SplitResult(CodePoint low, CodePoint high, SplitResultSet type)
@@ -441,11 +451,17 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool Split(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             return (a <= b)
-                    ? SplitOrdered(a, b, out before, out intersection, out after)
-                    : SplitOrdered(b, a, out before, out intersection, out after);
+                    ? SplitOrdered(a, b, SplitResultSet.A, SplitResultSet.B, out before, out intersection, out after)
+                    : SplitOrdered(b, a, SplitResultSet.B, SplitResultSet.A, out before, out intersection, out after);
         }
 
         public static bool SplitOrdered(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        {
+            return SplitOrdered(a, b, SplitResultSet.A, SplitResultSet.B, out before, out intersection, out after);
+        }
+
+        private static bool SplitOrdered(CodeRange lower, CodeRange higher, SplitResultSet lowerSet, SplitResultSet higherSet,
+             out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             // 7 Possible results
             //   1) Disjoint             (a.h < b.l)   => (a.l to a.h) + (b.l to b.h)                            -- A_X_B
@@ -461,31 +477,31 @@ namespace Soedeum.Dotnet.Library.Text
             //    7) Union               (a.h = b.h)   => (a.l to b.h)                                           -- X_AB_X
 
             // [1] (a.h < b.l) | Disjoint => A_B
-            if (a.high < b.low)
+            if (lower.high < higher.low)
             {
-                before = new SplitResult(a, SplitResultSet.A);
+                before = new SplitResult(lower, lowerSet);
 
                 intersection = SplitResult.Neither;
 
-                after = new SplitResult(a, SplitResultSet.B);
+                after = new SplitResult(lower, higherSet);
 
                 return false;
             }
             else
             {
                 // BEFORE -> [A|X] => when a.l != b.l, (a.l to b.l - 1)
-                before = (a.low == b.low) ? SplitResult.Neither : new SplitResult(a.low, b.low - 1, SplitResultSet.A);
+                before = (lower.low == higher.low) ? SplitResult.Neither : new SplitResult(lower.low, higher.low - 1, lowerSet);
 
                 // INTERSECTION -> AB => (b.l to MIN(a.h, b.h))     
-                CodePoint ab_high = (CodePoint)Math.Min(a.high, b.high);
+                CodePoint ab_high = (CodePoint)Math.Min(lower.high, higher.high);
 
-                intersection = new SplitResult(b.low, ab_high, SplitResultSet.AB);
+                intersection = new SplitResult(higher.low, ab_high, SplitResultSet.AB);
 
                 // AFTER -> [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))                
-                if (a.high > b.high)
-                    after = new SplitResult(ab_high + 1, a.high, SplitResultSet.A);
-                else if (b.high > a.high)
-                    after = new SplitResult(ab_high + 1, b.high, SplitResultSet.B);
+                if (lower.high > higher.high)
+                    after = new SplitResult(ab_high + 1, lower.high, lowerSet);
+                else if (higher.high > lower.high)
+                    after = new SplitResult(ab_high + 1, higher.high, higherSet);
                 else
                     after = SplitResult.Neither;
 

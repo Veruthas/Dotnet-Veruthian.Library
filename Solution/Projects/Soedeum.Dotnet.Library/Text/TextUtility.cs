@@ -148,6 +148,11 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // CodeString
+        public static CodeString ToCodeString(this List<CodePoint> codepoints)
+        {
+            return new CodeString(codepoints);
+        }
+
         public static CodeString ToCodeString(this IEnumerable<CodePoint> codepoints)
         {
             return new CodeString(codepoints);

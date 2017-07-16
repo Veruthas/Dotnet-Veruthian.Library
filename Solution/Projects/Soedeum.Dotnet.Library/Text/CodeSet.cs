@@ -7,7 +7,7 @@ using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-public class CodeSet : IEquatable<CodeSet>
+    public class CodeSet : IEquatable<CodeSet>
     {
         readonly CodeRange[] ranges;
 
@@ -221,23 +221,53 @@ public class CodeSet : IEquatable<CodeSet>
         }
 
 
-        // Subtraction
+        // Subtraction    
         public static CodeSet Remove(CodeSet source, CodeSet removing)
         {
-            // For each range in source, remove range in value;
-            var sourceRanges = source.ranges;
+            // Todo: Heavily optimize
 
+            // For each range in source, remove range in value;            
             var removingRanges = removing.ranges;
+
+            var result = new List<CodeRange>(source.ranges);
+
+            int min = 0;
 
             for (int r = 0; r < removingRanges.Length; r++)
             {
-                for (int s = 0; s < sourceRanges.Length; s++)
+                var removeRange = removingRanges[r];
+
+                for (int s = min; s < result.Count; s++)
                 {
-                    
+                    var sourceRange = result[s];
+
+                    // There is no overlap
+                    if (removeRange.Low > sourceRange.High || removeRange.High < sourceRange.Low)
+                        continue;
+                    if (CodeRange.Split(sourceRange, removeRange, out var before, out var intersection, out var after))
+                    {
+                        if (before.IsA)
+                        {
+                            result[s] = before.Range;
+
+                            if (after.IsA)
+                            {
+                                s++;
+
+                                result.Insert(s, after.Range);
+                            }
+                        }
+                        else if (after.IsA)
+                        {
+                            result[s] = after.Range;
+                        }
+
+                        min = s;
+                    }
                 }
             }
 
-            return source;
+            return new CodeSet(result.ToArray());
         }
 
         public static CodeSet operator -(CodeSet left, CodeSet right) => Remove(left, right);
