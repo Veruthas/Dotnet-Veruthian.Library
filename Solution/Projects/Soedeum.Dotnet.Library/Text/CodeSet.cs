@@ -166,11 +166,15 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodeSet List(CodeString codepoints) => FromList(codepoints);
 
-        public static implicit operator CodeSet(CodeString codepoints) => FromList(codepoints);
+        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints());
 
-        public static implicit operator CodeSet(CodePoint[] codepoints) => FromList(codepoints);
+        public static implicit operator CodeSet(string codepoints) => List(codepoints);
 
-        public static CodeSet FromList(IEnumerable<CodePoint> codepoints)
+        public static implicit operator CodeSet(CodeString codepoints) => List(codepoints);
+
+        public static implicit operator CodeSet(CodePoint[] codepoints) => List(codepoints);
+
+        private static CodeSet FromList(IEnumerable<CodePoint> codepoints)
         {
             var ranges = CodeRange.FromList(codepoints);
 
@@ -224,7 +228,7 @@ namespace Soedeum.Dotnet.Library.Text
         // Subtraction    
         public static CodeSet Remove(CodeSet source, CodeSet removing)
         {
-            // Todo: Heavily optimize
+            // TODO: Heavily optimize
 
             // For each range in source, remove range in value;            
             var removingRanges = removing.ranges;
@@ -261,8 +265,10 @@ namespace Soedeum.Dotnet.Library.Text
                         {
                             result[s] = after.Range;
                         }
-
-                        min = s;
+                        else
+                        {
+                            result.RemoveAt(s);
+                        }
                     }
                 }
             }

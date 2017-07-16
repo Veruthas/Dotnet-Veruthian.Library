@@ -100,9 +100,9 @@ namespace Soedeum.Dotnet.Library.Text
         public override string ToString()
         {
             if (IsCharacter)
-                return string.Format("'{0}'", Low.ToString());
+                return string.Format("'{0}'", Low.ToPrintableString());
             else
-                return string.Format("('{0}' to '{1}')", Low.ToString(), High.ToString());
+                return string.Format("('{0}' to '{1}')", Low.ToPrintableString(), High.ToPrintableString());
         }
 
         // Enumerator
@@ -281,7 +281,7 @@ namespace Soedeum.Dotnet.Library.Text
                 var low = list[i];
                 var high = list[i + 1];
 
-                if (CodeRange.Combine(low, high, out var union))
+                if (CodeRange.CombineOrdered(low, high, out var union))
                 {
                     list[i] = union;
 
@@ -296,6 +296,7 @@ namespace Soedeum.Dotnet.Library.Text
             return list.ToArray();
         }
 
+
         // Complement        
         public static CodeRange[] Complement(IEnumerable<CodeRange> ranges)
         {
@@ -306,17 +307,9 @@ namespace Soedeum.Dotnet.Library.Text
             return complement;
         }
 
-        public static CodeRange[] Complement(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
-        {
-            var orderedSet = Reduce(ranges);
-
-            var complement = ComplementOrderedSet(orderedSet, min, max);
-
-            return complement;
-        }
         public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges) => ComplementOrderedSet(ranges, CodePoint.MinValue, CodePoint.MaxValue);
 
-        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
+        private static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
         {
             // Complement just creates ranges that exclude the ranges in the set
             // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
@@ -349,6 +342,7 @@ namespace Soedeum.Dotnet.Library.Text
             return complement.ToArray();
         }
 
+
         // Combine
         public static bool Combine(CodeRange a, CodeRange b, out CodeRange union)
         {
@@ -359,11 +353,11 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool CombineOrdered(CodeRange a, CodeRange b, out CodeRange union)
         {
-            // 2 Possible results:
-            //  1) Disojoint (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
-            //  2) Union     (a.l <= b.l) && (a.h <= b.h)   => (a.l to b.h)
+            // Assumes a <= b
+            //  1) Disojoint (a.h + 1 < b.l)     => (a.l to a.h) + (b.l to b.h)
+            //  2) Union     (a.h + 1 >= b.l)    => (a.l to b.h)
 
-            if (a.High < b.Low)
+            if (a.High + 1 < b.Low)
             {
                 union = default(CodeRange);
 
@@ -371,7 +365,9 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                union = new CodeRange(a.Low, b.High);
+                var newHigh = a.high > b.high ? a.high : b.high;
+
+                union = new CodeRange(a.Low, newHigh);
 
                 return true;
             }

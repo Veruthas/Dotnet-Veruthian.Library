@@ -77,6 +77,45 @@ namespace Soedeum.Dotnet.Library.Text
             return "U+" + value.ToString("X4");
         }
 
+        public string ToPrintableString()
+        {
+            string result;
+
+            // Convert UTF32 -> UTF16
+            if (value < Utf32.SupplementaryPlanePrefix)
+            {
+                var asChar = (char)value;
+
+                switch (asChar)
+                {
+                    case '\0':
+                        result = "\\0";
+                        break;
+                    case '\t':
+                        result = "\\t";
+                        break;
+                    case '\n':
+                        result = "\\n";
+                        break;
+                    case '\r':
+                        result = "\\r";
+                        break;
+                    default:
+                        if (char.IsControl(asChar))
+                            result = ToCodePointString();
+                        else
+                            result = asChar.ToString();
+                        break;
+                }
+            }
+            else
+            {
+                result = ToCodePointString();
+            }
+
+            return result;
+        }
+
         public override string ToString()
         {
             string result;
