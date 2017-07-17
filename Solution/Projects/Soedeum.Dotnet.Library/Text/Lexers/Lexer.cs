@@ -10,7 +10,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
     public abstract class Lexer<TToken, TType> : Lexer<TToken, TType, IReader<CodePoint>>
         where TToken : IToken<TType>
     {
-        public Lexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
+        public Lexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }
     }
 
     public abstract class Lexer<TToken, TType, TReader> : IEnumerator<TToken>
@@ -32,7 +32,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
 
         // String Pool
-        private TypedCodeStringPool<TType> pool;
+        private Pool<CodeString, TType> pool;
 
 
         // Capture data
@@ -44,7 +44,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
 
         // Constructor
-        public Lexer(Source[] sources, TypedCodeStringPool<TType> pool)
+        public Lexer(Source[] sources, Pool<CodeString, TType> pool)
         {
             if (sources == null || sources.Length == 0)
                 sources = new Source[] { new Source(null, EmptyEnumerable<CodePoint>.Default.GetEnumerator()) };
@@ -99,7 +99,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
 
         // String Pool
-        protected TypedCodeStringPool<TType> CodeStringPool { get => pool; }
+        protected Pool<CodeString, TType> CodeStringPool { get => pool; }
 
 
         // Capture code
@@ -249,7 +249,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
                 value = result.Value;
 
-                type = result.Type;
+                type = result.Attribute;
             }
 
             var token = CreateToken(type, SourceName, captureLocation, value);

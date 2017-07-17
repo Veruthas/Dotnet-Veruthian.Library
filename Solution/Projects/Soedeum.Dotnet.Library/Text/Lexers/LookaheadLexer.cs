@@ -7,14 +7,14 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
     public abstract class LookaheadLexer<TToken, TType> : Lexer<TToken, TType, ILookaheadReader<CodePoint>>
       where TToken : IToken<TType>
     {
-        public LookaheadLexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
+        public LookaheadLexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }
     }
 
     public abstract class LookaheadLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ILookaheadReader<CodePoint>
     {
-        public LookaheadLexer(Source[] sources, TypedCodeStringPool<TType> pool) : base(sources, pool) { }
+        public LookaheadLexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }
 
         protected virtual bool PeekIsEnd(int lookahead) => Reader.PeekIsEnd(lookahead);
 
