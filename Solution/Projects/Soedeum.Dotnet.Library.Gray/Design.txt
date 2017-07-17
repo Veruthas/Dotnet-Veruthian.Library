@@ -36,7 +36,7 @@ grammar Gray
                                         or ('u' hexdigit hexdigit hexdigit hexdigit) 
                                         or ('+' hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit));
 
-    token Identifier := (alpha or '_') {alphanumeric or '_'};
+    insensitive token Identifier := (alpha or '_') {alphanumeric or '_'};
 
     token Union  := '+';
 
@@ -56,7 +56,9 @@ grammar Gray
     
     skip token Whitespace := {whitespace};
     
-    skip token LineComment := ';;' {notEnd};  
+    skip token LineComment := '//' {notEnd};  
+
+    skip token BlockComment := '/*' (BlockComment or any) '*/';
 
 
     charset any := ('\0' to '\+10FFFF');
