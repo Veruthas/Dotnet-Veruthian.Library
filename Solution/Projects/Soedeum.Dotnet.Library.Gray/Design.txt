@@ -32,9 +32,9 @@ grammar Gray
                                         or '\\' 
                                         or '\'' 
                                         or '"' 
-                                        or ('x' hexdigit hexdigit ) 
-                                        or ('u' hexdigit hexdigit hexdigit hexdigit) 
-                                        or ('+' hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit));
+                                        or ('x' hexdigit * 2) 
+                                        or ('u' hexdigit * 4) 
+                                        or ('+' hexdigit * 6) );
 
     insensitive token Identifier := (alpha or '_') {alphanumeric or '_'};
 
