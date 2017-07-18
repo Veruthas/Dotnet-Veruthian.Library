@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Globalization;
 using Soedeum.Dotnet.Library.Numerics;
 using Soedeum.Dotnet.Library.Text.Encodings;
 
@@ -71,7 +72,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static string operator +(CodePoint left, string right) => left.ToString() + right;
 
-        public string ToCodePointString()
+        public string ToCodePointFormat()
         {
             // Format (U+[Y][Y]XXXX)
             return "U+" + value.ToString("X4");
@@ -102,7 +103,7 @@ namespace Soedeum.Dotnet.Library.Text
                         break;
                     default:
                         if (char.IsControl(asChar))
-                            result = ToCodePointString();
+                            result = ToCodePointFormat();
                         else
                             result = asChar.ToString();
                         break;
@@ -110,7 +111,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
             else
             {
-                result = ToCodePointString();
+                result = ToCodePointFormat();
             }
 
             return result;
@@ -137,6 +138,10 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // CodeString
+        public CodeString ToCodeString() => new CodeString(this);
+
+        public CodeString Replicate(int count) => new CodeString(this, count);
+
         public static CodeString operator *(CodePoint value, int count) => new CodeString(value, count);
 
 
@@ -151,6 +156,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static bool operator !=(CodePoint left, CodePoint right) => left.value != right.value;
 
+        public bool IsIn(CodeSet set) => set.Contains(this);
 
         // Comparison
         public int CompareTo(CodePoint other) => this.value.CompareTo(other.value);
@@ -196,9 +202,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static explicit operator CodePoint(ushort value) => FromUtf16(value);
 
 
-        public static CodePoint FromUtf16(short value) => FromUtf16((ushort)value);
-
         public static CodePoint FromUtf16(char value) => FromUtf16((ushort)value);
+
+        public static CodePoint FromUtf16(short value) => FromUtf16((ushort)value);
 
         public static CodePoint FromUtf16(ushort value)
         {
@@ -206,10 +212,6 @@ namespace Soedeum.Dotnet.Library.Text
 
             return new CodePoint(utf32);
         }
-
-
-        public static CodePoint FromUtf16(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => new CodePoint(Utf16.Decoder.Decode(bits, endianness));
-
 
         public static CodePoint FromUtf16(char leadingSurrogate, char trailingSurrogate) => FromUtf16((ushort)leadingSurrogate, (ushort)trailingSurrogate);
 
@@ -224,54 +226,7 @@ namespace Soedeum.Dotnet.Library.Text
             return new CodePoint(utf32);
         }
 
-        public static CodePoint FromUtf16(short[] array, int index = 0) => FromUtf16(array, ref index);
-
-        public static CodePoint FromUtf16(short[] array, ref int index)
-        {
-            if (index >= array.Length)
-                throw new ArgumentOutOfRangeException("index", "Index out of bounds.");
-
-            var value = array[index++];
-
-            if (Utf16.IsLeadingSurrogate((ushort)value))
-            {
-                if (index >= array.Length)
-                    throw new ArgumentOutOfRangeException("index", "Need two items to process surrogate pair.");
-
-                var trailing = array[index++];
-
-                return FromUtf16(value, trailing);
-            }
-            else
-            {
-                return new CodePoint(value);
-            }
-        }
-
-
-        public static CodePoint FromUtf16(ushort[] array, int index = 0) => FromUtf16(array, ref index);
-
-        public static CodePoint FromUtf16(ushort[] array, ref int index)
-        {
-            if (index >= array.Length)
-                throw new ArgumentOutOfRangeException("index", "Index out of bounds.");
-
-            var value = array[index++];
-
-            if (Utf16.IsLeadingSurrogate(value))
-            {
-                if (index >= array.Length)
-                    throw new ArgumentOutOfRangeException("index", "Need two items to process surrogate pair.");
-
-                var trailing = array[index++];
-
-                return FromUtf16(value, trailing);
-            }
-            else
-            {
-                return new CodePoint(value);
-            }
-        }
+        public static CodePoint FromUtf16(BitTwiddler bits, ByteOrder endianness = ByteOrder.LittleEndian) => new CodePoint(Utf16.Decoder.Decode(bits, endianness));
 
 
         public static CodePoint FromUtf16(char[] array, int index = 0) => FromUtf16(array, ref index);
@@ -298,6 +253,53 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
+        public static CodePoint FromUtf16(short[] array, int index = 0) => FromUtf16(array, ref index);
+
+        public static CodePoint FromUtf16(short[] array, ref int index)
+        {
+            if (index >= array.Length)
+                throw new ArgumentOutOfRangeException("index", "Index out of bounds.");
+
+            var value = array[index++];
+
+            if (Utf16.IsLeadingSurrogate((ushort)value))
+            {
+                if (index >= array.Length)
+                    throw new ArgumentOutOfRangeException("index", "Need two items to process surrogate pair.");
+
+                var trailing = array[index++];
+
+                return FromUtf16(value, trailing);
+            }
+            else
+            {
+                return new CodePoint(value);
+            }
+        }
+
+        public static CodePoint FromUtf16(ushort[] array, int index = 0) => FromUtf16(array, ref index);
+
+        public static CodePoint FromUtf16(ushort[] array, ref int index)
+        {
+            if (index >= array.Length)
+                throw new ArgumentOutOfRangeException("index", "Index out of bounds.");
+
+            var value = array[index++];
+
+            if (Utf16.IsLeadingSurrogate(value))
+            {
+                if (index >= array.Length)
+                    throw new ArgumentOutOfRangeException("index", "Need two items to process surrogate pair.");
+
+                var trailing = array[index++];
+
+                return FromUtf16(value, trailing);
+            }
+            else
+            {
+                return new CodePoint(value);
+            }
+        }
 
         public static CodePoint FromUtf16(byte[] array, int index = 0, ByteOrder endianness = ByteOrder.LittleEndian) => FromUtf16(array, ref index, endianness);
 
@@ -425,8 +427,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
-        public CodeString ToCodeString() => new CodeString(this);
-
         #endregion
 
 
@@ -442,16 +442,5 @@ namespace Soedeum.Dotnet.Library.Text
         public static readonly CodePoint Replacement = new CodePoint(0xFFFD);
 
         #endregion
-
-    }
-
-
-    public class CodePointException : System.Exception
-    {
-        public CodePointException() { }
-
-        public CodePointException(string message) : base(message) { }
-
-        public CodePointException(string message, System.Exception inner) : base(message, inner) { }
     }
 }
