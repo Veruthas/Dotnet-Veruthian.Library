@@ -157,10 +157,10 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool Contains(CodeRange[] sortedSet, CodePoint value) => Find(sortedSet, value) != -1;
 
 
-        // Range String
-        // public static string ToRangeString(IEnumerable<CodeRange> ranges)
+        // RangeString
+        // public static CodeString ToRangeString(IEnumerable<CodeRange> ranges)
         // {
-        //     StringBuilder builder = new StringBuilder();
+        //     List<CodePoint> builder = new List<CodePoint>();
 
         //     foreach (var range in ranges)
         //     {
@@ -202,7 +202,7 @@ namespace Soedeum.Dotnet.Library.Text
         // }
 
         // From List
-        public static CodeRange[] FromList(IEnumerable<CodePoint> points)
+        public static CodeRange[] FromUnorderedList(IEnumerable<CodePoint> points)
         {
             SortedSet<CodePoint> sortedChars = new SortedSet<CodePoint>(points);
 
@@ -264,15 +264,15 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        // Reduced Union
-        public static CodeRange[] Reduce(IEnumerable<CodeRange> ranges)
+        // Normalized ranges
+        public static CodeRange[] NormalizeUnordered(IEnumerable<CodeRange> ranges)
         {
             SortedSet<CodeRange> list = new SortedSet<CodeRange>(ranges);
 
-            return ReduceOrdered(list);
+            return NormalizeOrdered(list);
         }
 
-        public static CodeRange[] ReduceOrdered(IEnumerable<CodeRange> ranges)
+        public static CodeRange[] NormalizeOrdered(IEnumerable<CodeRange> ranges)
         {
             List<CodeRange> list = new List<CodeRange>(ranges);
 
@@ -298,18 +298,18 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Complement        
-        public static CodeRange[] Complement(IEnumerable<CodeRange> ranges)
+        public static CodeRange[] UnnormalizedComplement(IEnumerable<CodeRange> ranges)
         {
-            var orderedSet = Reduce(ranges);
+            var orderedSet = NormalizeUnordered(ranges);
 
-            var complement = ComplementOrderedSet(orderedSet);
+            var complement = NormalizedComplement(orderedSet);
 
             return complement;
         }
 
-        public static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges) => ComplementOrderedSet(ranges, CodePoint.MinValue, CodePoint.MaxValue);
+        public static CodeRange[] NormalizedComplement(IEnumerable<CodeRange> ranges) => NormalizedComplement(ranges, CodePoint.MinValue, CodePoint.MaxValue);
 
-        private static CodeRange[] ComplementOrderedSet(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
+        private static CodeRange[] NormalizedComplement(IEnumerable<CodeRange> ranges, CodePoint min, CodePoint max)
         {
             // Complement just creates ranges that exclude the ranges in the set
             // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
@@ -342,9 +342,64 @@ namespace Soedeum.Dotnet.Library.Text
             return complement.ToArray();
         }
 
+        // Remove
+
+        public static CodeRange[] UnnormalizedRemove(CodeRange[] ranges, params CodeRange[] removing)
+        {
+            ranges = NormalizeUnordered(ranges);
+
+            removing = NormalizeUnordered(removing);
+
+            return NormalizedRemove(ranges, removing);
+        }
+
+        public static CodeRange[] NormalizedRemove(IEnumerable<CodeRange> ranges, IEnumerable<CodeRange> removing)
+        {
+            // For each range in source, remove range in value;                        
+            var result = new List<CodeRange>(ranges);
+
+            foreach (var remove in removing)
+                NormalizedRemove(result, remove);
+
+            return result.ToArray();
+        }
+
+        private static void NormalizedRemove(List<CodeRange> ranges, CodeRange remove)
+        {
+            for (int s = 0; s < ranges.Count; s++)
+            {
+                var sourceRange = ranges[s];
+
+                // There is no overlap
+                if (remove.Low > sourceRange.High || remove.High < sourceRange.Low)
+                    continue;
+                if (CodeRange.SplitUnordered(sourceRange, remove, out var before, out var intersection, out var after))
+                {
+                    if (before.IsA)
+                    {
+                        ranges[s] = before.Range;
+
+                        if (after.IsA)
+                        {
+                            s++;
+
+                            ranges.Insert(s, after.Range);
+                        }
+                    }
+                    else if (after.IsA)
+                    {
+                        ranges[s] = after.Range;
+                    }
+                    else
+                    {
+                        ranges.RemoveAt(s);
+                    }
+                }
+            }
+        }
 
         // Combine
-        public static bool Combine(CodeRange a, CodeRange b, out CodeRange union)
+        public static bool CombineUnordered(CodeRange a, CodeRange b, out CodeRange union)
         {
             return (a <= b)
                     ? CombineOrdered(a, b, out union)
@@ -375,7 +430,7 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Intersect        
-        public static bool Intersect(CodeRange a, CodeRange b, out CodeRange intersection)
+        public static bool IntersectUnordered(CodeRange a, CodeRange b, out CodeRange intersection)
         {
             return (a <= b)
                     ? IntersectOrdered(a, b, out intersection)
@@ -444,7 +499,7 @@ namespace Soedeum.Dotnet.Library.Text
             public static readonly SplitResult Neither = new SplitResult();
         }
 
-        public static bool Split(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
+        public static bool SplitUnordered(CodeRange a, CodeRange b, out SplitResult before, out SplitResult intersection, out SplitResult after)
         {
             return (a <= b)
                     ? SplitOrdered(a, b, SplitResultSet.A, SplitResultSet.B, out before, out intersection, out after)

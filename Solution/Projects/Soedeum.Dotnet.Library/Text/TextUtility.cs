@@ -79,28 +79,90 @@ namespace Soedeum.Dotnet.Library.Text
             return new EnumerableAdapter<CodePoint>(ToCodePoints(chars.GetEnumerator()));
         }
 
+        // String -> CodePoint
+        public static IEnumerator<CodePoint> ToCodePoints(this string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            else
+                return UncheckedToCodePoints(value, 0, value.Length);
+        }
+
+        public static IEnumerator<CodePoint> ToCodePoints(this string value, int start)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            else
+                return UncheckedToCodePoints(value, start, value.Length - start);
+        }
+
+        public static IEnumerator<CodePoint> ToCodePoints(this string value, int start, int amount)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            else
+                return UncheckedToCodePoints(value, start, amount);
+        }
+
+        private static IEnumerator<CodePoint> UncheckedToCodePoints(string value, int start, int amount)
+        {
+            if (start < 0 || start > value.Length)
+                throw new ArgumentOutOfRangeException("start");
+
+            if (amount < 0 || start + amount > value.Length)
+                throw new ArgumentOutOfRangeException("amount");
+
+
+            var codepoints = new CodePoint[amount];
+
+
+            var decoder = new Utf16.CharDecoder();
+
+            bool result = true;
+
+            for (int i = start; i < amount; i++)
+            {
+                var utf32 = decoder.Process(value[i]);
+
+                if (utf32 != null)
+                    yield return (CodePoint)utf32.GetValueOrDefault();
+            }
+
+
+            if (!result)
+                throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
+
+        }
+
 
         // String -> CodePoint[]
-        public static CodePoint[] ToCodePoints(this string value)
+        public static CodePoint[] ToCodePointArray(this string value)
         {
             if (value == null)
-                return null;
+                throw new ArgumentNullException("value");
             else
-                return ToCodePoints(value, 0, value.Length);
+                return UncheckedToCodePointArray(value, 0, value.Length);
         }
 
-        public static CodePoint[] ToCodePoints(this string value, int start)
+        public static CodePoint[] ToCodePointArray(this string value, int start)
         {
             if (value == null)
-                return null;
+                throw new ArgumentNullException("value");
             else
-                return ToCodePoints(value, start, value.Length - start);
+                return UncheckedToCodePointArray(value, start, value.Length - start);
         }
 
-        public static CodePoint[] ToCodePoints(this string value, int start, int amount)
+        public static CodePoint[] ToCodePointArray(this string value, int start, int amount)
         {
             if (value == null)
-                return null;
+                throw new ArgumentNullException(value);
+            else
+                return UncheckedToCodePointArray(value, start, amount);
+        }
+
+        private static CodePoint[] UncheckedToCodePointArray(string value, int start, int amount)
+        {
 
             if (start < 0 || start > value.Length)
                 throw new ArgumentOutOfRangeException("start");
@@ -165,17 +227,17 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodeString ToCodeString(this string value)
         {
-            return new CodeString(ToCodePoints(value));
+            return new CodeString(value);
         }
 
         public static CodeString ToCodeString(this string value, int start)
         {
-            return new CodeString(ToCodePoints(value, start));
+            return new CodeString(value, start);
         }
 
         public static CodeString ToCodeString(this string value, int start, int amount)
         {
-            return new CodeString(ToCodePoints(value, start, amount));
+            return new CodeString(value, start, amount);
         }
     }
 }

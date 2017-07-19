@@ -40,13 +40,13 @@ namespace Soedeum.Dotnet.Library.Text
             : this(ReplicateCodePoint(value, count), false) { }
 
         public CodeString(string value)
-            : this(value.ToCodePoints(), false) { }
+            : this(value.ToCodePointArray(), false) { }
 
         public CodeString(string value, int start)
-            : this(value.ToCodePoints(start), false) { }
+            : this(value.ToCodePointArray(start), false) { }
 
         public CodeString(string value, int start, int amount)
-            : this(value.ToCodePoints(start, amount), false) { }
+            : this(value.ToCodePointArray(start, amount), false) { }
 
 
         // Indexer

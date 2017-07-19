@@ -20,6 +20,8 @@ namespace _TestConsole
 
             var b = a - CodeSet.Range('D', 'L');
 
+            StringBuilder builder = new StringBuilder();
+            
             Pause();
         }
 

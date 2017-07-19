@@ -176,7 +176,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         private static CodeSet FromList(IEnumerable<CodePoint> codepoints)
         {
-            var ranges = CodeRange.FromList(codepoints);
+            var ranges = CodeRange.FromUnorderedList(codepoints);
 
             return new CodeSet(ranges);
         }
@@ -200,14 +200,14 @@ namespace Soedeum.Dotnet.Library.Text
             foreach (var set in sets)
                 list.UnionWith(set.ranges);
 
-            var reduced = CodeRange.ReduceOrdered(list);
+            var reduced = CodeRange.NormalizeOrdered(list);
 
             return new CodeSet(reduced);
         }
 
         private static CodeSet ReduceRanges(IEnumerable<CodeRange> ranges)
         {
-            var reduced = CodeRange.Reduce(ranges);
+            var reduced = CodeRange.NormalizeUnordered(ranges);
 
             return new CodeSet(reduced);
         }
@@ -219,62 +219,14 @@ namespace Soedeum.Dotnet.Library.Text
 
         private static CodeSet FromComplement(CodeSet set)
         {
-            var ranges = CodeRange.ComplementOrderedSet(set.ranges);
+            var ranges = CodeRange.NormalizedComplement(set.ranges);
 
             return new CodeSet(ranges);
         }
 
 
         // Subtraction    
-        public static CodeSet Remove(CodeSet source, CodeSet removing)
-        {
-            // TODO: Heavily optimize
-
-            // For each range in source, remove range in value;            
-            var removingRanges = removing.ranges;
-
-            var result = new List<CodeRange>(source.ranges);
-
-            int min = 0;
-
-            for (int r = 0; r < removingRanges.Length; r++)
-            {
-                var removeRange = removingRanges[r];
-
-                for (int s = min; s < result.Count; s++)
-                {
-                    var sourceRange = result[s];
-
-                    // There is no overlap
-                    if (removeRange.Low > sourceRange.High || removeRange.High < sourceRange.Low)
-                        continue;
-                    if (CodeRange.Split(sourceRange, removeRange, out var before, out var intersection, out var after))
-                    {
-                        if (before.IsA)
-                        {
-                            result[s] = before.Range;
-
-                            if (after.IsA)
-                            {
-                                s++;
-
-                                result.Insert(s, after.Range);
-                            }
-                        }
-                        else if (after.IsA)
-                        {
-                            result[s] = after.Range;
-                        }
-                        else
-                        {
-                            result.RemoveAt(s);
-                        }
-                    }
-                }
-            }
-
-            return new CodeSet(result.ToArray());
-        }
+        public static CodeSet Remove(CodeSet source, CodeSet remove) => new CodeSet(CodeRange.NormalizedRemove(source.ranges, remove.ranges));
 
         public static CodeSet operator -(CodeSet left, CodeSet right) => Remove(left, right);
 
