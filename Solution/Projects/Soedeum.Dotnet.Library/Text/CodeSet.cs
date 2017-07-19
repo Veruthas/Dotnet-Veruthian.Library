@@ -166,7 +166,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodeSet List(CodeString codepoints) => FromList(codepoints);
 
-        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints());
+        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
 
         public static implicit operator CodeSet(string codepoints) => List(codepoints);
 
