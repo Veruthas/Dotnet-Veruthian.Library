@@ -26,6 +26,15 @@ namespace Soedeum.Dotnet.Library.Text
             this.hashcode = HashCodes.Default.Combine(ranges);
         }
 
+        private CodeSet(IEnumerable<CodeRange> ranges)
+        {
+            this.ranges = System.Linq.Enumerable.ToArray(ranges);
+
+            foreach (var range in ranges)
+                size += range.Size;
+
+            this.hashcode = HashCodes.Default.Combine(ranges);
+        }
 
         public int Size => size;
 
@@ -134,9 +143,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         #region RangeString
 
-        // public string ToRangeString() => CodeRange.ToRangeString(ranges);
+        public CodeString ToRangeString() => CodeRange.ToCompressedRangeList(ranges);
 
-        // public static CodeSet FromRangeString(string rangeString) => new CodeSet(CodeRange.FromRangeString(rangeString, true));
+        public static CodeSet FromRangeString(CodeString ranges) => new CodeSet(CodeRange.FromCompressedRangeList(ranges).GetEnumerableAdapter());
 
         #endregion
 
