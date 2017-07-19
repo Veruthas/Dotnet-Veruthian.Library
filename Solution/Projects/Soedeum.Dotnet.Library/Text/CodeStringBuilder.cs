@@ -8,7 +8,14 @@ namespace Soedeum.Dotnet.Library.Text
 {
     public class CodeStringBuilder : IEnumerable<CodePoint>
     {
-        List<CodePoint> codepoints = new List<CodePoint>();
+        List<CodePoint> codepoints;
+
+
+        public CodeStringBuilder() => codepoints = new List<CodePoint>();
+
+        public CodeStringBuilder(int capacity) => codepoints = new List<CodePoint>(capacity);
+
+        public CodeStringBuilder(IEnumerable<CodePoint> codepoints) => codepoints = new List<CodePoint>(codepoints);
 
 
         public int Length => codepoints.Count;
@@ -36,32 +43,101 @@ namespace Soedeum.Dotnet.Library.Text
 
         public CodeStringBuilder Append(IEnumerable<CodePoint> values)
         {
+            if (values == null)
+                throw new ArgumentNullException("values");
+
             codepoints.AddRange(values);
 
             return this;
         }
         public CodeStringBuilder Append(IEnumerator<CodePoint> values)
         {
+            if (values == null)
+                throw new ArgumentNullException("values");
+
             while (values.MoveNext())
                 codepoints.Add(values.Current);
 
             return this;
         }
 
-        public CodeStringBuilder Insert (int index)
+        public CodeStringBuilder Insert(int index, IEnumerable<CodePoint> values)
         {
-            
+            if (values == null)
+                throw new ArgumentNullException("values");
+
+            codepoints.InsertRange(index, values);
+
+            return this;
+        }
+
+        public CodeStringBuilder Insert(int index, IEnumerator<CodePoint> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException("values");
+
+            while (values.MoveNext())
+                codepoints.Insert(index, values.Current);
+
+            return this;
         }
 
         // CodeString
-        public CodeStringBuilder Append(CodeString value) => Append(value);
+        public CodeStringBuilder Append(CodeString value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
 
-        public CodeStringBuilder Append(CodeString value, int start) => Append(value, start, value.Length - start);
+            codepoints.AddRange(value);
+
+            return this;
+        }
+
+        public CodeStringBuilder Append(CodeString value, int start)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            return Append(value, start, value.Length - start);
+        }
 
         public CodeStringBuilder Append(CodeString value, int start, int amount)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
             for (int i = start; i < start + amount; i++)
                 codepoints.Add(value[i]);
+
+            return this;
+        }
+
+        public CodeStringBuilder Insert(int index, CodeString value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            codepoints.InsertRange(index, value);
+
+            return this;
+
+        }
+
+        public CodeStringBuilder Insert(int index, CodeString value, int start)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            return Append(value, start, value.Length - start);
+        }
+
+        public CodeStringBuilder Insert(int index, CodeString value, int start, int amount)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            for (int i = start; i < start + amount; i++)
+                codepoints.Insert(index++, value[i]);
 
             return this;
         }
@@ -69,7 +145,20 @@ namespace Soedeum.Dotnet.Library.Text
         // Chars
         public CodeStringBuilder Append(IEnumerable<char> value)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
             Append(value.ToCodePoints());
+
+            return this;
+        }
+
+        public CodeStringBuilder Insert(int index, IEnumerable<char> value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Insert(index, value.ToCodePoints());
 
             return this;
         }
@@ -77,27 +166,72 @@ namespace Soedeum.Dotnet.Library.Text
         // Strings
         public CodeStringBuilder Append(string value)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
             Append(value.ToCodePoints());
 
             return this;
         }
         public CodeStringBuilder Append(string value, int start)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
             Append(value.ToCodePoints(start));
 
             return this;
         }
         public CodeStringBuilder Append(string value, int start, int amount)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
             Append(value.ToCodePoints(start, amount));
 
             return this;
         }
 
+        public CodeStringBuilder Insert(int index, string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Insert(index, value.ToCodePoints());
+
+            return this;
+        }
+        public CodeStringBuilder Insert(int index, string value, int start)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Insert(index, value.ToCodePoints(start));
+
+            return this;
+        }
+        public CodeStringBuilder Insert(int index, string value, int start, int amount)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Insert(index, value.ToCodePoints(start, amount));
+
+            return this;
+        }
+
+
         // Objects
         public CodeStringBuilder Append(object value)
         {
             Append(value.ToString());
+
+            return this;
+        }
+
+        public CodeStringBuilder Insert(int index, object value)
+        {
+            Insert(index, value.ToString());
 
             return this;
         }
@@ -169,10 +303,134 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
+        public CodeStringBuilder InsertFormat(int index, string format, object arg0)
+        {
+            string value = string.Format(format, arg0);
 
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, string format, object arg0, object arg1)
+        {
+            string value = string.Format(format, arg0, arg1);
+
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, string format, object arg0, object arg1, object arg2)
+        {
+            string value = string.Format(format, arg0, arg1, arg2);
+
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, string format, params object[] args)
+        {
+            string value = string.Format(format, args);
+
+            Insert(index, format);
+
+            return this;
+        }
+
+        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0)
+        {
+            string value = string.Format(provider, format, arg0);
+
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1)
+        {
+            string value = string.Format(provider, format, arg0, arg1);
+
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        {
+            string value = string.Format(provider, format, arg0, arg1, arg2);
+
+            Insert(index, format);
+
+            return this;
+        }
+        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, params object[] args)
+        {
+            string value = string.Format(provider, format, args);
+
+            Insert(index, format);
+
+            return this;
+        }
+
+        // Remove
+        public CodeStringBuilder Remove(CodePoint value)
+        {
+            codepoints.Remove(value);
+
+            return this;
+        }
+
+        public CodeStringBuilder Remove(int index)
+        {
+            codepoints.RemoveAt(index);
+
+            return this;
+        }
+
+        public CodeStringBuilder Remove(int index, int amount)
+        {
+            codepoints.RemoveRange(index, amount);
+
+            return this;
+        }
+
+        public CodeStringBuilder Remove(Predicate<CodePoint> match)
+        {
+            codepoints.RemoveAll(match);
+
+            return this;
+        }
+
+        public CodeStringBuilder Clear()
+        {
+            codepoints.Clear();
+
+            return this;
+        }
+
+
+        // Reverse
+        public CodeStringBuilder Reverse()
+        {
+            codepoints.Reverse();
+
+            return this;
+        }
+
+        public CodeStringBuilder Reverse(int index, int length)
+        {
+            codepoints.Reverse(index, length);
+
+            return this;
+        }
+
+
+        // Conversion
         public CodeString ToCodeString()
         {
             return new CodeString(codepoints);
+        }
+
+        public CodePoint[] ToCodePoints()
+        {
+            return codepoints.ToArray();
         }
 
         public override string ToString()
@@ -189,3 +447,4 @@ namespace Soedeum.Dotnet.Library.Text
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
+}

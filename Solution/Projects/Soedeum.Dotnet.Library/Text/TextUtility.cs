@@ -12,6 +12,9 @@ namespace Soedeum.Dotnet.Library.Text
         public static IEnumerator<CodePoint> DecodeValues<T, TDecoder>(IEnumerator<T> items, TDecoder decoder, string onIncomplete)
             where TDecoder : ITransformer<T, uint?>
         {
+            if (items == null)
+                throw new ArgumentNullException("items");
+
             uint? result = 0;
 
             while (items.MoveNext())
@@ -84,16 +87,16 @@ namespace Soedeum.Dotnet.Library.Text
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-            else
-                return UncheckedToCodePoints(value, 0, value.Length);
+
+            return UncheckedToCodePoints(value, 0, value.Length);
         }
 
         public static IEnumerator<CodePoint> ToCodePoints(this string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-            else
-                return UncheckedToCodePoints(value, start, value.Length - start);
+
+            return UncheckedToCodePoints(value, start, value.Length - start);
         }
 
         public static IEnumerator<CodePoint> ToCodePoints(this string value, int start, int amount)
@@ -101,8 +104,8 @@ namespace Soedeum.Dotnet.Library.Text
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            else
-                return UncheckedToCodePoints(value, start, amount);
+
+            return UncheckedToCodePoints(value, start, amount);
         }
 
         private static IEnumerator<CodePoint> UncheckedToCodePoints(string value, int start, int amount)
@@ -141,24 +144,24 @@ namespace Soedeum.Dotnet.Library.Text
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-            else
-                return UncheckedToCodePointArray(value, 0, value.Length);
+
+            return UncheckedToCodePointArray(value, 0, value.Length);
         }
 
         public static CodePoint[] ToCodePointArray(this string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
-            else
-                return UncheckedToCodePointArray(value, start, value.Length - start);
+
+            return UncheckedToCodePointArray(value, start, value.Length - start);
         }
 
         public static CodePoint[] ToCodePointArray(this string value, int start, int amount)
         {
             if (value == null)
                 throw new ArgumentNullException(value);
-            else
-                return UncheckedToCodePointArray(value, start, amount);
+
+            return UncheckedToCodePointArray(value, start, amount);
         }
 
         private static CodePoint[] UncheckedToCodePointArray(string value, int start, int amount)
