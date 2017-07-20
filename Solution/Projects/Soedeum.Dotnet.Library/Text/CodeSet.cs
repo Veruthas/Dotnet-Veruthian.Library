@@ -84,8 +84,25 @@ namespace Soedeum.Dotnet.Library.Text
         public override int GetHashCode() => hashcode;
 
 
-        public CodeRange[] ToArray() => ranges.Clone() as CodeRange[];
+        public CodeRange[] ToRangeArray() => ranges.Clone() as CodeRange[];
 
+        public CodePoint[] ToCodePointArray()
+        {
+            CodePoint[] result = new CodePoint[size];
+
+            int index = 0;
+
+            foreach (var range in ranges)
+            {
+                var low = range.Low;
+                var high = range.High;
+
+                for (var value = low; value <= high; value++)
+                    result[index] = value;
+            }
+
+            return result;
+        }
 
         public override string ToString()
         {
@@ -121,19 +138,19 @@ namespace Soedeum.Dotnet.Library.Text
                 yield return range;
         }
 
-        private IEnumerator<CodePoint> GetCharEnumerator()
+        private IEnumerator<CodePoint> GetCodePointEnumerator()
         {
             foreach (var range in ranges)
             {
-                int low = range.Low;
-                int high = range.High;
+                var low = range.Low;
+                var high = range.High;
 
-                for (int i = low; i <= high; i++)
-                    yield return (CodePoint)i;
+                for (var value = low; value <= high; value++)
+                    yield return value;
             }
         }
 
-        public IEnumerable<CodePoint> CodePoints => new EnumeratorGenerator<CodePoint>(GetCharEnumerator);
+        public IEnumerable<CodePoint> CodePoints => new EnumeratorGenerator<CodePoint>(GetCodePointEnumerator);
 
         public IEnumerable<CodeRange> Ranges => new EnumeratorGenerator<CodeRange>(GetRangeEnumerator);
 
