@@ -30,9 +30,9 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Utf8 -> CodePoint
-        public static EnumerableAdapter<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
+        public static IEnumerator<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
         {
-            return new EnumerableAdapter<CodePoint>(AsUtf8CodePoints(bytes.GetEnumerator()));
+            return AsUtf8CodePoints(bytes.GetEnumerator());
         }
 
         public static IEnumerator<CodePoint> AsUtf8CodePoints(this IEnumerator<byte> bytes)
@@ -43,9 +43,9 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Utf16 -> CodePoint
-        public static EnumerableAdapter<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return new EnumerableAdapter<CodePoint>(AsUtf16CodePoints(bytes.GetEnumerator(), endianness));
+            return AsUtf16CodePoints(bytes.GetEnumerator(), endianness);
         }
         public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
@@ -56,9 +56,9 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Utf32 -> CodePoint
-        public static EnumerableAdapter<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
-            return new EnumerableAdapter<CodePoint>(AsUtf32CodePoints(bytes.GetEnumerator(), endianness));
+            return AsUtf32CodePoints(bytes.GetEnumerator(), endianness);
         }
 
         public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
@@ -77,9 +77,9 @@ namespace Soedeum.Dotnet.Library.Text
             return DecodeValues(chars, decoder, Utf16.MissingTrailingSurrogateMessage());
         }
 
-        public static EnumerableAdapter<CodePoint> ToCodePoints(this IEnumerable<char> chars)
+        public static IEnumerator<CodePoint> ToCodePoints(this IEnumerable<char> chars)
         {
-            return new EnumerableAdapter<CodePoint>(ToCodePoints(chars.GetEnumerator()));
+            return ToCodePoints(chars.GetEnumerator());
         }
 
         // String -> CodePoint

@@ -34,6 +34,19 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
+        public CodeString(IEnumerator<CodePoint> codepoints)
+            : this(GetFromEnumerator(codepoints), false) { }
+
+        private static CodePoint[] GetFromEnumerator(IEnumerator<CodePoint> codepoints)
+        {
+            var result = new List<CodePoint>();
+
+            while (codepoints.MoveNext())
+                result.Add(codepoints.Current);
+
+            return result.ToArray();
+        }
+
         public CodeString(ICollection<CodePoint> codepoints)
                 : this(GetFromCollection(codepoints), false) { }
         public CodeString(IList<CodePoint> codepoints, int index)
