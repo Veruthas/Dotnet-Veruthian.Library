@@ -14,29 +14,19 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            // string s = "𠜎𠜱𠝹𠱓𠱸𠲖𠳏𠳕𠴕𠵼𠵿𠸎𠸏𠹷𠺝𠺢𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜𡁯𡁵𡁶𡁻𡃁𡃉𡇙𢃇𢞵𢫕𢭃𢯊𢱑𢱕𢳂𢴈𢵌𢵧𢺳𣲷𤓓𤶸𤷪𥄫𦉘𦟌𦧲𦧺𧨾𨅝𨈇𨋢𨳊𨳍𨳒𩶘";
+            // string s = "𠜎𠜱𠝹𠱓𠱸𠲖𠳏𠳕𠴕𠵼𠵿𠸎𠸏𠹷𠺝𠺢𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜𡁯𡁵𡁶𡁻𡃁𡃉𡇙𢃇𢞵𢫕𢭃𢯊𢱑𢱕𢳂𢴈𢵌𢵧𢺳𣲷𤓓𤶸𤷪𥄫𦉘𦟌𦧲𦧺𧨾𨅝𨈇𨋢𨳊𨳍𨳒𩶘";            
 
-            // A
-            var a = new CodePatternBuilder('A');
+            var s = new CodePatternBuilder(CodeSet.IdentifierFirst);
 
-            // A?
-            var am = new CodePatternBuilder('A').MakeOptional();
+            var t = new CodePatternBuilder(CodeSet.IdentifierFollow).MakeOptional().MakeRepeating();
 
-            // A*
-            var ast = new CodePatternBuilder('A').MakeOptional().MakeRepeating();
+            var u = new CodePatternBuilder(s).Append(t);
 
-            // A+
-            var apl = new CodePatternBuilder('A').MakeRepeating();
+            Console.WriteLine(s);
 
+            Console.WriteLine(t);
 
-            // A+B
-            var apb = new CodePatternBuilder("A").MakeRepeating().Append("B");
-
-            // A*B
-            var astb = new CodePatternBuilder('A').MakeOptional().MakeRepeating().Append("B");
-
-            // AB*
-            var abst = new CodePatternBuilder('A').Append("B").MakeOptional().MakeRepeating();
+            Console.WriteLine(u);
 
             Pause();
         }
