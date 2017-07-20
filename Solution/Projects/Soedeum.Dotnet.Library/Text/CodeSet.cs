@@ -172,17 +172,12 @@ namespace Soedeum.Dotnet.Library.Text
         // From Value
         public static CodeSet Value(CodePoint value) => new CodeSet(new CodeRange(value));
 
-        public static implicit operator CodeSet(CodePoint value) => Value(value);
-
-        public static implicit operator CodeSet(char value) => Value(value);
-
 
         // From Range
         public static CodeSet Range(CodeRange range) => new CodeSet(range);
 
         public static CodeSet Range(CodePoint low, CodePoint high) => new CodeSet(new CodeRange(low, high));
 
-        public static implicit operator CodeSet(CodeRange range) => Range(range);
 
 
         // From List
@@ -194,11 +189,6 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
 
-        public static implicit operator CodeSet(string codepoints) => List(codepoints);
-
-        public static implicit operator CodeSet(CodeString codepoints) => List(codepoints);
-
-        public static implicit operator CodeSet(CodePoint[] codepoints) => List(codepoints);
 
         private static CodeSet FromList(IEnumerable<CodePoint> codepoints)
         {
@@ -262,11 +252,11 @@ namespace Soedeum.Dotnet.Library.Text
         // Sets
         #region Sets (only using ASCII for now)
 
-        public static readonly CodeSet Complete = CodeRange.Complete;
+        public static readonly CodeSet Complete = Range(CodeRange.Complete);
 
         public static readonly CodeSet Empty = new CodeSet();
 
-        public static readonly CodeSet Null = '\0';
+        public static readonly CodeSet Null = Value('\0');
 
         public static readonly CodeSet NewLine = List("\n\r");
 
@@ -280,13 +270,13 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly CodeSet Letter = Lower + Upper;
 
-        public static readonly CodeSet LetterOrUnderscore = Letter + '_';
+        public static readonly CodeSet LetterOrUnderscore = Letter + Value('_');
 
         public static readonly CodeSet Digit = Range('0', '9');
 
         public static readonly CodeSet LetterOrDigit = Letter + Digit;
 
-        public static readonly CodeSet LetterOrDigitOrUnderscore = LetterOrDigit + '_';
+        public static readonly CodeSet LetterOrDigitOrUnderscore = LetterOrDigit + Value('_');
 
         public static readonly CodeSet HexDigit = Union(Digit, Range('A', 'F'), Range('a', 'f'));
 
