@@ -30,12 +30,52 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(params CodePoint[] codepoints)
             : this(codepoints, true) { }
 
+
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
-        public CodeString(List<CodePoint> codepoints)
-            : this(codepoints.ToArray(), false) { }
-            
+        public CodeString(ICollection<CodePoint> codepoints)
+                : this(GetFromCollection(codepoints), false) { }
+        public CodeString(IList<CodePoint> codepoints, int index)
+            : this(GetFromList(codepoints, index, codepoints.Count - index), false) { }
+        public CodeString(IList<CodePoint> codepoints, int index, int amount)
+            : this(GetFromList(codepoints, index, amount), false) { }
+        private static CodePoint[] GetFromCollection(ICollection<CodePoint> codepoints)
+        {
+            if (codepoints == null)
+                throw new ArgumentNullException("codepoints");
+
+            CodePoint[] values = new CodePoint[codepoints.Count];
+
+            codepoints.CopyTo(values, 0);
+
+            return values;
+        }
+        private static CodePoint[] GetFromList(IList<CodePoint> codepoints, int index, int amount)
+        {
+            if (codepoints == null)
+                throw new ArgumentNullException("codepoints");
+            if (index < 0 || index > codepoints.Count)
+                throw new ArgumentOutOfRangeException("index");
+            if (amount < 0 || index + amount > codepoints.Count)
+                throw new ArgumentOutOfRangeException("amount");
+
+            CodePoint[] values = new CodePoint[amount];
+
+            if (codepoints is List<CodePoint>)
+            {
+                var list = codepoints as List<CodePoint>;
+                list.CopyTo(index, values, 0, amount);
+            }
+            else
+            {
+                for (int i = 0; i < amount; i++)
+                    values[i] = codepoints[index + i];
+            }
+
+            return values;
+        }
+
         public CodeString(CodePoint value, int count)
             : this(ReplicateCodePoint(value, count), false) { }
 
