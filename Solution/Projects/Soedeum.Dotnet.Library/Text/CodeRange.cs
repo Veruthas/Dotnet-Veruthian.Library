@@ -157,49 +157,54 @@ namespace Soedeum.Dotnet.Library.Text
         public static bool Contains(CodeRange[] sortedSet, CodePoint value) => Find(sortedSet, value) != -1;
 
 
-        // RangeString
-        // public static CodeString ToRangeString(IEnumerable<CodeRange> ranges)
-        // {
-        //     List<CodePoint> builder = new List<CodePoint>();
+        // CompressedRangeList
+        public static CodeString ToCompressedRangeList(IEnumerable<CodeRange> ranges)
+        {
+            CodeStringBuilder builder = new CodeStringBuilder();
 
-        //     foreach (var range in ranges)
-        //     {
-        //         builder.Append(range.Low);
-        //         builder.Append(range.High);
-        //     }
+            foreach (var range in ranges)
+            {
+                builder.Append(range.Low);
+                builder.Append(range.High);
+            }
 
-        //     return builder.ToString();
-        // }
+            return builder.ToCodeString();
+        }
 
-        // public static CharRange[] FromRangeString(string rangeString, bool verifyOrderedSet = false)
-        // {
-        //     if (string.IsNullOrEmpty(rangeString))
-        //         return new CharRange[0];
+        public static IEnumerator<CodeRange> FromCompressedRangeList(IEnumerable<CodePoint> ranges, bool verifyNormalized = true)
+        {
+            return FromCompressedRangeList(ranges.GetEnumerator(), verifyNormalized);
+        }
 
-        //     if (rangeString.Length % 2 != 0)
-        //         throw new FormatException("Range string must contain character pairs. A lone character was found.");
+        public static IEnumerator<CodeRange> FromCompressedRangeList(IEnumerator<CodePoint> ranges, bool verifyNormalized = true)
+        {
+            if (ranges == null)
+                throw new ArgumentOutOfRangeException("rangeString");
 
-        //     CharRange[] ranges = new CharRange[rangeString.Length / 2];
+            int maxChar = -1;
 
-        //     int maxChar = -1;
+            while (true)
+            {
+                if (!ranges.MoveNext())
+                    yield break;
 
-        //     for (int i = 0, j = 0; i < rangeString.Length; i += 2, j++)
-        //     {
-        //         char low = rangeString[i];
-        //         char high = rangeString[i + 1];
+                var low = ranges.Current;
 
-        //         if (low <= maxChar || low > high)
-        //             throw new FormatException("Range string must consist of a set of sorted character pairs with no ranges in common.");
+                if (!ranges.MoveNext())
+                    throw new FormatException("Unpaired range!");
 
-        //         maxChar = high;
+                var high = ranges.Current;
 
-        //         var range = new CharRange(low, high);
+                if (verifyNormalized && low <= maxChar || low > high)
+                    throw new FormatException("Range string must consist of a set of sorted character pairs with no ranges in common.");
 
-        //         ranges[j] = range;
-        //     }
+                maxChar = high;
 
-        //     return ranges;
-        // }
+                var range = new CodeRange(low, high);
+
+                yield return range;
+            }
+        }
 
         // From List
         public static CodeRange[] FromUnorderedList(IEnumerable<CodePoint> points)
