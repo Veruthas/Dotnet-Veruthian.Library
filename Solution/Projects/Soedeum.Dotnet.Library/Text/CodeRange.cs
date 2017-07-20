@@ -153,8 +153,33 @@ namespace Soedeum.Dotnet.Library.Text
 
             return -1;
         }
+        public static int Find(IList<CodeRange> sortedSet, CodePoint value)
+        {
+            int low = 0;
+
+            int high = sortedSet.Count - 1;
+
+
+            while (low <= high)
+            {
+                int middle = (high + low) / 2;
+
+                var range = sortedSet[middle];
+
+                if (value < range.Low)
+                    high = middle - 1;
+                else if (value > range.High)
+                    low = middle + 1;
+                else
+                    return middle;
+            }
+
+            return -1;
+        }
 
         public static bool Contains(CodeRange[] sortedSet, CodePoint value) => Find(sortedSet, value) != -1;
+
+        public static bool Contains(IList<CodeRange> sortedSet, CodePoint value) => Find(sortedSet, value) != -1;
 
 
         // CompressedRangeList

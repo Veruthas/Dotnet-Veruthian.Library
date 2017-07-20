@@ -16,6 +16,28 @@ namespace _TestConsole
         {
             // string s = "𠜎𠜱𠝹𠱓𠱸𠲖𠳏𠳕𠴕𠵼𠵿𠸎𠸏𠹷𠺝𠺢𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜𡁯𡁵𡁶𡁻𡃁𡃉𡇙𢃇𢞵𢫕𢭃𢯊𢱑𢱕𢳂𢴈𢵌𢵧𢺳𣲷𤓓𤶸𤷪𥄫𦉘𦟌𦧲𦧺𧨾𨅝𨈇𨋢𨳊𨳍𨳒𩶘";
 
+            // A
+            var a = new CodePatternBuilder('A');
+
+            // A?
+            var am = new CodePatternBuilder('A').MakeOptional();
+
+            // A*
+            var ast = new CodePatternBuilder('A').MakeOptional().MakeRepeating();
+
+            // A+
+            var apl = new CodePatternBuilder('A').MakeRepeating();
+
+
+            // A+B
+            var apb = new CodePatternBuilder("A").MakeRepeating().Append("B");
+
+            // A*B
+            var astb = new CodePatternBuilder('A').MakeOptional().MakeRepeating().Append("B");
+
+            // AB*
+            var abst = new CodePatternBuilder('A').Append("B").MakeOptional().MakeRepeating();
+
             Pause();
         }
 
