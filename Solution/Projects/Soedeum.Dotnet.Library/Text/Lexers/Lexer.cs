@@ -129,10 +129,10 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
         protected virtual void RollbackCaptured(int length)
         {
-            if (length > captured.Count)
+            if (length > captured.Length)
                 ReleaseCaptured();
             else
-                captured.RemoveRange(captured.Count - length, length);
+                captured.Remove(captured.Length - length, length);
         }
 
         protected virtual TextLocation CaptureLocation { get => captureLocation; set => captureLocation = value; }
@@ -153,13 +153,13 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
                 captured.Clear();
 
             foreach (var point in data)
-                captured.Add(point);
+                captured.Append(point);
         }
 
         protected virtual void Capture(CodePoint item)
         {
             if (capturing)
-                captured.Add(item);
+                captured.Append(item);
 
             Location = Location.MoveToNext(item, Reader.Peek());
         }
