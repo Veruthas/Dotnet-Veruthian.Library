@@ -38,8 +38,8 @@ namespace Soedeum.Dotnet.Library.Text
                 : this(GetFromCollection(codepoints), false) { }
         public CodeString(IList<CodePoint> codepoints, int index)
             : this(GetFromList(codepoints, index, codepoints.Count - index), false) { }
-        public CodeString(IList<CodePoint> codepoints, int index, int amount)
-            : this(GetFromList(codepoints, index, amount), false) { }
+        public CodeString(IList<CodePoint> codepoints, int index, int length)
+            : this(GetFromList(codepoints, index, length), false) { }
         private static CodePoint[] GetFromCollection(ICollection<CodePoint> codepoints)
         {
             if (codepoints == null)
@@ -51,25 +51,25 @@ namespace Soedeum.Dotnet.Library.Text
 
             return values;
         }
-        private static CodePoint[] GetFromList(IList<CodePoint> codepoints, int index, int amount)
+        private static CodePoint[] GetFromList(IList<CodePoint> codepoints, int index, int length)
         {
             if (codepoints == null)
                 throw new ArgumentNullException("codepoints");
             if (index < 0 || index > codepoints.Count)
                 throw new ArgumentOutOfRangeException("index");
-            if (amount < 0 || index + amount > codepoints.Count)
-                throw new ArgumentOutOfRangeException("amount");
+            if (length < 0 || index + length > codepoints.Count)
+                throw new ArgumentOutOfRangeException("length");
 
-            CodePoint[] values = new CodePoint[amount];
+            CodePoint[] values = new CodePoint[length];
 
             if (codepoints is List<CodePoint>)
             {
                 var list = codepoints as List<CodePoint>;
-                list.CopyTo(index, values, 0, amount);
+                list.CopyTo(index, values, 0, length);
             }
             else
             {
-                for (int i = 0; i < amount; i++)
+                for (int i = 0; i < length; i++)
                     values[i] = codepoints[index + i];
             }
 
@@ -85,8 +85,8 @@ namespace Soedeum.Dotnet.Library.Text
         public CodeString(string value, int start)
             : this(value.ToCodePointArray(start), false) { }
 
-        public CodeString(string value, int start, int amount)
-            : this(value.ToCodePointArray(start, amount), false) { }
+        public CodeString(string value, int start, int length)
+            : this(value.ToCodePointArray(start, length), false) { }
 
 
         // Indexer
@@ -305,7 +305,7 @@ namespace Soedeum.Dotnet.Library.Text
         private static CodePoint[] ReplicateCodePoint(CodePoint value, int count)
         {
             if (count < 0)
-                throw new ArgumentOutOfRangeException("amount", count, "Amount cannot be a negative number.");
+                throw new ArgumentOutOfRangeException("length", count, "length cannot be a negative number.");
 
             CodePoint[] codepoints = new CodePoint[count];
 
@@ -371,17 +371,17 @@ namespace Soedeum.Dotnet.Library.Text
         // SubString
         public CodeString Substring(int start) => Substring(start, Length - start);
 
-        public CodeString Substring(int start, int amount)
+        public CodeString Substring(int start, int length)
         {
             if (start < 0 || start > Length)
                 throw new ArgumentOutOfRangeException("start");
 
-            if (start + amount > Length)
-                throw new ArgumentOutOfRangeException("amount");
+            if (start + length > Length)
+                throw new ArgumentOutOfRangeException("length");
 
-            var subpoints = new CodePoint[amount];
+            var subpoints = new CodePoint[length];
 
-            for (int i = 0, s = start; i < amount; i++, s++)
+            for (int i = 0, s = start; i < length; i++, s++)
                 subpoints[i] = codepoints[s];
 
             return new CodeString(subpoints, false);

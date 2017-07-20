@@ -213,9 +213,17 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // CodeString
-        public static CodeString ToCodeString(this List<CodePoint> codepoints)
+        public static CodeString ToCodeString(this ICollection<CodePoint> codepoints)
         {
             return new CodeString(codepoints);
+        }
+        public static CodeString ToCodeString(this IList<CodePoint> codepoints, int index)
+        {
+            return new CodeString(codepoints, index);
+        }
+        public static CodeString ToCodeString(this IList<CodePoint> codepoints, int index, int length)
+        {
+            return new CodeString(codepoints, index, length);
         }
 
         public static CodeString ToCodeString(this IEnumerable<CodePoint> codepoints)

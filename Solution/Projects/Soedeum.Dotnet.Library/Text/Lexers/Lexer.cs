@@ -38,7 +38,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
         // Capture data
         private bool capturing = false;
 
-        private List<CodePoint> captured = new List<CodePoint>();
+        private CodeStringBuilder captured = new CodeStringBuilder();
 
         private TextLocation captureLocation;
 
@@ -183,9 +183,9 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
             return read;
         }
 
-        protected void Read(int amount)
+        protected void Read(int length)
         {
-            for (int i = 0; i < amount; i++)
+            for (int i = 0; i < length; i++)
                 Read();
         }
 
