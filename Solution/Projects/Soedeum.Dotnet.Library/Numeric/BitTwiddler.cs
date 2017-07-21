@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Soedeum.Dotnet.Library.Numerics
+namespace Soedeum.Dotnet.Library.Numeric
 {
     public struct BitTwiddler
     {

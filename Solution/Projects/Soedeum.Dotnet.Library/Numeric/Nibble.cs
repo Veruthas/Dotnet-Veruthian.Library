@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Numerics
+namespace Soedeum.Dotnet.Library.Numeric
 {
     public struct Nibble : IEquatable<Nibble>, IComparable<Nibble>, IFormattable, IConvertible
     {

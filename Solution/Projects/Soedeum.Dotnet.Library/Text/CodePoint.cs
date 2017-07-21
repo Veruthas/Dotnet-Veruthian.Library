@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Globalization;
-using Soedeum.Dotnet.Library.Numerics;
+using Soedeum.Dotnet.Library.Numeric;
 using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
