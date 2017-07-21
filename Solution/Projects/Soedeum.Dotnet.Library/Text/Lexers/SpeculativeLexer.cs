@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Collections.Readers;
 using Soedeum.Dotnet.Library.Text;
 
 namespace Soedeum.Dotnet.Library.Text.Lexers

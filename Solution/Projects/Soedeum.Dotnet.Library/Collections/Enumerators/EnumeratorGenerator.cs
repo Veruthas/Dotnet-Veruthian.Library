@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Collections
+namespace Soedeum.Dotnet.Library.Collections.Enumerators
 {
     public class EnumeratorGenerator<T> : IEnumerable<T>
     {

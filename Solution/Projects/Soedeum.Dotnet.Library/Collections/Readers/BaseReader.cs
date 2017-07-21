@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Collections
+namespace Soedeum.Dotnet.Library.Collections.Readers
 {
     public abstract class BaseReader<T> : IReader<T>
     {

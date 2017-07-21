@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Collections
+namespace Soedeum.Dotnet.Library.Collections.Readers
 {
     public class SpeculativeReader<T> : VariableLookaheadReader<T>, ISpeculativeReader<T>
     {

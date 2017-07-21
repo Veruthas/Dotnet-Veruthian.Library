@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Soedeum.Dotnet.Library.Collections;
+using Soedeum.Dotnet.Library.Collections.Enumerators;
 
 namespace Soedeum.Dotnet.Library.Text
 {

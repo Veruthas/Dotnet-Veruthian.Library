@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Collections
+namespace Soedeum.Dotnet.Library.Collections.Readers
 {
     public interface IReader<T> : IDisposable
     {
