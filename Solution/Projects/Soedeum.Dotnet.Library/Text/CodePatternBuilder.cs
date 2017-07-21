@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Soedeum.Dotnet.Library.Collections;
@@ -19,21 +20,10 @@ namespace Soedeum.Dotnet.Library.Text
         public CodePatternBuilder(CodeRange range) => Append(range);
         public CodePatternBuilder(IEnumerable<CodeRange> ranges) => Append(ranges);
         public CodePatternBuilder(CodeSet set) => Append(set);
+        public CodePatternBuilder(string value) => Append(value);
         public CodePatternBuilder(IEnumerable<char> value) => Append(value);
         public CodePatternBuilder(CodePatternBuilder pattern) => Append(pattern);
 
-
-        public static implicit operator CodePatternBuilder(char value) => new CodePatternBuilder(value);
-
-        public static implicit operator CodePatternBuilder(CodePoint value) => new CodePatternBuilder(value);
-
-        public static implicit operator CodePatternBuilder(CodeString value) => new CodePatternBuilder((IEnumerable<CodePoint>)value);
-
-        public static implicit operator CodePatternBuilder(CodeRange range) => new CodePatternBuilder(range);
-
-        public static implicit operator CodePatternBuilder(CodeSet set) => new CodePatternBuilder(set);
-
-        public static implicit operator CodePatternBuilder(string value) => new CodePatternBuilder((IEnumerable<char>)value);
 
 
         // Concatenation
@@ -102,10 +92,18 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
+        public CodePatternBuilder Append(string value)
+        {
+            foreach (var codepoint in value.ToCodePoints().GetEnumerableAdapter())
+                Append(codepoint);
+
+            return this;
+        }
+
         public CodePatternBuilder Append(IEnumerable<char> value)
         {
             foreach (var codepoint in value.ToCodePoints().GetEnumerableAdapter())
-                Append(CodeSet.Value(codepoint));
+                Append(codepoint);
 
             return this;
         }
@@ -139,6 +137,8 @@ namespace Soedeum.Dotnet.Library.Text
         public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<CodeRange> ranges) => pattern.Append(ranges);
 
         public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodeSet set) => pattern.Append(set);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, string value) => pattern.Append(value);
 
         public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<char> value) => pattern.Append(value);
 
@@ -188,28 +188,18 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Union
-        public static CodePatternBuilder Or(CodePatternBuilder pattern0, CodePatternBuilder pattern1)
-        {
-            var newPattern = CreateUnionBase();
-
-            JoinPattern(newPattern, pattern0);
-
-            JoinPattern(newPattern, pattern1);
-
-            return newPattern;
-        }
-
-        public static CodePatternBuilder Or(params CodePatternBuilder[] patterns)
+        public static CodePatternBuilder Union(params CodePatternBuilder[] patterns)
         {
             var newPattern = CreateUnionBase();
 
             foreach (var pattern in patterns)
                 JoinPattern(newPattern, pattern);
 
-            return newPattern; ;
+            return newPattern;
         }
 
-        public static CodePatternBuilder operator |(CodePatternBuilder left, CodePatternBuilder right) => Or(left, right);
+
+        public static CodePatternBuilder operator |(CodePatternBuilder left, CodePatternBuilder right) => Union(left, right);
 
         private static CodePatternBuilder CreateUnionBase()
         {
@@ -230,7 +220,6 @@ namespace Soedeum.Dotnet.Library.Text
 
             addedLast.AddEmptyTransition(pattern.last);
         }
-
 
         // State creation
         private State GetNewState()
@@ -271,18 +260,20 @@ namespace Soedeum.Dotnet.Library.Text
 
 
         // Structures
-        private class State
+        public class State
         {
             public State(int index)
             {
+                this.Transitions = null;
+                this.EmptyTransitions = null;
                 this.Index = index;
             }
 
-            public int Index { get; set; }
+            public int Index { get; private set; }
 
-            public List<Transition> Transitions { get; set; }
+            public List<Transition> Transitions { get; private set; }
 
-            public List<int> EmptyTransitions { get; set; }
+            public List<int> EmptyTransitions { get; private set; }
 
 
             public void AddTransition(CodeRange range, State to)
@@ -314,6 +305,8 @@ namespace Soedeum.Dotnet.Library.Text
                     EmptyTransitions = new List<int>();
 
                 EmptyTransitions.Add(to.Index);
+
+                EmptyTransitions.Sort();
             }
 
             public State Clone(int offset)
@@ -396,7 +389,7 @@ namespace Soedeum.Dotnet.Library.Text
             }
         }
 
-        private struct Transition
+        public struct Transition
         {
             public Transition(CodeRange range, int stateIndex)
             {
@@ -405,9 +398,9 @@ namespace Soedeum.Dotnet.Library.Text
                 this.StateIndex = stateIndex;
             }
 
-            public CodeRange Range { get; set; }
+            public CodeRange Range { get; private set; }
 
-            public int StateIndex { get; set; }
+            public int StateIndex { get; private set; }
 
 
             public Transition Offset(int offset)
