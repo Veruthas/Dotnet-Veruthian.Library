@@ -1,4 +1,4 @@
-using Soedeum.Dotnet.Library.Collections.Readers;
+using Soedeum.Dotnet.Library.Data.Readers;
 using Soedeum.Dotnet.Library.Text;
 using Soedeum.Dotnet.Library.Text.Char;
 

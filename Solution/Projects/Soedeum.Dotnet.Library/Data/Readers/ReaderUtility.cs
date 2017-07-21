@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Collections.Readers
+namespace Soedeum.Dotnet.Library.Data.Readers
 {
     public static class ReaderUtility
     {

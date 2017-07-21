@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Soedeum.Dotnet.Library.Collections.Enumerators;
-using Soedeum.Dotnet.Library.Collections.Readers;
+using Soedeum.Dotnet.Library.Data.Enumeration;
+using Soedeum.Dotnet.Library.Data.Readers;
 using Soedeum.Dotnet.Library.Text;
 using Soedeum.Dotnet.Library.Text.Char;
 

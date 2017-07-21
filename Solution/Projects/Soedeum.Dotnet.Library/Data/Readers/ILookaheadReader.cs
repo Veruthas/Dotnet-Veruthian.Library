@@ -1,4 +1,4 @@
-namespace Soedeum.Dotnet.Library.Collections.Readers
+namespace Soedeum.Dotnet.Library.Data.Readers
 {
     public interface ILookaheadReader<T> : IReader<T>
     {

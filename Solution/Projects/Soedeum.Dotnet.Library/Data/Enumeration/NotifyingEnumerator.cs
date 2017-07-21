@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Collections.Enumerators
+namespace Soedeum.Dotnet.Library.Data.Enumeration
 {
     public class NotifyingEnumerator<T> : IEnumerator<T>
     {

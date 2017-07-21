@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Soedeum.Dotnet.Library.Collections.Enumerators
+namespace Soedeum.Dotnet.Library.Data.Enumeration
 {
     public static class EnumeratorUtility
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library.Collections.Readers
+namespace Soedeum.Dotnet.Library.Data.Readers
 {
     public interface ISpeculativeReader<T> : ILookaheadReader<T>
     {
