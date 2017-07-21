@@ -12,13 +12,73 @@ namespace Soedeum.Dotnet.Library.Text
 
         State last;
 
-
+        // Constructors
         public CodePatternBuilder() { }
+        public CodePatternBuilder(CodePoint value) => Append(value);
+        public CodePatternBuilder(IEnumerable<CodePoint> value) => Append(value);
+        public CodePatternBuilder(CodeRange range) => Append(range);
+        public CodePatternBuilder(IEnumerable<CodeRange> ranges) => Append(ranges);
         public CodePatternBuilder(CodeSet set) => Append(set);
         public CodePatternBuilder(IEnumerable<char> value) => Append(value);
-        public CodePatternBuilder(IEnumerable<CodePoint> value) => Append(value);
         public CodePatternBuilder(CodePatternBuilder pattern) => Append(pattern);
 
+
+        public static implicit operator CodePatternBuilder(char value) => new CodePatternBuilder(value);
+
+        public static implicit operator CodePatternBuilder(CodePoint value) => new CodePatternBuilder(value);
+
+        public static implicit operator CodePatternBuilder(CodeString value) => new CodePatternBuilder((IEnumerable<CodePoint>)value);
+
+        public static implicit operator CodePatternBuilder(CodeRange range) => new CodePatternBuilder(range);
+
+        public static implicit operator CodePatternBuilder(CodeSet set) => new CodePatternBuilder(set);
+
+        public static implicit operator CodePatternBuilder(string value) => new CodePatternBuilder((IEnumerable<char>)value);
+
+
+        // Concatenation
+        public CodePatternBuilder Append(CodePoint value)
+        {
+            return Append(new CodeRange(value));
+        }
+
+        public CodePatternBuilder Append(IEnumerable<CodePoint> value)
+        {
+            foreach (var codepoint in value)
+                Append(CodeSet.Value(codepoint));
+
+            return this;
+        }
+
+        public CodePatternBuilder Append(CodeRange range)
+        {
+            if (first == null)
+            {
+                this.first = GetNewState();
+
+                this.last = GetNewState();
+
+                first.AddTransition(range, last);
+            }
+            else
+            {
+                var newLast = GetNewState();
+
+                this.last.AddTransition(range, newLast);
+
+                this.last = newLast;
+            }
+
+            return this;
+        }
+
+        public CodePatternBuilder Append(IEnumerable<CodeRange> ranges)
+        {
+            foreach (var range in ranges)
+                Append(range);
+
+            return this;
+        }
 
         public CodePatternBuilder Append(CodeSet set)
         {
@@ -42,14 +102,6 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
-        public CodePatternBuilder Append(IEnumerable<CodePoint> value)
-        {
-            foreach (var codepoint in value)
-                Append(CodeSet.Value(codepoint));
-
-            return this;
-        }
-
         public CodePatternBuilder Append(IEnumerable<char> value)
         {
             foreach (var codepoint in value.ToCodePoints().GetEnumerableAdapter())
@@ -59,9 +111,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         public CodePatternBuilder Append(CodePatternBuilder pattern)
-        {            
-            int offset = states.Count;
-
+        {
             AddPatternStates(pattern, out var addedFirst, out var addedLast);
 
             if (first == null)
@@ -80,6 +130,22 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodePoint value) => pattern.Append(value);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<CodePoint> value) => pattern.Append(value);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodeRange range) => pattern.Append(range);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<CodeRange> ranges) => pattern.Append(ranges);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodeSet set) => pattern.Append(set);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<char> value) => pattern.Append(value);
+
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodePatternBuilder value) => pattern.Append(pattern);
+
+
+        // Repetition
         public CodePatternBuilder MakeOptional()
         {
             this.first.AddEmptyTransition(this.last);
@@ -94,28 +160,79 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
+        public CodePatternBuilder MakeRepeating(int times)
+        {
+            var clone = new CodePatternBuilder(this);
+
+            for (int i = 0; i < times - 1; i++)
+                Append(clone);
+
+            return this;
+        }
+
+        public CodePatternBuilder MakeRepeating(int min, int max)
+        {
+            var clone = new CodePatternBuilder(this);
+
+            for (int i = 0; i < min - 1; i++)
+                Append(clone);
+
+            for (int i = min; i < max; i++)
+                Append(new CodePatternBuilder(clone).MakeOptional());
+
+            return this;
+        }
+
+        public static CodePatternBuilder operator *(CodePatternBuilder pattern, int times) => pattern.MakeRepeating(times);
+
+
+
+        // Union
+        public static CodePatternBuilder Or(CodePatternBuilder pattern0, CodePatternBuilder pattern1)
+        {
+            var newPattern = CreateUnionBase();
+
+            JoinPattern(newPattern, pattern0);
+
+            JoinPattern(newPattern, pattern1);
+
+            return newPattern;
+        }
 
         public static CodePatternBuilder Or(params CodePatternBuilder[] patterns)
         {
-            var newPattern = new CodePatternBuilder();
-
-            var first = newPattern.first = newPattern.GetNewState();
-
-            var last = newPattern.last = newPattern.GetNewState();
+            var newPattern = CreateUnionBase();
 
             foreach (var pattern in patterns)
-            {
-                newPattern.AddPatternStates(pattern, out var addedFirst, out var addedLast);
+                JoinPattern(newPattern, pattern);
 
-                first.AddEmptyTransition(addedFirst);
+            return newPattern; ;
+        }
 
-                addedLast.AddEmptyTransition(last);
-            }
+        public static CodePatternBuilder operator |(CodePatternBuilder left, CodePatternBuilder right) => Or(left, right);
 
-            return newPattern;;
+        private static CodePatternBuilder CreateUnionBase()
+        {
+            var newPattern = new CodePatternBuilder();
+
+            newPattern.first = newPattern.GetNewState();
+
+            newPattern.last = newPattern.GetNewState();
+
+            return newPattern;
+        }
+
+        private static void JoinPattern(CodePatternBuilder pattern, CodePatternBuilder join)
+        {
+            pattern.AddPatternStates(join, out var addedFirst, out var addedLast);
+
+            pattern.first.AddEmptyTransition(addedFirst);
+
+            addedLast.AddEmptyTransition(pattern.last);
         }
 
 
+        // State creation
         private State GetNewState()
         {
             var state = new State(states.Count);
@@ -129,7 +246,7 @@ namespace Soedeum.Dotnet.Library.Text
         {
             int offset = states.Count;
 
-            foreach (var state in pattern.states)            
+            foreach (var state in pattern.states)
                 states.Add(state.Clone(offset));
 
             first = states[pattern.first.Index + offset];
@@ -138,6 +255,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
+        // ToString
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -152,6 +270,7 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
 
+        // Structures
         private class State
         {
             public State(int index)
@@ -293,7 +412,7 @@ namespace Soedeum.Dotnet.Library.Text
 
             public Transition Offset(int offset)
             {
-                return new Transition(Range, StateIndex = offset);
+                return new Transition(Range, StateIndex + offset);
             }
         }
     }
