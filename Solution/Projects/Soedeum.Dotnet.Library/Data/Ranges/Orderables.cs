@@ -22,14 +22,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableByte MaxValue => sbyte.MaxValue;
 
 
+        public OrderableByte Next() => new OrderableByte((sbyte)(this.value + 1));
+
+        public OrderableByte Previous() => new OrderableByte((sbyte)(this.value - 1));
+
+
         public int CompareTo(OrderableByte other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableByte other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableByte ? this.Equals((OrderableByte)obj) : false;
 
-        public OrderableByte Next() => new OrderableByte((sbyte)(this.value + 1));
 
-        public OrderableByte Previous() => new OrderableByte((sbyte)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableShort : IOrderable<OrderableShort>
@@ -51,15 +58,22 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public OrderableShort MaxValue => short.MaxValue;
 
+        
+        public OrderableShort Next() => new OrderableShort((short)(this.value + 1));
+
+        public OrderableShort Previous() => new OrderableShort((short)(this.value - 1));
+
 
         public int CompareTo(OrderableShort other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableShort other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableShort ? this.Equals((OrderableShort)obj) : false;
 
-        public OrderableShort Next() => new OrderableShort((short)(this.value + 1));
 
-        public OrderableShort Previous() => new OrderableShort((short)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableInt : IOrderable<OrderableInt>
@@ -82,14 +96,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableInt MaxValue => int.MaxValue;
 
 
+        public OrderableInt Next() => new OrderableInt((int)(this.value + 1));
+
+        public OrderableInt Previous() => new OrderableInt((int)(this.value - 1));
+
+
         public int CompareTo(OrderableInt other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableInt other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableInt ? this.Equals((OrderableInt)obj) : false;
 
-        public OrderableInt Next() => new OrderableInt((int)(this.value + 1));
 
-        public OrderableInt Previous() => new OrderableInt((int)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableLong : IOrderable<OrderableLong>
@@ -111,15 +132,22 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public OrderableLong MaxValue => long.MaxValue;
 
+        
+        public OrderableLong Next() => new OrderableLong((long)(this.value + 1));
+
+        public OrderableLong Previous() => new OrderableLong((long)(this.value - 1));
+
 
         public int CompareTo(OrderableLong other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableLong other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableLong ? this.Equals((OrderableLong)obj) : false;
 
-        public OrderableLong Next() => new OrderableLong((long)(this.value + 1));
 
-        public OrderableLong Previous() => new OrderableLong((long)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableUByte : IOrderable<OrderableUByte>
@@ -142,14 +170,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUByte MaxValue => byte.MaxValue;
 
 
+        public OrderableUByte Next() => new OrderableUByte((byte)(this.value + 1));
+
+        public OrderableUByte Previous() => new OrderableUByte((byte)(this.value - 1));
+
+
         public int CompareTo(OrderableUByte other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableUByte other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableUByte ? this.Equals((OrderableUByte)obj) : false;
 
-        public OrderableUByte Next() => new OrderableUByte((byte)(this.value + 1));
 
-        public OrderableUByte Previous() => new OrderableUByte((byte)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableUShort : IOrderable<OrderableUShort>
@@ -172,14 +207,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUShort MaxValue => ushort.MaxValue;
 
 
+        public OrderableUShort Next() => new OrderableUShort((ushort)(this.value + 1));
+
+        public OrderableUShort Previous() => new OrderableUShort((ushort)(this.value - 1));
+
+
         public int CompareTo(OrderableUShort other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableUShort other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableUShort ? this.Equals((OrderableUShort)obj) : false;
 
-        public OrderableUShort Next() => new OrderableUShort((ushort)(this.value + 1));
 
-        public OrderableUShort Previous() => new OrderableUShort((ushort)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableUInt : IOrderable<OrderableUInt>
@@ -202,14 +244,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUInt MaxValue => uint.MaxValue;
 
 
+        public OrderableUInt Next() => new OrderableUInt((uint)(this.value + 1));
+
+        public OrderableUInt Previous() => new OrderableUInt((uint)(this.value - 1));
+
+
         public int CompareTo(OrderableUInt other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableUInt other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableUInt ? this.Equals((OrderableUInt)obj) : false;
 
-        public OrderableUInt Next() => new OrderableUInt((uint)(this.value + 1));
 
-        public OrderableUInt Previous() => new OrderableUInt((uint)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableULong : IOrderable<OrderableULong>
@@ -232,14 +281,21 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableULong MaxValue => ulong.MaxValue;
 
 
+        public OrderableULong Next() => new OrderableULong((ulong)(this.value + 1));
+
+        public OrderableULong Previous() => new OrderableULong((ulong)(this.value - 1));
+
+
         public int CompareTo(OrderableULong other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableULong other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableULong ? this.Equals((OrderableULong)obj) : false;
 
-        public OrderableULong Next() => new OrderableULong((ulong)(this.value + 1));
 
-        public OrderableULong Previous() => new OrderableULong((ulong)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 
     public struct OrderableChar : IOrderable<OrderableChar>
@@ -262,13 +318,20 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableChar MaxValue => char.MaxValue;
 
 
+        public OrderableChar Next() => new OrderableChar((char)(this.value + 1));
+
+        public OrderableChar Previous() => new OrderableChar((char)(this.value - 1));
+
+
         public int CompareTo(OrderableChar other) => this.value.CompareTo(other.value);
 
         public bool Equals(OrderableChar other) => this.value.Equals(other.value);
 
+        public override bool Equals(object obj) => obj is OrderableChar ? this.Equals((OrderableChar)obj) : false;
 
-        public OrderableChar Next() => new OrderableChar((char)(this.value + 1));
 
-        public OrderableChar Previous() => new OrderableChar((char)(this.value - 1));
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override string ToString() => value.ToString();
     }
 }
