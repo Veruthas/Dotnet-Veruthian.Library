@@ -22,16 +22,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableByte MaxValue => sbyte.MaxValue;
 
 
-        public OrderableByte Next() => new OrderableByte((sbyte)(this.value + 1));
+        public OrderableByte Next => new OrderableByte((sbyte)(this.value + 1));
 
-        public OrderableByte Previous() => new OrderableByte((sbyte)(this.value - 1));
+        public OrderableByte Previous => new OrderableByte((sbyte)(this.value - 1));
 
 
         public int CompareTo(OrderableByte other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableByte other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableByte other) => this.value > other.value;
 
-        public bool LessThan(OrderableByte other) => this.value < other.value;
+        public bool IsLessThan(OrderableByte other) => this.value < other.value;
 
 
         public bool Equals(OrderableByte other) => this.value.Equals(other.value);
@@ -64,16 +64,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableShort MaxValue => short.MaxValue;
 
         
-        public OrderableShort Next() => new OrderableShort((short)(this.value + 1));
+        public OrderableShort Next => new OrderableShort((short)(this.value + 1));
 
-        public OrderableShort Previous() => new OrderableShort((short)(this.value - 1));
+        public OrderableShort Previous => new OrderableShort((short)(this.value - 1));
 
 
         public int CompareTo(OrderableShort other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableShort other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableShort other) => this.value > other.value;
 
-        public bool LessThan(OrderableShort other) => this.value < other.value;
+        public bool IsLessThan(OrderableShort other) => this.value < other.value;
 
 
         public bool Equals(OrderableShort other) => this.value.Equals(other.value);
@@ -106,16 +106,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableInt MaxValue => int.MaxValue;
 
 
-        public OrderableInt Next() => new OrderableInt((int)(this.value + 1));
+        public OrderableInt Next => new OrderableInt((int)(this.value + 1));
 
-        public OrderableInt Previous() => new OrderableInt((int)(this.value - 1));
+        public OrderableInt Previous => new OrderableInt((int)(this.value - 1));
 
 
         public int CompareTo(OrderableInt other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableInt other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableInt other) => this.value > other.value;
 
-        public bool LessThan(OrderableInt other) => this.value < other.value;
+        public bool IsLessThan(OrderableInt other) => this.value < other.value;
 
 
         public bool Equals(OrderableInt other) => this.value.Equals(other.value);
@@ -148,16 +148,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableLong MaxValue => long.MaxValue;
 
         
-        public OrderableLong Next() => new OrderableLong((long)(this.value + 1));
+        public OrderableLong Next => new OrderableLong((long)(this.value + 1));
 
-        public OrderableLong Previous() => new OrderableLong((long)(this.value - 1));
+        public OrderableLong Previous => new OrderableLong((long)(this.value - 1));
 
 
         public int CompareTo(OrderableLong other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableLong other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableLong other) => this.value > other.value;
 
-        public bool LessThan(OrderableLong other) => this.value < other.value;
+        public bool IsLessThan(OrderableLong other) => this.value < other.value;
 
 
         public bool Equals(OrderableLong other) => this.value.Equals(other.value);
@@ -190,16 +190,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUByte MaxValue => byte.MaxValue;
 
 
-        public OrderableUByte Next() => new OrderableUByte((byte)(this.value + 1));
+        public OrderableUByte Next => new OrderableUByte((byte)(this.value + 1));
 
-        public OrderableUByte Previous() => new OrderableUByte((byte)(this.value - 1));
+        public OrderableUByte Previous => new OrderableUByte((byte)(this.value - 1));
 
 
         public int CompareTo(OrderableUByte other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableUByte other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableUByte other) => this.value > other.value;
 
-        public bool LessThan(OrderableUByte other) => this.value < other.value;
+        public bool IsLessThan(OrderableUByte other) => this.value < other.value;
 
 
         public bool Equals(OrderableUByte other) => this.value.Equals(other.value);
@@ -232,16 +232,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUShort MaxValue => ushort.MaxValue;
 
 
-        public OrderableUShort Next() => new OrderableUShort((ushort)(this.value + 1));
+        public OrderableUShort Next => new OrderableUShort((ushort)(this.value + 1));
 
-        public OrderableUShort Previous() => new OrderableUShort((ushort)(this.value - 1));
+        public OrderableUShort Previous => new OrderableUShort((ushort)(this.value - 1));
 
 
         public int CompareTo(OrderableUShort other) => this.value.CompareTo(other.value);
         
-        public bool GreaterThan(OrderableUShort other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableUShort other) => this.value > other.value;
 
-        public bool LessThan(OrderableUShort other) => this.value < other.value;
+        public bool IsLessThan(OrderableUShort other) => this.value < other.value;
 
 
         public bool Equals(OrderableUShort other) => this.value.Equals(other.value);
@@ -274,16 +274,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableUInt MaxValue => uint.MaxValue;
 
 
-        public OrderableUInt Next() => new OrderableUInt((uint)(this.value + 1));
+        public OrderableUInt Next => new OrderableUInt((uint)(this.value + 1));
 
-        public OrderableUInt Previous() => new OrderableUInt((uint)(this.value - 1));
+        public OrderableUInt Previous => new OrderableUInt((uint)(this.value - 1));
 
 
         public int CompareTo(OrderableUInt other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableUInt other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableUInt other) => this.value > other.value;
 
-        public bool LessThan(OrderableUInt other) => this.value < other.value;
+        public bool IsLessThan(OrderableUInt other) => this.value < other.value;
 
 
         public bool Equals(OrderableUInt other) => this.value.Equals(other.value);
@@ -316,16 +316,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableULong MaxValue => ulong.MaxValue;
 
 
-        public OrderableULong Next() => new OrderableULong((ulong)(this.value + 1));
+        public OrderableULong Next => new OrderableULong((ulong)(this.value + 1));
 
-        public OrderableULong Previous() => new OrderableULong((ulong)(this.value - 1));
+        public OrderableULong Previous => new OrderableULong((ulong)(this.value - 1));
 
 
         public int CompareTo(OrderableULong other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableULong other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableULong other) => this.value > other.value;
 
-        public bool LessThan(OrderableULong other) => this.value < other.value;
+        public bool IsLessThan(OrderableULong other) => this.value < other.value;
 
 
         public bool Equals(OrderableULong other) => this.value.Equals(other.value);
@@ -358,16 +358,16 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public OrderableChar MaxValue => char.MaxValue;
 
 
-        public OrderableChar Next() => new OrderableChar((char)(this.value + 1));
+        public OrderableChar Next => new OrderableChar((char)(this.value + 1));
 
-        public OrderableChar Previous() => new OrderableChar((char)(this.value - 1));
+        public OrderableChar Previous => new OrderableChar((char)(this.value - 1));
 
 
         public int CompareTo(OrderableChar other) => this.value.CompareTo(other.value);
 
-        public bool GreaterThan(OrderableChar other) => this.value > other.value;
+        public bool IsGreaterThan(OrderableChar other) => this.value > other.value;
 
-        public bool LessThan(OrderableChar other) => this.value < other.value;
+        public bool IsLessThan(OrderableChar other) => this.value < other.value;
 
 
         public bool Equals(OrderableChar other) => this.value.Equals(other.value);

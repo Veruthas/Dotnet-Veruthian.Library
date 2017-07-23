@@ -10,13 +10,14 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         T MaxValue { get; }
 
-        T Next();
 
-        T Previous();
+        T Next { get; }
+
+        T Previous { get; }
 
 
-        bool LessThan(T other);
+        bool IsLessThan(T other);
 
-        bool GreaterThan(T other);
+        bool IsGreaterThan(T other);
     }
 }

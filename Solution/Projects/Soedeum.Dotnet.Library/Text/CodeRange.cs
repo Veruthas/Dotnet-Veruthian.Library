@@ -373,7 +373,6 @@ namespace Soedeum.Dotnet.Library.Text
         }
 
         // Remove
-
         public static CodeRange[] UnnormalizedRemove(CodeRange[] ranges, params CodeRange[] removing)
         {
             ranges = NormalizeUnordered(ranges);
