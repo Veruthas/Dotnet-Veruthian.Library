@@ -1,5 +1,4 @@
 using System;
-using Soedeum.Dotnet.Library.Utility;
 
 namespace Soedeum.Dotnet.Library.Text
 {

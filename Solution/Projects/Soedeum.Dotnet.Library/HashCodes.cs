@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Soedeum.Dotnet.Library.Utility
+namespace Soedeum.Dotnet.Library
 {
     public class HashCodes
     {
