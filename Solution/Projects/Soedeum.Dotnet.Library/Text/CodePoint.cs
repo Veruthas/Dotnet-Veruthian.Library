@@ -446,14 +446,19 @@ namespace Soedeum.Dotnet.Library.Text
         #endregion
 
         /* Orderable */
+        CodePoint IOrderable<CodePoint>.Next() => new CodePoint(this.value + 1);
+
+        CodePoint IOrderable<CodePoint>.Previous() => new CodePoint(this.value - 1);
+
+
         CodePoint IOrderable<CodePoint>.Default => default(CodePoint);
 
         CodePoint IOrderable<CodePoint>.MinValue => CodePoint.MinValue;
 
         CodePoint IOrderable<CodePoint>.MaxValue => CodePoint.MinValue;
 
-        CodePoint IOrderable<CodePoint>.Next() => new CodePoint(this.value + 1);
 
-        CodePoint IOrderable<CodePoint>.Previous() => new CodePoint(this.value - 1);
+        bool IOrderable<CodePoint>.LessThan(CodePoint other) => this.value < other.value;
+        bool IOrderable<CodePoint>.GreaterThan(CodePoint other) => this.value > other.value;
     }
 }

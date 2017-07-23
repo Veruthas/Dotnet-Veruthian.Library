@@ -128,8 +128,12 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
             while (current.CompareTo(high) <= 0)
             {
                 yield return current;
-                current = current.Next();
-            }            
+
+                if (current.Equals(current.MaxValue))
+                    break;
+                else
+                    current = current.Next();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -29,6 +29,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public int CompareTo(OrderableByte other) => this.value.CompareTo(other.value);
 
+        public bool GreaterThan(OrderableByte other) => this.value > other.value;
+
+        public bool LessThan(OrderableByte other) => this.value < other.value;
+
+
         public bool Equals(OrderableByte other) => this.value.Equals(other.value);
 
         public override bool Equals(object obj) => obj is OrderableByte ? this.Equals((OrderableByte)obj) : false;
@@ -65,6 +70,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
 
         public int CompareTo(OrderableShort other) => this.value.CompareTo(other.value);
+
+        public bool GreaterThan(OrderableShort other) => this.value > other.value;
+
+        public bool LessThan(OrderableShort other) => this.value < other.value;
+
 
         public bool Equals(OrderableShort other) => this.value.Equals(other.value);
 
@@ -103,6 +113,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public int CompareTo(OrderableInt other) => this.value.CompareTo(other.value);
 
+        public bool GreaterThan(OrderableInt other) => this.value > other.value;
+
+        public bool LessThan(OrderableInt other) => this.value < other.value;
+
+
         public bool Equals(OrderableInt other) => this.value.Equals(other.value);
 
         public override bool Equals(object obj) => obj is OrderableInt ? this.Equals((OrderableInt)obj) : false;
@@ -139,6 +154,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
 
         public int CompareTo(OrderableLong other) => this.value.CompareTo(other.value);
+
+        public bool GreaterThan(OrderableLong other) => this.value > other.value;
+
+        public bool LessThan(OrderableLong other) => this.value < other.value;
+
 
         public bool Equals(OrderableLong other) => this.value.Equals(other.value);
 
@@ -177,6 +197,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public int CompareTo(OrderableUByte other) => this.value.CompareTo(other.value);
 
+        public bool GreaterThan(OrderableUByte other) => this.value > other.value;
+
+        public bool LessThan(OrderableUByte other) => this.value < other.value;
+
+
         public bool Equals(OrderableUByte other) => this.value.Equals(other.value);
 
         public override bool Equals(object obj) => obj is OrderableUByte ? this.Equals((OrderableUByte)obj) : false;
@@ -213,6 +238,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
 
         public int CompareTo(OrderableUShort other) => this.value.CompareTo(other.value);
+        
+        public bool GreaterThan(OrderableUShort other) => this.value > other.value;
+
+        public bool LessThan(OrderableUShort other) => this.value < other.value;
+
 
         public bool Equals(OrderableUShort other) => this.value.Equals(other.value);
 
@@ -251,6 +281,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public int CompareTo(OrderableUInt other) => this.value.CompareTo(other.value);
 
+        public bool GreaterThan(OrderableUInt other) => this.value > other.value;
+
+        public bool LessThan(OrderableUInt other) => this.value < other.value;
+
+
         public bool Equals(OrderableUInt other) => this.value.Equals(other.value);
 
         public override bool Equals(object obj) => obj is OrderableUInt ? this.Equals((OrderableUInt)obj) : false;
@@ -287,6 +322,11 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
 
         public int CompareTo(OrderableULong other) => this.value.CompareTo(other.value);
+
+        public bool GreaterThan(OrderableULong other) => this.value > other.value;
+
+        public bool LessThan(OrderableULong other) => this.value < other.value;
+
 
         public bool Equals(OrderableULong other) => this.value.Equals(other.value);
 
@@ -325,7 +365,13 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public int CompareTo(OrderableChar other) => this.value.CompareTo(other.value);
 
+        public bool GreaterThan(OrderableChar other) => this.value > other.value;
+
+        public bool LessThan(OrderableChar other) => this.value < other.value;
+
+
         public bool Equals(OrderableChar other) => this.value.Equals(other.value);
+
 
         public override bool Equals(object obj) => obj is OrderableChar ? this.Equals((OrderableChar)obj) : false;
 
