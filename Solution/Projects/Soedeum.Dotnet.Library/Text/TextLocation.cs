@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Text
 {
@@ -39,10 +40,9 @@ namespace Soedeum.Dotnet.Library.Text
         const uint Cr = (uint)'\r';
 
 
-        public TextLocation MoveToNext(CodePoint current, CodePoint next, bool acceptNulls = true)
+        private TextLocation MoveToNextUtf32(uint current, uint next, bool acceptNulls)
         {
-
-            switch ((uint)current)
+            switch (current)
             {
                 case Null:
                     return (acceptNulls) ? this + 1 : this;
@@ -51,14 +51,41 @@ namespace Soedeum.Dotnet.Library.Text
                     return this.IncrementLine();
 
                 case Cr:
-                    return ((char)next == '\n') ? this + 1 : this.IncrementLine();
+                    return (next == Lf) ? this + 1 : this.IncrementLine();
 
                 default:
                     return this + 1;
             }
         }
 
+        public TextLocation MoveToNext(CodePoint current, CodePoint next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
+
+        public TextLocation MoveToNext(char current, char next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
+
+
+        // MoveThrough CodePoints
         public TextLocation MoveThrough(CodePoint current, CodeString following, bool acceptNulls = true)
+            => MoveThrough(current, (IEnumerable<CodePoint>)following, acceptNulls);
+
+        public TextLocation MoveThrough(CodePoint current, IEnumerable<CodePoint> following, bool acceptNulls = true)
+        {
+            TextLocation result = this;
+
+            foreach (CodePoint next in following)
+            {
+                result = result.MoveToNext(current, next, acceptNulls);
+
+                current = next;
+            }
+
+            return result;
+        }
+
+        // MoveThrough Chars
+        public TextLocation MoveThrough(char current, string following, bool acceptNulls = true)
+            => MoveThrough(current, (IEnumerable<char>)following, acceptNulls);
+
+        public TextLocation MoveThrough(char current, IEnumerable<char> following, bool acceptNulls = true)
         {
             TextLocation result = this;
 

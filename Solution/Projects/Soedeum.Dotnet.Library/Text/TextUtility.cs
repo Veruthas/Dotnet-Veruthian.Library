@@ -6,7 +6,7 @@ using Soedeum.Dotnet.Library.Text.Encodings;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public static class TextUtility
+    public static class CodeUtility
     {
         // Decode to CodePoint
         public static IEnumerator<CodePoint> DecodeValues<T, TDecoder>(IEnumerator<T> items, TDecoder decoder, string onIncomplete)
@@ -201,12 +201,6 @@ namespace Soedeum.Dotnet.Library.Text
 
             return codepoints;
         }
-
-
-        public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
-
-        public static bool IsNullOrWhitespace(this string value) => string.IsNullOrWhiteSpace(value);
-
 
         public static bool IsNullOrEmpty(this CodeString value) => CodeString.IsNullOrEmpty(value);
 
