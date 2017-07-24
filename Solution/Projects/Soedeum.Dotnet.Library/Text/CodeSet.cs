@@ -69,13 +69,4 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static readonly CodeSet IdentifierFollow = LetterOrDigitOrUnderscore;
     }
-
-    //     // From List
-    //     public static CodeSet List(params CodePoint[] codepoints) => FromList(codepoints);
-
-    //     public static CodeSet List(IEnumerable<CodePoint> codepoints) => FromList(codepoints);
-
-    //     public static CodeSet List(CodeString codepoints) => FromList(codepoints);
-
-    //     public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
 }
