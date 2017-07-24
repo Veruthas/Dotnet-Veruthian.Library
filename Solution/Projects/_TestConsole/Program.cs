@@ -25,5 +25,5 @@ namespace _TestConsole
             Console.ReadKey(true);
             System.Console.WriteLine();
         }
-    }    
+    }
 }

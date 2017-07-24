@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Data.Enumeration;
+using Soedeum.Dotnet.Library.Data.Ranges;
 
 namespace Soedeum.Dotnet.Library.Text
 {
@@ -18,8 +19,8 @@ namespace Soedeum.Dotnet.Library.Text
         public CodePatternBuilder() { }
         public CodePatternBuilder(CodePoint value) => Append(value);
         public CodePatternBuilder(IEnumerable<CodePoint> value) => Append(value);
-        public CodePatternBuilder(CodeRange range) => Append(range);
-        public CodePatternBuilder(IEnumerable<CodeRange> ranges) => Append(ranges);
+        public CodePatternBuilder(Range<CodePoint> range) => Append(range);
+        public CodePatternBuilder(IEnumerable<Range<CodePoint>> ranges) => Append(ranges);
         public CodePatternBuilder(CodeSet set) => Append(set);
         public CodePatternBuilder(string value) => Append(value);
         public CodePatternBuilder(IEnumerable<char> value) => Append(value);
@@ -30,7 +31,7 @@ namespace Soedeum.Dotnet.Library.Text
         // Concatenation
         public CodePatternBuilder Append(CodePoint value)
         {
-            return Append(new CodeRange(value));
+            return Append(new Range<CodePoint>(value));
         }
 
         public CodePatternBuilder Append(IEnumerable<CodePoint> value)
@@ -41,7 +42,7 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
-        public CodePatternBuilder Append(CodeRange range)
+        public CodePatternBuilder Append(Range<CodePoint> range)
         {
             if (first == null)
             {
@@ -63,7 +64,7 @@ namespace Soedeum.Dotnet.Library.Text
             return this;
         }
 
-        public CodePatternBuilder Append(IEnumerable<CodeRange> ranges)
+        public CodePatternBuilder Append(IEnumerable<Range<CodePoint>> ranges)
         {
             foreach (var range in ranges)
                 Append(range);
@@ -133,9 +134,9 @@ namespace Soedeum.Dotnet.Library.Text
 
         public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<CodePoint> value) => pattern.Append(value);
 
-        public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodeRange range) => pattern.Append(range);
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, Range<CodePoint> range) => pattern.Append(range);
 
-        public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<CodeRange> ranges) => pattern.Append(ranges);
+        public static CodePatternBuilder operator +(CodePatternBuilder pattern, IEnumerable<Range<CodePoint>> ranges) => pattern.Append(ranges);
 
         public static CodePatternBuilder operator +(CodePatternBuilder pattern, CodeSet set) => pattern.Append(set);
 
@@ -277,7 +278,7 @@ namespace Soedeum.Dotnet.Library.Text
             public List<int> EmptyTransitions { get; private set; }
 
 
-            public void AddTransition(CodeRange range, State to)
+            public void AddTransition(Range<CodePoint> range, State to)
             {
                 if (Transitions == null)
                     Transitions = new List<Transition>();
@@ -392,14 +393,14 @@ namespace Soedeum.Dotnet.Library.Text
 
         public struct Transition
         {
-            public Transition(CodeRange range, int stateIndex)
+            public Transition(Range<CodePoint> range, int stateIndex)
             {
                 this.Range = range;
 
                 this.StateIndex = stateIndex;
             }
 
-            public CodeRange Range { get; private set; }
+            public Range<CodePoint> Range { get; private set; }
 
             public int StateIndex { get; private set; }
 

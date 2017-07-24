@@ -8,7 +8,6 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
         where T : IOrderable<T>, new()
     {
-
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
         public RangeSet<T> Complement() => Complement();
