@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Data.Readers;
-using Soedeum.Dotnet.Library.Text;
+using Soedeum.Dotnet.Library.Text.Code;
 
 namespace Soedeum.Dotnet.Library.Text.Lexers
 {

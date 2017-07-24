@@ -5,7 +5,7 @@ using System.Text;
 using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Data.Enumeration;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public class CodeString : IEquatable<CodeString>, IComparable<CodeString>, IEnumerable<CodePoint>
     {

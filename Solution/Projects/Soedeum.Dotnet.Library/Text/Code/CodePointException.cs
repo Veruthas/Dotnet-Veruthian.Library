@@ -1,4 +1,4 @@
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public class CodePointException : System.Exception
     {

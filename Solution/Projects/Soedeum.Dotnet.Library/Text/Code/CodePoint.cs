@@ -2,10 +2,10 @@ using System;
 using System.Text;
 using System.Globalization;
 using Soedeum.Dotnet.Library.Numeric;
-using Soedeum.Dotnet.Library.Text.Encodings;
+using Soedeum.Dotnet.Library.Text.Code.Encodings;
 using Soedeum.Dotnet.Library.Data.Ranges;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>, IOrderable<CodePoint>
     {

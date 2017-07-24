@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Soedeum.Dotnet.Library.Text.Code;
 
 namespace Soedeum.Dotnet.Library.Text
 {

@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Data.Enumeration;
 using Soedeum.Dotnet.Library.Data.Readers;
-using Soedeum.Dotnet.Library.Text;
-using Soedeum.Dotnet.Library.Text.Char;
+using Soedeum.Dotnet.Library.Text.Code;
 
 namespace Soedeum.Dotnet.Library.Text.Lexers
 {

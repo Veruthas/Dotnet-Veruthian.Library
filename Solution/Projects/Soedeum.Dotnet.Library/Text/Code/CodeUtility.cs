@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Numeric;
-using Soedeum.Dotnet.Library.Text.Encodings;
+using Soedeum.Dotnet.Library.Text.Code.Encodings;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public static class CodeUtility
     {

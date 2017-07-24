@@ -6,7 +6,7 @@ using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Data.Enumeration;
 using Soedeum.Dotnet.Library.Data.Ranges;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public class CodeSet : RangeSet<CodePoint, CodeSet>
     {

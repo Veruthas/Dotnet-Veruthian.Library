@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Soedeum.Dotnet.Library.Text.Encodings;
+using Soedeum.Dotnet.Library.Text.Code.Encodings;
 
-namespace Soedeum.Dotnet.Library.Text
+namespace Soedeum.Dotnet.Library.Text.Code
 {
     public class CodeStringBuilder : IEnumerable<CodePoint>
     {

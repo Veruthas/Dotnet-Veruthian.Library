@@ -2,7 +2,7 @@ using System;
 using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Numeric;
 
-namespace Soedeum.Dotnet.Library.Text.Encodings
+namespace Soedeum.Dotnet.Library.Text.Code.Encodings
 {
     public static class Utf16
     {
