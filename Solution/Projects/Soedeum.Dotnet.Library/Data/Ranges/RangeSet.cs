@@ -206,7 +206,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         #region Constructors
 
-        private static TSet Create(params Range<T>[] ranges)
+        protected static TSet Create(params Range<T>[] ranges)
         {
             var set = new TSet();
 
@@ -230,7 +230,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public static TSet List(IEnumerable<T> items) => FromList(items);
 
-        private static TSet FromList(IEnumerable<T> codepoints)
+        protected static TSet FromList(IEnumerable<T> codepoints)
         {
             var ranges = Range<T>.FromUnorderedList(codepoints);
 
@@ -248,7 +248,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public static TSet Union(IEnumerable<Range<T>> ranges) => ReduceRanges(ranges);
 
 
-        private static TSet ReduceRanges(IEnumerable<TSet> sets)
+        protected static TSet ReduceRanges(IEnumerable<TSet> sets)
         {
             SortedSet<Range<T>> list = new SortedSet<Range<T>>();
 
@@ -260,7 +260,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
             return Create(reduced);
         }
 
-        private static TSet ReduceRanges(IEnumerable<Range<T>> ranges)
+        protected static TSet ReduceRanges(IEnumerable<Range<T>> ranges)
         {
             var reduced = Range<T>.NormalizeUnordered(ranges);
 
@@ -272,7 +272,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public static TSet Complement(TSet set) => FromComplement(set);
 
 
-        private static TSet FromComplement(TSet set)
+        protected static TSet FromComplement(TSet set)
         {
             var ranges = Range<T>.NormalizedComplement(set.RangeArray);
 

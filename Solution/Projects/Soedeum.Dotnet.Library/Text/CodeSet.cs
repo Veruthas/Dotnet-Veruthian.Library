@@ -32,6 +32,10 @@ namespace Soedeum.Dotnet.Library.Text
         public static CodeSet operator ~(CodeSet set) => Complement(set);
 
 
+        public static CodeSet List(CodeString codepoints) => FromList(codepoints);
+
+        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
+
         // Sets            
         public static readonly CodeSet Complete = Range(CodePoint.MinValue, CodePoint.MaxValue);
 

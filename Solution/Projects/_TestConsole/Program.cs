@@ -15,6 +15,8 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
+            CodeSet s = CodeSet.List("AX!@12");
+            s.
             Pause();
         }
 
