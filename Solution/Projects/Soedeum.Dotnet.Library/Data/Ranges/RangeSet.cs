@@ -13,20 +13,14 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         readonly int hashcode;
 
 
-        private RangeSet(params Range<T>[] ranges)
+        protected RangeSet(params Range<T>[] ranges)
         {
             this.ranges = ranges;
 
             this.hashcode = HashCodes.Default.Combine(ranges);
         }
 
-        private RangeSet(IEnumerable<Range<T>> ranges)
-        {
-            this.ranges = System.Linq.Enumerable.ToArray(ranges);
-
-            this.hashcode = HashCodes.Default.Combine(ranges);
-        }
-
+        public static readonly RangeSet<T> Empty = new RangeSet<T>(new Range<T>[0]);
 
         public int Count => ranges.Length;
 
@@ -169,7 +163,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
             }
         }
 
-        public IEnumerable<T> Item => new EnumeratorGenerator<T>(GetItemEnumerator);
+        public IEnumerable<T> Items => new EnumeratorGenerator<T>(GetItemEnumerator);
 
         public IEnumerable<Range<T>> Ranges => new EnumeratorGenerator<Range<T>>(GetRangeEnumerator);
 
