@@ -3,10 +3,11 @@ using System.Text;
 using System.Globalization;
 using Soedeum.Dotnet.Library.Numeric;
 using Soedeum.Dotnet.Library.Text.Encodings;
+using Soedeum.Dotnet.Library.Data.Ranges;
 
 namespace Soedeum.Dotnet.Library.Text
 {
-    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>
+    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>, IOrderable<CodePoint>
     {
         uint value;
 
@@ -427,6 +428,7 @@ namespace Soedeum.Dotnet.Library.Text
 
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
+
         #endregion
 
 
@@ -442,5 +444,21 @@ namespace Soedeum.Dotnet.Library.Text
         public static readonly CodePoint Replacement = new CodePoint(0xFFFD);
 
         #endregion
+
+        /* Orderable */
+        CodePoint IOrderable<CodePoint>.Next => new CodePoint(this.value + 1);
+
+        CodePoint IOrderable<CodePoint>.Previous => new CodePoint(this.value - 1);
+
+
+        CodePoint IOrderable<CodePoint>.Default => default(CodePoint);
+
+        CodePoint IOrderable<CodePoint>.MinValue => CodePoint.MinValue;
+
+        CodePoint IOrderable<CodePoint>.MaxValue => CodePoint.MinValue;
+
+
+        bool IOrderable<CodePoint>.IsLessThan(CodePoint other) => this.value < other.value;
+        bool IOrderable<CodePoint>.IsGreaterThan(CodePoint other) => this.value > other.value;
     }
 }
