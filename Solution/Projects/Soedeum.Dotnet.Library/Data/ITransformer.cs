@@ -1,6 +1,6 @@
 using System;
 
-namespace Soedeum.Dotnet.Library
+namespace Soedeum.Dotnet.Library.Data
 {
     public interface ITransformer<TSource, TTarget>
     {
