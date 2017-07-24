@@ -5,39 +5,81 @@ using Soedeum.Dotnet.Library.Data.Enumeration;
 
 namespace Soedeum.Dotnet.Library.Data.Ranges
 {
-    public class RangeSet<T> : IEquatable<RangeSet<T>>
+    public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
         where T : IOrderable<T>, new()
     {
-        readonly Range<T>[] ranges;
 
-        readonly int hashcode;
+        public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
+
+        public RangeSet<T> Complement() => Complement();
 
 
-        protected RangeSet(params Range<T>[] ranges)
+        public static bool operator ==(RangeSet<T> left, RangeSet<T> right) => left.Equals(right);
+
+        public static bool operator !=(RangeSet<T> left, RangeSet<T> right) => !left.Equals(right);
+
+        public override int GetHashCode() => base.GetHashCode();
+
+        public override bool Equals(object other) => base.Equals(other);
+
+
+        public static RangeSet<T> operator +(RangeSet<T> left, RangeSet<T> right) => Union(left, right);
+
+        public static RangeSet<T> operator -(RangeSet<T> set, RangeSet<T> remove) => Remove(set, remove);
+
+
+        public static RangeSet<T> operator ~(RangeSet<T> set) => Complement(set);
+    }
+
+
+    public abstract class RangeSet<T, TSet> : IEquatable<TSet>
+        where T : IOrderable<T>, new()
+        where TSet : RangeSet<T, TSet>, new()
+    {
+        static readonly Range<T>[] defaultRanges;
+
+        static readonly int defaultHashcode;
+
+
+        static RangeSet()
         {
-            this.ranges = ranges;
+            defaultRanges = new Range<T>[0];
+
+            defaultHashcode = HashCodes.Default.Combine(defaultRanges);
+        }
+
+        Range<T>[] ranges;
+
+        int hashcode;
+
+
+        protected virtual void SetRanges(Range<T>[] ranges, bool clone = false)
+        {
+            this.ranges = clone ? (Range<T>[])ranges.Clone() : ranges;
 
             this.hashcode = HashCodes.Default.Combine(ranges);
         }
 
-        public static readonly RangeSet<T> Empty = new RangeSet<T>(new Range<T>[0]);
+        public static readonly TSet Empty = new TSet();
 
-        public int Count => ranges.Length;
+        public int Count => ranges == null ? 0 : ranges.Length;
 
-
-        public bool IsEmpty => ranges.Length == 0;
-
-        public bool IsSingle => ranges.Length == 1 && ranges[0].IsSingle;
-
-        public bool IsRange => ranges.Length == 1 && !ranges[0].IsSingle;
+        private Range<T>[] RangeArray => ranges ?? defaultRanges;
 
 
-        public int Find(T value) => Range<T>.Find(ranges, value);
+        public bool IsEmpty => Count == 0;
 
-        public bool Contains(T value) => Range<T>.Contains(ranges, value);
+        public bool IsSingle => Count == 1 && ranges[0].IsSingle;
+
+        public bool IsRange => Count == 1 && !ranges[0].IsSingle;
 
 
-        public bool Equals(RangeSet<T> other)
+        public int Find(T value) => Range<T>.Find(RangeArray, value);
+
+        public bool Contains(T value) => Range<T>.Contains(RangeArray, value);
+
+
+        public bool Equals(TSet other)
         {
             if (this.ranges == other.ranges)
                 return true;
@@ -55,16 +97,10 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
             return true;
         }
 
-        public override bool Equals(object other) => (other is RangeSet<T>) ? Equals(other) : false;
-
-        public static bool operator ==(RangeSet<T> left, RangeSet<T> right) => left.Equals(right);
-
-        public static bool operator !=(RangeSet<T> left, RangeSet<T> right) => !left.Equals(right);
+        public override bool Equals(object other) => (other is TSet) ? Equals(other) : false;
 
 
-        public override int GetHashCode() => hashcode;
-
-
+        public override int GetHashCode() => ranges == null ? defaultHashcode : hashcode;
 
 
         public string ToString(Func<T, string> toString)
@@ -73,7 +109,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
             StringBuilder builder = new StringBuilder();
 
-            foreach (var range in ranges)
+            foreach (var range in RangeArray)
             {
                 if (initialized)
                     builder.Append(" | ");
@@ -92,7 +128,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
             StringBuilder builder = new StringBuilder();
 
-            foreach (var range in ranges)
+            foreach (var range in RangeArray)
             {
                 if (initialized)
                     builder.Append(" | ");
@@ -106,16 +142,17 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         }
 
 
+
         #region IEnumerable
 
-        public Range<T>[] ToRangeArray() => ranges.Clone() as Range<T>[];
+        public Range<T>[] ToRangeArray() => RangeArray.Clone() as Range<T>[];
 
         public T[] ToItemArray()
         {
             var items = new List<T>();
 
 
-            foreach (var range in ranges)
+            foreach (var range in RangeArray)
             {
                 var current = range.Low;
                 var high = range.High;
@@ -136,8 +173,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         public IEnumerator<Range<T>> GetRangeEnumerator()
         {
-
-            foreach (var range in ranges)
+            foreach (var range in RangeArray)
                 yield return range;
         }
 
@@ -145,8 +181,7 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         {
             var items = new List<T>();
 
-
-            foreach (var range in ranges)
+            foreach (var range in RangeArray)
             {
                 var current = range.Low;
                 var high = range.High;
@@ -172,78 +207,81 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
 
         #region Constructors
 
-        // From Value
-        public static RangeSet<T> Value(T value) => new RangeSet<T>(new Range<T>(value));
+        private static TSet Create(params Range<T>[] ranges)
+        {
+            var set = new TSet();
 
+            set.SetRanges(ranges);
+
+            return set;
+        }
+
+        // From Value
+        public static TSet Value(T value) => Create(new Range<T>(value));
 
         // From Range
-        public static RangeSet<T> Range(Range<T> range) => new RangeSet<T>(range);
+        public static TSet Range(Range<T> range) => Create(range);
 
-        public static RangeSet<T> Range(T a, T b) => new RangeSet<T>(new Range<T>(a, b));
+        public static TSet Range(T a, T b) => Create(new Range<T>(a, b));
 
 
 
         // From List
-        public static RangeSet<T> List(params T[] items) => FromList(items);
+        public static TSet List(params T[] items) => FromList(items);
 
-        public static RangeSet<T> List(IEnumerable<T> items) => FromList(items);
+        public static TSet List(IEnumerable<T> items) => FromList(items);
 
-        private static RangeSet<T> FromList(IEnumerable<T> codepoints)
+        private static TSet FromList(IEnumerable<T> codepoints)
         {
             var ranges = Range<T>.FromUnorderedList(codepoints);
 
-            return new RangeSet<T>(ranges);
+            return Create(ranges);
         }
 
 
         // From Union
-        public static RangeSet<T> Union(params RangeSet<T>[] sets) => ReduceRanges(sets);
+        public static TSet Union(params TSet[] sets) => ReduceRanges(sets);
 
-        public static RangeSet<T> Union(IEnumerable<RangeSet<T>> sets) => ReduceRanges(sets);
+        public static TSet Union(IEnumerable<TSet> sets) => ReduceRanges(sets);
 
-        public static RangeSet<T> Union(params Range<T>[] ranges) => ReduceRanges(ranges);
+        public static TSet Union(params Range<T>[] ranges) => ReduceRanges(ranges);
 
-        public static RangeSet<T> Union(IEnumerable<Range<T>> ranges) => ReduceRanges(ranges);
+        public static TSet Union(IEnumerable<Range<T>> ranges) => ReduceRanges(ranges);
 
-        public static RangeSet<T> operator +(RangeSet<T> left, RangeSet<T> right) => Union(left, right);
 
-        private static RangeSet<T> ReduceRanges(IEnumerable<RangeSet<T>> sets)
+        private static TSet ReduceRanges(IEnumerable<TSet> sets)
         {
             SortedSet<Range<T>> list = new SortedSet<Range<T>>();
 
             foreach (var set in sets)
-                list.UnionWith(set.ranges);
+                list.UnionWith(set.RangeArray);
 
             var reduced = Range<T>.NormalizeOrdered(list);
 
-            return new RangeSet<T>(reduced);
+            return Create(reduced);
         }
 
-        private static RangeSet<T> ReduceRanges(IEnumerable<Range<T>> ranges)
+        private static TSet ReduceRanges(IEnumerable<Range<T>> ranges)
         {
             var reduced = Range<T>.NormalizeUnordered(ranges);
 
-            return new RangeSet<T>(reduced);
+            return Create(reduced);
         }
 
 
         // From Complement
-        public static RangeSet<T> Complement(RangeSet<T> set) => FromComplement(set);
+        public static TSet Complement(TSet set) => FromComplement(set);
 
-        public static RangeSet<T> operator ~(RangeSet<T> set) => FromComplement(set);
 
-        private static RangeSet<T> FromComplement(RangeSet<T> set)
+        private static TSet FromComplement(TSet set)
         {
-            var ranges = Range<T>.NormalizedComplement(set.ranges);
+            var ranges = Range<T>.NormalizedComplement(set.RangeArray);
 
-            return new RangeSet<T>(ranges);
+            return Create(ranges);
         }
 
-
         // Subtraction    
-        public static RangeSet<T> Remove(RangeSet<T> source, RangeSet<T> remove) => new RangeSet<T>(Range<T>.NormalizedRemove(source.ranges, remove.ranges));
-
-        public static RangeSet<T> operator -(RangeSet<T> left, RangeSet<T> right) => Remove(left, right);
+        public static TSet Remove(TSet source, TSet remove) => Create(Range<T>.NormalizedRemove(source.ranges, remove.ranges));
 
         #endregion
     }
