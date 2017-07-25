@@ -1,15 +1,17 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Soedeum.Dotnet.Library.Data.Patterns
 {
-    public class PatternBuilder<T>
+    public class PatternBuilder<T> : IEnumerable<State<T>>
     {
-        List<State> states = new List<State>();
+        List<State<T>> states = new List<State<T>>();
 
-        State first;
+        State<T> start;
 
-        State last;
+        State<T> end;
 
         // Constructors
         public PatternBuilder() { }
@@ -19,26 +21,35 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         public PatternBuilder(PatternBuilder<T> pattern) => Append(pattern);
 
 
+        public State<T> this[int index] => states[index];
+
+        public int Count => states.Count;
+
+
+        public int StartIndex => start.Index;
+
+        public int EndIndex => end.Index;
+
 
         // Concatenation
         public PatternBuilder<T> Append(T value)
         {
-            State oldLast, newLast;
+            State<T> oldEnd, newEnd;
 
-            if (first == null)
+            if (start == null)
             {
-                this.first = oldLast = GetNewState();
+                this.start = oldEnd = GetNewState();
 
-                this.last = newLast = GetNewState();
+                this.end = newEnd = GetNewState();
             }
             else
             {
-                oldLast = this.last;
+                oldEnd = this.end;
 
-                this.last = newLast = GetNewState();
+                this.end = newEnd = GetNewState();
             }
 
-            oldLast.AddTransition(value, newLast);
+            oldEnd.AddTransition(value, newEnd);
 
             return this;
         }
@@ -47,22 +58,22 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
 
         public PatternBuilder<T> Append(IEnumerable<T> values)
         {
-            State oldLast, newLast;
+            State<T> oldEnd, newEnd;
 
-            if (first == null)
+            if (start == null)
             {
-                this.first = oldLast = GetNewState();
+                this.start = oldEnd = GetNewState();
 
-                this.last = newLast = GetNewState();
+                this.end = newEnd = GetNewState();
             }
             else
             {
-                oldLast = this.last;
+                oldEnd = this.end;
 
-                this.last = newLast = GetNewState();
+                this.end = newEnd = GetNewState();
             }
 
-            oldLast.AddTransitions(values, newLast);
+            oldEnd.AddTransitions(values, newEnd);
 
             return this;
         }
@@ -70,19 +81,19 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
 
         public PatternBuilder<T> Append(PatternBuilder<T> pattern)
         {
-            AddPatternStates(pattern, out var addedFirst, out var addedLast);
+            AddPatternStates(pattern, out var addedStart, out var addedEnd);
 
-            if (first == null)
+            if (start == null)
             {
-                first = addedFirst;
+                start = addedStart;
 
-                last = addedLast;
+                end = addedEnd;
             }
             else
             {
-                this.last.AddEmptyTransition(addedFirst);
+                this.end.AddEmptyTransition(addedStart);
 
-                this.last = addedLast;
+                this.end = addedEnd;
             }
 
             return this;
@@ -109,14 +120,14 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         // Repetition
         public PatternBuilder<T> MakeOptional()
         {
-            this.first.AddEmptyTransition(this.last);
+            this.start.AddEmptyTransition(this.end);
 
             return this;
         }
 
         public PatternBuilder<T> MakeRepeating()
         {
-            this.last.AddEmptyTransition(this.first);
+            this.end.AddEmptyTransition(this.start);
 
             return this;
         }
@@ -166,9 +177,9 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         {
             var newPattern = new PatternBuilder<T>();
 
-            newPattern.first = newPattern.GetNewState();
+            newPattern.start = newPattern.GetNewState();
 
-            newPattern.last = newPattern.GetNewState();
+            newPattern.end = newPattern.GetNewState();
 
             return newPattern;
         }
@@ -177,31 +188,31 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         {
             pattern.AddPatternStates(join, out var addedFirst, out var addedLast);
 
-            pattern.first.AddEmptyTransition(addedFirst);
+            pattern.start.AddEmptyTransition(addedFirst);
 
-            addedLast.AddEmptyTransition(pattern.last);
+            addedLast.AddEmptyTransition(pattern.end);
         }
 
         // State creation
-        private State GetNewState()
+        private State<T> GetNewState()
         {
-            var state = new State(states.Count);
+            var state = new State<T>(states.Count);
 
             states.Add(state);
 
             return state;
         }
 
-        private void AddPatternStates(PatternBuilder<T> pattern, out State first, out State last)
+        private void AddPatternStates(PatternBuilder<T> pattern, out State<T> start, out State<T> end)
         {
             int offset = states.Count;
 
             foreach (var state in pattern.states)
                 states.Add(state.Clone(offset));
 
-            first = states[pattern.first.Index + offset];
+            start = states[pattern.start.Index + offset];
 
-            last = states[pattern.last.Index + offset];
+            end = states[pattern.end.Index + offset];
         }
 
 
@@ -210,8 +221,8 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.Append("First: ").Append(first.Index).AppendLine();
-            builder.Append("Last: ").Append(last.Index).AppendLine();
+            builder.Append("First: ").Append(start.Index).AppendLine();
+            builder.Append("Last: ").Append(end.Index).AppendLine();
 
             foreach (var state in states)
                 builder.AppendLine(state.ToString());
@@ -219,155 +230,8 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
             return builder.ToString();
         }
 
+        public IEnumerator<State<T>> GetEnumerator() => states.GetEnumerator();
 
-        // Structures
-        public class State
-        {
-            public State(int index)
-            {
-                this.Transitions = null;
-                this.EmptyTransitions = null;
-                this.Index = index;
-            }
-
-            public int Index { get; private set; }
-
-            public List<Transition> Transitions { get; private set; }
-
-            public List<int> EmptyTransitions { get; private set; }
-
-
-            public void AddTransition(T on, State to)
-            {
-                if (Transitions == null)
-                    Transitions = new List<Transition>();
-
-                var transition = new Transition(on, to.Index);
-
-                Transitions.Add(transition);
-            }
-
-            public void AddTransitions(IEnumerable<T> on, State to)
-            {
-                if (Transitions == null)
-                    Transitions = new List<Transition>();
-
-                foreach (var onItem in on)
-                {
-                    var transition = new Transition(onItem, to.Index);
-
-                    Transitions.Add(transition);
-                }
-            }
-
-            public void AddEmptyTransition(State to)
-            {
-                if (EmptyTransitions == null)
-                    EmptyTransitions = new List<int>();
-
-                EmptyTransitions.Add(to.Index);
-
-                EmptyTransitions.Sort();
-            }
-
-            public State Clone(int offset)
-            {
-                var clone = new State(this.Index + offset);
-
-                if (Transitions != null)
-                {
-                    var clonedTransitions = clone.Transitions = new List<Transition>(Transitions.Count);
-
-                    for (int i = 0; i < Transitions.Count; i++)
-                        clonedTransitions.Add(Transitions[i].Offset(offset));
-                }
-
-                if (EmptyTransitions != null)
-                {
-                    var clonedEmpty = clone.EmptyTransitions = new List<int>(EmptyTransitions.Count);
-
-                    for (int i = 0; i < EmptyTransitions.Count; i++)
-                        clonedEmpty.Add(EmptyTransitions[i] + offset);
-                }
-
-                return clone;
-            }
-
-
-            public override string ToString()
-            {
-                var builder = new StringBuilder();
-
-                builder.Append('{').Append(Index).Append(": ");
-
-                bool final = true;
-
-                if (Transitions != null)
-                {
-                    final = false;
-
-                    bool started = false;
-
-                    foreach (var transition in Transitions)
-                    {
-                        if (started)
-                            builder.Append("; ");
-                        else
-                            started = true;
-
-                        builder.Append('{').Append(transition.On.ToString()).Append("} -> ").Append(transition.ToIndex);
-                    }
-                }
-
-                if (EmptyTransitions != null)
-                {
-                    if (!final)
-                        builder.Append("; ");
-                    else
-                        final = false;
-
-                    bool started = false;
-
-                    builder.Append("<empty> -> ");
-
-                    foreach (var emptyTransition in EmptyTransitions)
-                    {
-                        if (started)
-                            builder.Append(", ");
-                        else
-                            started = true;
-
-                        builder.Append(emptyTransition);
-                    }
-                }
-
-                if (final)
-                    builder.Append("<none>");
-
-                builder.Append("}");
-
-                return builder.ToString();
-            }
-        }
-
-        public struct Transition
-        {
-            public Transition(T on, int toIndex)
-            {
-                this.On = on;
-
-                this.ToIndex = toIndex;
-            }
-
-            public T On { get; private set; }
-
-            public int ToIndex { get; private set; }
-
-
-            public Transition Offset(int offset)
-            {
-                return new Transition(On, toIndex: +offset);
-            }
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -4,16 +4,30 @@ using System.Collections.Generic;
 
 namespace Soedeum.Dotnet.Library.Data.Enumeration
 {
-    public class EnumeratorGenerator<T> : IEnumerable<T>
+    public class EnumeratorGenerator<T, TEnumerator> : IEnumerable<T>
+        where TEnumerator : IEnumerator<T>
     {
-        GetEnumerator<T> generator;
+        Func<TEnumerator> generator;
 
-        public EnumeratorGenerator(GetEnumerator<T> generator) => this.generator = generator;
+        protected EnumeratorGenerator() { }
 
         public IEnumerator<T> GetEnumerator() => generator();
 
         IEnumerator IEnumerable.GetEnumerator() => generator();
+
+
+        public static EnumeratorGenerator<T, TEnumerator> Create(Func<TEnumerator> generator)
+        {
+            var result = new EnumeratorGenerator<T, TEnumerator>();
+
+            result.generator = generator;
+
+            return result;
+        }
     }
 
-    public delegate IEnumerator<T> GetEnumerator<T>();
+    public class EnumeratorGenerator<T> : EnumeratorGenerator<T, IEnumerator<T>>
+    {
+        protected EnumeratorGenerator() { }
+    }
 }
