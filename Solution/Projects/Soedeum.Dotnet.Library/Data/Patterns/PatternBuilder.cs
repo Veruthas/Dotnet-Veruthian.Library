@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Soedeum.Dotnet.Library.Data.Patterns
 {
-    public class PatternBuilder<T> : IEnumerable<State<T>>
+    public class PatternBuilder<T> : IEnumerable<PatternState<T>>
     {
-        List<State<T>> states = new List<State<T>>();
+        List<PatternState<T>> states = new List<PatternState<T>>();
 
-        State<T> start;
+        PatternState<T> start;
 
-        State<T> end;
+        PatternState<T> end;
 
         // Constructors
         public PatternBuilder() { }
@@ -21,20 +21,20 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         public PatternBuilder(PatternBuilder<T> pattern) => Append(pattern);
 
 
-        public State<T> this[int index] => states[index];
+        public PatternState<T> this[int index] => states[index];
 
         public int Count => states.Count;
 
 
-        public int StartIndex => start.Index;
+        public PatternState<T> Start => start;
 
-        public int EndIndex => end.Index;
+        public PatternState<T> End => end;
 
 
         // Concatenation
         public PatternBuilder<T> Append(T value)
         {
-            State<T> oldEnd, newEnd;
+            PatternState<T> oldEnd, newEnd;
 
             if (start == null)
             {
@@ -58,7 +58,7 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
 
         public PatternBuilder<T> Append(IEnumerable<T> values)
         {
-            State<T> oldEnd, newEnd;
+            PatternState<T> oldEnd, newEnd;
 
             if (start == null)
             {
@@ -194,16 +194,16 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         }
 
         // State creation
-        private State<T> GetNewState()
+        private PatternState<T> GetNewState()
         {
-            var state = new State<T>(states.Count);
+            var state = new PatternState<T>(states.Count);
 
             states.Add(state);
 
             return state;
         }
 
-        private void AddPatternStates(PatternBuilder<T> pattern, out State<T> start, out State<T> end)
+        private void AddPatternStates(PatternBuilder<T> pattern, out PatternState<T> start, out PatternState<T> end)
         {
             int offset = states.Count;
 
@@ -230,7 +230,7 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
             return builder.ToString();
         }
 
-        public IEnumerator<State<T>> GetEnumerator() => states.GetEnumerator();
+        public IEnumerator<PatternState<T>> GetEnumerator() => states.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

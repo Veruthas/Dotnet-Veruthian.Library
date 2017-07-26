@@ -1,8 +1,8 @@
 namespace Soedeum.Dotnet.Library.Data.Patterns
 {
-    public struct Transition<T>
+    public struct PatternTransition<T>
     {
-        public Transition(T on, int toIndex)
+        public PatternTransition(T on, int toIndex)
         {
             this.On = on;
 
@@ -14,9 +14,9 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         public int ToIndex { get; private set; }
 
 
-        public Transition<T> Offset(int offset)
+        public PatternTransition<T> Offset(int offset)
         {
-            return new Transition<T>(On, toIndex: +offset);
+            return new PatternTransition<T>(On, toIndex: +offset);
         }
     }
 }

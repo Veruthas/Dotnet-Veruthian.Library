@@ -4,15 +4,15 @@ using Soedeum.Dotnet.Library.Data.Enumeration;
 
 namespace Soedeum.Dotnet.Library.Data.Patterns
 {
-    public class State<T>
+    public class PatternState<T>
     {
         private int index;
 
-        private List<Transition<T>> transitions;
+        private List<PatternTransition<T>> transitions;
 
         private List<int> emptyTransitions;
 
-        public State(int index)
+        public PatternState(int index)
         {
             this.transitions = null;
             this.emptyTransitions = null;
@@ -25,7 +25,7 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
 
         public int TransitionCount => transitions == null ? 0 : transitions.Count;
 
-        public Transition<T> GetTransition(int index) => transitions[index];
+        public PatternTransition<T> GetTransition(int index) => transitions[index];
 
 
         public int EmptyTransitionCount => emptyTransitions == null ? 0 : EmptyTransitionCount;
@@ -33,12 +33,12 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
         public int GetEmptyTransition(int index) => emptyTransitions[index];
 
 
-        public IEnumerable<Transition<T>> Transitions
+        public IEnumerable<PatternTransition<T>> Transitions
         {
             get
             {
                 if (transitions == null)
-                    return EmptyEnumerable<Transition<T>>.Default;
+                    return EmptyEnumerable<PatternTransition<T>>.Default;
                 else
                     return transitions.AsReadOnly();
             }
@@ -55,30 +55,30 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
             }
         }
 
-        public void AddTransition(T on, State<T> to)
+        public void AddTransition(T on, PatternState<T> to)
         {
             if (transitions == null)
-                transitions = new List<Transition<T>>();
+                transitions = new List<PatternTransition<T>>();
 
-            var transition = new Transition<T>(on, to.index);
+            var transition = new PatternTransition<T>(on, to.index);
 
             transitions.Add(transition);
         }
 
-        public void AddTransitions(IEnumerable<T> on, State<T> to)
+        public void AddTransitions(IEnumerable<T> on, PatternState<T> to)
         {
             if (transitions == null)
-                transitions = new List<Transition<T>>();
+                transitions = new List<PatternTransition<T>>();
 
             foreach (var onItem in on)
             {
-                var transition = new Transition<T>(onItem, to.index);
+                var transition = new PatternTransition<T>(onItem, to.index);
 
                 transitions.Add(transition);
             }
         }
 
-        public void AddEmptyTransition(State<T> to)
+        public void AddEmptyTransition(PatternState<T> to)
         {
             if (emptyTransitions == null)
                 emptyTransitions = new List<int>();
@@ -88,13 +88,13 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
             emptyTransitions.Sort();
         }
 
-        public State<T> Clone(int offset)
+        public PatternState<T> Clone(int offset)
         {
-            var clone = new State<T>(this.index + offset);
+            var clone = new PatternState<T>(this.index + offset);
 
             if (transitions != null)
             {
-                var clonedTransitions = clone.transitions = new List<Transition<T>>(transitions.Count);
+                var clonedTransitions = clone.transitions = new List<PatternTransition<T>>(transitions.Count);
 
                 for (int i = 0; i < transitions.Count; i++)
                     clonedTransitions.Add(transitions[i].Offset(offset));
