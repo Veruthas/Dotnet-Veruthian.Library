@@ -7,7 +7,7 @@ namespace Soedeum.Dotnet.Library.Data.Patterns
     public class PatternState<T>
     {
         private int index;
-
+        
         private List<PatternTransition<T>> transitions;
 
         private List<int> emptyTransitions;
