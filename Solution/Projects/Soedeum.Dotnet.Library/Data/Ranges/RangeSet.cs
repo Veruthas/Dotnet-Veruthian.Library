@@ -197,9 +197,9 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
             }
         }
 
-        public IEnumerable<T> Items => new EnumeratorGenerator<T>(GetItemEnumerator);
+        public IEnumerable<T> Items => EnumeratorGenerator<T>.Create(GetItemEnumerator);
 
-        public IEnumerable<Range<T>> Ranges => new EnumeratorGenerator<Range<T>>(GetRangeEnumerator);
+        public IEnumerable<Range<T>> Ranges => EnumeratorGenerator<Range<T>>.Create(GetRangeEnumerator);
 
         #endregion
 
