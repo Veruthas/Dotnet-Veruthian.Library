@@ -15,7 +15,13 @@ namespace _TestConsole
     class Program
     {
         static void Main(string[] args)
-        {            
+        {
+            var comment = Pattern<char>.New();
+
+            var notCommentEnd = Pattern<char>.New().NonMatchAhead("*/");
+
+            comment.Match("/*").MatchOneOf(comment, notCommentEnd).Match("*/");
+
             Pause();
         }
 
