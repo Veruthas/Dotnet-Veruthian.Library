@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Soedeum.Dotnet.Library;
 using Soedeum.Dotnet.Library.Data;
+using Soedeum.Dotnet.Library.Data.Patterns;
 using Soedeum.Dotnet.Library.Data.Ranges;
 using Soedeum.Dotnet.Library.Numeric;
 using Soedeum.Dotnet.Library.Text.Code;
@@ -14,7 +15,7 @@ namespace _TestConsole
     class Program
     {
         static void Main(string[] args)
-        {
+        {            
             Pause();
         }
 
