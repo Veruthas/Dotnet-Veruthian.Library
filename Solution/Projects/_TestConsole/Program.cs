@@ -5,6 +5,7 @@ using System.Text;
 using Soedeum.Dotnet.Library;
 using Soedeum.Dotnet.Library.Data;
 using Soedeum.Dotnet.Library.Data.Patterns;
+using Soedeum.Dotnet.Library.Data.Readers;
 using Soedeum.Dotnet.Library.Data.Ranges;
 using Soedeum.Dotnet.Library.Numeric;
 using Soedeum.Dotnet.Library.Text.Code;
@@ -16,11 +17,17 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            var comment = Pattern<char>.New();
+            var reader = "Hello, world. My name is Levi!".GetSpeculativeReader();
 
-            var notCommentEnd = Pattern<char>.New().NonMatchAhead("*/");
+            reader.Mark();
 
-            comment.Match("/*").MatchOneOf(comment, notCommentEnd).Match("*/");
+            while (!reader.IsEnd)
+            {
+                if (char.IsPunctuation(reader.Peek()))
+                    reader.Mark();
+
+                reader.Read();
+            }
 
             Pause();
         }

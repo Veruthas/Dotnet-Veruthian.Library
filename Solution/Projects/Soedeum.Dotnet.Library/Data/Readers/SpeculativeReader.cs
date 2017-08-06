@@ -52,36 +52,54 @@ namespace Soedeum.Dotnet.Library.Data.Readers
 
             marks.Add(new MarkItem(Position, Index));
 
-            OnMarked();
+            OnMarked(Position);
         }
 
-        protected void OnMarked()
+        protected void OnMarked(int position)
         {
             if (Marked != null)
-                Marked(this);
+                Marked(this, position);
         }
 
-        public event SpeculationIncident<T> Marked;
+        public event SpeculationStarted<T> Marked;
 
 
         // Commit
-        public void Commit()
+        public void Commit() => Commit(1);
+
+        public void CommitAll() => Commit(marks.Count);
+
+        public void Commit(int marks)
         {
-            if (!IsSpeculating)
-                throw new InvalidOperationException("No speculations to commit to!");
+            if (marks < -1 || marks > MarkCount)
+                throw new InvalidOperationException(string.Format("Attempting to commit {0} speculations; only {1} exist", marks, MarkCount));
 
-            marks.Clear();
+            if (marks > 0)
+            {
+                // Get mark to commit from
+                var markIndex = this.marks.Count - marks;
 
-            OnCommitted();
+                var mark = this.marks[markIndex];
+
+
+                // Pop off all marks
+                this.marks.RemoveRange(markIndex, marks);
+
+                // Set to marked positions
+                var oldPosition = Position;
+
+                // Notify suscribers of retreat
+                OnCommitted(this.Position, oldPosition);
+            }
         }
 
-        protected virtual void OnCommitted()
+        protected virtual void OnCommitted(int markedPosition, int speculatedPosition)
         {
             if (Committed != null)
-                Committed(this);
+                Committed(this, markedPosition, speculatedPosition);
         }
 
-        public event SpeculationIncident<T> Committed;
+        public event SpeculationCompleted<T> Committed;
 
 
         // Retreat
@@ -115,10 +133,10 @@ namespace Soedeum.Dotnet.Library.Data.Readers
 
 
                 // Notify suscribers of retreat
-                OnRetreated(oldPosition, this.Position);
+                OnRetreated(this.Position, oldPosition);
 
                 // Get size of retreat
-                int length = (oldPosition - this.Position) + 1;
+                int length = (oldPosition - this.Position);
 
                 return length;
             }
@@ -126,12 +144,12 @@ namespace Soedeum.Dotnet.Library.Data.Readers
             return 0;
         }
 
-        protected virtual void OnRetreated(int fromPosition, int originalPosition)
+        protected virtual void OnRetreated(int markedPosition, int speculatedPosition)
         {
             if (Retreated != null)
-                Retreated(this, fromPosition, originalPosition);
+                Retreated(this, speculatedPosition, markedPosition);
         }
 
-        public event SpeculationRetreated<T> Retreated;
+        public event SpeculationCompleted<T> Retreated;
     }
 }

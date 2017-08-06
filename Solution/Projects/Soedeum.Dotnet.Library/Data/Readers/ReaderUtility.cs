@@ -68,9 +68,9 @@ namespace Soedeum.Dotnet.Library.Data.Readers
                                                                 this IEnumerator<T> enumerator,
                                                                 GenerateEndItem<T> generateEndItem = null,
                                                                 ReaderRead<T> onItemRead = null,
-                                                                SpeculationIncident<T> onMarked = null,
-                                                                SpeculationIncident<T> onCommitted = null,
-                                                                SpeculationRetreated<T> onRetreated = null)
+                                                                SpeculationStarted<T> onMarked = null,
+                                                                SpeculationCompleted<T> onCommitted = null,
+                                                                SpeculationCompleted<T> onRetreated = null)
         {
             var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
 
@@ -89,9 +89,9 @@ namespace Soedeum.Dotnet.Library.Data.Readers
                                                             this IEnumerable<T> enumerable,
                                                             GenerateEndItem<T> generateEndItem = null,
                                                             ReaderRead<T> onItemRead = null,
-                                                            SpeculationIncident<T> onMarked = null,
-                                                            SpeculationIncident<T> onCommitted = null,
-                                                            SpeculationRetreated<T> onRetreated = null)
+                                                            SpeculationStarted<T> onMarked = null,
+                                                            SpeculationCompleted<T> onCommitted = null,
+                                                            SpeculationCompleted<T> onRetreated = null)
         {
             return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
         }
