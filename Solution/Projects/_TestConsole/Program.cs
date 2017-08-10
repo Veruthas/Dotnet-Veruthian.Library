@@ -17,22 +17,9 @@ namespace _TestConsole
     {
         static void Main(string[] args)
         {
-            var reader = "Hello, world. My name is Levi!".GetSpeculativeReader();
-
-            reader.Mark();
-
-            while (!reader.IsEnd)
-            {
-                if (char.IsPunctuation(reader.Peek()))
-                    reader.Mark();
-
-                reader.Read();
-            }
-
             Pause();
         }
 
-        // Comment
         static void Pause()
         {
             Console.Write("Press any key to continue...");

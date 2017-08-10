@@ -29,4 +29,12 @@ namespace Soedeum.Dotnet.Library.Data.Readers
 
         void RetreatAll();
     }
+
+    public interface ISpeculativeReader<T, TState> : ISpeculativeReader<T>
+    {
+        TState GetMarkState(int mark);
+
+        void Mark(TState withState);
+
+    }
 }
