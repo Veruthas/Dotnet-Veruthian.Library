@@ -34,7 +34,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
             }
 
             int markIndex = markedLocations.Count - markCount;
-            
+
             this.Location = markedLocations[markIndex];
 
             markedLocations.RemoveRange(markIndex, markCount);
@@ -46,7 +46,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
                 markedLocations = new List<TextLocation>();
 
             markedLocations.Add(this.Location);
-            
+
             Reader.Mark();
         }
 
@@ -58,7 +58,9 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
         protected int Retreat()
         {
-            int fromPosition = Reader.Retreat();
+            int fromPosition = Reader.Position;
+
+            Reader.Retreat();
 
             OnRetreated(fromPosition, 1);
 
@@ -67,7 +69,7 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
 
         protected int Retreat(int marks)
         {
-            int fromPosition = Reader.Retreat(marks);
+            int fromPosition = Reader.Position;
 
             OnRetreated(fromPosition, marks);
 
@@ -78,7 +80,9 @@ namespace Soedeum.Dotnet.Library.Text.Lexers
         {
             int markCount = Reader.MarkCount;
 
-            int fromPosition = Reader.RetreatAll();
+            int fromPosition = Reader.Position;
+
+            Reader.RetreatAll();
 
             OnRetreated(fromPosition, markCount);
 

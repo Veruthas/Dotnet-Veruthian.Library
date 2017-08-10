@@ -55,13 +55,7 @@ namespace Soedeum.Dotnet.Library.Data.Readers
             OnMarked(Position);
         }
 
-        protected void OnMarked(int position)
-        {
-            if (Marked != null)
-                Marked(this, position);
-        }
-
-        public event SpeculationStarted<T> Marked;
+        protected void OnMarked(int position) { }
 
 
         // Commit
@@ -93,21 +87,15 @@ namespace Soedeum.Dotnet.Library.Data.Readers
             }
         }
 
-        protected virtual void OnCommitted(int markedPosition, int speculatedPosition)
-        {
-            if (Committed != null)
-                Committed(this, markedPosition, speculatedPosition);
-        }
-
-        public event SpeculationCompleted<T> Committed;
+        protected virtual void OnCommitted(int markedPosition, int speculatedPosition) { }
 
 
         // Retreat
-        public int Retreat() => Retreat(1);
+        public void Retreat() => Retreat(1);
 
-        public int RetreatAll() => Retreat(MarkCount);
+        public void RetreatAll() => Retreat(MarkCount);
 
-        public int Retreat(int marks)
+        public void Retreat(int marks)
         {
             if (marks < -1 || marks > MarkCount)
                 throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
@@ -132,24 +120,13 @@ namespace Soedeum.Dotnet.Library.Data.Readers
                 this.Position = mark.Position;
 
 
-                // Notify suscribers of retreat
+                // Notify retreat
                 OnRetreated(this.Position, oldPosition);
-
-                // Get size of retreat
-                int length = (oldPosition - this.Position);
-
-                return length;
             }
-
-            return 0;
         }
 
         protected virtual void OnRetreated(int markedPosition, int speculatedPosition)
         {
-            if (Retreated != null)
-                Retreated(this, speculatedPosition, markedPosition);
         }
-
-        public event SpeculationCompleted<T> Retreated;
     }
 }
