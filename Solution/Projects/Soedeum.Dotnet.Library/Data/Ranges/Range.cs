@@ -71,26 +71,30 @@ namespace Soedeum.Dotnet.Library.Data.Ranges
         public int CompareTo(Range<T> other)
         {
             int comparison = this.low.CompareTo(other.low);
-
+            
+            // (A, C) <=> (B, C)
             if (comparison < 0)
                 return -1;
+            // (B, C) <=> (A, C)
             else if (comparison > 0)
                 return 1;
+            // (A, C) <=> (A, D)
             else
                 return this.high.CompareTo(other.high);
         }
 
         public int CompareTo(T other)
         {
-            int comparison = this.low.CompareTo(other);
-
-            if (comparison < 0)
+            if (low.IsLessThan(other))
                 return -1;
-            else if (comparison > 0)
+            else if (high.IsGreaterThan(other))
                 return 1;
             else
-                return this.high.CompareTo(other);
+                return 0;
         }
+
+        public bool Contains(T value) => CompareTo(value) == 0;
+
 
         public static bool operator <(Range<T> left, Range<T> right) => left.CompareTo(right) < 0;
 
