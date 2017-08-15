@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Soedeum.Dotnet.Library;
 using Soedeum.Dotnet.Library.Data;
-using Soedeum.Dotnet.Library.Data.Patterns;
 using Soedeum.Dotnet.Library.Data.Readers;
 using Soedeum.Dotnet.Library.Data.Ranges;
 using Soedeum.Dotnet.Library.Numeric;
