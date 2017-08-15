@@ -6,94 +6,82 @@ namespace Soedeum.Dotnet.Library.Data.Readers
     {
         // Simple Reader
         public static SimpleReader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
-                                                             GenerateEndItem<T> generateEndItem = null,
-                                                             ReaderRead<T> onItemRead = null)
+                                                             GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new SimpleReader<T>(enumerator, generateEndItem);
-
-            reader.ItemRead += onItemRead;
 
             return reader;
         }
 
         public static SimpleReader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
-                                                            GenerateEndItem<T> generateEndItem = null,
-                                                            ReaderRead<T> onItemRead = null)
+                                                            GenerateEndItem<T> generateEndItem = null)
         {
-            return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem, onItemRead);
+            return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
         // Fixed Lookahead Reader
         public static FixedLookaheadReader<T> GetFixedLookaheadReader<T>(this IEnumerator<T> enumerator,
                                                                             int lookahead = 2,
-                                                                            GenerateEndItem<T> generateEndItem = null,
-                                                                            ReaderRead<T> onItemRead = null)
+                                                                            GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new FixedLookaheadReader<T>(enumerator, lookahead, generateEndItem);
-
-            reader.ItemRead += onItemRead;
 
             return reader;
         }
 
         public static FixedLookaheadReader<T> GetFixedLookaheadReader<T>(this IEnumerable<T> enumerable,
                                                                             int lookahead = 2,
-                                                                            GenerateEndItem<T> generateEndItem = null,
-                                                                            ReaderRead<T> onItemRead = null)
+                                                                            GenerateEndItem<T> generateEndItem = null)
         {
-            return GetFixedLookaheadReader(enumerable.GetEnumerator(), lookahead, generateEndItem, onItemRead);
+            return GetFixedLookaheadReader(enumerable.GetEnumerator(), lookahead, generateEndItem);
         }
 
         // Variable Lookahead Reader
         public static VariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerator<T> enumerator,
-                                                                                GenerateEndItem<T> generateEndItem = null,
-                                                                                ReaderRead<T> onItemRead = null)
+                                                                                GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new VariableLookaheadReader<T>(enumerator, generateEndItem);
-
-            reader.ItemRead += onItemRead;
 
             return reader;
         }
 
         public static VariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
-                                                                                GenerateEndItem<T> generateEndItem = null,
-                                                                                ReaderRead<T> onItemRead = null)
+                                                                                GenerateEndItem<T> generateEndItem = null)
         {
-            return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem, onItemRead);
+            return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
         // Speculative Reader
         public static SpeculativeReader<T> GetSpeculativeReader<T>(
                                                                 this IEnumerator<T> enumerator,
-                                                                GenerateEndItem<T> generateEndItem = null,
-                                                                ReaderRead<T> onItemRead = null,
-                                                                SpeculationIncident<T> onMarked = null,
-                                                                SpeculationIncident<T> onCommitted = null,
-                                                                SpeculationRetreated<T> onRetreated = null)
+                                                                GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
-
-            reader.ItemRead += onItemRead;
-
-            reader.Marked += onMarked;
-
-            reader.Committed += onCommitted;
-
-            reader.Retreated += onRetreated;
 
             return reader;
         }
 
         public static SpeculativeReader<T> GetSpeculativeReader<T>(
                                                             this IEnumerable<T> enumerable,
-                                                            GenerateEndItem<T> generateEndItem = null,
-                                                            ReaderRead<T> onItemRead = null,
-                                                            SpeculationIncident<T> onMarked = null,
-                                                            SpeculationIncident<T> onCommitted = null,
-                                                            SpeculationRetreated<T> onRetreated = null)
+                                                            GenerateEndItem<T> generateEndItem = null)
         {
-            return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem, onItemRead, onMarked, onCommitted, onRetreated);
+            return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem);
+        }
+
+        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
+                                                        this IEnumerator<T> enumerator,
+                                                        GenerateEndItem<T> generateEndItem = null)
+        {
+            var reader = new SpeculativeReader<T, TState>(enumerator, generateEndItem);
+
+            return reader;
+        }
+
+        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
+                                                            this IEnumerable<T> enumerable,
+                                                            GenerateEndItem<T> generateEndItem = null)
+        {
+            return GetSpeculativeWithStateReader<T, TState>(enumerable.GetEnumerator(), generateEndItem);
         }
     }
 }

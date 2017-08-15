@@ -106,14 +106,7 @@ namespace Soedeum.Dotnet.Library.Data.Readers
                 Read();
         }
 
-        protected void OnItemRead(T current)
-        {
-            if (ItemRead != null)
-                ItemRead(this, current);
-        }
-
-        public event ReaderRead<T> ItemRead;
-
+        protected void OnItemRead(T current) { }
 
         public bool GetNext(out T next)
         {
