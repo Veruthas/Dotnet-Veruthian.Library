@@ -1,15 +1,15 @@
 {
-    "version": "0.1.0",
-    "command": "dotnet",
-    "isShellCommand": true,
+    "version": "2.0.0",
+
     "args": [],
     "tasks": [
         {
-            "taskName": "build",
+            "label": "build",
+            "command": "dotnet",
             "args": [
+                "build",
                 "${workspaceRoot}/Solution/Projects/_TestConsole/_TestConsole.csproj"
             ],
-            "isBuildCommand": true,
             "problemMatcher": "$msCompile"
         }
     ]
