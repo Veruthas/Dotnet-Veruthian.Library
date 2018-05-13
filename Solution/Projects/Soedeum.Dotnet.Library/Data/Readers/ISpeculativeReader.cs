@@ -13,30 +13,28 @@ namespace Soedeum.Dotnet.Library.Data.Readers
         int GetMarkPosition(int mark);
 
 
-
         void Mark();
+
 
         void Commit();
 
+        void Commit(int marks);
 
-        // Returns the position retreated from
-        int Retreat();
-
-        int Retreat(int marks);
-
-        int RetreatAll();
+        void CommitAll();
 
 
-        event SpeculationIncident<T> Marked;
+        void Retreat();
 
-        event SpeculationIncident<T> Committed;
+        void Retreat(int marks);
 
-        event SpeculationRetreated<T> Retreated;
+        void RetreatAll();
     }
 
-    
-    public delegate void SpeculationIncident<T>(ISpeculativeReader<T> reader);
+    public interface ISpeculativeReader<T, TState> : ISpeculativeReader<T>
+    {
+        TState GetMarkState(int mark);
 
-    public delegate void SpeculationRetreated<T>(ISpeculativeReader<T> reader,
-            int fromPosition, int originalPosition);
+        void Mark(TState withState);
+
+    }
 }

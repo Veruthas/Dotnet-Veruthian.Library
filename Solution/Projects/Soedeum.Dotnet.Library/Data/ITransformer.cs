@@ -2,7 +2,7 @@ using System;
 
 namespace Soedeum.Dotnet.Library.Data
 {
-    public interface ITransformer<TSource, TTarget>
+    public interface ITransformer<in TSource, out TTarget>
     {
         TTarget Process(TSource value);
     }
