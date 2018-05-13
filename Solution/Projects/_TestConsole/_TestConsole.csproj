@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\Soedeum.Dotnet.Library\Soedeum.Dotnet.Library.csproj" />
+    <ProjectReference Include="..\Veruthian.Dotnet.Library\Veruthian.Dotnet.Library.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
