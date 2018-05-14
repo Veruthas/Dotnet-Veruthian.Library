@@ -4,46 +4,51 @@ namespace Veruthian.Dotnet.Library.Data.Tables
 {
     public class NestedTable<TKey, TValue> : Table<TKey, TValue>, INestedTable<TKey, TValue, Table<TKey, TValue>>
     {
-        Table<TKey, TValue> inner;
+        Table<TKey, TValue> lower;
 
-        Table<TKey, TValue> outer;
+        Table<TKey, TValue> upper;
 
 
 
-        public NestedTable(Table<TKey, TValue> inner, Table<TKey, TValue> outer = null)
+        public NestedTable(Table<TKey, TValue> lower, Table<TKey, TValue> upper = null)
         {
-            this.inner = inner;
+            this.lower = lower;
 
-            this.outer = outer;
+            this.upper = upper;
         }
 
 
-        public Table<TKey, TValue> InnerTable => inner;
+        public Table<TKey, TValue> LowerTable => lower;
 
-        public Table<TKey, TValue> OuterTable => outer;
+        public Table<TKey, TValue> UpperTable => upper;
 
 
-        public override int Count => inner.Count + (outer != null ? outer.Count : 0);
+        public override int Count => lower.Count + (upper != null ? upper.Count : 0);
 
-        public override bool HasKey(TKey key) => inner.HasKey(key) || (outer != null && outer.HasKey(key));
+        public override bool HasKey(TKey key) => lower.HasKey(key) || (upper != null && upper.HasKey(key));
 
         public override bool Get(TKey key, out TValue value)
         {
-            throw new System.NotImplementedException();
+            if (lower.Get(key, out value))
+                return true;
+            else if (upper != null && upper.Get(key, out value))
+                return true;
+            else
+                return false;
         }
 
-        public override void Set(TKey key, TValue value) => inner.Set(key, value);
+        public override void Set(TKey key, TValue value) => lower.Set(key, value);
 
         public override IEnumerable<KeyValuePair<TKey, TValue>> GetPairs()
         {
-            foreach(var pair in inner.GetPairs())
+            foreach (var pair in lower.GetPairs())
             {
                 yield return pair;
             }
 
-            if (outer != null)
+            if (upper != null)
             {
-                foreach (var pair in outer.GetPairs())
+                foreach (var pair in upper.GetPairs())
                 {
                     yield return pair;
                 }

@@ -6,6 +6,7 @@ using Veruthian.Dotnet.Library;
 using Veruthian.Dotnet.Library.Data;
 using Veruthian.Dotnet.Library.Data.Readers;
 using Veruthian.Dotnet.Library.Data.Ranges;
+using Veruthian.Dotnet.Library.Data.Tables;
 using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Code;
 using Veruthian.Dotnet.Library.Text.Code.Encodings;
