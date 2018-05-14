@@ -10,6 +10,11 @@ namespace Veruthian.Dotnet.Library.Data
         Table<TKey, TValue> baseTable;
 
 
+        public Table() { }
+
+        public Table(Table<TKey, TValue> baseTable) => this.baseTable = baseTable;
+
+
         // Recursive
         public int Count => LocalCount + BaseCount;
 
