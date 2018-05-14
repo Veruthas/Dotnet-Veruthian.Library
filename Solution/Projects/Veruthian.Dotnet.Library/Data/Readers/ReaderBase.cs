@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public abstract class BaseReader<T> : IReader<T>
+    public abstract class ReaderBase<T> : IReader<T>
     {
         IEnumerator<T> enumerator;
 
@@ -18,7 +18,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         T lastItem;
 
 
-        public BaseReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
+        public ReaderBase(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
