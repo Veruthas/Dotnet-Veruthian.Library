@@ -2,14 +2,16 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Tables
 {
-    public class ParralleledTable<TKey, TValue> : Table<TKey, TValue>, IParalleledTable<TKey, TValue, Table<TKey, TValue>>
+    public class ParalleledTable<TKey, TValue> : Table<TKey, TValue>, IParalleledTable<TKey, TValue, Table<TKey, TValue>>
     {
         List<Table<TKey, TValue>> tables = new List<Table<TKey, TValue>>();
 
 
-        public ParralleledTable() { }
+        public ParalleledTable() { }
 
-        public ParralleledTable(params Table<TKey, TValue>[] tables) => this.tables.AddRange(tables);
+        public ParalleledTable(params Table<TKey, TValue>[] tables) => this.tables.AddRange(tables);
+
+        public ParalleledTable(IEnumerable<Table<TKey, TValue>> tables) => this.tables.AddRange(tables);
 
 
         public int TableCount => tables.Count;

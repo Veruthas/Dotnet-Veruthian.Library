@@ -6,6 +6,7 @@ namespace Veruthian.Dotnet.Library.Data.Tables
     {
         Dictionary<TKey, TValue> items = new Dictionary<TKey, TValue>();
 
+
         public override int Count => items.Count;
 
         public override bool HasKey(TKey key) => items.ContainsKey(key);
@@ -30,7 +31,7 @@ namespace Veruthian.Dotnet.Library.Data.Tables
         {
             items[key] = value;
         }
-        
+
         public override IEnumerable<KeyValuePair<TKey, TValue>> GetPairs()
         {
             return items;
