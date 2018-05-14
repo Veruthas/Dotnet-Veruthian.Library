@@ -1,6 +1,10 @@
 # Veruthian.Dotnet.Library
 A shared group of libraries for all Veruthian dotnet projects.
 
+## # v0.0.2 
+##### Veruthian.Dotnet.Library.Data,Tables
+- Added new composable Tables
+
 ## # v0.0.1 Initial Release
 ##### Veruthian.Dotnet.Library.Data
 - Generic Enumerators
