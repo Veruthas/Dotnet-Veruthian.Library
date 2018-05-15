@@ -1,18 +1,21 @@
 ﻿using System;
 
-class Program
+namespace _Console
 {
-    static void Main(string[] args)
+    class Program
     {
-        Pause();
-    }
+        static void Main(string[] args)
+        {
+            Pause();
+        }
 
-    static void Pause()
-    {
-        Console.Write("Press any key to continue...");
+        static void Pause()
+        {
+            Console.Write("Press any key to continue...");
 
-        while (Console.ReadKey(true).Key != ConsoleKey.Enter);
+            while (Console.ReadKey(true).Key != ConsoleKey.Enter) ;
 
-        Console.WriteLine();
+            Console.WriteLine();
+        }
     }
 }
