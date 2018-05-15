@@ -43,25 +43,15 @@ namespace Veruthian.Dotnet.Library.Data.Tables
                 throw new System.ArgumentException(string.Format("Table does not contain key: '{0}'", key?.ToString() ?? "<NULL>"));
         }
 
-        public static NestedTable<TKey, TValue> CreateUpperTable<TKey, TValue>(this Table<TKey, TValue> lower)
+        public static SimpleTable<TKey, TValue> CreateTable<TKey, TValue>() => new SimpleTable<TKey, TValue>();
+
+
+
+        public static NestedTable<TKey, TValue> NestAsUpper<TKey, TValue>(this Table<TKey, TValue> upper, Table<TKey, TValue> withLower = null)
         {
-            var upper = new SimpleTable<TKey, TValue>();
+            if (withLower == null)
+                withLower = CreateTable<TKey, TValue>();
 
-            var nested = new NestedTable<TKey, TValue>(lower, upper);
-
-            return nested;
-        }
-        public static NestedTable<TKey, TValue> CreateLowerTable<TKey, TValue>(this Table<TKey, TValue> upper)
-        {
-            var lower = new SimpleTable<TKey, TValue>();
-
-            var nested = new NestedTable<TKey, TValue>(lower, upper);
-
-            return nested;
-        }
-        
-        public static NestedTable<TKey, TValue> NestAsUpper<TKey, TValue>(this Table<TKey, TValue> upper, Table<TKey, TValue> withLower)
-        {
             var nested = new NestedTable<TKey, TValue>(withLower, upper);
 
             return nested;
@@ -70,6 +60,9 @@ namespace Veruthian.Dotnet.Library.Data.Tables
 
         public static NestedTable<TKey, TValue> NestAsLower<TKey, TValue>(this Table<TKey, TValue> lower, Table<TKey, TValue> withUpper)
         {
+            if (withUpper == null)
+                withUpper = CreateTable<TKey, TValue>();
+
             var nested = new NestedTable<TKey, TValue>(lower, withUpper);
 
             return nested;
