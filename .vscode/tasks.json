@@ -8,7 +8,7 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "${workspaceRoot}/Solution/Projects/_TestConsole/_TestConsole.csproj"
+                "${workspaceRoot}/Solution/Projects/_Console/_Console.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
