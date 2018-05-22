@@ -112,7 +112,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             }
             else
             {
-                result = ToCodePointFormat();
+                result = ToString();
             }
 
             return result;
