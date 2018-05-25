@@ -73,7 +73,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             bool success = GetNext(out T next);
 
-            if (!EndFound)
+            if (!success && !EndFound)
                 EndPosition = Position + Size;
 
             buffer[index] = next;

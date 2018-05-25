@@ -120,8 +120,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             var current = RawPeek();
 
-            if (MoveNext())
+            if (!IsEnd)
             {
+                MoveNext();
+
                 Position++;
 
                 OnItemRead(current);
