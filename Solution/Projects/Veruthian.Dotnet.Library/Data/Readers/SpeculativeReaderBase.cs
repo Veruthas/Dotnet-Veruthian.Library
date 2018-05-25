@@ -39,7 +39,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         protected List<MarkItem> Marks { get => marks; }
 
         protected override bool CanReset { get => !IsSpeculating; }
-        
+
         public bool IsSpeculating => marks.Count != 0;
 
         public int MarkCount => marks.Count;
@@ -72,39 +72,35 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             if (marks > 0)
             {
-                // Get mark to commit from
+                // Get mark to commit
                 var markIndex = this.marks.Count - marks;
 
                 var mark = this.marks[markIndex];
 
-
-                // Pop off all marks
+                // Pop off all committed marks
                 this.marks.RemoveRange(markIndex, marks);
 
-                // Set to marked positions
-                var oldPosition = Position;
-
-                // Notify suscribers of retreat
-                OnCommitted(this.Position, oldPosition);
+                // Notify commit
+                OnCommitted(mark.Position, this.Position);
             }
         }
 
-        protected virtual void OnCommitted(int markedPosition, int speculatedPosition) { }
+        protected virtual void OnCommitted(int speculatedFromPosition, int committedToPosition) { }
 
 
-        // Retreat
-        public void Retreat() => Retreat(1);
+        // Rollback
+        public void Rollback() => Rollback(1);
 
-        public void RetreatAll() => Retreat(MarkCount);
+        public void RollbackAll() => Rollback(MarkCount);
 
-        public void Retreat(int marks)
+        public void Rollback(int marks)
         {
             if (marks < -1 || marks > MarkCount)
                 throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
 
             if (marks > 0)
             {
-                // Get mark to retreat to
+                // Get mark to rollback to
                 var markIndex = this.marks.Count - marks;
 
                 var mark = this.marks[markIndex];
@@ -123,11 +119,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
                 // Notify retreat
-                OnRetreated(this.Position, oldPosition);
+                OnRetreated(oldPosition, this.Position);
             }
         }
 
-        protected virtual void OnRetreated(int markedPosition, int speculatedPosition)
+        protected virtual void OnRetreated(int retreatedFromPosition, int retreatedToPosition)
         {
         }
     }
