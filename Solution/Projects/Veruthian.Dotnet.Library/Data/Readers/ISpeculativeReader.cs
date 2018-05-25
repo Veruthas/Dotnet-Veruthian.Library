@@ -23,11 +23,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         void CommitAll();
 
 
-        void Retreat();
+        void Rollback();
 
-        void Retreat(int marks);
+        void Rollback(int marks);
 
-        void RetreatAll();
+        void RollbackAll();
     }
 
     public interface ISpeculativeReader<T, TState> : ISpeculativeReader<T>
@@ -35,6 +35,5 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         TState GetMarkState(int mark);
 
         void Mark(TState withState);
-
     }
 }

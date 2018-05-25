@@ -2,11 +2,11 @@ using Veruthian.Dotnet.Library.Data.Readers;
 
 namespace Veruthian.Dotnet.Library.Data.Patterns
 {
-    public interface IPatternProcessor<T, TReader>
+    public interface IPatternProcessor<T, TReader, TState>
         where TReader : IReader<T>
     {
-        void OnDescend(IPattern pattern, TReader reader);
+        void OnDescend(IPattern<T, TReader, TState> pattern, TReader reader, TState state);
 
-        void OnAscend(IPattern pattern, TReader reader, bool successful);
+        void OnAscend(IPattern<T, TReader, TState> pattern, TReader reader, TState state, bool successful);
     }
 }

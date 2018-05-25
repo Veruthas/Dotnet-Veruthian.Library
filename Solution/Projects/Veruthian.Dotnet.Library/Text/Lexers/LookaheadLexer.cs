@@ -3,7 +3,7 @@ using Veruthian.Dotnet.Library.Text.Code;
 
 namespace Veruthian.Dotnet.Library.Text.Lexers
 {
-    public abstract class LookaheadLexer<TToken, TType> : Lexer<TToken, TType, ILookaheadReader<CodePoint>>
+    public abstract class LookaheadLexer<TToken, TType> : LookaheadLexer<TToken, TType, ILookaheadReader<CodePoint>>
       where TToken : IToken<TType>
     {
         public LookaheadLexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }

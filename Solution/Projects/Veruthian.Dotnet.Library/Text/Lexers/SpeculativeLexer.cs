@@ -5,14 +5,13 @@ using Veruthian.Dotnet.Library.Text.Code;
 
 namespace Veruthian.Dotnet.Library.Text.Lexers
 {
-    public abstract class SpeculativeLexer<TToken, TType> : Lexer<TToken, TType, ISpeculativeReader<CodePoint>>
+    public abstract class SpeculativeLexer<TToken, TType> : SpeculativeLexer<TToken, TType, ISpeculativeReader<CodePoint>>
         where TToken : IToken<TType>
     {
         public SpeculativeLexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }
-
     }
 
-    public abstract class SpeculativeLexer<TToken, TType, TReader> : Lexer<TToken, TType, TReader>
+    public abstract class SpeculativeLexer<TToken, TType, TReader> : LookaheadLexer<TToken, TType, TReader>
         where TToken : IToken<TType>
         where TReader : ISpeculativeReader<CodePoint>
     {
@@ -56,18 +55,18 @@ namespace Veruthian.Dotnet.Library.Text.Lexers
         }
 
 
-        protected int Retreat()
+        protected int Rollback()
         {
             int fromPosition = Reader.Position;
 
-            Reader.Retreat();
+            Reader.Rollback();
 
             OnRetreated(fromPosition, 1);
 
             return fromPosition;
         }
 
-        protected int Retreat(int marks)
+        protected int Rollback(int marks)
         {
             int fromPosition = Reader.Position;
 
@@ -76,13 +75,13 @@ namespace Veruthian.Dotnet.Library.Text.Lexers
             return fromPosition;
         }
 
-        protected int RetreatAll()
+        protected int RollbackAll()
         {
             int markCount = Reader.MarkCount;
 
             int fromPosition = Reader.Position;
 
-            Reader.RetreatAll();
+            Reader.RollbackAll();
 
             OnRetreated(fromPosition, markCount);
 
