@@ -9,6 +9,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         int index = 0;
 
+
         public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, GenerateEndItem<T> generateEndItem = null)
             : base(enumerator, generateEndItem)
         {
@@ -19,23 +20,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
 
+
         protected int Size { get => buffer.Length; }
-
-
-        protected override void VerifyLookahead(int lookahead = 0)
-        {
-            if (lookahead < 0 || lookahead >= Size)
-                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be in the range [1, {1}]", lookahead, Size - 1));
-        }
-
-        protected override T RawPeek(int lookahead = 0)
-        {
-            var actualIndex = (index + lookahead) % Size;
-
-            var item = buffer[actualIndex];
-
-            return item;
-        }
 
 
         protected override void Initialize()
@@ -68,7 +54,22 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        protected override bool MoveToNext()
+        protected override void EnsureLookahead(int lookahead = 0)
+        {
+            if (lookahead < 0 || lookahead >= Size)
+                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be in the range [1, {1}]", lookahead, Size - 1));
+        }
+
+        protected override T RawPeek(int lookahead = 0)
+        {
+            var actualIndex = (index + lookahead) % Size;
+
+            var item = buffer[actualIndex];
+
+            return item;
+        }
+
+        protected override bool MoveNext()
         {
             bool success = GetNext(out T next);
 
@@ -90,7 +91,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             for (int i = 0; i < amount; i++)
             {
-                if (!MoveToNext())
+                if (!MoveNext())
                     return i;
             }
 

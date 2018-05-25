@@ -10,11 +10,14 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public SimpleReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem)
             : base(enumerator, generateEndItem) { }
 
-        protected override T RawPeek(int lookahead = 0) => item;
 
         protected override void Initialize() => SkipAhead(1);
 
-        protected override bool MoveToNext()
+        protected override T RawPeek(int lookahead = 0) => item;
+
+        protected override void EnsureLookahead(int lookahead = 0) { }
+
+        protected override bool MoveNext()
         {
             bool success = GetNext(out T next);
 
@@ -33,13 +36,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             for (int i = 0; i < amount; i++)
             {
-                if (!MoveToNext())
+                if (!MoveNext())
                     return i;
             }
 
             return amount;
         }
-
-        protected override void VerifyLookahead(int lookahead = 0) { }
     }
 }
