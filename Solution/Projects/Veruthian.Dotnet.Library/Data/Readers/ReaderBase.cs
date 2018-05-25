@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
+    public delegate T GenerateEndItem<T>(T previous);
+
+    
     public abstract class ReaderBase<T> : IReader<T>
     {
         IEnumerator<T> enumerator;
@@ -25,39 +28,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             this.generateEndItem = generateEndItem;
         }
 
+        public virtual void Dispose() => enumerator.Dispose();
+
+
 
         public int Position { get => position; protected set => position = value; }
 
 
-        public virtual void Dispose() => enumerator.Dispose();
-
-
-        // End
-        public bool IsEnd { get => CheckedIsAtEnd(); }
-
-        protected bool CheckedIsAtEnd(int lookahead = 0)
-        {
-            VerifyInitialized();
-
-            VerifyLookahead(lookahead);
-
-            return RawIsAtEnd(lookahead);
-        }
-
-        protected bool RawIsAtEnd(int lookahead = 0)
-        {
-            return (endPosition != -1) && (position + lookahead) >= endPosition;
-        }
-
-        protected bool EndFound { get => endPosition != -1; }
-
-        protected int EndPosition { get => endPosition; set => endPosition = value; }
-
-        protected T LastItem { get => lastItem; set => lastItem = value; }
-
-
-        // Reading and Peeking
-        protected void VerifyInitialized()
+        // Initialized
+        protected void EnsureInitialized()
         {
             if (!initialized)
             {
@@ -69,56 +48,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        public T Peek() => CheckedPeek();
 
-        protected T CheckedPeek(int lookahead = 0)
-        {
-            VerifyInitialized();
-
-            VerifyLookahead(lookahead);
-
-            var current = RawPeek(lookahead);
-
-            return current;
-        }
-
-        public T Read()
-        {
-            VerifyInitialized();
-
-            var current = RawPeek();
-
-            if (MoveToNext())
-            {
-                Position++;
-
-                OnItemRead(current);
-            }
-
-            return current;
-        }
-
-
-        protected void OnItemRead(T current) { }
-
-
-        public int Skip(int amount)
-        {
-            var actualAmount = SkipAhead(amount);
-
-            if (actualAmount != 0)
-            {
-                Position += actualAmount;
-
-                OnItemsSkipped(amount);
-            }
-
-            return actualAmount;
-        }
-
-        protected void OnItemsSkipped(int amount) { }
-
-
+        // Fetches next item from enumerator
         protected bool GetNext(out T next)
         {
             if (!EndFound)
@@ -143,18 +74,93 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
 
+        // End
+        public bool IsEnd { get => CheckedIsAtEnd(); }
+
+        protected bool CheckedIsAtEnd(int lookahead = 0)
+        {
+            EnsureInitialized();
+
+            EnsureLookahead(lookahead);
+
+            return RawIsAtEnd(lookahead);
+        }
+
+        protected bool RawIsAtEnd(int lookahead = 0)
+        {
+            return (endPosition != -1) && (position + lookahead) >= endPosition;
+        }
+
+        protected bool EndFound { get => endPosition != -1; }
+
+        protected int EndPosition { get => endPosition; set => endPosition = value; }
+
+        protected T LastItem { get => lastItem; set => lastItem = value; }
+
+
+        // Peek
+        public T Peek() => CheckedPeek();
+
+        protected T CheckedPeek(int lookahead = 0)
+        {
+            EnsureInitialized();
+
+            EnsureLookahead(lookahead);
+
+            var current = RawPeek(lookahead);
+
+            return current;
+        }
+
+
+        // Read
+        public T Read()
+        {
+            EnsureInitialized();
+
+            var current = RawPeek();
+
+            if (MoveNext())
+            {
+                Position++;
+
+                OnItemRead(current);
+            }
+
+            return current;
+        }
+
+        protected void OnItemRead(T current) { }
+
+        
+        // Skip
+        public int Skip(int amount)
+        {
+            var actualAmount = SkipAhead(amount);
+
+            if (actualAmount != 0)
+            {
+                Position += actualAmount;
+
+                OnItemsSkipped(amount);
+            }
+
+            return actualAmount;
+        }
+
+        protected void OnItemsSkipped(int amount) { }
+
+
+
         // The Abstracts
         protected abstract void Initialize();
 
-        protected abstract bool MoveToNext();
+        protected abstract bool MoveNext();
 
         protected abstract int SkipAhead(int amount);
 
         protected abstract T RawPeek(int lookahead = 0);
 
-        protected abstract void VerifyLookahead(int lookahead = 0);
-    }
-
-
-    public delegate T GenerateEndItem<T>(T previous);
+        protected abstract void EnsureLookahead(int lookahead = 0);
+    }    
 }

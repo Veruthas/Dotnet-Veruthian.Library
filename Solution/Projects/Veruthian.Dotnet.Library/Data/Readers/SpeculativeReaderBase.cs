@@ -50,7 +50,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // Mark
         protected void CreateMark(int position, int index, TState state)
         {
-            VerifyInitialized();
+            EnsureInitialized();
 
             marks.Add(new MarkItem(position, index, state));
 
@@ -81,11 +81,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 this.marks.RemoveRange(markIndex, marks);
 
                 // Notify commit
-                OnCommitted(mark.Position, this.Position);
+                OnCommit(mark.Position, this.Position);
             }
         }
 
-        protected virtual void OnCommitted(int speculatedFromPosition, int committedToPosition) { }
+        protected virtual void OnCommit(int speculatedFromPosition, int committedToPosition) { }
 
 
         // Rollback
@@ -119,11 +119,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
                 // Notify retreat
-                OnRetreated(oldPosition, this.Position);
+                OnRollback(oldPosition, this.Position);
             }
         }
 
-        protected virtual void OnRetreated(int retreatedFromPosition, int retreatedToPosition)
+        protected virtual void OnRollback(int retreatedFromPosition, int retreatedToPosition)
         {
         }
     }

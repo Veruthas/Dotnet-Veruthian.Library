@@ -13,15 +13,19 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public VariableLookaheadReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
             : base(enumerator, generateEndItem) { }
 
+
         protected int Index { get => index; set => index = value; }
 
         protected int Size { get => buffer.Count; }
 
-
         protected virtual bool CanReset { get => true; }
 
 
-        protected override void VerifyLookahead(int lookahead = 0)
+
+        // Prefetch(0) should do initialization
+        protected override void Initialize() { }
+
+        protected override void EnsureLookahead(int lookahead = 0)
         {
             // Find out if we have enough lookahead.
             int available = (Size - index);
@@ -61,17 +65,14 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override T RawPeek(int lookahead = 0)
         {
-            // We don't want to add infinite end items, the set one should just be returned
+            // We don't want to add infinite end items, just return the cached end item
             if (EndFound && Position + lookahead >= EndPosition)
                 return LastItem;
             else
                 return buffer[index + lookahead];
         }
 
-        // Prefetch(0) should've done this for us
-        protected override void Initialize() { }
-
-        protected override bool MoveToNext()
+        protected override bool MoveNext()
         {
             if (IsEnd)
                 return false;
@@ -98,7 +99,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             for (int i = 0; i < amount; i++)
             {
-                if (!MoveToNext())
+                if (!MoveNext())
                     return i;
             }
 
