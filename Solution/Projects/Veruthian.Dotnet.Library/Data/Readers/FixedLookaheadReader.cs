@@ -68,7 +68,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        protected override void MoveToNext()
+        protected override bool MoveToNext()
         {
             bool success = GetNext(out T next);
 
@@ -78,6 +78,23 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             buffer[index] = next;
 
             index = (index + 1) % Size;
+
+            return success;
+        }
+
+        // TODO: Optimize
+        protected override int SkipAhead(int amount)
+        {
+            if (amount <= 0)
+                return 0;
+
+            for (int i = 0; i < amount; i++)
+            {
+                if (!MoveToNext())
+                    return i;
+            }
+
+            return amount;
         }
     }
 }
