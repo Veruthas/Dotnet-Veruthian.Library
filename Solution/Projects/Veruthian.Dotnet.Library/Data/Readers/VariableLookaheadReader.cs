@@ -33,10 +33,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 Prefetch(difference + 1);
         }
 
-        private void Prefetch(int amount)
+        private int Prefetch(int amount)
         {
             if (EndFound)
-                return;
+                return 0;
 
             int lastPosition = Size;
 
@@ -51,9 +51,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 else
                 {
                     EndPosition = lastPosition + i;
-                    break;
+
+                    return i;
                 }
             }
+
+            return amount;
         }
 
         protected override T RawPeek(int lookahead = 0)
@@ -68,17 +71,38 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // Prefetch(0) should've done this for us
         protected override void Initialize() { }
 
-        protected override void MoveToNext()
+        protected override bool MoveToNext()
         {
+            if (IsEnd)
+                return false;
+
             index++;
 
             if (index == Size && CanReset)
             {
                 index = 0;
-                buffer.Clear();                
+
+                buffer.Clear();
             }
 
             Prefetch(1);
+
+            return true;
+        }
+
+        // TODO: Optimize
+        protected override int SkipAhead(int amount)
+        {
+            if (amount <= 0)
+                return 0;
+
+            for (int i = 0; i < amount; i++)
+            {
+                if (!MoveToNext())
+                    return i;
+            }
+
+            return amount;
         }
     }
 }

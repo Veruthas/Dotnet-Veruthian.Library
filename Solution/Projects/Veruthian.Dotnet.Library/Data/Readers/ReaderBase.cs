@@ -88,10 +88,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             var current = RawPeek();
 
-            if (!IsEnd)
+            if (MoveToNext())
             {
-                MoveToNext();
-
                 Position++;
 
                 OnItemRead(current);
@@ -100,15 +98,28 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             return current;
         }
 
-        public void Read(int amount)
-        {
-            for (int i = 0; i < amount; i++)
-                Read();
-        }
 
         protected void OnItemRead(T current) { }
 
-        public bool GetNext(out T next)
+
+        public int Skip(int amount)
+        {
+            var actualAmount = SkipAhead(amount);
+
+            if (actualAmount != 0)
+            {
+                Position += actualAmount;
+
+                OnItemsSkipped(amount);
+            }
+
+            return actualAmount;
+        }
+
+        protected void OnItemsSkipped(int amount) { }
+
+
+        protected bool GetNext(out T next)
         {
             if (!EndFound)
             {
@@ -135,7 +146,9 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // The Abstracts
         protected abstract void Initialize();
 
-        protected abstract void MoveToNext();
+        protected abstract bool MoveToNext();
+
+        protected abstract int SkipAhead(int amount);
 
         protected abstract T RawPeek(int lookahead = 0);
 
