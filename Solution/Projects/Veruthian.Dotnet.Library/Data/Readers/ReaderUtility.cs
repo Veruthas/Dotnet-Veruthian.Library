@@ -67,21 +67,5 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem);
         }
-
-        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
-                                                        this IEnumerator<T> enumerator,
-                                                        GenerateEndItem<T> generateEndItem = null)
-        {
-            var reader = new SpeculativeReader<T, TState>(enumerator, generateEndItem);
-
-            return reader;
-        }
-
-        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
-                                                            this IEnumerable<T> enumerable,
-                                                            GenerateEndItem<T> generateEndItem = null)
-        {
-            return GetSpeculativeWithStateReader<T, TState>(enumerable.GetEnumerator(), generateEndItem);
-        }
     }
 }

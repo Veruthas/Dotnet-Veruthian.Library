@@ -19,7 +19,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             (codes) => codes.GetFixedLookaheadReader(),
             (codes) => codes.GetVariableLookaheadReader(),
             (codes) => codes.GetSpeculativeReader(),
-            (codes) => codes.GetSpeculativeWithStateReader<CodePoint, Object>(),
         };
 
         public static TheoryData<IReader<CodePoint>, CodeString> GenerateIReaders(string value)
@@ -64,7 +63,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         [MemberData(nameof(GenerateIReaders), parameters: "Hello")]
         public void TestIReaderSkipAll(IReader<CodePoint> reader, CodeString data)
         {
-            Assert.True(true);
         }
     }
 }
