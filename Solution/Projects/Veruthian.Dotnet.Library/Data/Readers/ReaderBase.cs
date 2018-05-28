@@ -5,27 +5,36 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 {
     public delegate T GenerateEndItem<T>(T previous);
 
-    
+
     public abstract class ReaderBase<T> : IReader<T>
     {
-        IEnumerator<T> enumerator;
+        private IEnumerator<T> enumerator;
 
-        GenerateEndItem<T> generateEndItem;
+        private GenerateEndItem<T> generateEndItem;
 
-        bool initialized;
+        private int position;
 
-        int position = -1;
+        private int endPosition;
 
-        int endPosition = -1;
-
-        T lastItem;
+        private T lastItem;
 
 
-        public ReaderBase(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
+        public ReaderBase() { }
+
+
+        protected void SetData(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
             this.generateEndItem = generateEndItem;
+
+            this.position = 0;
+
+            this.endPosition = -1;
+
+            this.lastItem = default(T);
+
+            Initialize();
         }
 
         public virtual void Dispose() => enumerator.Dispose();
@@ -34,19 +43,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         public int Position { get => position; protected set => position = value; }
 
-
-        // Initialized
-        protected void EnsureInitialized()
-        {
-            if (!initialized)
-            {
-                Initialize();
-
-                position++;
-
-                initialized = true;
-            }
-        }
 
 
         // Fetches next item from enumerator
@@ -79,8 +75,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected bool CheckedIsAtEnd(int lookahead = 0)
         {
-            EnsureInitialized();
-
             EnsureLookahead(lookahead);
 
             return RawIsAtEnd(lookahead);
@@ -103,8 +97,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected T CheckedPeek(int lookahead = 0)
         {
-            EnsureInitialized();
-
             EnsureLookahead(lookahead);
 
             var current = RawPeek(lookahead);
@@ -116,8 +108,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // Read
         public T Read()
         {
-            EnsureInitialized();
-
             var current = RawPeek();
 
             if (!IsEnd)
@@ -134,7 +124,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected void OnItemRead(T current) { }
 
-        
+
         // Skip
         public int Skip(int amount)
         {
@@ -154,7 +144,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
 
-        // The Abstracts
+        // The Abstracts        
         protected abstract void Initialize();
 
         protected abstract bool MoveNext();
@@ -164,5 +154,5 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         protected abstract T RawPeek(int lookahead = 0);
 
         protected abstract void EnsureLookahead(int lookahead = 0);
-    }    
+    }
 }

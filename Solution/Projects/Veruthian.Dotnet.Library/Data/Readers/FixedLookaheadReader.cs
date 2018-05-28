@@ -7,18 +7,18 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     {
         T[] buffer;
 
-        int index = 0;
+        int index;
 
 
         public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, GenerateEndItem<T> generateEndItem = null)
-            : base(enumerator, generateEndItem)
         {
             if (lookahead < 1)
                 throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be greater than 1."));
 
             buffer = new T[lookahead];
-        }
 
+            SetData(enumerator, generateEndItem);
+        }
 
 
         protected int Size { get => buffer.Length; }
@@ -26,6 +26,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override void Initialize()
         {
+            index = 0;
+
             bool atEnd = false;
 
             for (int i = 0; i < Size; i++)
@@ -73,12 +75,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             bool success = GetNext(out T next);
 
-            if (!success && !EndFound)
-                EndPosition = Position + Size;
-
             buffer[index] = next;
 
             index = (index + 1) % Size;
+
+            if (!success && !EndFound)
+                EndPosition = Position + Size;
 
             return success;
         }

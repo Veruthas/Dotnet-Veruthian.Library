@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public class SpeculativeReader<T> : VariableLookaheadReader<T>, ISpeculativeReader<T>
+    public class SpeculativeReader<T> : VariableLookaheadReaderBase<T>, ISpeculativeReader<T>
     {
         protected struct MarkItem
         {
@@ -27,10 +27,16 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
         public SpeculativeReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
-            : base(enumerator, generateEndItem)
         {
+            SetData(enumerator, generateEndItem);
         }
 
+        protected override void Initialize()
+        {
+            marks.Clear();
+
+            base.Initialize();            
+        }
 
         // Mark information
         protected List<MarkItem> Marks { get => marks; }
@@ -49,8 +55,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected void CreateMark(int position, int index)
         {
-            EnsureInitialized();
-
             marks.Add(new MarkItem(position, index));
 
             OnMarked(position, index);
