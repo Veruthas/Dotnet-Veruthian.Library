@@ -5,8 +5,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 {
     public abstract class LookaheadReaderBase<T> : ReaderBase<T>, ILookaheadReader<T>        
     {
-        public LookaheadReaderBase(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem) 
-            : base(enumerator, generateEndItem) { }
+        public LookaheadReaderBase() { }
 
         public T Peek(int lookahead) => base.CheckedPeek(lookahead);
 
