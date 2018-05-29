@@ -91,7 +91,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // TODO: Optimize
         protected override int SkipAhead(int amount)
         {
-            if (amount <= 0)
+            if (amount <= 0 || IsEnd)
                 return 0;
 
             for (int i = 0; i < amount; i++)
@@ -99,7 +99,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 MoveNext();
 
                 if (IsEnd)
-                    return i;
+                    return i + 1;
             }
 
             return amount;
