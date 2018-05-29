@@ -89,20 +89,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
         // TODO: Optimize
-        protected override int SkipAhead(int amount)
+        protected override void SkipAhead(int amount)
         {
-            if (amount <= 0 || IsEnd)
-                return 0;
-
             for (int i = 0; i < amount; i++)
             {
                 MoveNext();
 
                 if (IsEnd)
-                    return i + 1;
+                    break;
             }
-
-            return amount;
         }
     }
 }

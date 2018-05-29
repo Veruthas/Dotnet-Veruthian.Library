@@ -55,28 +55,17 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             do
             {
-                var skipped = reader.Skip(skipInterval);
+                reader.Skip(skipInterval);
                 
                 current += skipInterval;
 
                 if (!reader.IsEnd)
                 {
-                    // Confirm amount skipped was actually skilled
-                    Assert.Equal(skipInterval, skipped);
-
                     // Position should equal amount we skipped
                     Assert.Equal(current, reader.Position);
 
                     // We should be at same item in array and reader
                     Assert.Equal(data[current], reader.Peek());
-                }
-                else
-                {
-                    // Get the skip attempt difference
-                    var skipDelta = current - data.Length;
-
-                    // Make sure the amount skipped was as it should be
-                    Assert.Equal(skipInterval - skipDelta, skipped);
                 }
 
             } while (!reader.IsEnd);

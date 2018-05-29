@@ -39,9 +39,9 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
         // Mark information
-        protected List<MarkItem> Marks { get => marks; }
+        protected List<MarkItem> Marks => marks; 
 
-        protected override bool CanReset { get => !IsSpeculating; }
+        protected override bool CanReset => !IsSpeculating; 
 
         public bool IsSpeculating => marks.Count != 0;
 
@@ -53,14 +53,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // Mark
         public void Mark() => CreateMark(Position, Index);
 
-        protected void CreateMark(int position, int index)
-        {
-            marks.Add(new MarkItem(position, index));
-
-            OnMarked(position, index);
-        }
-
-        protected void OnMarked(int position, int index) { }
+        protected void CreateMark(int position, int index) => marks.Add(new MarkItem(position, index));
 
 
         // Commit
@@ -82,13 +75,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
                 // Pop off all committed marks
                 this.marks.RemoveRange(markIndex, marks);
-
-                // Notify commit
-                OnCommit(mark.Position, this.Position);
             }
         }
-
-        protected virtual void OnCommit(int speculatedFromPosition, int committedToPosition) { }
 
 
         // Rollback
@@ -119,15 +107,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 this.Index = mark.Index;
 
                 this.Position = mark.Position;
-
-
-                // Notify retreat
-                OnRollback(oldPosition, this.Position);
             }
-        }
-
-        protected virtual void OnRollback(int retreatedFromPosition, int retreatedToPosition)
-        {
         }
     }
 }

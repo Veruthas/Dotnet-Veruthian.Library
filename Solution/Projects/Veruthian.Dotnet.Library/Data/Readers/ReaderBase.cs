@@ -112,27 +112,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             MoveNext();
 
-            if (!IsEnd)
-                OnItemRead(current);
-
             return current;
         }
 
-        protected void OnItemRead(T current) { }
-
 
         // Skip
-        public int Skip(int amount)
-        {
-            var actualAmount = SkipAhead(amount);
-
-            if (actualAmount != 0)
-                OnItemsSkipped(amount);
-
-            return actualAmount;
-        }
-
-        protected void OnItemsSkipped(int amount) { }
+        public void Skip(int amount) => SkipAhead(amount);
 
 
 
@@ -141,7 +126,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected abstract void MoveNext();
 
-        protected abstract int SkipAhead(int amount);
+        protected abstract void SkipAhead(int amount);
 
         protected abstract T RawPeek(int lookahead = 0);
 
