@@ -43,8 +43,37 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             Assert.True(reader.IsEnd);
         }
 
-        protected void TestReaderSkipAll(T[] data)
+        protected void TestReaderSkip(T[] data, int skipInterval)
         {
+            // Negative skip intervals correspond to data.Length + |skip|
+            if (skipInterval <= 0)
+                skipInterval = data.Length - skipInterval;
+
+            var reader = GetReader(data);
+
+            int current = 0;
+
+            do
+            {
+                reader.Skip(skipInterval);
+
+                current += skipInterval;
+
+                if (!reader.IsEnd)
+                {
+                    // Position should equal amount we skipped
+                    Assert.Equal(current, reader.Position);
+
+                    // We should be at same item in array and reader
+                    Assert.Equal(data[current], reader.Peek());
+                }
+
+            } while (!reader.IsEnd);
+
+            // Make sure we are at end of reader
+            Assert.Equal(data.Length, reader.Position);
+
+            Assert.Equal(default(T), reader.Peek());
         }
     }
 
@@ -59,6 +88,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     }
 
 
+
     public class SimpleReaderTest : ReaderTest<CodePoint, SimpleReader<CodePoint>>
     {
         protected override SimpleReader<CodePoint> GetReader(CodePoint[] data)
@@ -71,10 +101,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         [InlineData("Hello, world!")]
         public void TestReadAndPeek(string data) => TestReaderReadAndPeek(data.ToCodePointArray());
 
+
         [Theory]
-        [InlineData("")]
-        [InlineData("Hello, world!")]
-        public void TestSkipAll(string data) => TestReaderSkipAll(data.ToCodePointArray());
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
+        [InlineData("Hello, world!", 1)]
+        [InlineData("Hello, world!", 2)]
+        public void TestSkip(string data, int skipInterval) => TestReaderSkip(data.ToCodePointArray(), skipInterval);
     }
 
     public class FixedLookaheadReaderTest : LookaheadReaderTest<CodePoint, FixedLookaheadReader<CodePoint>>
@@ -92,9 +127,13 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public void TestReadAndPeek(string data) => TestReaderReadAndPeek(data.ToCodePointArray());
 
         [Theory]
-        [InlineData("")]
-        [InlineData("Hello, world!")]
-        public void TestSkipAll(string data) => TestReaderSkipAll(data.ToCodePointArray());
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
+        [InlineData("Hello, world!", 1)]
+        [InlineData("Hello, world!", 2)]
+        public void TestSkip(string data, int skipInterval) => TestReaderSkip(data.ToCodePointArray(), skipInterval);
     }
 
     public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, VariableLookaheadReaderBase<CodePoint>>
@@ -110,9 +149,13 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public void TestReadAndPeek(string data) => TestReaderReadAndPeek(data.ToCodePointArray());
 
         [Theory]
-        [InlineData("")]
-        [InlineData("Hello, world!")]
-        public void TestSkipAll(string data) => TestReaderSkipAll(data.ToCodePointArray());
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
+        [InlineData("Hello, world!", 1)]
+        [InlineData("Hello, world!", 2)]
+        public void TestSkip(string data, int skipInterval) => TestReaderSkip(data.ToCodePointArray(), skipInterval);
     }
 
     public class SpeculativeReaderTest : SpeculativeReaderTest<CodePoint, SpeculativeReader<CodePoint>>
@@ -128,8 +171,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public void TestReadAndPeek(string data) => TestReaderReadAndPeek(data.ToCodePointArray());
 
         [Theory]
-        [InlineData("")]
-        [InlineData("Hello, world!")]
-        public void TestSkipAll(string data) => TestReaderSkipAll(data.ToCodePointArray());
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
+        [InlineData("Hello, world!", 1)]
+        [InlineData("Hello, world!", 2)]
+        public void TestSkip(string data, int skipInterval) => TestReaderSkip(data.ToCodePointArray(), skipInterval);
     }
 }

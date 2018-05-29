@@ -28,7 +28,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             this.generateEndItem = generateEndItem;
 
-            this.position = 0;
+            this.position = -1;
 
             this.endPosition = -1;
 
@@ -110,14 +110,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             var current = RawPeek();
 
+            MoveNext();
+
             if (!IsEnd)
-            {
-                MoveNext();
-
-                Position++;
-
                 OnItemRead(current);
-            }
 
             return current;
         }
@@ -131,11 +127,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var actualAmount = SkipAhead(amount);
 
             if (actualAmount != 0)
-            {
-                Position += actualAmount;
-
                 OnItemsSkipped(amount);
-            }
 
             return actualAmount;
         }
@@ -147,7 +139,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // The Abstracts        
         protected abstract void Initialize();
 
-        protected abstract bool MoveNext();
+        protected abstract void MoveNext();
 
         protected abstract int SkipAhead(int amount);
 

@@ -19,16 +19,17 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override void EnsureLookahead(int lookahead = 0) { }
 
-        protected override bool MoveNext()
+        protected override void MoveNext()
         {
             bool success = GetNext(out T next);
 
-            if (!success)
+            if (!IsEnd)            
+                Position++;
+
+            if (!success && !EndFound)
                 EndPosition = Position;
-
+                
             item = next;
-
-            return success;
         }
 
         protected override int SkipAhead(int amount)
@@ -38,7 +39,9 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             for (int i = 0; i < amount; i++)
             {
-                if (!MoveNext())
+                MoveNext();
+
+                if (IsEnd)
                     return i;
             }
 
