@@ -12,6 +12,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         T Read();
 
-        int Skip(int amount);
+        void Skip(int amount);
     }
 }
