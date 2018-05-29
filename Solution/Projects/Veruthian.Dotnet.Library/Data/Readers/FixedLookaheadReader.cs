@@ -13,7 +13,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, GenerateEndItem<T> generateEndItem = null)
         {
             if (lookahead < 1)
-                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be greater than 1."));
+                throw new ArgumentOutOfRangeException("lookahead", "Lookahead must be greater than 1.");
 
             buffer = new T[lookahead];
 
@@ -26,9 +26,16 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override void Initialize()
         {
+            Position = 0;
+
+            PopulateLookahead();
+        }
+
+        private void PopulateLookahead()
+        {
             index = 0;
 
-            bool atEnd = false;
+            bool atEnd = IsEnd;
 
             for (int i = 0; i < Size; i++)
             {
@@ -54,14 +61,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
                 buffer[i] = next;
             }
-
-            Position = 0;
         }
 
         protected override void EnsureLookahead(int lookahead = 0)
         {
             if (lookahead < 0 || lookahead >= Size)
-                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead ({0}) must be in the range [1, {1}]", lookahead, Size - 1));
+                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead must be in the range [0, {1}]", Size - 1));
         }
 
         protected override T RawPeek(int lookahead = 0)
@@ -77,8 +82,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             bool success = GetNext(out T next);
 
-            if (!IsEnd)            
-                Position++;                
+            if (!IsEnd)
+                Position++;
 
             if (!success && !EndFound)
                 EndPosition = Position + Size - 1;
@@ -91,12 +96,40 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // TODO: Optimize
         protected override void SkipAhead(int amount)
         {
-            for (int i = 0; i < amount; i++)
+            // No use populating lookahead until skip is done
+            if (amount >= Size)
             {
-                MoveNext();
+                if (!EndFound)
+                {
+                    Position += Size;
+                    
+                    for (int i = 0; i < amount - Size; i++)
+                    {
+                        bool success = GetNext(out T next);
 
-                if (IsEnd)
-                    break;
+                        if (!success)
+                        {
+                            EndPosition = Position;
+
+                            break;
+                        }
+
+                        Position++;
+                    }                    
+                }
+
+                PopulateLookahead();
+            }
+            // Simple skip
+            else
+            {
+                for (int i = 0; i < amount; i++)
+                {
+                    MoveNext();
+
+                    if (IsEnd)
+                        break;
+                }
             }
         }
     }
