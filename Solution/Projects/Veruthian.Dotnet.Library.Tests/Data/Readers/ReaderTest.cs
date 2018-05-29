@@ -116,7 +116,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     {
         protected override FixedLookaheadReader<CodePoint> GetReader(CodePoint[] data)
         {
-            return data.GetFixedLookaheadReader();
+            return data.GetFixedLookaheadReader(1);            
         }
 
         [Theory]
