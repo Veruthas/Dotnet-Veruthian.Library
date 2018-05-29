@@ -23,8 +23,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         protected override void Initialize()
         {
             buffer.Clear();
-            
+
             index = 0;
+
+            Position = 0;
         }
 
         protected override void EnsureLookahead(int lookahead = 0)
@@ -51,7 +53,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 bool success = GetNext(out T next);
 
                 if (success)
-                {
+                {                    
                     buffer.Add(next);
                 }
                 else
@@ -74,21 +76,23 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 return buffer[index + lookahead];
         }
 
-        protected override bool MoveNext()
+        protected override void MoveNext()
         {
-            if (IsEnd)
-                return false;
-
-            index++;
-
-            if (index == Size && CanReset)
+            if (!IsEnd)
             {
-                index = 0;
+                Position++;
+                
+                index++;
 
-                buffer.Clear();
+                if (index == Size && CanReset)
+                {
+                    index = 0;
+
+                    buffer.Clear();
+                }
+
+                Prefetch(1);
             }
-            
-            return Prefetch(1) == 1;
         }
 
         // TODO: Optimize
@@ -99,7 +103,9 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             for (int i = 0; i < amount; i++)
             {
-                if (!MoveNext())
+                MoveNext();
+
+                if (IsEnd)
                     return i;
             }
 
