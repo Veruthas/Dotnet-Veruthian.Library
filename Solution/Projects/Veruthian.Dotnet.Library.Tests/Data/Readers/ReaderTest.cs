@@ -218,5 +218,28 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var codes = data.ToCodePointArray();
             TestReaderSkip(GetReader(codes), codes, skipInterval);
         }
+
+        [Theory]
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
+        [InlineData("Hello, world!", 1)]
+        [InlineData("Hello, world!", 2)]
+        public void TestRollbackSkip(string data, int skipInterval)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+
+            reader.Mark();
+
+            while (!reader.IsEnd)
+                reader.Read();
+
+            reader.Rollback();
+
+            TestReaderSkip(reader, codes, skipInterval);
+        }
     }
 }
