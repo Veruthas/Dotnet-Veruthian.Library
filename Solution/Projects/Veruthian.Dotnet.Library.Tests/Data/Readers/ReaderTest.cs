@@ -166,12 +166,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
         [Theory]
-        // [InlineData("", 0)]
-        // [InlineData("", 1)]
-        // [InlineData("Hello, world!", 0)]
-        // [InlineData("Hello, world!", -1)]
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("Hello, world!", 0)]
+        [InlineData("Hello, world!", -1)]
         [InlineData("Hello, world!", 1)]
-        // [InlineData("Hello, world!", 2)]
+        [InlineData("Hello, world!", 2)]
         public void TestSkip(string data, int skipInterval)
         {
             var codes = data.ToCodePointArray();
