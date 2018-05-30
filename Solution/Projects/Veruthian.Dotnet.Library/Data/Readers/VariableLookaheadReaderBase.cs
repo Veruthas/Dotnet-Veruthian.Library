@@ -98,9 +98,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // TODO: Optimize
         protected override void SkipAhead(int amount)
         {
-            if (amount < Size)
-            {
+            if (index + amount <= Size)
+            {                
                 Position += amount;
+
+                index += amount;
             }
             else
             {
