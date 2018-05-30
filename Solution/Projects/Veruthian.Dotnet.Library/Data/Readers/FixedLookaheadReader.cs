@@ -102,20 +102,20 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 if (!EndFound)
                 {
                     Position += Size;
-                    
-                    for (int i = 0; i < amount - Size; i++)
+
+                    for (int i = 0; i <= amount - Size; i++)
                     {
                         bool success = GetNext(out T next);
 
                         if (!success)
-                        {
+                        {                            
                             EndPosition = Position;
 
                             break;
                         }
 
                         Position++;
-                    }                    
+                    }
                 }
 
                 PopulateLookahead();

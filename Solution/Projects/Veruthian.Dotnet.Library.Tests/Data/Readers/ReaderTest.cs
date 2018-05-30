@@ -117,34 +117,44 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
     public class FixedLookaheadReaderTest : LookaheadReaderTest<CodePoint, FixedLookaheadReader<CodePoint>>
     {
-        private FixedLookaheadReader<CodePoint> GetReader(CodePoint[] data)
+        private FixedLookaheadReader<CodePoint> GetReader(CodePoint[] data, int lookahead)
         {
-            return data.GetFixedLookaheadReader(1);
+            return data.GetFixedLookaheadReader(lookahead);
         }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData("A")]
-        [InlineData("AB")]
-        [InlineData("Hello, world!")]
-        public void TestReadAndPeek(string data)
+        [Fact]
+        public void TestZeroLookahead()
         {
-            var codes = data.ToCodePointArray();
-            TestReaderReadAndPeek(GetReader(codes), codes);
+            Assert.ThrowsAny<Exception>(() => GetReader("".ToCodePointArray(), 0));
         }
 
 
         [Theory]
-        [InlineData("", 0)]
-        [InlineData("", 1)]
-        [InlineData("Hello, world!", 0)]
-        [InlineData("Hello, world!", -1)]
-        [InlineData("Hello, world!", 1)]
+        [InlineData("", 2)]
+        [InlineData("A", 1)]
+        [InlineData("AB", 1)]
         [InlineData("Hello, world!", 2)]
-        public void TestSkip(string data, int skipInterval)
+        [InlineData("Hello, world!", 20)]
+        public void TestReadAndPeek(string data, int lookahead)
         {
             var codes = data.ToCodePointArray();
-            TestReaderSkip(GetReader(codes), codes, skipInterval);
+            TestReaderReadAndPeek(GetReader(codes, lookahead), codes);
+        }
+
+
+        [Theory]
+        [InlineData("", 2, 0)]
+        [InlineData("", 2, 1)]
+        [InlineData("Hello, world!", 2, 0)]
+        [InlineData("Hello, world!", 2, -1)]
+        [InlineData("Hello, world!", 2, 1)]
+        [InlineData("Hello, world!", 2, 2)]
+        [InlineData("Hello, world!", 2, 3)]
+        [InlineData("Hello, world!", 1, 1)]
+        public void TestSkip(string data, int lookahead, int skipInterval)
+        {
+            var codes = data.ToCodePointArray();
+            TestReaderSkip(GetReader(codes, lookahead), codes, skipInterval);
         }
     }
 
