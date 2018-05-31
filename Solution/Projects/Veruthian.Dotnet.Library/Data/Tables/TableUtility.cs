@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Tables
 {
-    public static class Tables
+    public static class TableUtility
     {
         public static IEnumerable<KeyValuePair<TKey, TValue>> GetUniquePairs<TKey, TValue>(this ITable<TKey, TValue> table)
         {
@@ -71,6 +71,6 @@ namespace Veruthian.Dotnet.Library.Data.Tables
 
         public static ParalleledTable<TKey, TValue> CreateTableList<TKey, TValue>(params Table<TKey, TValue>[] tables) => new ParalleledTable<TKey, TValue>(tables);
 
-        public static ParalleledTable<TKey, TValue> CreateTableList<TKey, TValue>(IEnumerable<Table<TKey, TValue>> tables) => new ParalleledTable<TKey, TValue>(tables);
+        public static ParalleledTable<TKey, TValue> CreateTableList<TKey, TValue>(this IEnumerable<Table<TKey, TValue>> tables) => new ParalleledTable<TKey, TValue>(tables);
     }
 }

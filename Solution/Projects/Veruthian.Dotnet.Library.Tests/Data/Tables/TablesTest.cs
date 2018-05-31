@@ -8,7 +8,7 @@ namespace Veruthian.Dotnet.Library.Data.Tables
         [Fact]
         public void TestSimpleTableAccess()
         {
-            var table = Tables.CreateTable<string, string>();
+            var table = TableUtility.CreateTable<string, string>();
 
             table.Set("A", "a");
 
