@@ -90,24 +90,24 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return builder.ToString();
         }
 
-        public SequentialOperation<TState> AnyOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, true, operations);
+        public static SequentialOperation<TState> AnyOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, true, operations);
 
-        public SequentialOperation<TState> AnyOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, true, operations);
+        public static SequentialOperation<TState> AnyOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, true, operations);
 
-        public SequentialOperation<TState> AnyOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, true, operations);
-
-
-        public SequentialOperation<TState> AllOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, false, operations);
-
-        public SequentialOperation<TState> AllOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, false, operations);
-
-        public SequentialOperation<TState> AllOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(false, false, operations);
+        public static SequentialOperation<TState> AnyOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, true, operations);
 
 
-        public SequentialOperation<TState> NoneOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, false, operations);
+        public static SequentialOperation<TState> AllOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, false, operations);
 
-        public SequentialOperation<TState> NoneOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, false, operations);
+        public static SequentialOperation<TState> AllOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, false, operations);
 
-        public SequentialOperation<TState> NoneOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, false, operations);
+        public static SequentialOperation<TState> AllOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(false, false, operations);
+
+
+        public static SequentialOperation<TState> NoneOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, false, operations);
+
+        public static SequentialOperation<TState> NoneOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, false, operations);
+
+        public static SequentialOperation<TState> NoneOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, false, operations);
     }
 }

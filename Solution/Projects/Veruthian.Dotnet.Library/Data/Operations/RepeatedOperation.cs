@@ -87,16 +87,15 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
             builder.Append('{').Append(operation.ToString());
 
-            if (minimum != 0)
+            if (maximum != 0)
             {
                 builder.Append(" : ").Append(minimum);
 
-                if (maximum != 0)
-                    builder.Append(" to ").Append(maximum);
+                builder.Append(" to ").Append(maximum);
             }
-            else if (maximum != 0)
+            else if (minimum != 0)
             {
-                builder.Append(" : ").Append(maximum);
+                builder.Append(" : ").Append(minimum);
             }
 
             builder.Append('}');
