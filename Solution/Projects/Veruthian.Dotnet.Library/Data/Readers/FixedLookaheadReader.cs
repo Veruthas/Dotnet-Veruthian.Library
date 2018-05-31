@@ -96,40 +96,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         // TODO: Optimize
         protected override void SkipAhead(int amount)
         {
-            // No use populating lookahead until skip is done
-            if (amount >= Size)
+            for (int i = 0; i < amount; i++)
             {
-                if (!EndFound)
-                {
-                    Position += Size;
+                MoveNext();
 
-                    for (int i = 0; i <= amount - Size; i++)
-                    {
-                        bool success = GetNext(out T next);
-
-                        if (!success)
-                        {                            
-                            EndPosition = Position;
-
-                            break;
-                        }
-
-                        Position++;
-                    }
-                }
-
-                PopulateLookahead();
-            }
-            // Simple skip
-            else
-            {
-                for (int i = 0; i < amount; i++)
-                {
-                    MoveNext();
-
-                    if (IsEnd)
-                        break;
-                }
+                if (IsEnd)
+                    break;
             }
         }
     }
