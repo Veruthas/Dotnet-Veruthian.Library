@@ -95,24 +95,34 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        // TODO: Optimize
         protected override void SkipAhead(int amount)
         {
-            if (index + amount <= Size)
-            {                
-                Position += amount;
-
-                index += amount;
-            }
-            else
+            if (index < Size)
             {
-                for (int i = 0; i < amount; i++)
-                {
-                    MoveNext();
+                int delta = Size - index;
 
-                    if (IsEnd)
-                        break;
+                if (CanReset)
+                {
+                    index = 0;
+
+                    buffer.Clear();
                 }
+                else
+                {
+                    index = Size;
+                }
+
+                Position += delta;
+
+                amount -= delta;
+            }
+
+            for (int i = 0; i < amount; i++)
+            {
+                MoveNext();
+
+                if (IsEnd)
+                    break;
             }
         }
     }
