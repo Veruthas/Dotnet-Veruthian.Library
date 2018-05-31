@@ -216,6 +216,19 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var codes = data.ToCodePointArray();
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
+
+        [Theory]
+        [InlineData("", 4)]
+        [InlineData("ABCD", 4)]
+        [InlineData("ABCDEFGHIJKLM", 4)]
+        public void TestLookahead(string data, int lookahead)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+
+            BaseTestLookahead(reader, codes, lookahead);
+        }
     }
 
     public class SpeculativeReaderTest : SpeculativeReaderTest<CodePoint, SpeculativeReader<CodePoint>>
@@ -269,6 +282,19 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             reader.Rollback();
 
             BaseTestSkip(reader, codes, skipInterval);
+        }
+
+        [Theory]
+        [InlineData("", 4)]
+        [InlineData("ABCD", 4)]
+        [InlineData("ABCDEFGHIJKLM", 4)]
+        public void TestLookahead(string data, int lookahead)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+
+            BaseTestLookahead(reader, codes, lookahead);
         }
     }
 }
