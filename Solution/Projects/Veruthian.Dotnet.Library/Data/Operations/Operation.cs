@@ -9,7 +9,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             if (tracer != null)
                 tracer.StartingOperation(this, state);
 
-            bool result = DoAction(state);
+            bool result = DoAction(state, tracer);
 
             if (tracer != null)
                 tracer.FinishingOperation(this, state, result);
