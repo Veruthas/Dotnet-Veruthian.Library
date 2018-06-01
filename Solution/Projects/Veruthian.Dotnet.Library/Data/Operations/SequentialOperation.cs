@@ -20,7 +20,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public SequentialOperation(bool untilResult, bool resultOnFound, IEnumerable<IOperation<TState>> operations)
             : this(untilResult, resultOnFound, new List<IOperation<TState>>(operations)) { }
 
-        public SequentialOperation(bool untilResult, bool resultOnFound, List<IOperation<TState>> operations = null)
+        private SequentialOperation(bool untilResult, bool resultOnFound, List<IOperation<TState>> operations = null)
         {
             this.untilResult = untilResult;
 
@@ -29,7 +29,19 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.operations = operations != null ? operations : new List<IOperation<TState>>();
         }
 
-        public List<IOperation<TState>> Operations => operations;
+
+        public SequentialOperation<TState> Add(IOperation<TState> operation)
+        {
+            if (operation == null)
+                throw new ArgumentNullException("Operation cannot be null!");
+
+            operations.Add(operation);
+
+            return this;
+        }
+
+        public SequentialOperation<TState> AddSelf() => Add(this);
+
 
         public bool Perform(TState state)
         {
@@ -62,6 +74,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return result;
         }
 
+        // Problem, recursive sequences will print forever!
         public override string ToString()
         {
             string separator = untilResult ? " or " : " ";
@@ -94,20 +107,20 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public static SequentialOperation<TState> AnyOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, true, operations);
 
-        public static SequentialOperation<TState> AnyOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, true, operations);
+        public static SequentialOperation<TState> AnyOf() => new SequentialOperation<TState>(true, true);
 
 
         public static SequentialOperation<TState> AllOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, false, operations);
 
         public static SequentialOperation<TState> AllOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, false, operations);
 
-        public static SequentialOperation<TState> AllOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(false, false, operations);
+        public static SequentialOperation<TState> AllOf() => new SequentialOperation<TState>(false, false);
 
 
         public static SequentialOperation<TState> NoneOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, false, operations);
 
         public static SequentialOperation<TState> NoneOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, false, operations);
 
-        public static SequentialOperation<TState> NoneOf(List<IOperation<TState>> operations = null) => new SequentialOperation<TState>(true, false, operations);
+        public static SequentialOperation<TState> NoneOf() => new SequentialOperation<TState>(true, false);
     }
 }

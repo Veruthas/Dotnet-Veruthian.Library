@@ -14,6 +14,10 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.operation = operation;
         }
 
+
+        public IOperation<TState> Operation => operation;
+
+
         public bool Perform(TState state)
         {
             operation.Perform(state);
