@@ -7,20 +7,19 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 {
     #region SequentialOperation
 
-    public abstract class SequentialOperation<TState, TOperation> : IOperation<TState>, IEnumerable<TOperation>
-        where TOperation : IOperation<TState>
+    public abstract class SequentialOperation<TState> : IOperation<TState>, IEnumerable<IOperation<TState>>        
     {
-        protected readonly List<TOperation> operations;
+        protected readonly List<IOperation<TState>> operations;
 
-        protected SequentialOperation(List<TOperation> operations = null)
+        protected SequentialOperation(List<IOperation<TState>> operations = null)
         {
-            this.operations = operations ?? new List<TOperation>();
+            this.operations = operations ?? new List<IOperation<TState>>();
         }
 
 
-        protected SequentialOperation(IEnumerable<TOperation> operations)
+        protected SequentialOperation(IEnumerable<IOperation<TState>> operations)
         {
-            this.operations = new List<TOperation>(operations);
+            this.operations = new List<IOperation<TState>>(operations);
         }
 
 
@@ -30,7 +29,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
 
 
-        public IEnumerator<TOperation> GetEnumerator() => operations.GetEnumerator();
+        public IEnumerator<IOperation<TState>> GetEnumerator() => operations.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -78,19 +77,27 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
     #region DynamicSequentialOperation
 
-    public abstract class DynamicSequentialOperation<TState, TOperation> : SequentialOperation<TState, TOperation>
-        where TOperation : IOperation<TState>
+    public abstract class DynamicSequentialOperation<TState> : SequentialOperation<TState>        
     {
-        protected DynamicSequentialOperation(IEnumerable<TOperation> operations)
+        protected DynamicSequentialOperation(IEnumerable<IOperation<TState>> operations)
             : base(operations) { }
 
 
-        public List<TOperation> SubOperations => operations;
+        public List<IOperation<TState>> SubOperations => operations;
         
 
-        public DynamicSequentialOperation<TState, TOperation> Add(TOperation operation)
+        public DynamicSequentialOperation<TState> Add(IOperation<TState> operation)
         {
-            SubOperations<
+            SubOperations.Add(operation);
+
+            return this;
+        }
+
+        public DynamicSequentialOperation<TState> AddSelf()
+        {
+            SubOperations.Add(this);
+
+            return this;
         }
     }
 
@@ -98,14 +105,13 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
     #region AnyOfSequenceOperation
 
-    public class AnyOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
-        where TOperation : IOperation<TState>
+    public class AnyOfSequenceOperation<TState> : DynamicSequentialOperation<TState>
     {
-        public AnyOfSequenceOperation(params TOperation[] operations)
+        public AnyOfSequenceOperation(params IOperation<TState>[] operations)
             : base(operations) { }
 
 
-        public AnyOfSequenceOperation(IEnumerable<TOperation> operations)
+        public AnyOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
             : base(operations) { }
 
         public override bool UntilSubResult => true;
@@ -115,28 +121,18 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public override string ToString() => "AnyOf" + base.ToString();
     }
 
-    public class AnyOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
-    {
-        public AnyOfSequenceOperation(params IOperation<TState>[] operations)
-            : base(operations) { }
-
-
-        public AnyOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
-            : base(operations) { }
-    }
 
     #endregion
 
     #region AllOfSequenceOperation
 
-    public class AllOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
-        where TOperation : IOperation<TState>
+    public class AllOfSequenceOperation<TState> : DynamicSequentialOperation<TState>
     {
-        public AllOfSequenceOperation(params TOperation[] operations)
+        public AllOfSequenceOperation(params IOperation<TState>[] operations)
             : base(operations) { }
 
 
-        public AllOfSequenceOperation(IEnumerable<TOperation> operations)
+        public AllOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
             : base(operations) { }
 
         public override bool UntilSubResult => true;
@@ -146,28 +142,17 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public override string ToString() => "AllOf" + base.ToString();
     }
 
-    public class AllOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
-    {
-        public AllOfSequenceOperation(params IOperation<TState>[] operations)
-            : base(operations) { }
-
-
-        public AllOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
-            : base(operations) { }
-    }
-
     #endregion
 
     #region NoneOfSequenceOperation
 
-    public class NoneOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
-        where TOperation : IOperation<TState>
+    public class NoneOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState>
     {
-        public NoneOfSequenceOperation(params TOperation[] operations)
+        public NoneOfSequenceOperation(params IOperation<TState>[] operations)
             : base(operations) { }
 
 
-        public NoneOfSequenceOperation(IEnumerable<TOperation> operations)
+        public NoneOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
             : base(operations) { }
 
         public override bool UntilSubResult => true;
@@ -177,38 +162,11 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public override string ToString() => "NoneOf" + base.ToString();
     }
 
-    public class NoneOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
-    {
-        public NoneOfSequenceOperation(params IOperation<TState>[] operations)
-            : base(operations) { }
-
-
-        public NoneOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
-            : base(operations) { }
-    }
-
     #endregion
 
     #region IsNotOfSequenceOperation
 
-    public class IsNotOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
-        where TOperation : IOperation<TState>
-    {
-        public IsNotOfSequenceOperation(params TOperation[] operations)
-            : base(operations) { }
-
-
-        public IsNotOfSequenceOperation(IEnumerable<TOperation> operations)
-            : base(operations) { }
-
-        public override bool UntilSubResult => true;
-
-        public override bool ResultOnSuccess => true;
-
-        public override string ToString() => "IsNotOf" + base.ToString();
-    }
-
-    public class IsNotOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
+    public class IsNotOfSequenceOperation<TState> : DynamicSequentialOperation<TState>
     {
         public IsNotOfSequenceOperation(params IOperation<TState>[] operations)
             : base(operations) { }
@@ -216,6 +174,12 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public IsNotOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
             : base(operations) { }
+
+        public override bool UntilSubResult => true;
+
+        public override bool ResultOnSuccess => true;
+
+        public override string ToString() => "IsNotOf" + base.ToString();
     }
 
     #endregion
