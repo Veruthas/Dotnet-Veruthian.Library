@@ -3,20 +3,13 @@ using System.Text;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class RepeatedOperation<TState> : IOperation<TState>
+    public class RepeatedOperation<TState> : NestedOperation<TState>
     {
-        IOperation<TState> operation;
-
         int minimum, maximum;
 
         public RepeatedOperation(IOperation<TState> operation, int minimum = 0, int maximum = 0)
+            : base(operation)
         {
-            if (operation == null)
-                throw new ArgumentNullException("Operation cannot be null!");
-
-            this.operation = operation;
-
-
             if (minimum < 0 || maximum < 0 || (maximum != 0 && minimum > maximum))
                 throw new ArgumentException("Minimum cannot be less that maximum");
 
@@ -25,35 +18,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.maximum = maximum;
         }
 
-        public IOperation<TState> Operation => operation;
-        
-
-        public bool Perform(TState state)
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            int count = 0;
-
-            while (true)
-            {
-                var result = operation.Perform(state);
-
-                if (result)
-                {
-                    count++;
-
-                    if (maximum != 0 && count == maximum)
-                        return true;
-                }
-                else
-                {
-                    return count >= minimum;
-                }
-            }
-        }
-
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            tracer.StartingOperation(this, state);
-
             bool finalResult = true;
 
             int count = 0;
@@ -79,10 +45,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
                 }
             }
 
-            tracer.FinishingOperation(this, state, finalResult);
-
             return finalResult;
-        }
+        }        
 
         public override string ToString()
         {

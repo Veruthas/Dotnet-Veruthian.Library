@@ -2,36 +2,13 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class OptionalOperation<TState> : IOperation<TState>
+    public class OptionalOperation<TState> : NestedOperation<TState>
     {
-        IOperation<TState> operation;
+        public OptionalOperation(IOperation<TState> operation) : base(operation) { }
 
-        public OptionalOperation(IOperation<TState> operation)
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            if (operation == null)
-                throw new ArgumentNullException("Operation cannot be null!");
-                
-            this.operation = operation;
-        }
-
-
-        public IOperation<TState> Operation => operation;
-
-
-        public bool Perform(TState state)
-        {
-            operation.Perform(state);
-
-            return true;
-        }
-
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            tracer.StartingOperation(operation, state);
-
             operation.Perform(state, tracer);
-
-            tracer.FinishingOperation(operation, state, true);
 
             return true;
         }

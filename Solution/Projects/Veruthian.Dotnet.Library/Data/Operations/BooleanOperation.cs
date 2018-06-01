@@ -13,9 +13,12 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public bool Perform(TState state, IOperationTracer<TState> tracer)
         {
-            tracer.StartingOperation(this, state);
+            if (tracer != null)
+            {
+                tracer.StartingOperation(this, state);
 
-            tracer.FinishingOperation(this, state, value);
+                tracer.FinishingOperation(this, state, value);
+            }
 
             return value;
         }
