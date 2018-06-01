@@ -1,70 +1,63 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
+    #region SequentialOperation
 
-    public class SequentialOperation<TState> : IOperation<TState>
+    public abstract class SequentialOperation<TState, TOperation> : IOperation<TState>, IEnumerable<TOperation>
+        where TOperation : IOperation<TState>
     {
-        List<IOperation<TState>> operations;
+        protected readonly List<TOperation> operations;
 
-        bool untilResult;
-
-        bool resultOnFound;
-
-
-        public SequentialOperation(bool untilResult, bool resultOnFound, params IOperation<TState>[] operations)
-            : this(untilResult, resultOnFound, new List<IOperation<TState>>(operations)) { }
-
-        public SequentialOperation(bool untilResult, bool resultOnFound, IEnumerable<IOperation<TState>> operations)
-            : this(untilResult, resultOnFound, new List<IOperation<TState>>(operations)) { }
-
-        private SequentialOperation(bool untilResult, bool resultOnFound, List<IOperation<TState>> operations = null)
+        protected SequentialOperation(List<TOperation> operations = null)
         {
-            this.untilResult = untilResult;
-
-            this.resultOnFound = resultOnFound;
-
-            this.operations = operations != null ? operations : new List<IOperation<TState>>();
+            this.operations = operations ?? new List<TOperation>();
         }
 
 
-        public SequentialOperation<TState> Add(IOperation<TState> operation)
+        protected SequentialOperation(IEnumerable<TOperation> operations)
         {
-            if (operation == null)
-                throw new ArgumentNullException("Operation cannot be null!");
-
-            operations.Add(operation);
-
-            return this;
+            this.operations = new List<TOperation>(operations);
         }
 
-        public SequentialOperation<TState> AddSelf() => Add(this);
+
+        public abstract bool UntilSubResult { get; }
+
+        public abstract bool ResultOnSuccess { get; }
+
+
+
+        public IEnumerator<TOperation> GetEnumerator() => operations.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         public bool Perform(TState state)
         {
             foreach (var operation in operations)
             {
-                if (operation.Perform(state) == untilResult)
-                    return resultOnFound;
+                if (operation.Perform(state) == UntilSubResult)
+                    return ResultOnSuccess;
             }
 
-            return !resultOnFound;
+            return !ResultOnSuccess;
         }
 
         public bool Perform(TState state, IOperationTracer<TState> tracer)
         {
             tracer.StartingOperation(this, state);
 
-            bool result = !untilResult;
+            bool result = !ResultOnSuccess;
 
             foreach (var operation in operations)
             {
-                if (operation.Perform(state, tracer) == resultOnFound)
+                if (operation.Perform(state, tracer) == UntilSubResult)
                 {
-                    result = resultOnFound;
+                    result = ResultOnSuccess;
+
                     break;
                 }
             }
@@ -77,46 +70,153 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public override string ToString()
         {
-            string sequenceType;
-
-            if (untilResult && resultOnFound)
-                sequenceType = "AnyOfSequence";
-            else if (!untilResult && !resultOnFound)
-                sequenceType = "AllOfSequence";
-            else if (untilResult && !resultOnFound)
-                sequenceType = "NoneOfSequence";
-            else
-                sequenceType = "IsNotOfSequence";
-
-            return sequenceType + $"(Count={operations.Count})";
+            return $"Sequence({operations.Count})";
         }
-
-        public static SequentialOperation<TState> AnyOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, true, operations);
-
-        public static SequentialOperation<TState> AnyOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, true, operations);
-
-        public static SequentialOperation<TState> AnyOf() => new SequentialOperation<TState>(true, true);
-
-
-        public static SequentialOperation<TState> AllOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, false, operations);
-
-        public static SequentialOperation<TState> AllOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, false, operations);
-
-        public static SequentialOperation<TState> AllOf() => new SequentialOperation<TState>(false, false);
-
-
-        public static SequentialOperation<TState> NoneOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, false, operations);
-
-        public static SequentialOperation<TState> NoneOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, false, operations);
-
-        public static SequentialOperation<TState> NoneOf() => new SequentialOperation<TState>(true, false);
-
-
-        public static SequentialOperation<TState> IsNotOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, true, operations);
-
-        public static SequentialOperation<TState> IsNotOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, true, operations);
-
-        public static SequentialOperation<TState> IsNotOf() => new SequentialOperation<TState>(false, true);
-
     }
+
+    #endregion
+
+    #region DynamicSequentialOperation
+
+    public abstract class DynamicSequentialOperation<TState, TOperation> : SequentialOperation<TState, TOperation>
+        where TOperation : IOperation<TState>
+    {
+        protected DynamicSequentialOperation(IEnumerable<TOperation> operations)
+            : base(operations) { }
+
+
+        public List<TOperation> SubOperations => operations;
+        
+
+        public DynamicSequentialOperation<TState, TOperation> Add(TOperation operation)
+        {
+            SubOperations<
+        }
+    }
+
+    #endregion
+
+    #region AnyOfSequenceOperation
+
+    public class AnyOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
+        where TOperation : IOperation<TState>
+    {
+        public AnyOfSequenceOperation(params TOperation[] operations)
+            : base(operations) { }
+
+
+        public AnyOfSequenceOperation(IEnumerable<TOperation> operations)
+            : base(operations) { }
+
+        public override bool UntilSubResult => true;
+
+        public override bool ResultOnSuccess => true;
+
+        public override string ToString() => "AnyOf" + base.ToString();
+    }
+
+    public class AnyOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
+    {
+        public AnyOfSequenceOperation(params IOperation<TState>[] operations)
+            : base(operations) { }
+
+
+        public AnyOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
+            : base(operations) { }
+    }
+
+    #endregion
+
+    #region AllOfSequenceOperation
+
+    public class AllOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
+        where TOperation : IOperation<TState>
+    {
+        public AllOfSequenceOperation(params TOperation[] operations)
+            : base(operations) { }
+
+
+        public AllOfSequenceOperation(IEnumerable<TOperation> operations)
+            : base(operations) { }
+
+        public override bool UntilSubResult => true;
+
+        public override bool ResultOnSuccess => true;
+
+        public override string ToString() => "AllOf" + base.ToString();
+    }
+
+    public class AllOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
+    {
+        public AllOfSequenceOperation(params IOperation<TState>[] operations)
+            : base(operations) { }
+
+
+        public AllOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
+            : base(operations) { }
+    }
+
+    #endregion
+
+    #region NoneOfSequenceOperation
+
+    public class NoneOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
+        where TOperation : IOperation<TState>
+    {
+        public NoneOfSequenceOperation(params TOperation[] operations)
+            : base(operations) { }
+
+
+        public NoneOfSequenceOperation(IEnumerable<TOperation> operations)
+            : base(operations) { }
+
+        public override bool UntilSubResult => true;
+
+        public override bool ResultOnSuccess => true;
+
+        public override string ToString() => "NoneOf" + base.ToString();
+    }
+
+    public class NoneOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
+    {
+        public NoneOfSequenceOperation(params IOperation<TState>[] operations)
+            : base(operations) { }
+
+
+        public NoneOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
+            : base(operations) { }
+    }
+
+    #endregion
+
+    #region IsNotOfSequenceOperation
+
+    public class IsNotOfSequenceOperation<TState, TOperation> : DynamicSequentialOperation<TState, TOperation>
+        where TOperation : IOperation<TState>
+    {
+        public IsNotOfSequenceOperation(params TOperation[] operations)
+            : base(operations) { }
+
+
+        public IsNotOfSequenceOperation(IEnumerable<TOperation> operations)
+            : base(operations) { }
+
+        public override bool UntilSubResult => true;
+
+        public override bool ResultOnSuccess => true;
+
+        public override string ToString() => "IsNotOf" + base.ToString();
+    }
+
+    public class IsNotOfSequenceOperation<TState> : AnyOfSequenceOperation<TState, IOperation<TState>>
+    {
+        public IsNotOfSequenceOperation(params IOperation<TState>[] operations)
+            : base(operations) { }
+
+
+        public IsNotOfSequenceOperation(IEnumerable<IOperation<TState>> operations)
+            : base(operations) { }
+    }
+
+    #endregion
 }

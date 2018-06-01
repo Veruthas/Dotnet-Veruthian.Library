@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class ActionOperation<TState> : IOperation<TState>
+    public class ActionOperation<TState> : SimpleOperation<TState>
     {
         string description;
 
@@ -16,20 +16,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         }
 
 
-        public bool Perform(TState state) => action(state);
-
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            tracer.StartingOperation(this, state);
-
-            bool result = action(state);
-
-            tracer.FinishingOperation(this, state, result);
-            
-            return result;
-        }
-
-
         public override string ToString() => description ?? $"Action {base.ToString()}";
+
+        protected override bool DoAction(TState state) => action(state);
     }
 }
