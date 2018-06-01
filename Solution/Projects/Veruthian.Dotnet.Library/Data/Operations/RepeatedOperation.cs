@@ -105,6 +105,5 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
             return builder.ToString();
         }
-
     }
 }

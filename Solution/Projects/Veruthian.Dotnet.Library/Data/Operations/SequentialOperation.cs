@@ -74,33 +74,21 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return result;
         }
 
-        // Problem, recursive sequences will print forever!
+
         public override string ToString()
         {
-            string separator = untilResult ? " or " : " ";
+            string sequenceType;
 
-            var builder = new StringBuilder();
+            if (untilResult && resultOnFound)
+                sequenceType = "AnyOfSequence";
+            else if (!untilResult && !resultOnFound)
+                sequenceType = "AllOfSequence";
+            else if (untilResult && !resultOnFound)
+                sequenceType = "NoneOfSequence";
+            else
+                sequenceType = "IsNotOfSequence";
 
-            if (untilResult ^ resultOnFound)
-                builder.Append("not ");
-
-            builder.Append('(');
-
-            bool started = false;
-
-            foreach (var operation in operations)
-            {
-                if (!started)
-                    started = true;
-                else
-                    builder.Append(separator);
-
-                builder.Append(operation.ToString());
-            }
-
-            builder.Append(')');
-
-            return builder.ToString();
+            return sequenceType + $"(Count={operations.Count})";
         }
 
         public static SequentialOperation<TState> AnyOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(true, true, operations);
@@ -122,5 +110,13 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public static SequentialOperation<TState> NoneOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(true, false, operations);
 
         public static SequentialOperation<TState> NoneOf() => new SequentialOperation<TState>(true, false);
+
+
+        public static SequentialOperation<TState> IsNotOf(params IOperation<TState>[] operations) => new SequentialOperation<TState>(false, true, operations);
+
+        public static SequentialOperation<TState> IsNotOf(IEnumerable<IOperation<TState>> operations) => new SequentialOperation<TState>(false, true, operations);
+
+        public static SequentialOperation<TState> IsNotOf() => new SequentialOperation<TState>(false, true);
+
     }
 }
