@@ -25,6 +25,9 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.maximum = maximum;
         }
 
+        public IOperation<TState> Operation => operation;
+        
+
         public bool Perform(TState state)
         {
             int count = 0;
