@@ -1,18 +1,19 @@
+using System;
+
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class NestedOperation<TState> : IOperation<TState>
+    public abstract class NestedOperation<TState> : Operation<TState>, INestedOperation<TState>
     {
         protected readonly IOperation<TState> operation;
 
-
-        public bool Perform(TState state)
+        public NestedOperation(IOperation<TState> operation)
         {
-            throw new System.NotImplementedException();
+            if (operation == null)
+                throw new ArgumentNullException("Operation cannot be null!");
+
+            this.operation = operation;
         }
 
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            throw new System.NotImplementedException();
-        }
+        public IOperation<TState> Operation => operation;
     }
 }

@@ -7,7 +7,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 {
     #region SequentialOperation
 
-    public abstract class SequentialOperation<TState> : IOperation<TState>, IEnumerable<IOperation<TState>>        
+    public abstract class SequentialOperation<TState> : Operation<TState>, ISequentialOperation<TState>
     {
         protected readonly List<IOperation<TState>> operations;
 
@@ -22,11 +22,9 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.operations = new List<IOperation<TState>>(operations);
         }
 
+        public IOperation<TState> this[int index] => operations[index];
 
-        public abstract bool UntilSubResult { get; }
-
-        public abstract bool ResultOnSuccess { get; }
-
+        public int Count => operations.Count;
 
 
         public IEnumerator<IOperation<TState>> GetEnumerator() => operations.GetEnumerator();
@@ -34,21 +32,12 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-        public bool Perform(TState state)
+        public abstract bool UntilSubResult { get; }
+
+        public abstract bool ResultOnSuccess { get; }
+
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            foreach (var operation in operations)
-            {
-                if (operation.Perform(state) == UntilSubResult)
-                    return ResultOnSuccess;
-            }
-
-            return !ResultOnSuccess;
-        }
-
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            tracer.StartingOperation(this, state);
-
             bool result = !ResultOnSuccess;
 
             foreach (var operation in operations)
@@ -61,8 +50,6 @@ namespace Veruthian.Dotnet.Library.Data.Operations
                 }
             }
 
-            tracer.FinishingOperation(this, state, result);
-
             return result;
         }
 
@@ -71,6 +58,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         {
             return $"Sequence({operations.Count})";
         }
+
+
     }
 
     #endregion
@@ -83,19 +72,16 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             : base(operations) { }
 
 
-        public List<IOperation<TState>> SubOperations => operations;
-        
-
         public DynamicSequentialOperation<TState> Add(IOperation<TState> operation)
         {
-            SubOperations.Add(operation);
+            operations.Add(operation);
 
             return this;
         }
 
         public DynamicSequentialOperation<TState> AddSelf()
         {
-            SubOperations.Add(this);
+            operations.Add(this);
 
             return this;
         }
