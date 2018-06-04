@@ -6,17 +6,17 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 {
     public abstract class Operation<TState> : IOperation<TState>
     {
-        public abstract string Name { get; }
+        public abstract string Description { get; }
 
         public bool Perform(TState state, IOperationTracer<TState> tracer = null)
         {
             if (tracer != null)
-                tracer.StartingOperation(this, state);
+                tracer.OperationStarting(this, state);
 
             bool result = DoAction(state, tracer);
 
             if (tracer != null)
-                tracer.FinishingOperation(this, state, result);
+                tracer.OperationFinishing(this, state, result);
 
             return result;
         }
@@ -24,7 +24,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         protected abstract bool DoAction(TState state, IOperationTracer<TState> tracer = null);
 
-        public override string ToString() => Name;
+        public override string ToString() => Description;
 
 
 

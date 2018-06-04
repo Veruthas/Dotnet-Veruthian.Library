@@ -6,7 +6,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
     {
         public OptionalOperation(IOperation<TState> operation) : base(operation) { }
 
-        public override string Name => "Optional";
+        public override string Description => "Optional";
         
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {

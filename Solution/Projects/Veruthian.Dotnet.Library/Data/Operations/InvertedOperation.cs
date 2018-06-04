@@ -6,7 +6,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
     {
         public InvertedOperation(IOperation<TState> operation) : base(operation) { }
 
-        public override string Name => "Invert";
+        public override string Description => "Invert";
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => !operation.Perform(state, tracer);
         

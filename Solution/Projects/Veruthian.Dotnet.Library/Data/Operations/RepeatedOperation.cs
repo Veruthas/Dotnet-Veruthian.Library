@@ -22,7 +22,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public int Maximum => maximum;
 
-        public override string Name
+        public override string Description
         {
             get
             {

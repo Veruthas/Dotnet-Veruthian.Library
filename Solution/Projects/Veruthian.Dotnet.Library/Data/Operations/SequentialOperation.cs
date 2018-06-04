@@ -25,7 +25,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         }
 
 
-        public override string Name => $"{this.SequenceType}Sequence";
+        public override string Description => $"{this.SequenceType}Sequence";
 
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
