@@ -20,9 +20,15 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         }
 
 
-        public override IOperation<TState> this[int index] => operations[index];
+        public override IOperation<TState> GetSubOperation(int index)
+        {
+            VerifyIndex(index);
+
+            return operations[index];
+        }
 
         public override int Count => operations.Length;
+
 
         public override IEnumerator<IOperation<TState>> GetEnumerator() => (IEnumerator<IOperation<TState>>)operations.GetEnumerator();
     }

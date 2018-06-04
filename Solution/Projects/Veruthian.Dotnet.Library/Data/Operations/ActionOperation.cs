@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class ActionOperation<TState> : Operation<TState>
+    public class ActionOperation<TState> : SimpleOperation<TState>
     {
         string description;
 

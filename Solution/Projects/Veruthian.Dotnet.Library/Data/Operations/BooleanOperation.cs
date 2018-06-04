@@ -1,30 +1,16 @@
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public class BooleanOperation<TState> : IOperation<TState>
+    public class BooleanOperation<TState> : SimpleOperation<TState>
     {
         bool value;
 
         private BooleanOperation(bool value) => this.value = value;
 
-        public bool Perform(TState state)
-        {
-            return value;
-        }
 
+        public override string Name => value.ToString();
 
-        public string Name => value.ToString();
-
-        public bool Perform(TState state, IOperationTracer<TState> tracer)
-        {
-            if (tracer != null)
-            {
-                tracer.StartingOperation(this, state);
-
-                tracer.FinishingOperation(this, state, value);
-            }
-
-            return value;
-        }
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => value;
+        
 
         public override string ToString() => value.ToString();
 

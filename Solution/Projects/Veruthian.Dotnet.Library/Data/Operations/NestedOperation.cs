@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Operations
 {
-    public abstract class NestedOperation<TState> : Operation<TState>, IParentOperation<TState>
+    public abstract class NestedOperation<TState> : Operation<TState>
     {
         protected readonly IOperation<TState> operation;
 
@@ -20,25 +20,16 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         public IOperation<TState> Operation => operation;
 
 
-        IOperation<TState> IParentOperation<TState>.this[int index]
+        public override int Count => 1;
+
+        public override IOperation<TState> GetSubOperation(int index)
         {
-            get
-            {
-                if (index == 0)
-                    return operation;
-                else
-                    throw new IndexOutOfRangeException("index");
-            }
+            VerifyIndex(index);
+
+            return operation;
         }
 
-        int IParentOperation<TState>.Count => 1;
-
-        IEnumerator<IOperation<TState>> IEnumerable<IOperation<TState>>.GetEnumerator()
-        {
-            yield return operation;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
+        public override IEnumerator<IOperation<TState>> GetEnumerator()
         {
             yield return operation;
         }
