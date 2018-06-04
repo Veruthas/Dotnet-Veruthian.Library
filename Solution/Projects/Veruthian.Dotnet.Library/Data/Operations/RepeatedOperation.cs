@@ -18,6 +18,23 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             this.maximum = maximum;
         }
 
+        public int Minimum => minimum;
+
+        public int Maximum => maximum;
+
+        public override string Name
+        {
+            get
+            {
+                if (maximum != 0)
+                    return $"Repeat:{minimum}-{maximum}";
+                else if (minimum != 0)
+                    return $"Repeat:{minimum}";
+                else
+                    return $"Repeat";
+            }
+        }
+
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
             bool finalResult = true;
@@ -46,7 +63,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             }
 
             return finalResult;
-        }        
+        }
 
         public override string ToString()
         {

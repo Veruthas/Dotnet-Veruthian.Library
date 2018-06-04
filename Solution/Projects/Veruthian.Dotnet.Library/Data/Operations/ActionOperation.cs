@@ -16,7 +16,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         }
 
 
-        public override string ToString() => description ?? $"Action {base.ToString()}";
+        public override string Name => description ?? $"Action";
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => action(state);
     }
