@@ -11,6 +11,9 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return value;
         }
 
+
+        public string Name => value.ToString();
+
         public bool Perform(TState state, IOperationTracer<TState> tracer)
         {
             if (tracer != null)

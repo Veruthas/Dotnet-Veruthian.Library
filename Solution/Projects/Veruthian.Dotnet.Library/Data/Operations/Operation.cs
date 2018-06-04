@@ -4,8 +4,10 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 {
     public abstract class Operation<TState> : IOperation<TState>
     {
+        public abstract string Name { get; }
+
         public bool Perform(TState state, IOperationTracer<TState> tracer = null)
-        {            
+        {
             if (tracer != null)
                 tracer.StartingOperation(this, state);
 
@@ -17,6 +19,9 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return result;
         }
 
+
         protected abstract bool DoAction(TState state, IOperationTracer<TState> tracer = null);
+
+        public override string ToString() => Name;
     }
 }

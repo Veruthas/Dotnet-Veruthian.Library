@@ -6,13 +6,13 @@ namespace Veruthian.Dotnet.Library.Data.Operations
     {
         public OptionalOperation(IOperation<TState> operation) : base(operation) { }
 
+        public override string Name => "Optional";
+        
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
             operation.Perform(state, tracer);
 
             return true;
         }
-
-        public override string ToString() => "[" + operation.ToString() + "]";
     }
 }
