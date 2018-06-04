@@ -12,7 +12,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         AnyOf
     }
 
-    public abstract class SequentialOperation<TState> : Operation<TState>, IParentOperation<TState>
+    public abstract class SequentialOperation<TState> : Operation<TState>
     {
         private bool returnWhenResult;
 
@@ -26,15 +26,6 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
 
         public override string Name => $"{this.SequenceType}Sequence";
-
-        public abstract IOperation<TState> this[int index] { get; }
-
-        public abstract int Count { get; }
-
-
-        public abstract IEnumerator<IOperation<TState>> GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
