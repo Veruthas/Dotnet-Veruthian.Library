@@ -30,15 +30,11 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            bool result;
-
             foreach (var operation in this)
             {
                 if (operation.Perform(state, tracer) == returnWhenResult)
                 {
-                    result = returnWhenResult;
-
-                    break;
+                    return returnWhenResult;
                 }
             }
 
