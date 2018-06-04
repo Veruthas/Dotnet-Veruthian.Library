@@ -7,7 +7,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         private BooleanOperation(bool value) => this.value = value;
 
 
-        public override string Name => value.ToString();
+        public override string Description => value.ToString();
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => value;
         

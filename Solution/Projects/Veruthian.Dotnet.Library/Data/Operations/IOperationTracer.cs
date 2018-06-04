@@ -2,8 +2,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 {
     public interface IOperationTracer<TState>
     {
-        void StartingOperation(IOperation<TState> operation, TState state);
+        void OperationStarting(IOperation<TState> operation, TState state);
 
-        void FinishingOperation(IOperation<TState> operation, TState state, bool success);
+        void OperationFinishing(IOperation<TState> operation, TState state, bool success);
     }
 }
