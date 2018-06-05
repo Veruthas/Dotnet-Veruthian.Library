@@ -74,6 +74,8 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             ["{Inc(0-5)}"] = Repeat(Increment(5)),
             ["{Inc(0-5):0:5}"] = Repeat(Increment(5), 0, 5),
             ["{Inc(0-4):0:5}"] = Repeat(Increment(4), 0, 5),
+            ["{Inc(0-3):3:5}"] = Repeat(Increment(3), 3, 5),
+            ["{Inc(0-2):3:5}"] = Repeat(Increment(2), 3, 5),
         };
 
         public static Dictionary<string, Func<object, object>> constructors = new Dictionary<string, Func<object, object>>()
@@ -98,10 +100,11 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         [InlineData("(False|True)", true)]
         [InlineData("{False}", true)]
         [InlineData("{True:0:5}", true)]
-        [InlineData("{True:0:5}", true)]
         [InlineData("{Inc(0-5)}", true, "int")]
         [InlineData("{Inc(0-5):0:5}", true, "int")]
-        [InlineData("{Inc(0-4):0:5}", false, "int")]        
+        [InlineData("{Inc(0-4):0:5}", true, "int")]
+        [InlineData("{Inc(0-3):3:5}", true, "int")]
+        [InlineData("{Inc(0-2):3:5}", false, "int")]
         public void TestSimpleOperation(string operationKey, bool expectedResult, string constructor = null, object args = null, string expectedState = null)
         {
             IOperation<object> operation = operations[operationKey];
