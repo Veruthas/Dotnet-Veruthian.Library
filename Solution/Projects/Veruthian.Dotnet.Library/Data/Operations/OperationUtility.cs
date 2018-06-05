@@ -19,7 +19,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public override string ToString() => FlattenedString();
 
-        public string FlattenedString(string separator = ", ", string before = "<", string after = ">")
+        public string FlattenedString(string separator = " ", string before = "<", string after = ">")
         {
             var result = new StringBuilder();
             result.Append(Operation.ToString());
@@ -32,7 +32,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return result.ToString();
         }
 
-        public string IndicesToString(string separator = ", ", string before = "<", string after = ">")
+        public string IndicesToString(string separator = " ", string before = "<", string after = ">")
         {
             StringBuilder builder = new StringBuilder();
 
@@ -41,7 +41,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return builder.ToString();
         }
 
-        public void IndicesToString(StringBuilder builder, string separator = ", ", string before = "<", string after = ">")
+        public void IndicesToString(StringBuilder builder, string separator = " ", string before = "<", string after = ">")
         {
             bool started = false;
 
