@@ -5,23 +5,24 @@ namespace _Console
 {
     class Program
     {
-        private static readonly IOperation<object> True = BooleanOperation<object>.True;
-        private static readonly IOperation<object> False = BooleanOperation<object>.False;
+        private static readonly BooleanOperation<object> True = BooleanOperation<object>.True;
 
-        private static IOperation<object> Invert(IOperation<object> operation) => new InvertedOperation<object>(operation);
+        private static readonly BooleanOperation<object> False = BooleanOperation<object>.False;
 
-        private static IOperation<object> Maybe(IOperation<object> operation) => new OptionalOperation<object>(operation);
+        private static InvertedOperation<object> Invert(IOperation<object> operation) => new InvertedOperation<object>(operation);
 
-        private static IOperation<object> AllOf(params IOperation<object>[] operations) => new VariableSequentialOperation<object>(SequenceType.AllOf, operations);
+        private static OptionalOperation<object> Maybe(IOperation<object> operation) => new OptionalOperation<object>(operation);
 
-        private static IOperation<object> AnyOf(params IOperation<object>[] operations) => new FixedSequentialOperation<object>(SequenceType.AnyOf, operations);
+        private static VariableSequentialOperation<object> AllOf(params IOperation<object>[] operations) => new VariableSequentialOperation<object>(SequenceType.AllOf, operations);
 
-        private static IOperation<object> Repeat(IOperation<object> operation, int min = 0, int max = 0) => new RepeatedOperation<object>(operation, min, max);
+        private static VariableSequentialOperation<object> AnyOf(params IOperation<object>[] operations) => new VariableSequentialOperation<object>(SequenceType.AnyOf, operations);
+
+        private static RepeatedOperation<object> Repeat(IOperation<object> operation, int min = 0, int max = 0) => new RepeatedOperation<object>(operation, min, max);
 
 
         static void Main(string[] args)
         {
-            var item = AllOf(True, True, False, AnyOf(Maybe(True), Repeat(True, 0, 5)));
+            var item = AllOf().Add(True).Add(False).AddSelf();
 
             var flat = item.Flatten();
 
