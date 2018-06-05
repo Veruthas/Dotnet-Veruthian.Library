@@ -57,7 +57,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
                 }
                 else
                 {
-                    finalResult = count >= minimum && (maximum == 0 || count >= maximum);
+                    finalResult = count >= minimum;
                     break;
                 }
             }
