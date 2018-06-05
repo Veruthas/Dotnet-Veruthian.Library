@@ -64,27 +64,5 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
             return finalResult;
         }
-
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append('{').Append(operation.ToString());
-
-            if (maximum != 0)
-            {
-                builder.Append(" : ").Append(minimum);
-
-                builder.Append(" to ").Append(maximum);
-            }
-            else if (minimum != 0)
-            {
-                builder.Append(" : ").Append(minimum);
-            }
-
-            builder.Append('}');
-
-            return builder.ToString();
-        }
     }
 }
