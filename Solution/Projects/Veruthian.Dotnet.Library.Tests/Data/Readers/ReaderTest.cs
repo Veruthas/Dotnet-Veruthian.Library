@@ -100,9 +100,9 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
 
-    public class SimpleReaderTest : ReaderTest<CodePoint, SimpleReader<CodePoint>>
+    public class SimpleReaderTest : ReaderTest<CodePoint, Reader<CodePoint>>
     {
-        private SimpleReader<CodePoint> GetReader(CodePoint[] data)
+        private Reader<CodePoint> GetReader(CodePoint[] data)
         {
             return data.GetSimpleReader();
         }
