@@ -2,7 +2,17 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public abstract class ReaderAdapter<T> : IReader<T>
+    public class ReaderAdapater<T> : ReaderAdapterBase<T>
+    {
+        protected ReaderAdapater(IReader<T> reader)
+        {
+            this.Reader = reader;
+        }
+
+        protected override IReader<T> Reader { get; }
+    }
+
+    public abstract class ReaderAdapterBase<T> : IReader<T>
     {
         protected abstract IReader<T> Reader { get; }
 
@@ -19,7 +29,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var item = Reader.Read();
 
             OnItemRead(item);
-            
+
             return item;
         }
 

@@ -2,7 +2,17 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public abstract class SpeculativeReaderAdapater<T> : LookaheadReaderAdapter<T>, ISpeculativeReader<T>
+    public class SpeculativeReaderAdapater<T> : SpeculativeReaderAdapaterBase<T>
+    {
+        protected SpeculativeReaderAdapater(ISpeculativeReader<T> reader)
+        {
+            this.SpeculativeReader = reader;
+        }
+
+        protected override ISpeculativeReader<T> SpeculativeReader { get; }
+    }
+
+    public abstract class SpeculativeReaderAdapaterBase<T> : LookaheadReaderAdapterBase<T>, ISpeculativeReader<T>
     {
         protected abstract ISpeculativeReader<T> SpeculativeReader { get; }
 
