@@ -5,15 +5,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     public static class ReaderUtility
     {
         // Simple Reader
-        public static SimpleReader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
+        public static Reader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
                                                              GenerateEndItem<T> generateEndItem = null)
         {
-            var reader = new SimpleReader<T>(enumerator, generateEndItem);
+            var reader = new Reader<T>(enumerator, generateEndItem);
 
             return reader;
         }
 
-        public static SimpleReader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
+        public static Reader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
                                                             GenerateEndItem<T> generateEndItem = null)
         {
             return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem);

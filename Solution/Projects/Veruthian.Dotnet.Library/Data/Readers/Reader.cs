@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public class SimpleReader<T> : ReaderBase<T>
+    public class Reader<T> : ReaderBase<T>
     {
         T item;
 
-        public SimpleReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem)
+        public Reader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem)
         {
             SetData(enumerator, generateEndItem);
         }
