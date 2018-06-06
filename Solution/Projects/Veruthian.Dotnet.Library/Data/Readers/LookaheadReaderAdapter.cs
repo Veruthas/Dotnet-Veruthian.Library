@@ -1,6 +1,17 @@
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public abstract class LookaheadReaderAdapter<T> : ReaderAdapter<T>, ILookaheadReader<T>
+    public class LookaheadReaderAdapter<T> : LookaheadReaderAdapterBase<T>
+    {
+        protected LookaheadReaderAdapter(ILookaheadReader<T> reader)
+        {
+            this.LookaheadReader = reader;
+        }
+
+        protected override ILookaheadReader<T> LookaheadReader { get; }
+    }
+
+
+    public abstract class LookaheadReaderAdapterBase<T> : ReaderAdapterBase<T>, ILookaheadReader<T>
     {
         protected abstract ILookaheadReader<T> LookaheadReader{ get; }
 
