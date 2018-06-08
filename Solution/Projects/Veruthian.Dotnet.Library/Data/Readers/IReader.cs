@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
@@ -11,6 +12,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         T Peek();
 
         T Read();
+
+        IEnumerator<T> Read(int amount);
 
         void Skip(int amount);
     }

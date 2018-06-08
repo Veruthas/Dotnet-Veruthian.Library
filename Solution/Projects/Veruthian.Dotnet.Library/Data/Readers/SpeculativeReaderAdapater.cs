@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
@@ -26,6 +27,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public virtual int MarkCount => SpeculativeReader.MarkCount;
 
         public virtual int GetMarkPosition(int mark) => SpeculativeReader.GetMarkPosition(mark);
+
+
+        public virtual T PeekFromMark(int mark, int lookahead) => SpeculativeReader.PeekFromMark(mark, lookahead);
+
+        public virtual IEnumerable<T> PeekFromMark(int mark, int lookahead, int amount, bool includeEnd = false) 
+            => SpeculativeReader.PeekFromMark(mark, lookahead, amount, includeEnd);
 
 
         public virtual void Mark()
