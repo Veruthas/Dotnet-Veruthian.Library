@@ -35,13 +35,41 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             marks.Clear();
 
-            base.Initialize();            
+            base.Initialize();
         }
 
-        // Mark information
-        protected List<MarkItem> Marks => marks; 
+        public T PeekFromMark(int mark, int lookahead)
+        {
+            var markItem = marks[mark];
 
-        protected override bool CanReset => !IsSpeculating; 
+            int actualIndex = markItem.Index + lookahead;
+
+            EnsureLookahead(actualIndex);
+
+            var item = RawPeekIndex(actualIndex);
+
+            return item;
+        }
+
+        public IEnumerable<T> PeekFromMark(int mark, int lookahead, int amount, bool includeEnd = false)
+        {
+            var markItem = marks[mark];
+
+            int actualIndex = markItem.Index + lookahead;
+
+            EnsureLookahead(actualIndex + amount);
+
+            for (int i = actualIndex; i < actualIndex + amount; i++)
+            {
+                var item = RawPeekIndex(actualIndex);
+            }
+        }
+
+
+        // Mark information
+        protected List<MarkItem> Marks => marks;
+
+        protected override bool CanReset => !IsSpeculating;
 
         public bool IsSpeculating => marks.Count != 0;
 

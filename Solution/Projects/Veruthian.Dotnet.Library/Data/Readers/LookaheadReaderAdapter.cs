@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
     public class LookaheadReaderAdapter<T> : LookaheadReaderAdapterBase<T>
@@ -18,8 +20,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         protected override IReader<T> Reader => LookaheadReader;
         
 
-        public T Peek(int lookahead) => LookaheadReader.Peek(lookahead);
+        public virtual T Peek(int lookahead) => LookaheadReader.Peek(lookahead);
 
-        public bool PeekIsEnd(int lookahead) => LookaheadReader.PeekIsEnd(lookahead);
+        public virtual IEnumerable<T> Peek(int lookahead, int amount, bool includeEnd = false) => LookaheadReader.Peek(lookahead, amount, includeEnd);
+
+        public virtual bool PeekIsEnd(int lookahead) => LookaheadReader.PeekIsEnd(lookahead);
     }
 }

@@ -5,7 +5,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 {
     public class VariableLookaheadReaderBase<T> : LookaheadReaderBase<T>
     {
-        List<T> buffer = new List<T>();
+        List<T> items = new List<T>();
 
         int index;
 
@@ -15,14 +15,16 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected int Index { get => index; set => index = value; }
 
-        protected int Size { get => buffer.Count; }
+        protected List<T> Items { get => items; }
+
+        protected int Size { get => items.Count; }
 
         protected virtual bool CanReset { get => true; }
 
 
         protected override void Initialize()
         {
-            buffer.Clear();
+            items.Clear();
 
             index = 0;
 
@@ -54,7 +56,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
                 if (success)
                 {
-                    buffer.Add(next);
+                    items.Add(next);
                 }
                 else
                 {
@@ -66,14 +68,23 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             return amount;
         }
+        
+        protected T RawPeekIndex(int index)
+        {
+            // We don't want to add infinite end items, just return the cached end item
+            if (EndFound && index >= items.Count)
+                return LastItem;
+            else
+                return items[index];
+        }
 
         protected override T RawPeek(int lookahead = 0)
         {
             // We don't want to add infinite end items, just return the cached end item
-            if (EndFound && Position + lookahead >= EndPosition)
+            if (EndFound && index + lookahead >= items.Count)
                 return LastItem;
             else
-                return buffer[index + lookahead];
+                return items[index + lookahead];
         }
 
         protected override void MoveNext()
@@ -88,7 +99,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 {
                     index = 0;
 
-                    buffer.Clear();
+                    items.Clear();
                 }
 
                 EnsureLookahead(1);
@@ -105,7 +116,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 {
                     index = 0;
 
-                    buffer.Clear();
+                    items.Clear();
                 }
                 else
                 {
