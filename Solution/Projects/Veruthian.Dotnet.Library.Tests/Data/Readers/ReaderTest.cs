@@ -104,7 +104,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     {
         private Reader<CodePoint> GetReader(CodePoint[] data)
         {
-            return data.GetSimpleReader();
+            return data.GetReader();
         }
 
         [Theory]
