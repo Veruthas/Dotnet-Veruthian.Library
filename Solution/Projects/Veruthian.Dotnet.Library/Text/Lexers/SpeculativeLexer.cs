@@ -18,13 +18,10 @@ namespace Veruthian.Dotnet.Library.Text.Lexers
 
         public SpeculativeLexer(Source[] sources, Pool<CodeString, TType> pool) : base(sources, pool) { }
 
-        protected List<TextLocation> markedLocations;
+        protected Stack<TextLocation> markedLocations;
 
-        protected virtual void OnRetreated(int fromPosition, int markCount)
+        protected virtual void OnRetreated(int fromPosition)
         {
-            if (markCount > markedLocations.Count)
-                throw new ArgumentOutOfRangeException("markCount");
-
             if (IsCapturing)
             {
                 int length = fromPosition - Reader.Position;
@@ -32,19 +29,15 @@ namespace Veruthian.Dotnet.Library.Text.Lexers
                 RollbackCaptured(length);
             }
 
-            int markIndex = markedLocations.Count - markCount;
-
-            this.Location = markedLocations[markIndex];
-
-            markedLocations.RemoveRange(markIndex, markCount);
+            this.Location = markedLocations.Pop();
         }
 
         protected void Mark()
         {
             if (markedLocations == null)
-                markedLocations = new List<TextLocation>();
+                markedLocations = new Stack<TextLocation>();
 
-            markedLocations.Add(this.Location);
+            markedLocations.Push(this.Location);
 
             Reader.Mark();
         }
@@ -61,29 +54,7 @@ namespace Veruthian.Dotnet.Library.Text.Lexers
 
             Reader.Rollback();
 
-            OnRetreated(fromPosition, 1);
-
-            return fromPosition;
-        }
-
-        protected int Rollback(int marks)
-        {
-            int fromPosition = Reader.Position;
-
-            OnRetreated(fromPosition, marks);
-
-            return fromPosition;
-        }
-
-        protected int RollbackAll()
-        {
-            int markCount = Reader.MarkCount;
-
-            int fromPosition = Reader.Position;
-
-            Reader.RollbackAll();
-
-            OnRetreated(fromPosition, markCount);
+            OnRetreated(fromPosition);
 
             return fromPosition;
         }

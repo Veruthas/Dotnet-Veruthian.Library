@@ -23,7 +23,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        List<MarkItem> marks = new List<MarkItem>();
+        Stack<MarkItem> marks = new Stack<MarkItem>();
 
 
         public SpeculativeReader(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
@@ -38,107 +38,87 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             base.Initialize();
         }
 
-        public T PeekFromMark(int mark, int lookahead)
+        public T PeekFromMark(int lookahead)
         {
-            var markItem = marks[mark];
+            if (lookahead < 0)
+                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
 
-            int actualIndex = markItem.Index + lookahead;
+            var mark = marks.Peek();
 
-            EnsureLookahead(actualIndex);
+            int actualIndex = mark.Index + lookahead;
+
+            EnsureIndex(actualIndex);
 
             var item = RawPeekByIndex(actualIndex);
 
             return item;
         }
 
-        public IEnumerable<T> PeekFromMark(int mark, int lookahead, int amount, bool includeEnd = false)
+        public IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false)
         {
-            var markItem = marks[mark];
+            if (lookahead < 0)
+                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
 
-            int actualIndex = markItem.Index + lookahead;
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("amount", amount, "Amount cannot be less than 0");
 
-            // This is wrong
-            EnsureLookahead(actualIndex + amount);
+            var mark = marks.Peek();
 
-            for (int i = actualIndex; i < actualIndex + amount; i++)
+            int index = mark.Index + lookahead;
+
+            EnsureIndex(index + amount);
+
+            for (int i = index; i < index + amount; i++)
             {
-                var item = RawPeekByIndex(actualIndex);
-
-                yield return item;
+                if (i < Size || includeEnd)
+                    yield return RawPeekByIndex(index);
+                else
+                    yield break;
             }
+
         }
 
 
         // Mark information
-        protected List<MarkItem> Marks => marks;
+        protected Stack<MarkItem> Marks => marks;
 
         protected override bool CanReset => !IsSpeculating;
 
         public bool IsSpeculating => marks.Count != 0;
 
+
         public int MarkCount => marks.Count;
 
-        public int GetMarkPosition(int mark) => marks[mark].Position;
+        public int MarkPosition => marks.Peek().Position;
 
 
         // Mark
         public void Mark() => CreateMark(Position, Index);
 
-        protected void CreateMark(int position, int index) => marks.Add(new MarkItem(position, index));
+        protected void CreateMark(int position, int index) => marks.Push(new MarkItem(position, index));
 
 
         // Commit
-        public void Commit() => Commit(1);
-
-        public void CommitAll() => Commit(marks.Count);
-
-        public void Commit(int marks)
+        public void Commit()
         {
-            if (marks < -1 || marks > MarkCount)
-                throw new InvalidOperationException(string.Format("Attempting to commit {0} speculations; only {1} exist", marks, MarkCount));
+            if (!IsSpeculating)
+                throw new InvalidOperationException("Cannot commit when not speculating.");
 
-            if (marks > 0)
-            {
-                // Get mark to commit
-                var markIndex = this.marks.Count - marks;
-
-                var mark = this.marks[markIndex];
-
-                // Pop off all committed marks
-                this.marks.RemoveRange(markIndex, marks);
-            }
+            marks.Pop();
         }
 
 
         // Rollback
-        public void Rollback() => Rollback(1);
-
-        public void RollbackAll() => Rollback(MarkCount);
-
-        public void Rollback(int marks)
+        public void Rollback()
         {
-            if (marks < -1 || marks > MarkCount)
-                throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
+            if (!IsSpeculating)
+                throw new InvalidOperationException("Cannot rollback when not speculating.");
 
-            if (marks > 0)
-            {
-                // Get mark to rollback to
-                var markIndex = this.marks.Count - marks;
+            var mark = marks.Pop();
 
-                var mark = this.marks[markIndex];
+            this.Index = mark.Index;
 
-
-                // Pop off all marks
-                this.marks.RemoveRange(markIndex, marks);
-
-
-                // Set to marked positions
-                var oldPosition = Position;
-
-                this.Index = mark.Index;
-
-                this.Position = mark.Position;
-            }
+            this.Position = mark.Position;
         }
     }
 }

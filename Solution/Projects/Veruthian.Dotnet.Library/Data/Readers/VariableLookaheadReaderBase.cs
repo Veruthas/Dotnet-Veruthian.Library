@@ -32,23 +32,18 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
 
-        protected void EnsureSize(int index, int amount)
-        {
-
-        }
-
-        
-        protected override void EnsureLookahead(int lookahead = 0)
-        {
-            // Find out if we have enough lookahead.
+        protected void EnsureIndex(int index)
+        {            
             int available = (Size - index);
 
-            int difference = available - lookahead;
-
-            // Prefetch (d + 1) items (since index and lookaheads are indices)
-            if (difference <= 0)
-                Prefetch(difference + 1);
+            // Prefetch (d + 1) items
+            if (available <= 0)
+                Prefetch(available + 1);
         }
+
+
+        protected override void EnsureLookahead(int lookahead = 0) => EnsureIndex(index + lookahead);
+
 
         private void Prefetch(int amount)
         {
