@@ -65,7 +65,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override void EnsureLookahead(int lookahead = 0)
         {
-            if (lookahead < 0 || lookahead >= Size)
+            if (lookahead < 0 || lookahead > Size)
                 throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead must be in the range [0, {1}]", Size - 1));
         }
 
