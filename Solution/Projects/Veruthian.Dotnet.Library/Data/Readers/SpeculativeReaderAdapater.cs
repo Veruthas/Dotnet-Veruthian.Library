@@ -24,15 +24,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         public virtual bool IsSpeculating => SpeculativeReader.IsSpeculating;
 
+
         public virtual int MarkCount => SpeculativeReader.MarkCount;
 
-        public virtual int GetMarkPosition(int mark) => SpeculativeReader.GetMarkPosition(mark);
+        public virtual int GetMarkPosition(int marksBack) => SpeculativeReader.GetMarkPosition(marksBack);
 
+        public virtual T PeekFromMark(int marksBack, int lookahead) => SpeculativeReader.PeekFromMark(marksBack, lookahead);
 
-        public virtual T PeekFromMark(int mark, int lookahead) => SpeculativeReader.PeekFromMark(mark, lookahead);
-
-        public virtual IEnumerable<T> PeekFromMark(int mark, int lookahead, int amount, bool includeEnd = false) 
-            => SpeculativeReader.PeekFromMark(mark, lookahead, amount, includeEnd);
+        public virtual IEnumerable<T> PeekFromMark(int marksBack, int lookahead, int amount, bool includeEnd = false) 
+            => SpeculativeReader.PeekFromMark(marksBack, lookahead, amount, includeEnd);
 
 
         public virtual void Mark()
@@ -60,15 +60,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             OnCommit(markedPosition, committedPosition);
         }
 
-        public virtual void Commit(int marks)
+        public virtual void Commit(int marksBack)
         {
             int markCount = SpeculativeReader.MarkCount;
 
-            int markedPosition = GetMarkPosition(markCount - marks);
+            int markedPosition = GetMarkPosition(markCount - marksBack);
 
             int committedPosition = Position;
 
-            SpeculativeReader.Commit(marks);
+            SpeculativeReader.Commit(marksBack);
 
             OnCommit(markedPosition, committedPosition);
         }
@@ -100,15 +100,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             OnCommit(markedPosition, speculatedPosition);
         }
 
-        public virtual void Rollback(int marks)
+        public virtual void Rollback(int marksBack)
         {
             int markCount = SpeculativeReader.MarkCount;
 
-            int markedPosition = GetMarkPosition(markCount - marks);
+            int markedPosition = GetMarkPosition(markCount - marksBack);
 
             int speculatedPosition = Position;
 
-            SpeculativeReader.Rollback(marks);
+            SpeculativeReader.Rollback(marksBack);
 
             OnCommit(markedPosition, speculatedPosition);
         }

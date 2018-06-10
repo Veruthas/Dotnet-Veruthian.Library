@@ -31,6 +31,13 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             Position = 0;
         }
 
+
+        protected void EnsureSize(int index, int amount)
+        {
+
+        }
+
+        
         protected override void EnsureLookahead(int lookahead = 0)
         {
             // Find out if we have enough lookahead.
@@ -43,33 +50,30 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 Prefetch(difference + 1);
         }
 
-        private int Prefetch(int amount)
+        private void Prefetch(int amount)
         {
-            if (EndFound)
-                return 0;
-
-            int lastPosition = Size;
-
-            for (int i = 0; i < amount; i++)
+            if (!EndFound)
             {
-                bool success = GetNext(out T next);
+                int lastPosition = Size;
 
-                if (success)
+                for (int i = 0; i < amount; i++)
                 {
-                    items.Add(next);
-                }
-                else
-                {
-                    EndPosition = lastPosition + i;
+                    bool success = GetNext(out T next);
 
-                    return i;
+                    if (success)
+                    {
+                        items.Add(next);
+                    }
+                    else
+                    {
+                        EndPosition = lastPosition + i;
+
+                    }
                 }
             }
-
-            return amount;
         }
-        
-        protected T RawPeekIndex(int index)
+
+        protected T RawPeekByIndex(int index)
         {
             // We don't want to add infinite end items, just return the cached end item
             if (EndFound && index >= items.Count)
@@ -78,14 +82,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 return items[index];
         }
 
-        protected override T RawPeek(int lookahead = 0)
-        {
-            // We don't want to add infinite end items, just return the cached end item
-            if (EndFound && index + lookahead >= items.Count)
-                return LastItem;
-            else
-                return items[index + lookahead];
-        }
+        protected override T RawPeek(int lookahead = 0) => RawPeekByIndex(index + lookahead);
 
         protected override void MoveNext()
         {
