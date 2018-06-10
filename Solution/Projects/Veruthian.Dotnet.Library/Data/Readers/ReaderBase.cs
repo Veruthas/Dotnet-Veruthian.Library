@@ -117,6 +117,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         public IEnumerable<T> Read(int amount, bool includeEnd = false)
         {
+            TryPreload(amount);
+
             for (int i = 0; i < amount; i++)
             {
                 if (!IsEnd || includeEnd)
@@ -134,6 +136,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected abstract void MoveNext();
 
+        protected abstract void TryPreload(int amount);
+        
         protected abstract void SkipAhead(int amount);
 
         protected abstract T RawPeek(int lookahead = 0);

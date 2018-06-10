@@ -69,6 +69,28 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             Assert.Equal(data.Length, reader.Position);
 
             Assert.Equal(default(T), reader.Peek());
+
+            Assert.Equal(default(T), reader.Read());
+
+            Assert.True(reader.IsEnd);
+        }
+
+        protected void BaseTestReadEnumerable(TReader reader, T[] data)
+        {
+            int i = 0;
+
+            foreach (var item in reader.Read(data.Length))
+            {
+                Assert.Equal(data[i++], item);
+            }
+
+            Assert.Equal(data.Length, reader.Position);
+
+            Assert.Equal(default(T), reader.Peek());
+
+            Assert.Equal(default(T), reader.Read());
+
+            Assert.True(reader.IsEnd);
         }
     }
 
@@ -100,7 +122,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
 
-    public class SimpleReaderTest : ReaderTest<CodePoint, Reader<CodePoint>>
+    public class ReaderTest : ReaderTest<CodePoint, Reader<CodePoint>>
     {
         private Reader<CodePoint> GetReader(CodePoint[] data)
         {
@@ -128,6 +150,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             var codes = data.ToCodePointArray();
             BaseTestSkip(GetReader(codes), codes, skipInterval);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("ABCDEFGHIJKLM")]
+        public void TestReadEnumerable(string data)
+        {
+            var codes = data.ToCodePointArray();
+            BaseTestReadEnumerable(GetReader(codes), codes);
         }
     }
 
@@ -171,6 +202,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             var codes = data.ToCodePointArray();
             BaseTestSkip(GetReader(codes, lookahead), codes, skipInterval);
+        }
+
+        [Theory]
+        [InlineData("", 2)]
+        [InlineData("ABCDEFGHIJKLM", 2)]
+        public void TestReadEnumerable(string data, int lookahead)
+        {
+            var codes = data.ToCodePointArray();
+            BaseTestReadEnumerable(GetReader(codes, lookahead), codes);
         }
 
         [Theory]
@@ -218,6 +258,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
         [Theory]
+        [InlineData("")]
+        [InlineData("ABCDEFGHIJKLM")]
+        public void TestReadEnumerable(string data)
+        {
+            var codes = data.ToCodePointArray();
+            BaseTestReadEnumerable(GetReader(codes), codes);
+        }
+
+        [Theory]
         [InlineData("", 4)]
         [InlineData("ABCD", 4)]
         [InlineData("ABCDEFGHIJKLM", 4)]
@@ -259,6 +308,15 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             var codes = data.ToCodePointArray();
             BaseTestSkip(GetReader(codes), codes, skipInterval);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("ABCDEFGHIJKLM")]
+        public void TestReadEnumerable(string data)
+        {
+            var codes = data.ToCodePointArray();
+            BaseTestReadEnumerable(GetReader(codes), codes);
         }
 
         [Theory]

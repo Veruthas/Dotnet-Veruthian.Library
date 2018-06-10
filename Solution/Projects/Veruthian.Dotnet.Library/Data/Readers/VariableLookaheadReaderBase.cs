@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public class VariableLookaheadReaderBase<T> : LookaheadReaderBase<T>
+    public abstract class VariableLookaheadReaderBase<T> : LookaheadReaderBase<T>
     {
         List<T> items = new List<T>();
 
@@ -33,14 +33,13 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
 
         protected void EnsureIndex(int index)
-        {            
+        {
             int available = (Size - index);
 
             // Prefetch (d + 1) items
             if (available <= 0)
                 Prefetch(available + 1);
         }
-
 
         protected override void EnsureLookahead(int lookahead = 0) => EnsureIndex(index + lookahead);
 
@@ -79,6 +78,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         protected override T RawPeek(int lookahead = 0) => RawPeekByIndex(index + lookahead);
 
+
         protected override void MoveNext()
         {
             if (!IsEnd)
@@ -97,6 +97,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 EnsureLookahead(1);
             }
         }
+
+        protected override void TryPreload(int amount) => EnsureLookahead(amount);
 
         protected override void SkipAhead(int amount)
         {
