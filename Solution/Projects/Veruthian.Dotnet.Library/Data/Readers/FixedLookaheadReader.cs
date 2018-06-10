@@ -93,6 +93,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             index = (index + 1) % Size;
         }
 
+        protected override void TryPreload(int amount) { }
+
         // TODO: Optimize
         protected override void SkipAhead(int amount)
         {

@@ -23,7 +23,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         {
             bool success = GetNext(out T next);
 
-            if (!IsEnd)            
+            if (!IsEnd)
                 Position++;
 
             if (!success && !EndFound)
@@ -31,6 +31,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             item = next;
         }
+
+        protected override void TryPreload(int amount) { }
 
         protected override void SkipAhead(int amount)
         {
