@@ -8,15 +8,12 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         bool IsSpeculating { get; }
 
 
-        int MarkCount { get; }
+        int MarkPosition { get; }
 
 
-        int GetMarkPosition(int mark);
+        T PeekFromMark(int lookahead);
 
-
-        T PeekFromMark(int mark, int lookahead);
-
-        IEnumerable<T> PeekFromMark(int mark, int lookahead, int amount, bool includeEnd = false);
+        IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false);
 
 
         void Mark();
@@ -24,15 +21,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         void Commit();
 
-        void Commit(int marks);
-
-        void CommitAll();
-
 
         void Rollback();
-
-        void Rollback(int marks);
-
-        void RollbackAll();
     }
 }
