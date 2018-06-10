@@ -5,7 +5,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     public static class ReaderUtility
     {
         // Simple Reader
-        public static Reader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
+        public static Reader<T> GetReader<T>(this IEnumerator<T> enumerator,
                                                              GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new Reader<T>(enumerator, generateEndItem);
@@ -13,10 +13,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             return reader;
         }
 
-        public static Reader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
+        public static Reader<T> GetReader<T>(this IEnumerable<T> enumerable,
                                                             GenerateEndItem<T> generateEndItem = null)
         {
-            return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem);
+            return GetReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
         // Fixed Lookahead Reader
