@@ -115,6 +115,14 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             return current;
         }
 
+        public IEnumerable<T> Read(int amount, bool includeEnd = false)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                if (!IsEnd || includeEnd)
+                    yield return Read();
+            }
+        }
 
         // Skip
         public void Skip(int amount) => SkipAhead(amount);

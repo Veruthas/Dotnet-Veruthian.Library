@@ -13,7 +13,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         T Read();
 
-        IEnumerator<T> Read(int amount);
+        IEnumerable<T> Read(int amount, bool includeEnd = false);
 
         void Skip(int amount);
     }

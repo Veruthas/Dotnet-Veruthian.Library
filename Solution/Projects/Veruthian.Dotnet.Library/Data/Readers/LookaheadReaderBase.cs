@@ -16,7 +16,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             for (int i = lookahead; i < lookahead + amount; i++)
             {
                 if (!PeekIsEnd(i) || includeEnd)
-                    yield return Peek(i);
+                    yield return RawPeek(i);
             }
         }
 

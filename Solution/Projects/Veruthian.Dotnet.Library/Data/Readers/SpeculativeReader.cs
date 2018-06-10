@@ -46,7 +46,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             EnsureLookahead(actualIndex);
 
-            var item = RawPeekIndex(actualIndex);
+            var item = RawPeekByIndex(actualIndex);
 
             return item;
         }
@@ -57,11 +57,14 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             int actualIndex = markItem.Index + lookahead;
 
+            // This is wrong
             EnsureLookahead(actualIndex + amount);
 
             for (int i = actualIndex; i < actualIndex + amount; i++)
             {
-                var item = RawPeekIndex(actualIndex);
+                var item = RawPeekByIndex(actualIndex);
+
+                yield return item;
             }
         }
 
