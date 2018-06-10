@@ -28,16 +28,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
 
             // End of reader reached
-            Assert.Equal(data.Length, reader.Position);
-
-            Assert.Equal(default(T), reader.Peek());
-
-            Assert.Equal(default(T), reader.Read());
-
-            Assert.Equal(data.Length, reader.Position);
-
-            // Assert is end of reader
-            Assert.True(reader.IsEnd);
+            TestIsAtEnd(reader, data);
         }
 
         protected void BaseTestSkip(TReader reader, T[] data, int skipInterval)
@@ -66,13 +57,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             } while (!reader.IsEnd);
 
             // Make sure we are at end of reader
-            Assert.Equal(data.Length, reader.Position);
-
-            Assert.Equal(default(T), reader.Peek());
-
-            Assert.Equal(default(T), reader.Read());
-
-            Assert.True(reader.IsEnd);
+            TestIsAtEnd(reader, data);
         }
 
         protected void BaseTestReadEnumerable(TReader reader, T[] data)
@@ -84,11 +69,18 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                 Assert.Equal(data[i++], item);
             }
 
+            TestIsAtEnd(reader, data);
+        }
+
+        protected void TestIsAtEnd(TReader reader, T[] data)
+        {
             Assert.Equal(data.Length, reader.Position);
 
             Assert.Equal(default(T), reader.Peek());
 
             Assert.Equal(default(T), reader.Read());
+
+            Assert.Equal(data.Length, reader.Position);
 
             Assert.True(reader.IsEnd);
         }
@@ -112,6 +104,27 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
                 reader.Read();
             }
+        }
+
+
+        public void BaseTestPeekEnumerable(TReader reader, T[] data, int lookahead = 0)
+        {
+            int index = 0;
+
+            while (!reader.IsEnd)
+            {
+                foreach (var item in reader.Peek(0, lookahead))
+                {
+                    if (index >= data.Length)
+                        break;
+
+                    Assert.Equal(data[index++], item);
+                }
+
+                reader.Skip(lookahead);
+            }
+
+            TestIsAtEnd(reader, data);
         }
     }
 
@@ -225,6 +238,20 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             BaseTestLookahead(reader, codes, lookahead);
         }
+
+        [Theory]
+        // [InlineData("", 2, 0)]
+        [InlineData("ABCD", 2, 2)]
+        // [InlineData("ABCDE", 4, 4)]
+        // [InlineData("ABCDE", 6, 5)]
+        public void TestPeekEnumerable(string data, int lookahead, int chunkSize)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes, lookahead);
+
+            BaseTestPeekEnumerable(reader, codes, chunkSize);
+        }
     }
 
     public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, VariableLookaheadReaderBase<CodePoint>>
@@ -277,6 +304,20 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var reader = GetReader(codes);
 
             BaseTestLookahead(reader, codes, lookahead);
+        }
+
+        [Theory]
+        [InlineData("", 0)]
+        [InlineData("ABCD", 2)]
+        [InlineData("ABCDE", 4)]
+        [InlineData("ABCDE", 5)]
+        public void TestPeekEnumerable(string data, int lookahead)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+
+            BaseTestPeekEnumerable(reader, codes, lookahead);
         }
     }
 
@@ -353,6 +394,20 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var reader = GetReader(codes);
 
             BaseTestLookahead(reader, codes, lookahead);
+        }
+
+        [Theory]
+        [InlineData("", 0)]
+        [InlineData("ABCD", 2)]
+        [InlineData("ABCDE", 4)]
+        [InlineData("ABCDE", 5)]
+        public void TestPeekEnumerable(string data, int lookahead)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+
+            BaseTestPeekEnumerable(reader, codes, lookahead);
         }
     }
 }
