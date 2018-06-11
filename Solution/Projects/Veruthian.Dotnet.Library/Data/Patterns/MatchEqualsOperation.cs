@@ -7,7 +7,7 @@ namespace Veruthian.Dotnet.Library.Data.Patterns
     {
         T item;
 
-        public MatchEqualsOperation(T item, bool readOnMatch)
+        public MatchEqualsOperation(T item, bool readOnMatch = true)
             : base(readOnMatch)
         {
             this.item = item;
@@ -16,7 +16,7 @@ namespace Veruthian.Dotnet.Library.Data.Patterns
         public T Item => item;
 
         public string Name => "MatchEquals";
-        
+
         public override string Description => $"{Name}({(item == null ? "<NULL>" : item.ToString())})";
 
         protected override bool Match(T item)

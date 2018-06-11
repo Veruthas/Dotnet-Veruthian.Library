@@ -137,14 +137,14 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             reader.Skip(data.Length);
 
-            // for (int i = 0; i < data.Length; i++)
-            // {
-            //     var dataItem = data[i];
+            for (int i = 0; i < data.Length; i++)
+            {
+                var dataItem = data[i];
 
-            //     var readerItem = reader.PeekFromMark(i);
+                var readerItem = reader.PeekFromMark(i);
 
-            //     Assert.Equal(dataItem, readerItem);
-            // }
+                Assert.Equal(dataItem, readerItem);
+            }
 
             int index = 0;
 
