@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Veruthian.Dotnet.Library.Data.Operations;
+using Veruthian.Dotnet.Library.Data.Patterns;
+using Veruthian.Dotnet.Library.Data.Ranges;
+using Veruthian.Dotnet.Library.Data.Readers;
+using Veruthian.Dotnet.Library.Text.Code;
 
 namespace _Console
 {
@@ -20,18 +25,61 @@ namespace _Console
         private static RepeatedOperation<object> Repeat(IOperation<object> operation, int min = 0, int max = 0) => new RepeatedOperation<object>(operation, min, max);
 
 
+        private class Marker<TReader> : NestedOperation<TReader>
+            where TReader : ISpeculativeReader<CodePoint>
+        {
+            public Marker(IOperation<TReader> operation) : base(operation)
+            {
+            }
+
+            public override string Description => "Hello";
+
+            protected override bool DoAction(TReader state, IOperationTracer<TReader> tracer = null)
+            {
+                state.Mark();
+
+                var success = operation.Perform(state, tracer);
+
+                if (success)
+                {
+                    var str = new CodeString(state.PeekFromMark(0, state.Position - state.MarkPosition));
+
+                    Console.WriteLine(str);
+
+                    state.Commit();
+
+                    return true;
+                }
+
+                state.Commit();
+
+                return false;
+            }
+        }
+
         static void Main(string[] args)
         {
-            var item = AllOf().Add(True).Add(False).AddSelf();
+            var letterSet = RangeSet<CodePoint>.Union(RangeSet<CodePoint>.Range('A', 'Z'), RangeSet<CodePoint>.Range('a', 'z'));
 
-            var flat = item.Flatten();
+            var whitespaceSet = RangeSet<CodePoint>.List(' ', '\t');
 
-            for (int i = 0; i < flat.Length; i++)
-            {
-                var f = flat[i];
+            var letters = new MatchInSetOperation<CodePoint, ISpeculativeReader<CodePoint>>(letterSet);
 
-                Console.WriteLine($"{i}: {f}");
-            }
+            var repeatletters = new RepeatedOperation<ISpeculativeReader<CodePoint>>(letters, 1);
+
+            var whitespace = new MatchInSetOperation<CodePoint, ISpeculativeReader<CodePoint>>(whitespaceSet);
+
+            var repeatespace = new RepeatedOperation<ISpeculativeReader<CodePoint>>(whitespace);
+
+            var matcher = new Marker<ISpeculativeReader<CodePoint>>(repeatletters);
+
+            
+            var seq = new VariableSequentialOperation<ISpeculativeReader<CodePoint>>(SequenceType.AllOf, repeatespace, matcher, repeatespace);
+
+            var op = new RepeatedOperation<ISpeculativeReader<CodePoint>>(seq);
+
+            op.Perform("Hello world my name is Levi Minkoff".ToCodePoints().GetSpeculativeReader());
+
 
             Pause();
         }

@@ -9,7 +9,7 @@ namespace Veruthian.Dotnet.Library.Data.Patterns
     {
         RangeSet<T> set;
 
-        public MatchInSetOperation(RangeSet<T> set, bool readOnMatch)
+        public MatchInSetOperation(RangeSet<T> set, bool readOnMatch = true)
             : base(readOnMatch)
         {
             this.set = set;

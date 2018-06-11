@@ -23,7 +23,7 @@ namespace Veruthian.Dotnet.Library.Data.Patterns
             {
                 if (ReadOnMatch)
                     state.Read();
-                    
+
                 return true;
             }
 
