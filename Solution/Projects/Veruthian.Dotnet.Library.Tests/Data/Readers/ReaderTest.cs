@@ -131,6 +131,30 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     public abstract class SpeculativeReaderTest<T, TReader> : LookaheadReaderTest<T, TReader>
         where TReader : ISpeculativeReader<T>
     {
+        protected void BaseTestPeekFromMark(TReader reader, T[] data)
+        {
+            reader.Mark();
+
+            reader.Skip(data.Length);
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                var dataItem = data[i];
+
+                var readerItem = reader.PeekFromMark(i);
+
+                Assert.Equal(dataItem, readerItem);
+            }
+
+            int index = 0;
+
+            foreach (var readerItem in reader.PeekFromMark(0, data.Length))
+            {
+                var dataItem = data[index++];
+
+                Assert.Equal(dataItem, readerItem);
+            }
+        }
     }
 
 
@@ -240,10 +264,10 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
         [Theory]
-        // [InlineData("", 2, 0)]
+        [InlineData("", 2, 0)]
         [InlineData("ABCD", 2, 2)]
-        // [InlineData("ABCDE", 4, 4)]
-        // [InlineData("ABCDE", 6, 5)]
+        [InlineData("ABCDE", 4, 4)]
+        [InlineData("ABCDE", 6, 5)]
         public void TestPeekEnumerable(string data, int lookahead, int chunkSize)
         {
             var codes = data.ToCodePointArray();
@@ -348,6 +372,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public void TestSkip(string data, int skipInterval)
         {
             var codes = data.ToCodePointArray();
+
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
 
@@ -357,6 +382,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         public void TestReadEnumerable(string data)
         {
             var codes = data.ToCodePointArray();
+
             BaseTestReadEnumerable(GetReader(codes), codes);
         }
 
@@ -408,6 +434,19 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             var reader = GetReader(codes);
 
             BaseTestPeekEnumerable(reader, codes, lookahead);
+        }
+
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("ABCDE")]
+        public void TestPeekFromMark(string data)
+        {
+            var codes = data.ToCodePointArray();
+
+            var reader = GetReader(codes);
+            
+            BaseTestPeekFromMark(reader, codes);
         }
     }
 }
