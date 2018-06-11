@@ -32,13 +32,25 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         {
             foreach (var operation in this)
             {
-                if (operation.Perform(state, tracer) == returnWhenResult)
+                var result = operation.Perform(state, tracer);
+
+                OnOperationPeformed(operation, state, tracer, result);
+
+                if (result == returnWhenResult)
                 {
+                    OnCompletion(returnWhenResult);
+
                     return returnWhenResult;
                 }
             }
 
+            OnCompletion(!returnWhenResult);
+
             return !returnWhenResult;
         }
+
+        protected virtual void OnOperationPeformed(IOperation<TState> operation, TState state, IOperationTracer<TState> tracer, bool result) { }
+
+        protected virtual void OnCompletion(bool success) { }
     }
 }

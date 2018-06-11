@@ -38,7 +38,7 @@ namespace _Console
             {
                 state.Mark();
 
-                var success = operation.Perform(state, tracer);
+                var success = Operation.Perform(state, tracer);
 
                 if (success)
                 {

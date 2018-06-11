@@ -21,6 +21,6 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public override string Description => description ?? "NestedAction";
 
-        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => action(operation, state, tracer);
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => action(Operation, state, tracer);
     }
 }

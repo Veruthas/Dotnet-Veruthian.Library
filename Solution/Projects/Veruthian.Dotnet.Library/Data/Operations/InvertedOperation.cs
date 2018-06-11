@@ -8,7 +8,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         public override string Description => "Invert";
 
-        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => !operation.Perform(state, tracer);
+        protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null) => !Operation.Perform(state, tracer);
         
     }
 }
