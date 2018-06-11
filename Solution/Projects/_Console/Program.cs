@@ -69,14 +69,12 @@ namespace _Console
 
             var whitespace = new MatchInSetOperation<CodePoint, ISpeculativeReader<CodePoint>>(whitespaceSet);
 
-            var repeatespace = new RepeatedOperation<ISpeculativeReader<CodePoint>>(whitespace);
-
             var matcher = new Marker<ISpeculativeReader<CodePoint>>(repeatletters);
 
-            
-            var seq = new VariableSequentialOperation<ISpeculativeReader<CodePoint>>(SequenceType.AllOf, repeatespace, matcher, repeatespace);
 
-            var op = new RepeatedOperation<ISpeculativeReader<CodePoint>>(seq);
+            
+
+            var op = whitespace.Repeat().And(matcher).And(whitespace.Repeat()).Repeat();
 
             op.Perform("Hello world my name is Levi Minkoff".ToCodePoints().GetSpeculativeReader());
 

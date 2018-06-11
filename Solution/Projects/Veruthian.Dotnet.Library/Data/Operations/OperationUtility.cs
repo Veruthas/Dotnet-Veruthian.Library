@@ -99,5 +99,45 @@ namespace Veruthian.Dotnet.Library.Data.Operations
                 return index;
             }
         }
+
+        public static RepeatedOperation<TState> Repeat<TState>(this IOperation<TState> operation, int minimum = 0, int maximum = 0)
+        {
+            return new RepeatedOperation<TState>(operation, minimum, maximum);
+        }
+
+        public static OptionalOperation<TState> MakeOptional<TState>(this IOperation<TState> operation)
+        {
+            return new OptionalOperation<TState>(operation);
+        }
+
+        public static VariableSequentialOperation<TState> And<TState>(this IOperation<TState> first, IOperation<TState> follow)
+        {
+            return new VariableSequentialOperation<TState>(SequenceType.AllOf, first, follow);
+        }
+
+        public static VariableSequentialOperation<TState> And<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
+        {
+            return sequence.Add(follow);
+        }
+
+        public static VariableSequentialOperation<TState> AndSelf<TState>(this VariableSequentialOperation<TState> sequence)
+        {
+            return sequence.AddSelf();
+        }
+
+        public static VariableSequentialOperation<TState> Or<TState>(this IOperation<TState> first, IOperation<TState> follow)
+        {
+            return new VariableSequentialOperation<TState>(SequenceType.AnyOf, first, follow);
+        }
+
+        public static VariableSequentialOperation<TState> Or<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
+        {
+            return sequence.Add(follow);
+        }
+
+        public static VariableSequentialOperation<TState> OrSelf<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
+        {
+            return sequence.Add(follow);
+        }
     }
 }
