@@ -68,7 +68,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             for (int i = index; i < index + amount; i++)
             {
                 if (i < Size || includeEnd)
-                    yield return RawPeekByIndex(index);
+                    yield return RawPeekByIndex(i);
                 else
                     yield break;
             }
