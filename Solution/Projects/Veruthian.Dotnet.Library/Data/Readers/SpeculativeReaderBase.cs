@@ -42,11 +42,11 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
             var mark = marks.Peek();
 
-            int actualIndex = mark.Index + lookahead;
+            int index = mark.Index + lookahead;
 
-            EnsureIndex(actualIndex);
+            EnsureIndex(index);
 
-            var item = RawPeekByIndex(actualIndex);
+            var item = RawPeekByIndex(index);
 
             return item;
         }
