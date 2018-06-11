@@ -44,7 +44,7 @@ namespace _Console
                 {
                     var str = new CodeString(state.PeekFromMark(0, state.Position - state.MarkPosition));
 
-                    Console.WriteLine(str);
+                    Console.WriteLine(str.ToString().ToUpper());
 
                     state.Commit();
 
@@ -61,8 +61,10 @@ namespace _Console
         {
             var letterSet = RangeSet<CodePoint>.Union(RangeSet<CodePoint>.Range('A', 'Z'), RangeSet<CodePoint>.Range('a', 'z'));
 
-            var whitespaceSet = RangeSet<CodePoint>.List(' ', '\t');
+            var whitespaceSet = RangeSet<CodePoint>.List(' ', '\t', '.');
 
+
+            
             var letters = new MatchInSetOperation<CodePoint, ISpeculativeReader<CodePoint>>(letterSet);
 
             var repeatletters = new RepeatedOperation<ISpeculativeReader<CodePoint>>(letters, 1);
@@ -76,7 +78,7 @@ namespace _Console
 
             var op = whitespace.Repeat().And(matcher).And(whitespace.Repeat()).Repeat();
 
-            op.Perform("Hello world my name is Levi Minkoff".ToCodePoints().GetSpeculativeReader());
+            op.Perform("Hello world\t\t my . .name is Levi Minkoff".ToCodePoints().GetSpeculativeReader());
 
 
             Pause();

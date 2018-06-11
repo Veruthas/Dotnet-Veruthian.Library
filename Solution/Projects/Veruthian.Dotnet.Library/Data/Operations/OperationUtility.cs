@@ -25,7 +25,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             result.Append(Operation.ToString());
             result.Append('(');
 
-            IndicesToString(result, separator, before, after);;
+            IndicesToString(result, separator, before, after); ;
 
             result.Append(')');
 
@@ -110,34 +110,14 @@ namespace Veruthian.Dotnet.Library.Data.Operations
             return new OptionalOperation<TState>(operation);
         }
 
-        public static VariableSequentialOperation<TState> And<TState>(this IOperation<TState> first, IOperation<TState> follow)
+        public static AnyOfSequenceOperation<TState> Or<TState>(this IOperation<TState> first, IOperation<TState> follow)
         {
-            return new VariableSequentialOperation<TState>(SequenceType.AllOf, first, follow);
+            return new AnyOfSequenceOperation<TState>(first, follow);
         }
 
-        public static VariableSequentialOperation<TState> And<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
+        public static AllOfSequenceOperation<TState> And<TState>(this IOperation<TState> first, IOperation<TState> follow)
         {
-            return sequence.Add(follow);
-        }
-
-        public static VariableSequentialOperation<TState> AndSelf<TState>(this VariableSequentialOperation<TState> sequence)
-        {
-            return sequence.AddSelf();
-        }
-
-        public static VariableSequentialOperation<TState> Or<TState>(this IOperation<TState> first, IOperation<TState> follow)
-        {
-            return new VariableSequentialOperation<TState>(SequenceType.AnyOf, first, follow);
-        }
-
-        public static VariableSequentialOperation<TState> Or<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
-        {
-            return sequence.Add(follow);
-        }
-
-        public static VariableSequentialOperation<TState> OrSelf<TState>(this VariableSequentialOperation<TState> sequence, IOperation<TState> follow)
-        {
-            return sequence.Add(follow);
+            return new AllOfSequenceOperation<TState>(first, follow);
         }
     }
 }
