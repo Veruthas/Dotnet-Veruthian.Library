@@ -10,7 +10,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
         
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            operation.Perform(state, tracer);
+            Operation.Perform(state, tracer);
 
             return true;
         }

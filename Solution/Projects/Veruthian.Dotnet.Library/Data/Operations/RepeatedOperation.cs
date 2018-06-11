@@ -43,7 +43,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
             while (true)
             {
-                var result = operation.Perform(state, tracer);
+                var result = Operation.Perform(state, tracer);
 
                 if (result)
                 {
