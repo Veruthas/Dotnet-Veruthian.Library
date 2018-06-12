@@ -22,7 +22,7 @@ namespace Veruthian.Dotnet.Library.Data.Operations
 
         private static IOperation<object> Increment(int until)
         {
-            return new ActionOperation<object>(
+            return new DynamicOperation<object>(
                 (o) =>
                 {
                     var data = (Boxed<int>)o;
