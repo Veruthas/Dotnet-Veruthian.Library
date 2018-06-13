@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Veruthian.Dotnet.Library.Data.Patterns
 {
     public interface IPatternNode<TNode, TType> : IEnumerable<TNode>
