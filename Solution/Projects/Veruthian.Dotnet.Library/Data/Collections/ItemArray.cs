@@ -76,19 +76,31 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public T[] ToArray() => (T[])items.Clone();
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
+
+        IEnumerable<int> ILookup<int, T>.Keys
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                for (int i = 0; i < Count; i++)
+                    yield return i;
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerable<T> ILookup<int, T>.Values => Values;
+
+        private IEnumerable<T> Values
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                foreach (var item in items)
+                    yield return item;
+            }
         }
 
-        IEnumerable<int> ILookup<int, T>.Keys => throw new System.NotImplementedException();
-
-        IEnumerable<T> ILookup<int, T>.Values => throw new System.NotImplementedException();
+        bool ILookup<int, T>.HasKey(int index) => index > 0 && index < Count;
 
         public IEnumerable<KeyValuePair<int, T>> Pairs => throw new System.NotImplementedException();
 

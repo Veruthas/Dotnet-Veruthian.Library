@@ -14,6 +14,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         IEnumerable<KeyValuePair<TKey, TValue>> Pairs { get; }
 
+        bool HasKey(TKey key);
+        
         bool TryGet(TKey key, out TValue value);
     }
 }
