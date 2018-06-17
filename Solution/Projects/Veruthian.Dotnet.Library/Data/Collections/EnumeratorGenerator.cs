@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Veruthian.Dotnet.Library.Data.Enumeration
+namespace Veruthian.Dotnet.Library.Data.Collections
 {
     public class EnumeratorGenerator<T, TEnumerator> : IEnumerable<T>
         where TEnumerator : IEnumerator<T>

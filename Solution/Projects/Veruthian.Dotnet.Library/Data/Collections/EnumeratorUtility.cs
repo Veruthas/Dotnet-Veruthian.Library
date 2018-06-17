@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Veruthian.Dotnet.Library.Data.Enumeration
+namespace Veruthian.Dotnet.Library.Data.Collections
 {
     public static class EnumeratorUtility
     {
