@@ -103,6 +103,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
+        bool ILookup<int, T>.HasKey(int index) => index > 0 && index < Count;
+
         public static implicit operator ItemList<T>(List<T> items) => new ItemList<T>(items);
     }
 }
