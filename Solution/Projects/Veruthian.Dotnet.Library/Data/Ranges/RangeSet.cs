@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 
 namespace Veruthian.Dotnet.Library.Data.Ranges
 {

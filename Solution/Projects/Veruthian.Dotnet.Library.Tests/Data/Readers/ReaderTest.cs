@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Text.Code;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Dotnet.Library.Data;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {
