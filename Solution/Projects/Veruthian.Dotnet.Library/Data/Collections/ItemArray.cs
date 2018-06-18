@@ -45,9 +45,11 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public int Count => items.Length;
 
+        public bool HasKey(int index) => index >= 0 && index < Count;
+
         public bool TryGet(int index, out T value)
         {
-            if (index > 0 && index <= items.Length)
+            if (HasKey(index))
             {
                 value = items[index];
 
@@ -100,7 +102,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        bool ILookup<int, T>.HasKey(int index) => index > 0 && index < Count;
 
         public IEnumerable<KeyValuePair<int, T>> Pairs => throw new System.NotImplementedException();
 
