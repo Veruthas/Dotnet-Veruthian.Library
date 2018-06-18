@@ -48,13 +48,14 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public void Insert(int index, T value) => items.Insert(index, value);
 
-        public void Remove(T value) => items.Remove(value);
+        public void Remove(int index) => items.RemoveAt(index);
 
-        public void RemoveBy(int index) => items.RemoveAt(index);
+
+        public bool HasKey(int index) => index >= 0 && index < Count;
 
         public bool TryGet(int index, out T value)
         {
-            if (index > 0 && index < Count)
+            if (HasKey(index))
             {
                 value = items[index];
                 return true;
@@ -103,7 +104,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        bool ILookup<int, T>.HasKey(int index) => index > 0 && index < Count;
 
         public static implicit operator ItemList<T>(List<T> items) => new ItemList<T>(items);
     }

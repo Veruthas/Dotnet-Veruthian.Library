@@ -4,9 +4,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         void Insert(TKey key, TValue value);
 
-        void RemoveBy(TKey key);
-
-        void Remove(TValue value);
+        void Remove(TKey key);
 
         void Clear();
     }
