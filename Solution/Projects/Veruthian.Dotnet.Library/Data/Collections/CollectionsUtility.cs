@@ -54,20 +54,19 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
 
         // To Item Array
-        public static ItemArray<T> ToItemArray<T>(this T[] items) => new ItemArray<T>(items);
+        public static ItemArray<T> ToItemArray<T>(this T[] items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
 
+        public static ItemArray<T> ToItemArray<T>(this IEnumerable<T> items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
 
-        public static ItemArray<T> ToItemArray<T>(this IEnumerable<T> items) => new ItemArray<T>(items);
+        public static ItemArray<T> ToItemArray<T>(this ILookup<int, T> items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
 
+        public static ItemList<T> ToItemList<T>(this T[] items, bool defaultable = false) => new ItemList<T>(defaultable, items);
 
-        public static ItemArray<T> ToItemArray<T>(this ILookup<int, T> items) => new ItemArray<T>(items);
+        public static ItemList<T> ToItemList<T>(this IEnumerable<T> items, bool defaultable = false) => new ItemList<T>(defaultable, items);
 
+        public static ItemList<T> ToItemList<T>(this ILookup<int, T> items, bool defaultable = false) => new ItemList<T>(defaultable, items);
 
-
-        // Repeat
-        public static ItemArray<T> RepeatAsItemArray<T>(this T item, int repeated = 1) => new ItemArray<T>(item, repeated);
-
-
+        // Repeat        
         public static T[] RepeatAsArray<T>(this T value, int times = 1)
         {
             var items = new T[times];
@@ -83,6 +82,11 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             for (int i = 0; i < times; i++)
                 yield return value;
         }
+
+        public static ItemArray<T> RepeatAsItemArray<T>(this T item, int repeated = 1) => new ItemArray<T>(item, repeated);
+
+        public static ItemList<T> RepeatAsItemList<T>(this T item, int repeated = 1) => new ItemList<T>(item, repeated);
+
 
 
         // Add to Lookup
