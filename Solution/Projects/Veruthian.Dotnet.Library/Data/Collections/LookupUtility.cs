@@ -8,22 +8,15 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public static ItemArray<T> ToItemArray<T>(this T[] items) => new ItemArray<T>(items);
 
-        public static ItemList<T> ToItemList<T>(this T[] items) => new ItemList<T>(items);
-
 
         public static ItemArray<T> ToItemArray<T>(this IEnumerable<T> items) => new ItemArray<T>(items);
-
-        public static ItemList<T> ToItemList<T>(this IEnumerable<T> items) => new ItemList<T>(items);
 
 
         public static ItemArray<T> ToItemArray<T>(this ILookup<int, T> items) => new ItemArray<T>(items);
 
-        public static ItemList<T> ToItemList<T>(this ILookup<int, T> items) => new ItemList<T>(items);
-
 
         public static ItemArray<T> RepeatAsItemArray<T>(this T item, int repeated = 1) => new ItemArray<T>(item, repeated);
 
-        public static ItemList<T> RepeatAsItemList<T>(this T item, int repeated = 1) => new ItemList<T>(item, repeated);
 
 
         public static T[] ToArray<T>(this ILookup<int, T> items)
