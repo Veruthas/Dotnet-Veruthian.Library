@@ -2,31 +2,51 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public class ItemNestedLookup<TKey, TValue, TUpperLookup, TLowerLookup> : IResizeableLookup<TKey, TValue>
-        where TUpperLookup : ILookup<TKey, TValue>
-        where TLowerLookup : IResizeableLookup<TKey, TValue>
+    public class ItemNestedLookup<TKey, TValue, TUpper, TLower> : IResizeableLookup<TKey, TValue>
+        where TUpper : ILookup<TKey, TValue>
+        where TLower : IResizeableLookup<TKey, TValue>
     {
 
-        TUpperLookup upper;
+        TUpper upper;
 
-        TLowerLookup lower;
+        TLower lower;
+
+        bool defaultable;
+
+        public ItemNestedLookup(TUpper upper, TLower lower) : this(false, upper, lower) { }
+
+        public ItemNestedLookup(bool defaultable, TUpper upper, TLower lower)
+        {
+            this.defaultable = defaultable;
+
+            this.upper = upper;
+
+            this.lower = lower;
+        }
 
 
-        TUpperLookup UpperLookup => upper;
+        TUpper UpperLookup => upper;
 
-        TLowerLookup LowerLookup => lower;
+        TLower LowerLookup => lower;
 
 
 
         public TValue this[TKey key]
         {
-            get => TryGet(key, out var value) ? value : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
-            set => lower[key] = value;
+            get => TryGet(key, out var value) ? value : defaultable ? default(TValue) : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
+            set
+            {
+                if (HasKey(key))
+                    lower[key] = value;
+                else
+                    throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not defined."); ;
+            }
+
         }
 
         TValue ILookup<TKey, TValue>.this[TKey key] => this[key];
 
-        public bool IsDefaultable => false;
+        public bool IsDefaultable => defaultable;
 
         public int Count
         {
@@ -53,7 +73,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        
+
         public IEnumerable<TKey> Keys
         {
             get

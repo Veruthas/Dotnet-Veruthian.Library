@@ -8,13 +8,24 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         TSequence sequence;
 
+        bool defaultable;
+
+
         public ItemSequentialLookup(TSequence sequence) => this.sequence = sequence;
+
+
+        public ItemSequentialLookup(bool defaultable, TSequence sequence)
+        {
+            this.defaultable = defaultable;
+
+            this.sequence = sequence;
+        }
 
 
         public TSequence Sequence => sequence;
 
 
-        public TValue this[TKey key] => TryGet(key, out var value) ? value : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
+        public TValue this[TKey key] => TryGet(key, out var value) ? value : defaultable ? default(TValue) : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
 
         public bool IsDefaultable => false;
 
@@ -26,9 +37,9 @@ namespace Veruthian.Dotnet.Library.Data.Collections
                 {
                     var keys = new HashSet<TKey>();
 
-                    foreach(var lookup in sequence.Values)
+                    foreach (var lookup in sequence.Values)
                     {
-                        foreach( var key in lookup.Keys)
+                        foreach (var key in lookup.Keys)
                         {
                             if (!keys.Contains(key))
                                 keys.Add(key);

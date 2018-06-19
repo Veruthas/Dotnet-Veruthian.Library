@@ -23,7 +23,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        public bool IsDefaultable => false;
+        public bool IsDefaultable => lookup.IsDefaultable;
         
         public int Count => count;
 
