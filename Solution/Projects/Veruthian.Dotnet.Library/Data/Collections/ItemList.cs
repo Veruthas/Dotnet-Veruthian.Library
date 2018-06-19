@@ -1,88 +1,118 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public class ItemList<T> : IResizeableLookup<int, T>, IEnumerable<T>
+    public class ItemList<T> : ItemArrayBase<T>, IResizeableLookup<int, T>
     {
-        List<T> items;
+        const int smallest = 4;
 
-        bool defaultable;
+        protected int count;
 
 
+        public ItemList() : base(new T[smallest], false) { }
 
-        public T this[int index]
+        public ItemList(int capacity) : base(new T[capacity], false) { }
+
+        public ItemList(params T[] items) : base(items, false) { }
+
+        public ItemList(IEnumerable<T> items) : base(items.ToArray(), false) { }
+
+        public ItemList(ILookup<int, T> items) : base(items.ToArray(), false) { }
+
+        public ItemList(T item, int repeat) : base(item.RepeatAsArray(repeat), false) { }
+
+
+        public ItemList(bool defaultable) : base(new T[0], defaultable) { }
+
+        public ItemList(bool defaultable, int capacity) : base(new T[capacity], defaultable) { }
+
+        public ItemList(bool defaultable, params T[] items) : base(items, defaultable) { }
+
+        public ItemList(bool defaultable, IEnumerable<T> items) : base(items.ToArray(), defaultable) { }
+
+        public ItemList(bool defaultable, ILookup<int, T> items) : base(items.ToArray(), defaultable) { }
+
+        public ItemList(bool defaultable, T item, int repeat) : base(item.RepeatAsArray(repeat), defaultable) { }
+
+
+        public sealed override int Count => count;
+
+        public void Add(T value)
         {
-            get => items[index];
-            set => items[index] = value;
+            if (count == items.Length)
+                Resize();
+
+            items[count++] = value;
         }
 
-        T ILookup<int, T>.this[int index] => items[index];
 
-
-        public bool IsDefaultable => defaultable;
-        
-        public int Count => items.Count;
-
-        
-
-        public void Clear() => items.Clear();
-
-        public void Insert(int index, T value) => items.Insert(index, value);
-
-        public void Remove(int index) => items.RemoveAt(index);
-
-
-        public bool HasKey(int index) => index >= 0 && index < Count;
-
-        public bool TryGet(int index, out T value)
+        public void Insert(int index, T value)
         {
-            if (HasKey(index))
+            VerifyIndex(index);
+
+            if (count == items.Length)
+                Resize();
+
+            if (index == count)
             {
-                value = items[index];
-                return true;
+                items[count++] = value;
             }
             else
             {
-                value = default(T);
-                return false;
+                Array.Copy(items, index, items, index + 1, count - index);
+
+                items[index] = value;
+
+                count++;
             }
         }
 
-
-        public List<T> ToList() => new List<T>(items);
-
-
-        public IEnumerator<T> GetEnumerator()
+        public void Remove(int index)
         {
-            return ((IEnumerable<T>)items).GetEnumerator();
-        }
+            VerifyIndex(index);
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<T>)items).GetEnumerator();
-        }
-
-        IEnumerable<int> ILookup<int, T>.Keys
-        {
-            get
+            if (index == count - 1)
             {
-                for (int i = 0; i < Count; i++)
-                    yield return i;
+                items[index] = default(T);
+                count--;
+            }
+            else
+            {
+                Array.Copy(items, index + 1, items, index, count - index - 1);
+
+                items[count--] = default(T);
             }
         }
 
-        IEnumerable<T> ILookup<int, T>.Values => items;
-
-        public IEnumerable<KeyValuePair<int, T>> Pairs
+        private void VerifyIndex(int index)
         {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return new KeyValuePair<int, T>(i, items[i]);
+            if (index < 0 || index >= count)
+                throw new IndexOutOfRangeException();
+        }
 
-            }
+        // Enforce power of two?
+        private void Resize()
+        {
+            int size = smallest;
+
+            while (size <= count)
+                size <<= 1;
+
+            T[] newItems = new T[size];
+
+            Array.Copy(this.items, newItems, count);
+
+            this.items = newItems;
+        }
+
+        public void Clear()
+        {
+            Array.Clear(items, 0, items.Length);
+
+            count = 0;
         }
     }
 }

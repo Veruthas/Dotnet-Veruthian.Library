@@ -35,7 +35,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public bool IsDefaultable => defaultable;
 
-        public virtual int Count => items.Length;
+        public abstract int Count { get; }
 
         public bool HasKey(int index) => index >= 0 && index < Count;
 

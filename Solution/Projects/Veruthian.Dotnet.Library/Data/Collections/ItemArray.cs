@@ -30,5 +30,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public ItemArray(bool defaultable, T item, int repeat) : base(item.RepeatAsArray(repeat), defaultable) { }
 
+
+        public sealed override int Count => items.Length;
     }
 }
