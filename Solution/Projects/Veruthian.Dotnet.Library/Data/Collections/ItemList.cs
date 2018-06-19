@@ -8,29 +8,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         List<T> items;
 
-        public ItemList() => this.items = new List<T>();
+        bool defaultable;
 
-        public ItemList(params T[] items) => this.items = items.ToList();
-
-        public ItemList(IEnumerable<T> items) => this.items = items.ToList();
-
-        public ItemList(ILookup<int, T> items)
-        {
-            this.items = new List<T>(items.Count);
-
-            for (int i = 0; i < items.Count; i++)
-                this.items.Add(items[i]);
-        }
-
-        public ItemList(int capacity) => this.items = new List<T>(capacity);
-
-        public ItemList(T item, int repeated)
-        {
-            this.items = new List<T>(repeated);
-
-            for (int i = 0; i < repeated; i++)
-                this.items.Add(item);
-        }
 
 
         public T this[int index]
@@ -42,7 +21,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         T ILookup<int, T>.this[int index] => items[index];
 
 
-        public bool IsDefaultable => false;
+        public bool IsDefaultable => defaultable;
         
         public int Count => items.Count;
 
@@ -71,8 +50,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-
-        public List<T> InternalList() => items;
 
         public List<T> ToList() => new List<T>(items);
 
@@ -107,8 +84,5 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
             }
         }
-
-
-        public static implicit operator ItemList<T>(List<T> items) => new ItemList<T>(items);
     }
 }

@@ -84,8 +84,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-
-
         public ItemArray<T> Resize(int newSize)
         {
             T[] newItems = new T[newSize];
@@ -118,13 +116,20 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         {
             get
             {
-                foreach (var item in items)
-                    yield return item;
+                for (int i = 0; i < Count; i++)
+                    yield return items[i];
             }
         }
 
 
-        public IEnumerable<KeyValuePair<int, T>> Pairs => throw new System.NotImplementedException();
+        public IEnumerable<KeyValuePair<int, T>> Pairs
+        {
+            get
+            {
+                for (int i = 0; i < Count; i++)
+                    yield return new KeyValuePair<int, T>(i, items[i]);
+            }
+        }
 
 
         public static implicit operator ItemArray<T>(T[] array) => new ItemArray<T>(array);
