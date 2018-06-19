@@ -12,30 +12,18 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         protected int count;
 
 
-        public ItemList() : base(new T[smallest], false) { }
+        public ItemList() : base(new T[smallest]) { }
 
-        public ItemList(int capacity) : base(new T[capacity], false) { }
+        public ItemList(int capacity) : base(new T[capacity]) { }
 
-        public ItemList(params T[] items) : base(items, false) { }
+        public ItemList(params T[] items) : base(items) => count = items.Length;
 
-        public ItemList(IEnumerable<T> items) : base(items.ToArray(), false) { }
+        public ItemList(IEnumerable<T> items) : base(items.ToArray()) => count = this.items.Length;
 
-        public ItemList(ILookup<int, T> items) : base(items.ToArray(), false) { }
+        public ItemList(ILookup<int, T> items) : base(items.ToArray()) => count = items.Count;
 
-        public ItemList(T item, int repeat) : base(item.RepeatAsArray(repeat), false) { }
+        public ItemList(T item, int repeat) : base(item.RepeatAsArray(repeat)) => count = repeat;
 
-
-        public ItemList(bool defaultable) : base(new T[0], defaultable) { }
-
-        public ItemList(bool defaultable, int capacity) : base(new T[capacity], defaultable) { }
-
-        public ItemList(bool defaultable, params T[] items) : base(items, defaultable) { }
-
-        public ItemList(bool defaultable, IEnumerable<T> items) : base(items.ToArray(), defaultable) { }
-
-        public ItemList(bool defaultable, ILookup<int, T> items) : base(items.ToArray(), defaultable) { }
-
-        public ItemList(bool defaultable, T item, int repeat) : base(item.RepeatAsArray(repeat), defaultable) { }
 
 
         public sealed override int Count => count;
@@ -96,16 +84,23 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         // Enforce power of two?
         private void Resize()
         {
-            int size = smallest;
-
-            while (size <= count)
-                size <<= 1;
+            int size = GetNewSize(count);
 
             T[] newItems = new T[size];
 
             Array.Copy(this.items, newItems, count);
 
             this.items = newItems;
+        }
+
+        private static int GetNewSize(int oldSize)
+        {
+            int newSize = smallest;
+
+            while (newSize <= oldSize)
+                newSize <<= 1;
+
+            return newSize;
         }
 
         public void Clear()
