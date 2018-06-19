@@ -13,6 +13,16 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         int count;
 
 
+        public ItemSpan(ILookup<int, T> lookup, int start, int count)
+        {
+            this.lookup = lookup;
+            
+            this.start = start;
+            
+            this.count = count;
+        }
+
+
         public T this[int index]
         {
             get
@@ -23,8 +33,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        public bool IsDefaultable => lookup.IsDefaultable;
-        
         public int Count => count;
 
         IEnumerable<int> ILookup<int, T>.Keys

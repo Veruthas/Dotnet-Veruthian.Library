@@ -11,17 +11,15 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         protected bool defaultable;
 
-        protected ItemArrayBase(T[] items, bool defaultable)
+        protected ItemArrayBase(T[] items)
         {
             this.items = items;
-
-            this.defaultable = defaultable;
         }
 
 
         public T this[int index]
         {
-            get => HasKey(index) ? items[index] : defaultable ? default(T) : throw new IndexOutOfRangeException();
+            get => HasKey(index) ? items[index] : throw new IndexOutOfRangeException();
             set
             {
                 if (HasKey(index))
@@ -32,8 +30,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         }
 
         T ILookup<int, T>.this[int index] => this[index];
-
-        public bool IsDefaultable => defaultable;
 
         public abstract int Count { get; }
 

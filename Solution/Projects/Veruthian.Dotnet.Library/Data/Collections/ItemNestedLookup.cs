@@ -11,19 +11,13 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         TLower lower;
 
-        bool defaultable;
 
-        public ItemNestedLookup(TUpper upper, TLower lower) : this(false, upper, lower) { }
-
-        public ItemNestedLookup(bool defaultable, TUpper upper, TLower lower)
+        public ItemNestedLookup(TUpper upper, TLower lower)
         {
-            this.defaultable = defaultable;
-
             this.upper = upper;
 
             this.lower = lower;
         }
-
 
         TUpper UpperLookup => upper;
 
@@ -33,7 +27,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public TValue this[TKey key]
         {
-            get => TryGet(key, out var value) ? value : defaultable ? default(TValue) : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
+            get => TryGet(key, out var value) ? value : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
             set
             {
                 if (HasKey(key))
@@ -46,7 +40,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         TValue ILookup<TKey, TValue>.this[TKey key] => this[key];
 
-        public bool IsDefaultable => defaultable;
 
         public int Count
         {

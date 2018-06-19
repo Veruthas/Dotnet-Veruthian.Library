@@ -6,8 +6,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         TValue this[TKey key] { get; }
 
-        bool IsDefaultable { get; }
-
         int Count { get; }
 
         IEnumerable<TKey> Keys { get; }

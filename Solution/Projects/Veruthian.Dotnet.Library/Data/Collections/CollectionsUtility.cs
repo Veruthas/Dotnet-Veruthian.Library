@@ -54,17 +54,17 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
 
         // To Item Array
-        public static ItemArray<T> ToItemArray<T>(this T[] items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
+        public static ItemArray<T> ToItemArray<T>(this T[] items) => new ItemArray<T>(items);
 
-        public static ItemArray<T> ToItemArray<T>(this IEnumerable<T> items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
+        public static ItemArray<T> ToItemArray<T>(this IEnumerable<T> items) => new ItemArray<T>(items);
 
-        public static ItemArray<T> ToItemArray<T>(this ILookup<int, T> items, bool defaultable = false) => new ItemArray<T>(defaultable, items);
+        public static ItemArray<T> ToItemArray<T>(this ILookup<int, T> items) => new ItemArray<T>(items);
 
-        public static ItemList<T> ToItemList<T>(this T[] items, bool defaultable = false) => new ItemList<T>(defaultable, items);
+        public static ItemList<T> ToItemList<T>(this T[] items) => new ItemList<T>(items);
 
-        public static ItemList<T> ToItemList<T>(this IEnumerable<T> items, bool defaultable = false) => new ItemList<T>(defaultable, items);
+        public static ItemList<T> ToItemList<T>(this IEnumerable<T> items) => new ItemList<T>(items);
 
-        public static ItemList<T> ToItemList<T>(this ILookup<int, T> items, bool defaultable = false) => new ItemList<T>(defaultable, items);
+        public static ItemList<T> ToItemList<T>(this ILookup<int, T> items) => new ItemList<T>(items);
 
         // Repeat        
         public static T[] RepeatAsArray<T>(this T value, int times = 1)
