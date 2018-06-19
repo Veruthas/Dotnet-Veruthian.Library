@@ -16,6 +16,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public TValue this[TKey key] => TryGet(key, out var value) ? value : throw new KeyNotFoundException($"{key?.ToString() ?? ""} is not define.");
 
+        public bool IsDefaultable => false;
+
         public int Count
         {
             get
@@ -63,7 +65,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-
         public IEnumerable<TValue> Values
         {
             get
@@ -87,7 +88,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-
         public IEnumerable<KeyValuePair<TKey, TValue>> Pairs
         {
             get
@@ -110,7 +110,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
                 }
             }
         }
-
 
         public bool HasKey(TKey key)
         {

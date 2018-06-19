@@ -9,41 +9,62 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         T[] items;
 
-        public ItemArray() => this.items = new T[0];
+        bool defaultable;
 
-        public ItemArray(params T[] items) => this.items = items;
-
-        public ItemArray(IEnumerable<T> items) => this.items = items.ToArray();
-
-        public ItemArray(ILookup<int, T> items)
+        protected ItemArray(T[] items, bool defaultable)
         {
-            this.items = new T[items.Count];
+            this.items = items;
 
-            for (int i = 0; i < items.Count; i++)
-                this.items[i] = items[i];
+            this.defaultable = defaultable;
         }
 
-        public ItemArray(int size) => this.items = new T[size];
 
-        public ItemArray(T item, int repeated)
-        {
-            this.items = new T[repeated];
+        public ItemArray() : this(new T[0], false) { }
 
-            for (int i = 0; i < items.Length; i++)
-                items[i] = item;
-        }
+        public ItemArray(int size) : this(new T[size], false) { }
+
+        public ItemArray(T item, int repeated) : this(item.RepeatAsArray(), false) { }
+
+        public ItemArray(params T[] items) : this(items, false) { }
+
+        public ItemArray(IEnumerable<T> items) : this(items.ToArray(), false) { }
+
+        public ItemArray(ILookup<int, T> items) : this(items.ToArray(), false) { }
+
+
+        public ItemArray(bool defaultable) : this(new T[0], defaultable) { }
+
+        public ItemArray(bool defaultable, int size) : this(new T[size], false) { }
+
+        public ItemArray(bool defaultable, T item, int repeated) : this(item.RepeatAsArray(), defaultable) { }
+
+        public ItemArray(bool defaultable, params T[] items) : this(items, defaultable) { }
+
+        public ItemArray(bool defaultable, IEnumerable<T> items) : this(items.ToArray(), defaultable) { }
+
+        public ItemArray(bool defaultable, ILookup<int, T> items) : this(items.ToArray(), defaultable) { }
+
+
 
 
         public T this[int index]
         {
-            get => items[index];
-            set => items[index] = value;
+            get => HasKey(index) ? items[index] : defaultable ? default(T) : throw new IndexOutOfRangeException();
+            set
+            {
+                if (HasKey(index))
+                    items[index] = value;
+                else
+                    throw new IndexOutOfRangeException();
+            }
         }
 
         T ILookup<int, T>.this[int index] => this[index];
 
+        public bool IsDefaultable => defaultable;
 
         public int Count => items.Length;
+
 
         public bool HasKey(int index) => index >= 0 && index < Count;
 

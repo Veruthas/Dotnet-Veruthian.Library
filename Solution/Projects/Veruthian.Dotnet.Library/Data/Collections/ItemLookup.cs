@@ -15,7 +15,10 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         TValue ILookup<TKey, TValue>.this[TKey key] => this[key];
 
+        public bool IsDefaultable => false;
+
         public int Count => items.Count;
+
 
         public IEnumerable<TKey> Keys => items.Keys;
 
