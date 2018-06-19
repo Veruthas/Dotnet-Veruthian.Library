@@ -41,8 +41,12 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         T ILookup<int, T>.this[int index] => items[index];
 
+
+        public bool IsDefaultable => false;
+        
         public int Count => items.Count;
 
+        
 
         public void Clear() => items.Clear();
 

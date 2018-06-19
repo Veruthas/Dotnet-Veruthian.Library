@@ -23,6 +23,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
+        public bool IsDefaultable => false;
+        
         public int Count => count;
 
         IEnumerable<int> ILookup<int, T>.Keys

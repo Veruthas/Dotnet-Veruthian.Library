@@ -26,6 +26,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         TValue ILookup<TKey, TValue>.this[TKey key] => this[key];
 
+        public bool IsDefaultable => false;
+
         public int Count
         {
             get
@@ -51,6 +53,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
+        
         public IEnumerable<TKey> Keys
         {
             get
