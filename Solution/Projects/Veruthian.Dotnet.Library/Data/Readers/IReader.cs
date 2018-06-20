@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public interface IReader<T> : IDisposable
+    public interface IReader<out T> : IDisposable
     {
         bool IsEnd { get; }
 
