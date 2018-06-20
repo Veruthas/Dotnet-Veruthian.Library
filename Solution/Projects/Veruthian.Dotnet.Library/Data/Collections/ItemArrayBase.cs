@@ -1,91 +1,44 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public abstract class ItemArrayBase<T> : ISettableLookup<int, T>, IEnumerable<T>
+    public abstract class ItemArrayBase<T> : ILookup<int, T>, IEnumerable<T>
     {
-        protected T[] items;
-
-        protected bool defaultable;
-
-        protected ItemArrayBase(T[] items)
-        {
-            this.items = items;
-        }
-
-
         public T this[int index]
         {
-            get => HasKey(index) ? items[index] : throw new IndexOutOfRangeException();
-            set
-            {
-                if (HasKey(index))
-                    items[index] = value;
-                else
-                    throw new IndexOutOfRangeException();
-            }
-        }
-
-        T ILookup<int, T>.this[int index] => this[index];
-
-        public abstract int Count { get; }
-
-        public bool HasKey(int index) => index >= 0 && index < Count;
-
-        public bool TryGet(int index, out T value)
-        {
-            if (HasKey(index))
-            {
-                value = items[index];
-
-                return true;
-            }
-            else
-            {
-                value = default(T);
-
-                return false;
-            }
+            get => TryGet(index, out T value) ? value : throw new IndexOutOfRangeException();            
         }
 
 
-        public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
+        public int Count => throw new System.NotImplementedException();
 
-        IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
 
-        IEnumerable<int> ILookup<int, T>.Keys
-        {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return i;
-            }
-        }
+        public bool IsValidIndex(int index) => index >= 0 && index < Count;
 
-        IEnumerable<T> ILookup<int, T>.Values
-        {
-            get => Values;
-        }
+        bool ILookup<int, T>.HasKey(int index) => IsValidIndex(index);
 
-        private IEnumerable<T> Values
-        {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return items[i];
-            }
-        }
+        public abstract bool Contains(T value);
 
-        public IEnumerable<KeyValuePair<int, T>> Pairs
-        {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return new KeyValuePair<int, T>(i, items[i]);
-            }
-        }
+        public abstract bool TryGet(int index, out T value);
+
+
+        IEnumerable<int> ILookup<int, T>.Keys => GetKeys();
+
+        IEnumerable<T> IContainer<T>.Values => GetValues();
+
+        public IEnumerable<KeyValuePair<int, T>> Pairs => GetPairs();
+
+        public IEnumerator<T> GetEnumerator() => GetValues().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetValues().GetEnumerator();
+
+
+        protected abstract IEnumerable<int> GetKeys();
+
+        protected abstract IEnumerable<T> GetValues();
+
+        protected abstract IEnumerable<KeyValuePair<int, T>> GetPairs();
     }
 }

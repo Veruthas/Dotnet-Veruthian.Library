@@ -2,15 +2,11 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public interface ILookup<TKey, TValue>
+    public interface ILookup<TKey, TValue> : IContainer<TValue>
     {
         TValue this[TKey key] { get; }
 
-        int Count { get; }
-
         IEnumerable<TKey> Keys { get; }
-
-        IEnumerable<TValue> Values { get; }
 
         IEnumerable<KeyValuePair<TKey, TValue>> Pairs { get; }
 
@@ -32,6 +28,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     // IExpandableContainer<T> => Add<T>, Remove<T>
 
     // ILookup<K, V> : IContainer<K> => Get<K, V>, TryGet<K, V>, Keys, Values, Pairs
-    // ISettableLookup<K, V> : ILookup<K, V> => Set<K, V>
+    // IMutableLookup<K, V> : ILookup<K, V> => Set<K, V>
     // IExpandableLookup<K, V> : ISettableLookup<K, V> => Insert<K, V>, Remove<K>
 }
