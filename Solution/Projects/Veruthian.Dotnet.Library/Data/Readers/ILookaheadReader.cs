@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public interface ILookaheadReader<T> : IReader<T>
+    public interface ILookaheadReader<out T> : IReader<T>
     {
         T Peek(int lookahead);
 

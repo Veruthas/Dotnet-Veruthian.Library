@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public interface ISpeculativeReader<T> : ILookaheadReader<T>
+    public interface ISpeculativeReader<out T> : ILookaheadReader<T>
     {
         bool IsSpeculating { get; }
 
