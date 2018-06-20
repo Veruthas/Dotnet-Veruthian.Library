@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -41,7 +42,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         }
 
 
-        // To Array
+        // Array extensions
         public static T[] ToArray<T>(this ILookup<int, T> items)
         {
             var array = new T[items.Count];
@@ -52,6 +53,14 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             return array;
         }
 
+        public static T[] Resize<T>(this T[] array, int newSize)
+        {
+            T[] newArray = new T[newSize];
+
+            Array.Copy(array, newArray, Math.Min(newSize, array.Length));
+
+            return newArray;
+        }
 
         // To Item Array
         public static ItemArray<T> ToItemArray<T>(this T[] items) => new ItemArray<T>(items);
@@ -89,7 +98,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
 
 
-        // Add to Lookup
+        // Lookup
         public static void Add<T>(this IResizeableLookup<int, T> lookup, T item) => lookup.Insert(lookup.Count, item);
     }
 }
