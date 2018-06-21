@@ -19,6 +19,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
         public int StartIndex => startIndex;
 
+        public int EndIndex => startIndex + Count - 1;
 
         IEnumerable<int> ILookup<int, T>.Keys
         {

@@ -4,6 +4,8 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {
         int StartIndex { get; }
 
+        int EndIndex { get; }
+
         int? IndexOf(T value);
     }
 }
