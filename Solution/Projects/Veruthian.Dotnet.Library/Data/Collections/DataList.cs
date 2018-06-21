@@ -28,41 +28,30 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         public DataList(int startIndex, T item, int repeat) : base(startIndex) => this.items = item.RepeatAsList(repeat);
 
 
-        public override int Count => throw new System.NotImplementedException();
+        public override int Count => items.Count;
 
-        protected override T RawGet(int adjustedValidIndex)
-        {
-            throw new System.NotImplementedException();
-        }
 
-        protected override void RawSet(int adjustedValidIndex, T value)
-        {
-            throw new System.NotImplementedException();
-        }
+        protected override T RawGet(int adjustedValidIndex) => items[adjustedValidIndex];
 
-        public override void Add(T value)
-        {
-            throw new System.NotImplementedException();
-        }
+        protected override void RawSet(int adjustedValidIndex, T value) => items[adjustedValidIndex] = value;
 
-        public override void Clear()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public override void Insert(int key, T value)
-        {
-            throw new System.NotImplementedException();
-        }
+        public override void Add(T value) => items.Add(value);
 
-        public override bool Remove(T value)
-        {
-            throw new System.NotImplementedException();
-        }
+        void AddRange(IEnumerable<T> values) => items.AddRange(values);
 
-        public override void RemoveBy(int key)
-        {
-            throw new System.NotImplementedException();
-        }
+        public override void Insert(int index, T value) => items.Add(value);
+
+        void InsertRange(int index, IEnumerable<T> values) => items.InsertRange(index - StartIndex, values);
+
+
+        public override bool Remove(T value) => items.Remove(value);
+
+        public override void RemoveBy(int index) => items.RemoveAt(index - StartIndex);
+
+        void RemoveRange(int start, int count) => items.RemoveRange(start - StartIndex, count);
+
+
+        public override void Clear() => items.Clear();
     }
 }
