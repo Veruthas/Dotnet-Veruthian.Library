@@ -6,16 +6,16 @@ namespace Veruthian.Dotnet.Library.Data.Collections
     {        
         HashSet<T> items = new HashSet<T>();
 
-        public override int Count => items.Count;
+        public sealed override int Count => items.Count;
 
-        public override void Add(T value) => items.Add(value);
+        public sealed override void Add(T value) => items.Add(value);
 
-        public override bool Remove(T value) => items.Remove(value);
+        public sealed override bool Remove(T value) => items.Remove(value);
 
-        public override void Clear() => items.Clear();
+        public sealed override void Clear() => items.Clear();
 
-        public override bool Contains(T value) => items.Contains(value);
+        public sealed override bool Contains(T value) => items.Contains(value);
 
-        public override IEnumerable<T> Values => items;
+        public sealed override IEnumerable<T> Values => items;
     }
 }
