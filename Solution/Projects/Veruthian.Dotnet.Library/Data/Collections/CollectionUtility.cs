@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public static class LookupUtility
+    public static class CollectionUtility
     {
         // Stream Enumerator
         public static IEnumerator<byte> GetEnumerator(this Stream stream)
@@ -90,5 +90,5 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             for (int i = 0; i < times; i++)
                 yield return value;
         }
-    }
+    }    
 }
