@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public abstract class IMutableArrayBase<T> : ItemArrayBase<T>, IMutableLookup<int, T>
+    public abstract class ItemMutableArrayBase<T> : ItemArrayBase<T>, IMutableLookup<int, T>
     {
         public new T this[int key]
         {
@@ -13,9 +13,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             }
         }
 
-        public bool TrySet(int key, T value)
-        {
-            throw new System.NotImplementedException();
-        }
+        public abstract bool TrySet(int index, T value);
     }
 }

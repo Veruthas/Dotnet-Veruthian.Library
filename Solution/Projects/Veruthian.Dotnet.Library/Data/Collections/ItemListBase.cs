@@ -1,6 +1,6 @@
 namespace Veruthian.Dotnet.Library.Data.Collections
 {
-    public abstract class ItemListBase<T> : IMutableArrayBase<T>, IExpandableContainer<T>, IExpandableLookup<int, T>
+    public abstract class ItemListBase<T> : ItemMutableArrayBase<T>, IExpandableContainer<T>, IExpandableLookup<int, T>
     {
         public abstract void Add(T value);
 
