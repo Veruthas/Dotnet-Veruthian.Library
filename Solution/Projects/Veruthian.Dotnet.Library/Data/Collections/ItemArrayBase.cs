@@ -12,7 +12,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         }
 
 
-        public int Count => throw new System.NotImplementedException();
+        public abstract int Count { get; }
 
 
         public bool IsValidIndex(int index) => index >= 0 && index < Count;
@@ -36,7 +36,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
 
         protected abstract IEnumerable<int> GetKeys();
-
+        
         protected abstract IEnumerable<T> GetValues();
 
         protected abstract IEnumerable<KeyValuePair<int, T>> GetPairs();
