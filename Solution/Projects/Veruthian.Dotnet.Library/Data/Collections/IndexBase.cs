@@ -6,7 +6,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 {
     public abstract class IndexBase<T> : IIndex<T>, IEnumerable<T>
     {
-        readonly int startIndex;
+        protected int startIndex;
 
 
         protected IndexBase(int startIndex = 0) => this.startIndex = startIndex;
@@ -17,7 +17,11 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             get => TryGet(index, out var value) ? value : throw new IndexOutOfRangeException();
         }
 
-        public int StartIndex => startIndex;
+        public int StartIndex
+        {
+            get => startIndex;
+            set => this.startIndex = value;
+        }
 
         public int EndIndex => startIndex + Count - 1;
 
@@ -73,7 +77,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
             return result == -1 ? (int?)null : result;
         }
-        
+
         private int UnadjustedIndexOf(T value)
         {
             for (int i = 0; i < Count; i++)
@@ -94,7 +98,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 
             return -1;
         }
-        
+
 
         public bool TryGet(int index, out T value)
         {

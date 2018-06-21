@@ -20,15 +20,6 @@ namespace Veruthian.Dotnet.Library.Data.Collections
         public DataArray(T item, int repeat) => this.items = item.RepeatAsArray(repeat);
 
 
-        public DataArray(int startIndex, int size) : base(startIndex) => this.items = new T[size];
-
-        public DataArray(int startIndex, params T[] items) : base(startIndex) => this.items = items;
-
-        public DataArray(int startIndex, IEnumerable<T> items) : base(startIndex) => this.items = items.ToArray();
-
-        public DataArray(int startIndex, T item, int repeat) : base(startIndex) => this.items = item.RepeatAsArray(repeat);
-
-
         public override int Count => items.Length;
 
 
