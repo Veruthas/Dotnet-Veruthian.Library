@@ -75,6 +75,16 @@ namespace Veruthian.Dotnet.Library.Data.Collections
             return items;
         }
 
+        public static List<T> RepeatAsList<T>(this T value, int times = 1)
+        {
+            var items = new List<T>(times);            
+
+            for (int i = 0; i < times; i++)
+                items.Add(value);
+
+            return items;
+        }
+
         public static IEnumerable<T> RepeatAsEnumerable<T>(this T value, int times = 1)
         {
             for (int i = 0; i < times; i++)
