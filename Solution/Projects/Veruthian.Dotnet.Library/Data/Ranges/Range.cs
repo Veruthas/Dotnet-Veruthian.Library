@@ -85,9 +85,9 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
 
         public int CompareTo(T other)
         {
-            if (low.IsLessThan(other))
+            if (low.Precedes(other))
                 return -1;
-            else if (high.IsGreaterThan(other))
+            else if (high.Follows(other))
                 return 1;
             else
                 return 0;
@@ -145,9 +145,9 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
 
         #region Range Operations
 
-        private static T Min(T a, T b) => a.IsLessThan(b) ? a : b;
+        private static T Min(T a, T b) => a.Precedes(b) ? a : b;
 
-        private static T Max(T a, T b) => a.IsGreaterThan(b) ? a : b;
+        private static T Max(T a, T b) => a.Follows(b) ? a : b;
 
 
         // Merge
@@ -164,7 +164,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
             //  1) Disojoint (a.h + 1 < b.l)     => (a.l to a.h) + (b.l to b.h)
             //  2) Union     (a.h + 1 >= b.l)    => (a.l to b.h)
 
-            if (a.High.Next.IsLessThan(b.Low))
+            if (a.High.Next.Precedes(b.Low))
             {
                 union = default(Range<T>);
 
@@ -172,7 +172,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
             }
             else
             {
-                var newHigh = a.high.IsGreaterThan(b.high) ? a.high : b.high;
+                var newHigh = a.high.Follows(b.high) ? a.high : b.high;
 
                 union = new Range<T>(a.Low, newHigh);
 
@@ -194,7 +194,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
             //  1) Disojoint    (a.h < b.l)                    => (a.l to a.h) + (b.l to b.h)
             //  2) Intersection (a.l <= b.l) && (a.h <= b.h)   => (b.l to MIN(a.h, b.h))
 
-            if (a.High.IsLessThan(b.Low))
+            if (a.High.Precedes(b.Low))
             {
                 intersection = default(Range<T>);
 
@@ -279,7 +279,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
             //    7) Union               (a.h = b.h)   => (a.l to b.h)                                           -- X_AB_X
 
             // [1] (a.h < b.l) | Disjoint => A_B
-            if (lower.high.IsLessThan(higher.low))
+            if (lower.high.Precedes(higher.low))
             {
                 before = new SplitResult(lower, lowerRangeName);
 
@@ -303,9 +303,9 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
                 intersection = new SplitResult(higher.low, ab_high, SplitResultRange.AB);
 
                 // AFTER -> [A|B|X] => when a.h != b.h, (ab.h + 1 to MAX(a.h, b.h))                
-                if (lower.high.IsGreaterThan(higher.high))
+                if (lower.high.Follows(higher.high))
                     after = new SplitResult(ab_high.Next, lower.high, lowerRangeName);
-                else if (higher.high.IsGreaterThan(lower.high))
+                else if (higher.high.Follows(lower.high))
                     after = new SplitResult(ab_high.Next, higher.high, higherRangeName);
                 else
                     after = SplitResult.Neither;
@@ -333,9 +333,9 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
 
                 var range = sortedSet[middle];
 
-                if (value.IsLessThan(range.Low))
+                if (value.Precedes(range.Low))
                     high = middle - 1;
-                else if (value.IsGreaterThan(range.High))
+                else if (value.Follows(range.High))
                     low = middle + 1;
                 else
                     return middle;
@@ -515,7 +515,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
                 var sourceRange = ranges[s];
 
                 // There is no overlap
-                if (remove.low.IsGreaterThan(sourceRange.High) || remove.High.IsLessThan(sourceRange.Low))
+                if (remove.low.Follows(sourceRange.High) || remove.High.Precedes(sourceRange.Low))
                     continue;
                 if (SplitUnordered(sourceRange, remove, out var before, out var intersection, out var after))
                 {
