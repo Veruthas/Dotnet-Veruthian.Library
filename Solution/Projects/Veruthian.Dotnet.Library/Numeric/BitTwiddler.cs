@@ -155,8 +155,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
                 this.bitCount = bitCount;
             }
-        }
-        // Bits        
+        }     
 
 
         // Bytes        
