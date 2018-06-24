@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Dotnet.Library.Data
+namespace Veruthian.Dotnet.Library
 {
     public interface IOrderable<T> : IEquatable<T>, IComparable<T>
     {

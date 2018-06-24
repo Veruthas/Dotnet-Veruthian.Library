@@ -2,18 +2,24 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : IEquatable<Nibble>, IComparable<Nibble>, IFormattable, IConvertible
+    public struct Nibble : ISequential<Nibble>, IFormattable, IConvertible
     {
         const byte mask = 0xF;
 
-        byte value;
+        public static readonly Nibble MinValue = new Nibble(0x0);
+
+        public static readonly Nibble MaxValue = new Nibble(0xF);
+
+
+        private readonly byte value;
 
 
         private Nibble(int value) => this.value = (byte)(value & mask);
 
 
 
-        // To/FromString
+        #region StringConverter
+
         public string ToString(bool uppercase)
         {
             char result;
@@ -62,11 +68,11 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        // Equality/Comparison
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
+        #endregion
+
+        #region Equality/Comparison
+
+        public override int GetHashCode() => value.GetHashCode();
 
         public override bool Equals(object obj) => (obj is Nibble) ? this.Equals((Nibble)obj) : false;
 
@@ -74,10 +80,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public static bool operator !=(Nibble left, Nibble right) => left.value != right.value;
 
-        public bool Equals(Nibble other)
-        {
-            return this.value == other.value;
-        }
+        public bool Equals(Nibble other) => this.value == other.value;
 
         public static bool operator <(Nibble left, Nibble right) => left.value < right.value;
 
@@ -87,12 +90,12 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public static bool operator >=(Nibble left, Nibble right) => left.value >= right.value;
 
-        public int CompareTo(Nibble other)
-        {
-            return this.value.CompareTo(other.value);
-        }
+        public int CompareTo(Nibble other) => this.value.CompareTo(other.value);
 
-        // Conversion        
+        #endregion
+
+        #region Conversion
+
         public static implicit operator byte(Nibble value) => value.value;
         public static implicit operator ushort(Nibble value) => value.value;
         public static implicit operator uint(Nibble value) => value.value;
@@ -136,8 +139,10 @@ namespace Veruthian.Dotnet.Library.Numeric
         uint IConvertible.ToUInt32(IFormatProvider provider) => ((IConvertible)this.value).ToUInt32(provider);
         ulong IConvertible.ToUInt64(IFormatProvider provider) => ((IConvertible)this.value).ToUInt64(provider);
 
+        #endregion
 
-        // Operators
+        #region Operators
+
         public static Nibble operator ++(Nibble value) => unchecked(new Nibble(value.value + 1));
 
         public static Nibble operator --(Nibble value) => unchecked(new Nibble(value.value - 1));
@@ -180,9 +185,24 @@ namespace Veruthian.Dotnet.Library.Numeric
                 return new Nibble(value.value << amount);
         }
 
-        // Constants
-        public static readonly Nibble MinValue = new Nibble(0x0);
+        #endregion
 
-        public static readonly Nibble MaxValue = new Nibble(0xF);
+        #region ISequential
+
+        public bool Precedes(Nibble other) => this < other;
+
+        public bool Follows(Nibble other) => this > other;
+
+        Nibble ISequential<Nibble>.Next => this += 1;
+
+        Nibble ISequential<Nibble>.Previous => this -= 1;
+
+        Nibble IOrderable<Nibble>.Default => default(Nibble);
+
+        Nibble IOrderable<Nibble>.MinValue => Nibble.MinValue;
+
+        Nibble IOrderable<Nibble>.MaxValue => Nibble.MaxValue;
+
+        #endregion
     }
 }
