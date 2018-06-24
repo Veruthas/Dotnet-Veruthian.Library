@@ -451,14 +451,14 @@ namespace Veruthian.Dotnet.Library.Text.Code
         CodePoint ISequential<CodePoint>.Previous => new CodePoint(this.value - 1);
 
 
-        CodePoint ISequential<CodePoint>.Default => default(CodePoint);
+        CodePoint IOrderable<CodePoint>.Default => default(CodePoint);
 
-        CodePoint ISequential<CodePoint>.MinValue => CodePoint.MinValue;
+        CodePoint IOrderable<CodePoint>.MinValue => CodePoint.MinValue;
 
-        CodePoint ISequential<CodePoint>.MaxValue => CodePoint.MinValue;
+        CodePoint IOrderable<CodePoint>.MaxValue => CodePoint.MinValue;
 
 
-        bool ISequential<CodePoint>.IsLessThan(CodePoint other) => this.value < other.value;
-        bool ISequential<CodePoint>.IsGreaterThan(CodePoint other) => this.value > other.value;
+        bool IOrderable<CodePoint>.Precedes(CodePoint other) => this.value < other.value;
+        bool IOrderable<CodePoint>.Follows(CodePoint other) => this.value > other.value;
     }
 }
