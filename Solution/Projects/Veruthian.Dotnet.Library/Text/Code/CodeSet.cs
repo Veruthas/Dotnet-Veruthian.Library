@@ -34,7 +34,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         public static CodeSet List(CodeString codepoints) => FromList(codepoints);
 
-        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
+        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints());
 
         // Sets            
         public static readonly CodeSet Complete = Range(CodePoint.MinValue, CodePoint.MaxValue);

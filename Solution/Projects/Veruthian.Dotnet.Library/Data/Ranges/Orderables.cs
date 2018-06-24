@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Data.Ranges
 {
-    public struct OrderableByte : IOrderable<OrderableByte>
+    public struct OrderableByte : ISequential<OrderableByte>
     {
         sbyte value;
 
@@ -44,7 +44,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableShort : IOrderable<OrderableShort>
+    public struct OrderableShort : ISequential<OrderableShort>
     {
         short value;
 
@@ -86,7 +86,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableInt : IOrderable<OrderableInt>
+    public struct OrderableInt : ISequential<OrderableInt>
     {
         int value;
 
@@ -128,7 +128,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableLong : IOrderable<OrderableLong>
+    public struct OrderableLong : ISequential<OrderableLong>
     {
         long value;
 
@@ -170,7 +170,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableUByte : IOrderable<OrderableUByte>
+    public struct OrderableUByte : ISequential<OrderableUByte>
     {
         byte value;
 
@@ -212,7 +212,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableUShort : IOrderable<OrderableUShort>
+    public struct OrderableUShort : ISequential<OrderableUShort>
     {
         ushort value;
 
@@ -254,7 +254,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableUInt : IOrderable<OrderableUInt>
+    public struct OrderableUInt : ISequential<OrderableUInt>
     {
         uint value;
 
@@ -296,7 +296,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableULong : IOrderable<OrderableULong>
+    public struct OrderableULong : ISequential<OrderableULong>
     {
         ulong value;
 
@@ -338,7 +338,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
         public override string ToString() => value.ToString();
     }
 
-    public struct OrderableChar : IOrderable<OrderableChar>
+    public struct OrderableChar : ISequential<OrderableChar>
     {
         char value;
 
