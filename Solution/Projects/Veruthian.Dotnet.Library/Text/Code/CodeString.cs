@@ -37,15 +37,12 @@ namespace Veruthian.Dotnet.Library.Text.Code
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
-        public CodeString(IEnumerator<CodePoint> codepoints)
-            : this(GetFromEnumerator(codepoints), false) { }
-
-        private static CodePoint[] GetFromEnumerator(IEnumerator<CodePoint> codepoints)
+        private static CodePoint[] GetFromEnumerator(IEnumerable<CodePoint> codepoints)
         {
             var result = new List<CodePoint>();
 
-            while (codepoints.MoveNext())
-                result.Add(codepoints.Current);
+            foreach(var codepoint in codepoints)
+                result.Add(codepoint);
 
             return result.ToArray();
         }
@@ -420,12 +417,12 @@ namespace Veruthian.Dotnet.Library.Text.Code
         #region Join
         public static CodeString Join(CodeString separator, params CodeString[] values) => Join(separator, values);
 
-        public static CodeString Join(CodeString separator, IEnumerable<CodeString> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+        public static CodeString Join(CodeString separator, IEnumerable<CodeString> values) => Combine(GetEnumerable(separator, values));
 
-        public static CodeString Join(CodeString separator, IEnumerable<object> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+        public static CodeString Join(CodeString separator, IEnumerable<object> values) => Combine(GetEnumerable(separator, values));
 
 
-        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<CodeString> values)
+        private static IEnumerable<CodeString> GetEnumerable(CodeString separator, IEnumerable<CodeString> values)
         {
             bool initialized = false;
 
@@ -440,7 +437,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             }
         }
 
-        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<object> values)
+        private static IEnumerable<CodeString> GetEnumerable(CodeString separator, IEnumerable<object> values)
         {
             bool initialized = false;
 

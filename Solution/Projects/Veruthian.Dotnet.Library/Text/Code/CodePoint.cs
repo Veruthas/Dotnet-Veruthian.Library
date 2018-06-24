@@ -3,11 +3,11 @@ using System.Text;
 using System.Globalization;
 using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Code.Encodings;
-using Veruthian.Dotnet.Library.Data.Ranges;
+using Veruthian.Dotnet.Library.Data;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {
-    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>, IOrderable<CodePoint>
+    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>, ISequential<CodePoint>
     {
         uint value;
 
@@ -446,9 +446,9 @@ namespace Veruthian.Dotnet.Library.Text.Code
         #endregion
 
         /* Orderable */
-        CodePoint IOrderable<CodePoint>.Next => new CodePoint(this.value + 1);
+        CodePoint ISequential<CodePoint>.Next => new CodePoint(this.value + 1);
 
-        CodePoint IOrderable<CodePoint>.Previous => new CodePoint(this.value - 1);
+        CodePoint ISequential<CodePoint>.Previous => new CodePoint(this.value - 1);
 
 
         CodePoint IOrderable<CodePoint>.Default => default(CodePoint);
@@ -458,7 +458,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
         CodePoint IOrderable<CodePoint>.MaxValue => CodePoint.MinValue;
 
 
-        bool IOrderable<CodePoint>.IsLessThan(CodePoint other) => this.value < other.value;
-        bool IOrderable<CodePoint>.IsGreaterThan(CodePoint other) => this.value > other.value;
+        bool IOrderable<CodePoint>.Precedes(CodePoint other) => this.value < other.value;
+        bool IOrderable<CodePoint>.Follows(CodePoint other) => this.value > other.value;
     }
 }

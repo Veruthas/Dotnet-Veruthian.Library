@@ -1,23 +1,19 @@
 using System;
 
-namespace Veruthian.Dotnet.Library.Data.Ranges
+namespace Veruthian.Dotnet.Library.Data
 {
     public interface IOrderable<T> : IEquatable<T>, IComparable<T>
     {
         T Default { get; }
+
 
         T MinValue { get; }
 
         T MaxValue { get; }
 
 
-        T Next { get; }
+        bool Precedes(T other);
 
-        T Previous { get; }
-
-
-        bool IsLessThan(T other);
-
-        bool IsGreaterThan(T other);
+        bool Follows(T other);
     }
 }

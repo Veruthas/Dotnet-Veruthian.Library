@@ -18,13 +18,7 @@ namespace Veruthian.Dotnet.Library.Data.Collections
                 else
                     yield break;
             }
-        }
-
-        // Adapter
-        public static EnumerableAdapter<T> GetEnumerableAdapter<T>(this IEnumerator<T> enumerator)
-        {
-            return new EnumerableAdapter<T>(enumerator);
-        }
+        }    
 
         // NotifyingEnumerator
         public static NotifyingEnumerator<T> GetNotifyingEnumerator<T>(this IEnumerator<T> enumerator, EnumeratorMoveNext<T> onMoveNext = null)
