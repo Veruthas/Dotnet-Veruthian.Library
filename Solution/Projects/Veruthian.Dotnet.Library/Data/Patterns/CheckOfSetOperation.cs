@@ -6,7 +6,7 @@ namespace Veruthian.Dotnet.Library.Data.Patterns
     public class CheckOfSetOperation<TState, TReader, T> : CheckOperation<TState, TReader, T>
         where TState : HasType<TReader>
         where TReader : ILookaheadReader<T>
-        where T : IOrderable<T>, new()
+        where T : ISequential<T>, new()
     {
         RangeSet<T> set;
 
