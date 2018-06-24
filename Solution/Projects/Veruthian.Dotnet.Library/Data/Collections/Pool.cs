@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Veruthian.Dotnet.Library.Text.Lexers
+namespace Veruthian.Dotnet.Library.Data.Collections
 {
     public class Pool<TItem, TAttribute>
     {
