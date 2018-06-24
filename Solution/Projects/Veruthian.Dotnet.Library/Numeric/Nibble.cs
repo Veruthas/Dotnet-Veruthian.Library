@@ -5,93 +5,19 @@ namespace Veruthian.Dotnet.Library.Numeric
 {
     public struct Nibble : ISequential<Nibble>, IFormattable, IConvertible
     {
-        const byte mask = 0xF;
-
-        public static readonly Nibble MinValue = new Nibble(0x0);
-
-        public static readonly Nibble MaxValue = new Nibble(0xF);
-
-
         private readonly byte value;
 
 
         private Nibble(int value) => this.value = (byte)(value & mask);
 
 
+        #region Constants
 
-        #region StringConverter
+        const byte mask = 0xF;
 
-        public string ToString(bool uppercase)
-        {
-            char result;
+        public static readonly Nibble MinValue = new Nibble(0x0);
 
-            if (value >= 10)
-            {
-                if (uppercase)
-                {
-                    result = (char)('A' + (value - 10));
-                }
-                else
-                {
-                    result = (char)('a' + (value - 10));
-                }
-            }
-            else
-            {
-                result = (char)(value + '0');
-            }
-
-            return result.ToString();
-        }
-
-        public override string ToString() => ToString(true);
-
-        public string ToString(IFormatProvider provider) => value.ToString(provider);
-
-        public string ToString(string format) => value.ToString(format);
-
-        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);
-
-
-        public bool TryParse(string value, out Nibble result)
-        {
-            if (byte.TryParse(value, out byte byteResult) && byteResult <= 15)
-            {
-                result = new Nibble(byteResult);
-
-                return true;
-            }
-            else
-            {
-                result = default(Nibble);
-
-                return false;
-            }
-        }
-
-        #endregion
-
-        #region Equality/Comparison
-
-        public override int GetHashCode() => value.GetHashCode();
-
-        public override bool Equals(object obj) => (obj is Nibble) ? this.Equals((Nibble)obj) : false;
-
-        public static bool operator ==(Nibble left, Nibble right) => left.value == right.value;
-
-        public static bool operator !=(Nibble left, Nibble right) => left.value != right.value;
-
-        public bool Equals(Nibble other) => this.value == other.value;
-
-        public static bool operator <(Nibble left, Nibble right) => left.value < right.value;
-
-        public static bool operator >(Nibble left, Nibble right) => left.value > right.value;
-
-        public static bool operator <=(Nibble left, Nibble right) => left.value <= right.value;
-
-        public static bool operator >=(Nibble left, Nibble right) => left.value >= right.value;
-
-        public int CompareTo(Nibble other) => this.value.CompareTo(other.value);
+        public static readonly Nibble MaxValue = new Nibble(0xF);
 
         #endregion
 
@@ -142,6 +68,30 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
+        #region Comparison
+
+        public override int GetHashCode() => value.GetHashCode();
+
+        public override bool Equals(object obj) => (obj is Nibble) ? this.Equals((Nibble)obj) : false;
+
+        public static bool operator ==(Nibble left, Nibble right) => left.value == right.value;
+
+        public static bool operator !=(Nibble left, Nibble right) => left.value != right.value;
+
+        public bool Equals(Nibble other) => this.value == other.value;
+
+        public static bool operator <(Nibble left, Nibble right) => left.value < right.value;
+
+        public static bool operator >(Nibble left, Nibble right) => left.value > right.value;
+
+        public static bool operator <=(Nibble left, Nibble right) => left.value <= right.value;
+
+        public static bool operator >=(Nibble left, Nibble right) => left.value >= right.value;
+
+        public int CompareTo(Nibble other) => this.value.CompareTo(other.value);
+
+        #endregion
+
         #region Operators
 
         public static Nibble operator ++(Nibble value) => unchecked(new Nibble(value.value + 1));
@@ -184,6 +134,58 @@ namespace Veruthian.Dotnet.Library.Numeric
                 return MinValue;
             else
                 return new Nibble(value.value << amount);
+        }
+
+        #endregion
+
+        #region Strings
+
+        public string ToString(bool uppercase)
+        {
+            char result;
+
+            if (value >= 10)
+            {
+                if (uppercase)
+                {
+                    result = (char)('A' + (value - 10));
+                }
+                else
+                {
+                    result = (char)('a' + (value - 10));
+                }
+            }
+            else
+            {
+                result = (char)(value + '0');
+            }
+
+            return result.ToString();
+        }
+
+        public override string ToString() => ToString(true);
+
+        public string ToString(IFormatProvider provider) => value.ToString(provider);
+
+        public string ToString(string format) => value.ToString(format);
+
+        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);
+
+
+        public bool TryParse(string value, out Nibble result)
+        {
+            if (byte.TryParse(value, out byte byteResult) && byteResult <= 15)
+            {
+                result = new Nibble(byteResult);
+
+                return true;
+            }
+            else
+            {
+                result = default(Nibble);
+
+                return false;
+            }
         }
 
         #endregion
