@@ -1,10 +1,11 @@
 using System;
 
-namespace Veruthian.Dotnet.Library.Data.Ranges
+namespace Veruthian.Dotnet.Library.Data
 {
-    public interface IOrderable<T> : IEquatable<T>, IComparable<T>
+    public interface ISequential<T> : IEquatable<T>, IComparable<T>
     {
         T Default { get; }
+
 
         T MinValue { get; }
 

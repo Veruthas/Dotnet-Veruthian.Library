@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Veruthian.Dotnet.Library.Data.Ranges
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
-        where T : IOrderable<T>, new()
+        where T : ISequential<T>, new()
     {
         static T main = new T();
 

@@ -9,17 +9,19 @@ namespace Veruthian.Dotnet.Library.Text.Code
     public static class CodeUtility
     {
         // Decode to CodePoint
-        public static IEnumerator<CodePoint> DecodeValues<T, TDecoder>(IEnumerator<T> items, TDecoder decoder, string onIncomplete)
+        public static IEnumerable<CodePoint> DecodeValues<T, TDecoder>(IEnumerable<T> items, TDecoder decoder, string onIncomplete)
             where TDecoder : ITransformer<T, uint?>
         {
+            var enumerator = items.GetEnumerator();
+
             if (items == null)
                 throw new ArgumentNullException("items");
 
             uint? result = 0;
 
-            while (items.MoveNext())
+            while (enumerator.MoveNext())
             {
-                result = decoder.Process(items.Current);
+                result = decoder.Process(enumerator.Current);
 
                 if (result != null)
                     yield return (CodePoint)result.GetValueOrDefault();
@@ -30,12 +32,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
         }
 
         // Utf8 -> CodePoint
-        public static IEnumerator<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
-        {
-            return AsUtf8CodePoints(bytes.GetEnumerator());
-        }
-
-        public static IEnumerator<CodePoint> AsUtf8CodePoints(this IEnumerator<byte> bytes)
+        public static IEnumerable<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
         {
             var decoder = new Utf8.ByteDecoder();
 
@@ -43,11 +40,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
         }
 
         // Utf16 -> CodePoint
-        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
-        {
-            return AsUtf16CodePoints(bytes.GetEnumerator(), endianness);
-        }
-        public static IEnumerator<CodePoint> AsUtf16CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf16.ByteDecoder(endianness);
 
@@ -56,12 +49,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
 
         // Utf32 -> CodePoint
-        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
-        {
-            return AsUtf32CodePoints(bytes.GetEnumerator(), endianness);
-        }
-
-        public static IEnumerator<CodePoint> AsUtf32CodePoints(this IEnumerator<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
 
@@ -70,20 +58,15 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
 
         // Char -> CodePoint
-        public static IEnumerator<CodePoint> ToCodePoints(this IEnumerator<char> chars)
+        public static IEnumerable<CodePoint> ToCodePoints(this IEnumerable<char> chars)
         {
             var decoder = new Utf16.CharDecoder();
 
             return DecodeValues(chars, decoder, Utf16.MissingTrailingSurrogateMessage());
         }
 
-        public static IEnumerator<CodePoint> ToCodePoints(this IEnumerable<char> chars)
-        {
-            return ToCodePoints(chars.GetEnumerator());
-        }
-
         // String -> CodePoint
-        public static IEnumerator<CodePoint> ToCodePoints(this string value)
+        public static IEnumerable<CodePoint> ToCodePoints(this string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -91,7 +74,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return UncheckedToCodePoints(value, 0, value.Length);
         }
 
-        public static IEnumerator<CodePoint> ToCodePoints(this string value, int start)
+        public static IEnumerable<CodePoint> ToCodePoints(this string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -99,7 +82,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return UncheckedToCodePoints(value, start, value.Length - start);
         }
 
-        public static IEnumerator<CodePoint> ToCodePoints(this string value, int start, int amount)
+        public static IEnumerable<CodePoint> ToCodePoints(this string value, int start, int amount)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -108,7 +91,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return UncheckedToCodePoints(value, start, amount);
         }
 
-        private static IEnumerator<CodePoint> UncheckedToCodePoints(string value, int start, int amount)
+        private static IEnumerable<CodePoint> UncheckedToCodePoints(string value, int start, int amount)
         {
             if (start < 0 || start > value.Length)
                 throw new ArgumentOutOfRangeException("start");
