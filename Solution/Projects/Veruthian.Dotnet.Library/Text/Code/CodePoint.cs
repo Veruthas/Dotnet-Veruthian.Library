@@ -3,7 +3,6 @@ using System.Text;
 using System.Globalization;
 using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Code.Encodings;
-using Veruthian.Dotnet.Library.Data;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {

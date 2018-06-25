@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Text.Code;
-using Veruthian.Dotnet.Library.Data.Collections;
+using Veruthian.Dotnet.Library.Collections;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Veruthian.Dotnet.Library.Data.Readers
+namespace Veruthian.Dotnet.Library.Readers
 {
     public abstract class ReaderTest<T, TReader>
         where TReader : IReader<T>

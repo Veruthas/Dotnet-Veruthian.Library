@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using Veruthian.Dotnet.Library.Data;
-using Veruthian.Dotnet.Library.Data.Collections;
+using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {

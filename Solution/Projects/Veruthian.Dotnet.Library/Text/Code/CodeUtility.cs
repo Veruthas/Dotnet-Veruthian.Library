@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Veruthian.Dotnet.Library.Data;
 using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Code.Encodings;
 

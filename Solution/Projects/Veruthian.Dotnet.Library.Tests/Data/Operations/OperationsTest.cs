@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Veruthian.Dotnet.Library.Data.Operations
+namespace Veruthian.Dotnet.Library.Operations
 {
     public class OperationsTest
     {
