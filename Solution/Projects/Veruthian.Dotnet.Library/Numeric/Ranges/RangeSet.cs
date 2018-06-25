@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
 
-namespace Veruthian.Dotnet.Library.Ranges
+namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : struct, ISequential<T>, IBounded<T>
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
@@ -32,7 +32,7 @@ namespace Veruthian.Dotnet.Library.Ranges
 
 
     public abstract class RangeSet<T, TSet> : IEquatable<TSet>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : struct, ISequential<T>, IBounded<T>
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;

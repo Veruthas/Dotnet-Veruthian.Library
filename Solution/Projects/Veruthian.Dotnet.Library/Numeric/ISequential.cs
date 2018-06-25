@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Dotnet.Library
+namespace Veruthian.Dotnet.Library.Numeric
 {
     public interface ISequential<T> : IOrderable<T>
     {
