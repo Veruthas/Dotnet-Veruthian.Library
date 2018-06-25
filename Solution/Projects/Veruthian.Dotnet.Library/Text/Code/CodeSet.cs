@@ -2,9 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Veruthian.Dotnet.Library.Data;
-using Veruthian.Dotnet.Library.Data.Collections;
-using Veruthian.Dotnet.Library.Data.Ranges;
+using Veruthian.Dotnet.Library.Collections;
+using Veruthian.Dotnet.Library.Ranges;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {
