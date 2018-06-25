@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
-using Veruthian.Dotnet.Library.Ranges;
+using Veruthian.Dotnet.Library.Numeric.Ranges;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {

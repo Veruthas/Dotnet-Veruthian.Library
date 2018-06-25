@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Veruthian.Dotnet.Library.Ranges
+namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : struct, ISequential<T>, IBounded<T>
     {
         static T main = new T();
 
@@ -15,9 +15,6 @@ namespace Veruthian.Dotnet.Library.Ranges
 
         public Range(T value)
         {
-            if (value == null)
-                throw new ArgumentOutOfRangeException("value");
-
             this.low = this.high = value;
 
             hashcode = HashCodes.Default.Combine(this.low, this.high);
@@ -25,11 +22,6 @@ namespace Veruthian.Dotnet.Library.Ranges
 
         public Range(T a, T b)
         {
-            if (a == null)
-                throw new ArgumentOutOfRangeException("a");
-            if (b == null)
-                throw new ArgumentOutOfRangeException("b");
-
             int comparison = a.CompareTo(b);
 
             if (comparison > 0)

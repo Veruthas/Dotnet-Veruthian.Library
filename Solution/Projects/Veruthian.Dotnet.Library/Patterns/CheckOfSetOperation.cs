@@ -1,4 +1,5 @@
-using Veruthian.Dotnet.Library.Ranges;
+using Veruthian.Dotnet.Library.Numeric;
+using Veruthian.Dotnet.Library.Numeric.Ranges;
 using Veruthian.Dotnet.Library.Readers;
 
 namespace Veruthian.Dotnet.Library.Patterns
@@ -6,7 +7,7 @@ namespace Veruthian.Dotnet.Library.Patterns
     public class CheckOfSetOperation<TState, TReader, T> : CheckOperation<TState, TReader, T>
         where TState : HasType<TReader>
         where TReader : ILookaheadReader<T>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : struct, ISequential<T>, IBounded<T>
     {
         RangeSet<T> set;
 
