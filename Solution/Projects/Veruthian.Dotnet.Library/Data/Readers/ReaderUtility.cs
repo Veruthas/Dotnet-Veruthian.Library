@@ -5,18 +5,18 @@ namespace Veruthian.Dotnet.Library.Data.Readers
     public static class ReaderUtility
     {
         // Simple Reader
-        public static SimpleReader<T> GetSimpleReader<T>(this IEnumerator<T> enumerator,
+        public static Reader<T> GetReader<T>(this IEnumerator<T> enumerator,
                                                              GenerateEndItem<T> generateEndItem = null)
         {
-            var reader = new SimpleReader<T>(enumerator, generateEndItem);
+            var reader = new Reader<T>(enumerator, generateEndItem);
 
             return reader;
         }
 
-        public static SimpleReader<T> GetSimpleReader<T>(this IEnumerable<T> enumerable,
+        public static Reader<T> GetReader<T>(this IEnumerable<T> enumerable,
                                                             GenerateEndItem<T> generateEndItem = null)
         {
-            return GetSimpleReader(enumerable.GetEnumerator(), generateEndItem);
+            return GetReader(enumerable.GetEnumerator(), generateEndItem);
         }
 
         // Fixed Lookahead Reader
@@ -45,7 +45,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             return reader;
         }
 
-        public static VariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
+        public static VariableLookaheadReaderBase<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
                                                                                 GenerateEndItem<T> generateEndItem = null)
         {
             return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem);
@@ -66,22 +66,6 @@ namespace Veruthian.Dotnet.Library.Data.Readers
                                                             GenerateEndItem<T> generateEndItem = null)
         {
             return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem);
-        }
-
-        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
-                                                        this IEnumerator<T> enumerator,
-                                                        GenerateEndItem<T> generateEndItem = null)
-        {
-            var reader = new SpeculativeReader<T, TState>(enumerator, generateEndItem);
-
-            return reader;
-        }
-
-        public static SpeculativeReader<T, TState> GetSpeculativeWithStateReader<T, TState>(
-                                                            this IEnumerable<T> enumerable,
-                                                            GenerateEndItem<T> generateEndItem = null)
-        {
-            return GetSpeculativeWithStateReader<T, TState>(enumerable.GetEnumerator(), generateEndItem);
         }
     }
 }

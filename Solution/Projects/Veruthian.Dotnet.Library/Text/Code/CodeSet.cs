@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Dotnet.Library.Data;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 using Veruthian.Dotnet.Library.Data.Ranges;
 
 namespace Veruthian.Dotnet.Library.Text.Code
@@ -34,7 +34,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         public static CodeSet List(CodeString codepoints) => FromList(codepoints);
 
-        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints().GetEnumerableAdapter());
+        public static CodeSet List(string codepoints) => FromList(codepoints.ToCodePoints());
 
         // Sets            
         public static readonly CodeSet Complete = Range(CodePoint.MinValue, CodePoint.MaxValue);

@@ -3,112 +3,50 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
+    public delegate T GenerateEndItem<T>(T previous);
+
+
     public abstract class ReaderBase<T> : IReader<T>
     {
-        IEnumerator<T> enumerator;
+        private IEnumerator<T> enumerator;
 
-        GenerateEndItem<T> generateEndItem;
+        private GenerateEndItem<T> generateEndItem;
 
-        bool initialized;
+        private int position;
 
-        int position = -1;
+        private int endPosition;
 
-        int endPosition = -1;
-
-        T lastItem;
+        private T lastItem;
 
 
-        public ReaderBase(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
+        public ReaderBase() { }
+
+
+        protected void SetData(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
         {
             this.enumerator = enumerator;
 
             this.generateEndItem = generateEndItem;
+
+            this.position = -1;
+
+            this.endPosition = -1;
+
+            this.lastItem = default(T);
+
+            Initialize();
         }
+
+        public virtual void Dispose() => enumerator.Dispose();
+
 
 
         public int Position { get => position; protected set => position = value; }
 
 
-        public virtual void Dispose() => enumerator.Dispose();
 
-
-        // End
-        public bool IsEnd { get => CheckedIsAtEnd(); }
-
-        protected bool CheckedIsAtEnd(int lookahead = 0)
-        {
-            VerifyInitialized();
-
-            VerifyLookahead(lookahead);
-
-            return RawIsAtEnd(lookahead);
-        }
-
-        protected bool RawIsAtEnd(int lookahead = 0)
-        {
-            return (endPosition != -1) && (position + lookahead) >= endPosition;
-        }
-
-        protected bool EndFound { get => endPosition != -1; }
-
-        protected int EndPosition { get => endPosition; set => endPosition = value; }
-
-        protected T LastItem { get => lastItem; set => lastItem = value; }
-
-
-        // Reading and Peeking
-        protected void VerifyInitialized()
-        {
-            if (!initialized)
-            {
-                Initialize();
-
-                position++;
-
-                initialized = true;
-            }
-        }
-
-        public T Peek() => CheckedPeek();
-
-        protected T CheckedPeek(int lookahead = 0)
-        {
-            VerifyInitialized();
-
-            VerifyLookahead(lookahead);
-
-            var current = RawPeek(lookahead);
-
-            return current;
-        }
-
-        public T Read()
-        {
-            VerifyInitialized();
-
-            var current = RawPeek();
-
-            if (!IsEnd)
-            {
-                MoveToNext();
-
-                Position++;
-
-                OnItemRead(current);
-            }
-
-            return current;
-        }
-
-        public void Read(int amount)
-        {
-            for (int i = 0; i < amount; i++)
-                Read();
-        }
-
-        protected void OnItemRead(T current) { }
-
-        public bool GetNext(out T next)
+        // Fetches next item from enumerator
+        protected bool GetNext(out T next)
         {
             if (!EndFound)
             {
@@ -132,16 +70,78 @@ namespace Veruthian.Dotnet.Library.Data.Readers
         }
 
 
-        // The Abstracts
+        // End
+        public bool IsEnd { get => CheckedIsAtEnd(); }
+
+        protected bool CheckedIsAtEnd(int lookahead = 0)
+        {
+            EnsureLookahead(lookahead);
+
+            return RawIsAtEnd(lookahead);
+        }
+
+        protected bool RawIsAtEnd(int lookahead = 0)
+        {
+            return (endPosition != -1) && (position + lookahead) >= endPosition;
+        }
+
+        protected bool EndFound { get => endPosition != -1; }
+
+        protected int EndPosition { get => endPosition; set => endPosition = value; }
+
+        protected T LastItem { get => lastItem; set => lastItem = value; }
+
+
+        // Peek
+        public T Peek() => CheckedPeek();
+
+        protected T CheckedPeek(int lookahead = 0)
+        {
+            EnsureLookahead(lookahead);
+
+            var current = RawPeek(lookahead);
+
+            return current;
+        }
+
+
+        // Read
+        public T Read()
+        {
+            var current = RawPeek();
+
+            MoveNext();
+
+            return current;
+        }
+
+        public IEnumerable<T> Read(int amount, bool includeEnd = false)
+        {
+            TryPreload(amount);
+
+            for (int i = 0; i < amount; i++)
+            {
+                if (!IsEnd || includeEnd)
+                    yield return Read();
+            }
+        }
+
+        // Skip
+        public void Skip(int amount) => SkipAhead(amount);
+
+
+
+        // The Abstracts        
         protected abstract void Initialize();
 
-        protected abstract void MoveToNext();
+        protected abstract void MoveNext();
+
+        protected abstract void TryPreload(int amount);
+        
+        protected abstract void SkipAhead(int amount);
 
         protected abstract T RawPeek(int lookahead = 0);
 
-        protected abstract void VerifyLookahead(int lookahead = 0);
+        protected abstract void EnsureLookahead(int lookahead = 0);
     }
-
-
-    public delegate T GenerateEndItem<T>(T previous);
 }

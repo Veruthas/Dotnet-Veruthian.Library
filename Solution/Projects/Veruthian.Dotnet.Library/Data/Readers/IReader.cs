@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public interface IReader<T> : IDisposable
+    public interface IReader<out T> : IDisposable
     {
         bool IsEnd { get; }
 
@@ -12,6 +13,8 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         T Read();
 
-        void Read(int amount);
+        IEnumerable<T> Read(int amount, bool includeEnd = false);
+
+        void Skip(int amount);
     }
 }

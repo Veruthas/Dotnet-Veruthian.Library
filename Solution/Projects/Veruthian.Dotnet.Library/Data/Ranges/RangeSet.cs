@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 
 namespace Veruthian.Dotnet.Library.Data.Ranges
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : IOrderable<T>, new()
+        where T : ISequential<T>, IBounded<T>, new()
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
@@ -32,7 +32,7 @@ namespace Veruthian.Dotnet.Library.Data.Ranges
 
 
     public abstract class RangeSet<T, TSet> : IEquatable<TSet>
-        where T : IOrderable<T>, new()
+        where T : ISequential<T>, IBounded<T>, new()
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;

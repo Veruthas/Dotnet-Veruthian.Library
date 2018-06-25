@@ -3,21 +3,18 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public abstract class SpeculativeReaderBase<T, TState> : VariableLookaheadReader<T>
+    public abstract class SpeculativeReaderBase<T> : VariableLookaheadReaderBase<T>, ISpeculativeReader<T>
     {
         protected struct MarkItem
         {
-            public int Position { get; set; }
+            public int Position { get; }
 
-            public int Index { get; set; }
+            public int Index { get; }
 
-            public TState State { get; set; }
-
-            public MarkItem(int position, int index, TState state)
+            public MarkItem(int position, int index)
             {
                 this.Position = position;
                 this.Index = index;
-                this.State = state;
             }
 
             public override string ToString()
@@ -26,109 +23,99 @@ namespace Veruthian.Dotnet.Library.Data.Readers
             }
         }
 
-        List<MarkItem> marks = new List<MarkItem>();
+        Stack<MarkItem> marks = new Stack<MarkItem>();
 
 
-        public SpeculativeReaderBase(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)
-            : base(enumerator, generateEndItem)
+        public SpeculativeReaderBase() { }
+
+        protected override void Initialize()
         {
+            marks.Clear();
+
+            base.Initialize();
+        }
+
+        public T PeekFromMark(int lookahead)
+        {
+            if (lookahead < 0)
+                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
+
+            var mark = marks.Peek();
+
+            int index = mark.Index + lookahead;
+
+            EnsureIndex(index);
+
+            var item = RawPeekByIndex(index);
+
+            return item;
+        }
+
+        public IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false)
+        {
+            if (lookahead < 0)
+                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
+
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("amount", amount, "Amount cannot be less than 0");
+
+            var mark = marks.Peek();
+
+            int index = mark.Index + lookahead;
+
+            EnsureIndex(index + amount);
+
+            for (int i = index; i < index + amount; i++)
+            {
+                if (i < Size || includeEnd)
+                    yield return RawPeekByIndex(i);
+                else
+                    yield break;
+            }
+
         }
 
 
         // Mark information
-        protected List<MarkItem> Marks { get => marks; }
+        protected Stack<MarkItem> Marks => marks;
 
-        protected override bool CanReset { get => !IsSpeculating; }
-        
+        protected override bool CanReset => !IsSpeculating;
+
         public bool IsSpeculating => marks.Count != 0;
+
 
         public int MarkCount => marks.Count;
 
-        public int GetMarkPosition(int mark) => marks[mark].Position;
+        public int MarkPosition => marks.Peek().Position;
 
 
         // Mark
-        protected void CreateMark(int position, int index, TState state)
-        {
-            VerifyInitialized();
+        public void Mark() => CreateMark(Position, Index);
 
-            marks.Add(new MarkItem(position, index, state));
-
-            OnMarked(position, index, state);
-        }
-
-        protected void OnMarked(int position, int index, TState state) { }
+        protected void CreateMark(int position, int index) => marks.Push(new MarkItem(position, index));
 
 
         // Commit
-        public void Commit() => Commit(1);
-
-        public void CommitAll() => Commit(marks.Count);
-
-        public void Commit(int marks)
+        public void Commit()
         {
-            if (marks < -1 || marks > MarkCount)
-                throw new InvalidOperationException(string.Format("Attempting to commit {0} speculations; only {1} exist", marks, MarkCount));
+            if (!IsSpeculating)
+                throw new InvalidOperationException("Cannot commit when not speculating.");
 
-            if (marks > 0)
-            {
-                // Get mark to commit from
-                var markIndex = this.marks.Count - marks;
-
-                var mark = this.marks[markIndex];
-
-
-                // Pop off all marks
-                this.marks.RemoveRange(markIndex, marks);
-
-                // Set to marked positions
-                var oldPosition = Position;
-
-                // Notify suscribers of retreat
-                OnCommitted(this.Position, oldPosition);
-            }
+            marks.Pop();
         }
 
-        protected virtual void OnCommitted(int markedPosition, int speculatedPosition) { }
 
-
-        // Retreat
-        public void Retreat() => Retreat(1);
-
-        public void RetreatAll() => Retreat(MarkCount);
-
-        public void Retreat(int marks)
+        // Rollback
+        public void Rollback()
         {
-            if (marks < -1 || marks > MarkCount)
-                throw new InvalidOperationException(string.Format("Attempting to rollback {0} speculations; only {1} exist", marks, MarkCount));
+            if (!IsSpeculating)
+                throw new InvalidOperationException("Cannot rollback when not speculating.");
 
-            if (marks > 0)
-            {
-                // Get mark to retreat to
-                var markIndex = this.marks.Count - marks;
+            var mark = marks.Pop();
 
-                var mark = this.marks[markIndex];
+            this.Index = mark.Index;
 
-
-                // Pop off all marks
-                this.marks.RemoveRange(markIndex, marks);
-
-
-                // Set to marked positions
-                var oldPosition = Position;
-
-                this.Index = mark.Index;
-
-                this.Position = mark.Position;
-
-
-                // Notify retreat
-                OnRetreated(this.Position, oldPosition);
-            }
-        }
-
-        protected virtual void OnRetreated(int markedPosition, int speculatedPosition)
-        {
+            this.Position = mark.Position;
         }
     }
 }

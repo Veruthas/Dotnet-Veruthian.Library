@@ -1,16 +1,19 @@
 using System;
+using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Data.Readers
 {
-    public interface ISpeculativeReader<T> : ILookaheadReader<T>
+    public interface ISpeculativeReader<out T> : ILookaheadReader<T>
     {
         bool IsSpeculating { get; }
 
 
-        int MarkCount { get; }
+        int MarkPosition { get; }
 
 
-        int GetMarkPosition(int mark);
+        T PeekFromMark(int lookahead);
+
+        IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false);
 
 
         void Mark();
@@ -18,23 +21,7 @@ namespace Veruthian.Dotnet.Library.Data.Readers
 
         void Commit();
 
-        void Commit(int marks);
 
-        void CommitAll();
-
-
-        void Retreat();
-
-        void Retreat(int marks);
-
-        void RetreatAll();
-    }
-
-    public interface ISpeculativeReader<T, TState> : ISpeculativeReader<T>
-    {
-        TState GetMarkState(int mark);
-
-        void Mark(TState withState);
-
+        void Rollback();
     }
 }
