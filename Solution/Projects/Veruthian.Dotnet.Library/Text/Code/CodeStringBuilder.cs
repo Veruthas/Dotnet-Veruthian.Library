@@ -479,6 +479,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return builder.ToString();
         }
+
         public string ToString(int index) => ToString(index, Length - index);
 
         public string ToString(int index, int length)
@@ -492,6 +493,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return builder.ToString();
         }
+        
 
         private void VerifyInRange(int index, int length)
         {

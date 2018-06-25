@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Veruthian.Dotnet.Library.Data;
-using Veruthian.Dotnet.Library.Data.Enumeration;
+using Veruthian.Dotnet.Library.Data.Collections;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {
@@ -13,6 +14,8 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         readonly CodePoint[] codepoints;
 
+
+        #region Constructors
 
         private CodeString(CodePoint[] codepoints, bool clone)
         {
@@ -34,15 +37,12 @@ namespace Veruthian.Dotnet.Library.Text.Code
         public CodeString(IEnumerable<CodePoint> codepoints)
             : this(System.Linq.Enumerable.ToArray(codepoints), false) { }
 
-        public CodeString(IEnumerator<CodePoint> codepoints)
-            : this(GetFromEnumerator(codepoints), false) { }
-
-        private static CodePoint[] GetFromEnumerator(IEnumerator<CodePoint> codepoints)
+        private static CodePoint[] GetFromEnumerator(IEnumerable<CodePoint> codepoints)
         {
             var result = new List<CodePoint>();
 
-            while (codepoints.MoveNext())
-                result.Add(codepoints.Current);
+            foreach(var codepoint in codepoints)
+                result.Add(codepoint);
 
             return result.ToArray();
         }
@@ -102,7 +102,9 @@ namespace Veruthian.Dotnet.Library.Text.Code
             : this(value.ToCodePointArray(start, length), false) { }
 
 
-        // Indexer
+        #endregion
+
+        
         public CodePoint this[int index] => codepoints[index];
 
         public int Length => codepoints.Length;
@@ -110,10 +112,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
         public bool IsEmpty => Length == 0;
 
 
-        /* Operators */
-        #region Operators
+        #region Operations
 
-        // Validation
+        #region Validation
+
         public bool IsValid
         {
             get
@@ -132,8 +134,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
                 codepoint.VerifyIsValid();
         }
 
+        #endregion
 
-        // Equality
+        #region Equality
+
         public override int GetHashCode() => hashcode;
 
         public override bool Equals(object obj) => (obj is CodeString) ? Equals(obj as CodeString) : false;
@@ -179,7 +183,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         public static bool IsNullOrEmpty(CodeString value) => value == null || value.IsEmpty;
 
-        // Comparison
+        #endregion
+
+        #region Comparison
+        
         public int CompareTo(CodeString other)
         {
             // Treat null like empty
@@ -231,7 +238,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         public static bool operator >=(CodeString left, CodeString right) => Compare(left, right) != -1;
 
-        // Combination
+        #endregion
+
+        #region Combination
+
         public static CodeString operator +(CodeString left, CodeString right) => Combine(left, right);
 
         public static CodeString operator +(CodeString left, CodePoint right) => Combine(left, right);
@@ -313,8 +323,70 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return new CodeString(combined, false);
         }
 
+        #endregion
 
-        // Replicate
+        #region Unoptimized
+        
+        public CodeString Normalize()
+        {
+            string converted = this.ToString().Normalize();
+
+            return new CodeString(converted);
+        }
+
+        public CodeString Normalize(NormalizationForm form)
+        {
+            string converted = this.ToString().Normalize(form);
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToUpper()
+        {
+            string converted = this.ToString().ToUpper();
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToUpper(CultureInfo culture)
+        {
+            string converted = this.ToString().ToUpper(culture);
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToUpperInvariant()
+        {
+            string converted = this.ToString().ToUpperInvariant();
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToLower()
+        {
+            string converted = this.ToString().ToLower();
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToLower(CultureInfo culture)
+        {
+            string converted = this.ToString().ToLower(culture);
+
+            return new CodeString(converted);
+        }
+
+        public CodeString ToLowerInvariant()
+        {
+            string converted = this.ToString().ToLowerInvariant();
+
+            return new CodeString(converted);
+        }
+
+        #endregion
+
+        #region Replicate
+
         private static CodePoint[] ReplicateCodePoint(CodePoint value, int count)
         {
             if (count < 0)
@@ -340,15 +412,17 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return Combine(values);
         }
 
-        // Join
+        #endregion
+
+        #region Join
         public static CodeString Join(CodeString separator, params CodeString[] values) => Join(separator, values);
 
-        public static CodeString Join(CodeString separator, IEnumerable<CodeString> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+        public static CodeString Join(CodeString separator, IEnumerable<CodeString> values) => Combine(GetEnumerable(separator, values));
 
-        public static CodeString Join(CodeString separator, IEnumerable<object> values) => Combine(GetEnumerator(separator, values).GetEnumerableAdapter());
+        public static CodeString Join(CodeString separator, IEnumerable<object> values) => Combine(GetEnumerable(separator, values));
 
 
-        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<CodeString> values)
+        private static IEnumerable<CodeString> GetEnumerable(CodeString separator, IEnumerable<CodeString> values)
         {
             bool initialized = false;
 
@@ -363,7 +437,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             }
         }
 
-        private static IEnumerator<CodeString> GetEnumerator(CodeString separator, IEnumerable<object> values)
+        private static IEnumerable<CodeString> GetEnumerable(CodeString separator, IEnumerable<object> values)
         {
             bool initialized = false;
 
@@ -380,8 +454,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
             }
         }
 
+        #endregion
 
-        // SubString
+        #region SubString
+
         public CodeString Substring(int start) => Substring(start, Length - start);
 
         public CodeString Substring(int start, int length)
@@ -410,8 +486,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return new CodeString(reversed, false);
         }
 
+        #endregion
 
-        // String
+        #region String
+
         public override string ToString()
         {
             // should this be cached?
@@ -425,10 +503,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         public static implicit operator string(CodeString value) => value.IsNull() ? null : value.ToString();
 
-
         #endregion
 
-        // Enumerator
+        #region Enumerator
+
         public CodePoint[] ToCodePointArray() => (CodePoint[])codepoints.Clone();
 
         public IEnumerator<CodePoint> GetEnumerator()
@@ -438,6 +516,10 @@ namespace Veruthian.Dotnet.Library.Text.Code
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        #endregion
+
+        #endregion
 
 
         // Constants

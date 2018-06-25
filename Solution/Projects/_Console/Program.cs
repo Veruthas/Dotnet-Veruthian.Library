@@ -1,11 +1,12 @@
 ﻿using System;
+using Veruthian.Dotnet.Library.Data.Collections;
 
 namespace _Console
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {            
             Pause();
         }
 

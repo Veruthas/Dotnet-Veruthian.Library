@@ -7,8 +7,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 {
     public struct BitTwiddler
     {
-
-        /* Constants */
         #region Constants
 
         static readonly ulong[] masks = GetBitMasks();
@@ -145,7 +143,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         readonly int bitCount;
 
 
-        /* Constructors */
         #region Constructors
 
         private BitTwiddler(ulong value, int bitCount)
@@ -158,8 +155,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
                 this.bitCount = bitCount;
             }
-        }
-        // Bits        
+        }     
 
 
         // Bytes        
@@ -521,8 +517,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-
-        /* Counts */
         #region Counts
 
         private static int CorrectBitCount(int bitCount) => (bitCount < 0) ? 0 : (bitCount > MaxBitCount) ? MaxBitCount : bitCount;
@@ -565,8 +559,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-
-        /* Access and Modification */
         #region Access and Modification
 
         // Get
@@ -681,8 +673,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-
-        /* Operations */
         #region Operations
 
 
@@ -1045,8 +1035,8 @@ namespace Veruthian.Dotnet.Library.Numeric
         // TODO: Signed arithmetic/Sign extension for arbitrarty bitregions
         #endregion
 
+        #region ToString
 
-        // ToString()
         public string ToBitString(int bitsPerRegion = 4, string regionSeparator = "-", int bitCount = -1)
         {
             if (bitCount == -1)
@@ -1131,10 +1121,13 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public override string ToString() => hex ? ToHexString() : ToBinaryString();
 
+
         private static bool hex = true;
 
         public static void DefaultAsHexString() => hex = true;
 
         public static bool DefaultAsBinaryString() => hex = false;
+
+        #endregion
     }
 }
