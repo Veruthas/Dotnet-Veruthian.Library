@@ -1,6 +1,6 @@
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public interface INumeric<N> : ISequential<N>
+    public interface INumeric<N> : IOrderable<N>
         where N : struct, INumeric<N>
     {
         N Add(N value);
@@ -9,10 +9,10 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         N Multiply(N value);
 
-        N? Divide(N value);
+        N Divide(N value);
 
         N Modulus(N value);
 
-        (N?, N) DivideWithRemainder(N value);
+        N DivideWithRemainder(N value, out N remainder);
     }
 }
