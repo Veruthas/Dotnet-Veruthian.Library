@@ -6,6 +6,6 @@ namespace Veruthian.Dotnet.Library.Data
     {
         T Next { get; }
 
-        T Previous { get; }
+        T Previous { get; }        
     }
 }
