@@ -6,48 +6,43 @@ namespace Veruthian.Dotnet.Library.Data.Collections
 {
     public class DataList<T> : ExpandableIndexBase<T>
     {
-        protected const int minimumSize = 4;
+        List<T> items;
 
-        T[] items;
+        public DataList() => this.items = new List<T>();
 
-        int size = 0;
-        
+        public DataList(int capacity) => this.items = new List<T>(capacity);
 
-        public DataList() => throw new NotImplementedException();
+        public DataList(params T[] items) => this.items = items.ToList();
 
-        public DataList(int capacity) => throw new NotImplementedException();
+        public DataList(IEnumerable<T> items) => this.items = items.ToList();
 
-        public DataList(params T[] items) => throw new NotImplementedException();
-
-        public DataList(IEnumerable<T> items) => throw new NotImplementedException();
-
-        public DataList(T item, int repeat) => throw new NotImplementedException();
+        public DataList(T item, int repeat) => this.items = item.RepeatAsList(repeat);
 
 
-        public override int Count => throw new NotImplementedException();
+        public override int Count => items.Count;
 
 
-        protected override T RawGet(int adjustedValidIndex) => throw new NotImplementedException();
+        protected override T RawGet(int adjustedValidIndex) => items[adjustedValidIndex];
 
-        protected override void RawSet(int adjustedValidIndex, T value) => throw new NotImplementedException();
-
-
-        public override void Add(T value) => throw new NotImplementedException();
-
-        public override void AddRange(IEnumerable<T> values) => throw new NotImplementedException();
-
-        public override void Insert(int index, T value) => throw new NotImplementedException();
-
-        public override void InsertRange(int index, IEnumerable<T> values) => throw new NotImplementedException();
+        protected override void RawSet(int adjustedValidIndex, T value) => items[adjustedValidIndex] = value;
 
 
-        public override bool Remove(T value) => throw new NotImplementedException();
+        public override void Add(T value) => items.Add(value);
 
-        public override void RemoveBy(int index) => throw new NotImplementedException();
+        public override void AddRange(IEnumerable<T> values) => items.AddRange(values);
 
-        public override void RemoveRange(int start, int count) => throw new NotImplementedException();
+        public override void Insert(int index, T value) => items.Insert(index, value);
+
+        public override void InsertRange(int index, IEnumerable<T> values) => items.InsertRange(index, values);
 
 
-        public override void Clear() => throw new NotImplementedException();
+        public override bool Remove(T value) => items.Remove(value);
+
+        public override void RemoveBy(int index) => items.RemoveAt(index);
+
+        public override void RemoveRange(int start, int count) => items.RemoveRange(start, count);
+
+
+        public override void Clear() => items.Clear();
     }
 }
