@@ -3,7 +3,7 @@ using Veruthian.Dotnet.Library.Data;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : ISequential<Nibble>, IFormattable, IConvertible
+    public struct Nibble : ISequential<Nibble>, IBounded<Nibble>, IFormattable, IConvertible
     {
         private readonly byte value;
 
@@ -200,11 +200,11 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         Nibble ISequential<Nibble>.Previous => this -= 1;
 
-        Nibble IOrderable<Nibble>.Default => default(Nibble);
+        Nibble IBounded<Nibble>.Default => default(Nibble);
 
-        Nibble IOrderable<Nibble>.MinValue => Nibble.MinValue;
+        Nibble IBounded<Nibble>.MinValue => Nibble.MinValue;
 
-        Nibble IOrderable<Nibble>.MaxValue => Nibble.MaxValue;
+        Nibble IBounded<Nibble>.MaxValue => Nibble.MaxValue;
 
         #endregion
     }

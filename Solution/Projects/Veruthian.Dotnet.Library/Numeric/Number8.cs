@@ -3,7 +3,7 @@ using Veruthian.Dotnet.Library.Data;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Number8: ISequential<Number8>, IFormattable
+    public struct Number8 : ISequential<Number8>, IBounded<Number8>, IFormattable
     {
         private byte value;
 
@@ -27,11 +27,11 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         Number8 ISequential<Number8>.Previous => throw new NotImplementedException();
 
-        Number8 IOrderable<Number8>.Default => Default;
+        Number8 IBounded<Number8>.Default => Default;
 
-        Number8 IOrderable<Number8>.MinValue => MinValue;
+        Number8 IBounded<Number8>.MinValue => MinValue;
 
-        Number8 IOrderable<Number8>.MaxValue => MaxValue;
+        Number8 IBounded<Number8>.MaxValue => MaxValue;
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public string ToString(IFormatProvider provider) => value.ToString(provider);
 
-        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);      
+        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);
 
 
         // Parsing

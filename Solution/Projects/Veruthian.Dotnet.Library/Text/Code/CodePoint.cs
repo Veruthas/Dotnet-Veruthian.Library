@@ -7,7 +7,7 @@ using Veruthian.Dotnet.Library.Data;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {
-    public struct CodePoint : IEquatable<CodePoint>, IComparable<CodePoint>, ISequential<CodePoint>
+    public struct CodePoint : ISequential<CodePoint>, IBounded<CodePoint>
     {
         uint value;
 
@@ -451,11 +451,11 @@ namespace Veruthian.Dotnet.Library.Text.Code
         CodePoint ISequential<CodePoint>.Previous => new CodePoint(this.value - 1);
 
 
-        CodePoint IOrderable<CodePoint>.Default => default(CodePoint);
+        CodePoint IBounded<CodePoint>.Default => default(CodePoint);
 
-        CodePoint IOrderable<CodePoint>.MinValue => CodePoint.MinValue;
+        CodePoint IBounded<CodePoint>.MinValue => CodePoint.MinValue;
 
-        CodePoint IOrderable<CodePoint>.MaxValue => CodePoint.MinValue;
+        CodePoint IBounded<CodePoint>.MaxValue => CodePoint.MinValue;
 
 
         bool IOrderable<CodePoint>.Precedes(CodePoint other) => this.value < other.value;
