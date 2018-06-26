@@ -199,7 +199,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         Nibble ISequential<Nibble>.Previous => this -= 1;
 
-        Nibble IBounded<Nibble>.Default => default(Nibble);
 
         Nibble IBounded<Nibble>.MinValue => Nibble.MinValue;
 

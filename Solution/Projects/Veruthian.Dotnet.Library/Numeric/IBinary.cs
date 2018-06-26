@@ -3,7 +3,7 @@ using Veruthian.Dotnet.Library.Collections;
 namespace Veruthian.Dotnet.Library.Numeric
 {
     public interface IBinary<B>
-        where B : struct, IBinary<B>, IIndex<bool>
+        where B : IBinary<B>, IIndex<bool>
     {
         B And(B value);
 
