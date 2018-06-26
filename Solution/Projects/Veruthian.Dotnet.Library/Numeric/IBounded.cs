@@ -4,8 +4,6 @@ namespace Veruthian.Dotnet.Library.Numeric
     {
         T MinValue { get; }
 
-        T Default { get; }
-
         T MaxValue { get; }
     }
 }
