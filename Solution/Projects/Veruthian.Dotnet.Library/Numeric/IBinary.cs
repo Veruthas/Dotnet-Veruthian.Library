@@ -3,10 +3,8 @@ using Veruthian.Dotnet.Library.Collections;
 namespace Veruthian.Dotnet.Library.Numeric
 {
     public interface IBinary<B>
-        where B : struct, IBinary<B>
+        where B : struct, IBinary<B>, IIndex<bool>
     {
-        IIndex<bool> Bits{ get; }
-
         B And(B value);
 
         B Nand(B value);
