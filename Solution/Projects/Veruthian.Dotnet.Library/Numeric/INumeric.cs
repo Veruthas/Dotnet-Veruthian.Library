@@ -13,6 +13,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         N Modulus(N value);
 
-        N DivideWithRemainder(N value, out N remainder);
+        N DivideWithRemainder(N value, out N remainder);        
     }
 }
