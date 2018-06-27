@@ -5,17 +5,17 @@ namespace Veruthian.Dotnet.Library.Numeric
     public interface IBinary<B>
         where B : IBinary<B>, IIndex<bool>
     {
-        B And(B value);
+        B And(B other);
 
-        B Nand(B value);
+        B Nand(B other);
 
-        B Or(B value);
+        B Or(B other);
 
-        B Nor(B value);
+        B Nor(B other);
 
-        B Xor(B value);
+        B Xor(B other);
 
-        B Equivalence(B value);
+        B Equivalence(B other);
 
         B Not();
     }

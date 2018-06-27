@@ -62,5 +62,15 @@ namespace Veruthian.Dotnet.Library
 
             return hash;
         }
+
+        public int Combine<T>(params T[] items)
+        {
+            int hash = primeBase;
+
+            foreach (var item in items)
+                hash = (hash * primeOffset) + item.GetHashCode();
+
+            return hash;
+        }
     }
 }
