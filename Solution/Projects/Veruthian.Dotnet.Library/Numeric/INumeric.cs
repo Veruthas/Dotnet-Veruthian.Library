@@ -3,18 +3,22 @@ namespace Veruthian.Dotnet.Library.Numeric
     public interface INumeric<N> : IOrderable<N>
         where N : INumeric<N>
     {
-        N Add(N value);
+        N Add(N other);
+    
+        N Subtract(N other);
+    
+        N Delta(N other);
 
-        N Subtract(N value);
+        N Increment();
+        
+        N Decrement();
 
-        N Delta(N value);
+        N Multiply(N other);
 
-        N Multiply(N value);
+        N Divide(N other);        
 
-        N Divide(N value);        
+        N Divide(N other, out N remainder);
 
-        N Divide(N value, out N remainder);
-
-        N Modulus(N value);
+        N Modulus(N other);
     }
 }
