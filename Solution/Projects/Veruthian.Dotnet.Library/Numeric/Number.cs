@@ -55,6 +55,7 @@ namespace Veruthian.Dotnet.Library.Numeric
                 this = new Number((uint)value, (uint)(value >> 32));
         }
 
+
         public static implicit operator Number(uint value) => new Number(value);
 
         public static explicit operator Number(int value) => new Number(value);
@@ -65,11 +66,13 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-
+        #region Properties
+            
         private bool IsLight => values == null;
 
         private bool IsHeavy => values != null;
 
+        #endregion
 
         #region Comparison
 
@@ -209,45 +212,22 @@ namespace Veruthian.Dotnet.Library.Numeric
                 }
                 else
                 {
-                    return Add(left.value, right.values);
+                    return new Number(NumericUtility.Add(left.value, right.values));
                 }
             }
             else
             {
                 if (right.IsLight)
                 {
-                    return Add(right.value, left.values);
+                    return new Number(NumericUtility.Add(right.value, left.values));
                 }
                 else
                 {
-                    return Add(left.values, right.values);
+                    return new Number(NumericUtility.Add(left.values, right.values));
                 }
             }
         }
 
-        private static Number Add(uint value, uint[] values)
-        {
-            int oldSize = values.Length;
-
-            bool overflow = (values[oldSize - 1] == uint.MaxValue);
-
-            var newValues = new uint[overflow ? oldSize : oldSize + 1];
-
-            uint carry = value;
-
-            for (int i = 0; i < oldSize; i++)
-                (newValues[i], carry) = NumericUtility.Add(values[i], carry);
-
-            if (overflow)
-                newValues[oldSize] = carry;
-
-            return new Number(newValues);
-        }
-
-        private static Number Add(uint[] left, uint[] right)
-        {
-            return new Number();
-        }
 
 
         public static Number Subtract(Number left, Number right)
