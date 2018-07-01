@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Veruthian.Dotnet.Library.Text.Char
+namespace Veruthian.Dotnet.Library.Text.Char.Extensions
 {
-    public static class CharUtility
+    public static class CharExtensions
     {
         // Enumerators
         public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
