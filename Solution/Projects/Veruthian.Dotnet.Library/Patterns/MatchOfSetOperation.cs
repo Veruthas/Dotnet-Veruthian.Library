@@ -5,7 +5,7 @@ using Veruthian.Dotnet.Library.Readers;
 namespace Veruthian.Dotnet.Library.Patterns
 {
     public class MatchOfSetOperation<TState, TReader, T> : MatchOperation<TState, TReader, T>
-        where TState : HasType<TReader>
+        where TState : Has<TReader>
         where TReader : IReader<T>
         where T : struct, ISequential<T>, IBounded<T>
     {

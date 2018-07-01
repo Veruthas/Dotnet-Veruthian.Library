@@ -5,7 +5,7 @@ using Veruthian.Dotnet.Library.Readers;
 namespace Veruthian.Dotnet.Library.Patterns
 {
     public class CheckOfSetOperation<TState, TReader, T> : CheckOperation<TState, TReader, T>
-        where TState : HasType<TReader>
+        where TState : Has<TReader>
         where TReader : ILookaheadReader<T>
         where T : struct, ISequential<T>, IBounded<T>
     {

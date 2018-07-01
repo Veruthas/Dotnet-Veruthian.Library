@@ -3,7 +3,7 @@ using Veruthian.Dotnet.Library.Readers;
 namespace Veruthian.Dotnet.Library.Patterns
 {
     public class DynamicMatchOperation<TState, TReader, T> : MatchOperation<TState, TReader, T>
-        where TState : HasType<TReader>
+        where TState : Has<TReader>
         where TReader : IReader<T>
     {
         MatchFunction<T> match;
