@@ -4,7 +4,7 @@ using Veruthian.Dotnet.Library.Readers;
 namespace Veruthian.Dotnet.Library.Patterns
 {
     public abstract class CheckOperation<TState, TReader, T> : SimpleOperation<TState>
-        where TState : HasType<TReader>
+        where TState : Has<TReader>
         where TReader : ILookaheadReader<T>
     {
         int lookahead;
