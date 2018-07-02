@@ -309,8 +309,6 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        Density ILookup<int, bool>.Density => Density.Dense;
-
 
         #endregion
     }
