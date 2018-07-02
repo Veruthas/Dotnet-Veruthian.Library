@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
+using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, IFormattable
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, IBinary<Nibble>, IIndex<bool>, IFormattable
     {
         private readonly byte value;
 
@@ -25,23 +27,23 @@ namespace Veruthian.Dotnet.Library.Numeric
         public static implicit operator byte(Nibble value) => value.value;
 
         public static implicit operator ushort(Nibble value) => value.value;
-        
+
         public static implicit operator uint(Nibble value) => value.value;
-        
+
         public static implicit operator ulong(Nibble value) => value.value;
-        
+
         public static implicit operator sbyte(Nibble value) => (sbyte)value.value;
-        
+
         public static implicit operator short(Nibble value) => value.value;
-        
+
         public static implicit operator int(Nibble value) => value.value;
-        
+
         public static implicit operator long(Nibble value) => value.value;
-        
+
         public static implicit operator float(Nibble value) => value.value;
-        
+
         public static implicit operator double(Nibble value) => value.value;
-        
+
         public static explicit operator char(Nibble value) => (char)value.value;
 
 
@@ -73,13 +75,17 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public override int GetHashCode() => value.GetHashCode();
 
+        public bool Equals(Nibble other) => this.value == other.value;
+
         public override bool Equals(object obj) => (obj is Nibble) ? this.Equals((Nibble)obj) : false;
+
+        public int CompareTo(Nibble other) => this.value.CompareTo(other.value);
+
 
         public static bool operator ==(Nibble left, Nibble right) => left.value == right.value;
 
         public static bool operator !=(Nibble left, Nibble right) => left.value != right.value;
 
-        public bool Equals(Nibble other) => this.value == other.value;
 
         public static bool operator <(Nibble left, Nibble right) => left.value < right.value;
 
@@ -88,8 +94,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         public static bool operator <=(Nibble left, Nibble right) => left.value <= right.value;
 
         public static bool operator >=(Nibble left, Nibble right) => left.value >= right.value;
-
-        public int CompareTo(Nibble other) => this.value.CompareTo(other.value);
 
         #endregion
 
@@ -109,6 +113,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public static Nibble operator %(Nibble left, Nibble right) => unchecked(new Nibble(left.value % right.value));
 
+
         public static Nibble operator ~(Nibble value) => new Nibble(~value.value);
 
         public static Nibble operator &(Nibble left, Nibble right) => new Nibble(left.value & right.value);
@@ -116,26 +121,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         public static Nibble operator |(Nibble left, Nibble right) => new Nibble(left.value | right.value);
 
         public static Nibble operator ^(Nibble left, Nibble right) => new Nibble(left.value ^ right.value);
-
-        public static Nibble operator >>(Nibble value, int amount)
-        {
-            if (amount < 0)
-                return value << -amount;
-            else if (amount >= 4)
-                return MinValue;
-            else
-                return new Nibble(value.value >> amount);
-        }
-
-        public static Nibble operator <<(Nibble value, int amount)
-        {
-            if (amount < 0)
-                return value >> -amount;
-            else if (amount >= 4)
-                return MinValue;
-            else
-                return new Nibble(value.value << amount);
-        }
 
         #endregion
 
@@ -191,7 +176,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-        #region INUmeric
+        #region INumeric
 
         public bool Precedes(Nibble other) => this < other;
 
@@ -220,11 +205,112 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         Nibble INumeric<Nibble>.Modulus(Nibble other) => this % other;
 
+        #endregion
 
+        #region IBounded
 
         Nibble IBounded<Nibble>.MinValue => Nibble.MinValue;
 
         Nibble IBounded<Nibble>.MaxValue => Nibble.MaxValue;
+
+        #endregion
+
+        #region IBinary
+
+        Nibble IBinary<Nibble>.And(Nibble other) => this & other;
+
+        Nibble IBinary<Nibble>.Nand(Nibble other) => ~(this & other);
+
+        Nibble IBinary<Nibble>.Or(Nibble other) => this | other;
+
+        Nibble IBinary<Nibble>.Nor(Nibble other) => ~(this | other);
+
+        Nibble IBinary<Nibble>.Xor(Nibble other) => this ^ other;
+
+        Nibble IBinary<Nibble>.Equivalence(Nibble other) => ~(this ^ other);
+
+        Nibble IBinary<Nibble>.Not() => ~this;
+
+
+        const int bits = 4;
+
+
+        bool ILookup<int, bool>.this[int key] => TryGet(key, out var result) ? result : throw new IndexOutOfRangeException();
+
+
+        bool IContainer<bool>.Contains(bool value) => (value && this.value != 0) || (!value && this.value != 0xF);
+
+        bool ILookup<int, bool>.HasKey(int key) => (uint)key <= bits;
+
+        private bool TryGet(int key, out bool value)
+        {
+            if ((uint)key <= bits)
+            {
+                value = ((this.value >> key) & 0x1) == 1;
+
+                return true;
+            }
+            else
+            {
+                value = false;
+
+                return false;
+            }
+        }
+
+        bool ILookup<int, bool>.TryGet(int key, out bool value) => TryGet(key, out value);
+
+
+        int? IIndex<bool>.IndexOf(bool value)
+        {
+            int match = value ? 0x1 : 0x0;
+
+            for (int i = 0; i < bits; i++)
+            {
+                if (((this.value >> i) & 0x1) == match)
+                    return i;
+            }
+
+            return null;
+        }
+
+
+        int IContainer<bool>.Count => bits;
+
+        int IIndex<bool>.StartIndex => 0;
+
+        int IIndex<bool>.EndIndex => bits - 1;
+
+        IEnumerable<int> ILookup<int, bool>.Keys
+        {
+            get
+            {
+                for (int i = 0; i < bits; i++)
+                    yield return i;
+            }
+        }
+
+        IEnumerable<bool> IContainer<bool>.Values
+        {
+            get
+            {
+                for (int i = 0; i < bits; i++)
+                    yield return ((this.value >> i) & 0x1) == 0x1;
+
+            }
+        }
+
+        IEnumerable<KeyValuePair<int, bool>> ILookup<int, bool>.Pairs
+        {
+            get
+            {
+                for (int i = 0; i < bits; i++)
+                    yield return new KeyValuePair<int, bool>(i, ((this.value >> i) & 0x1) == 0x1);
+            }
+        }
+
+        Density ILookup<int, bool>.Density => Density.Dense;
+
 
         #endregion
     }
