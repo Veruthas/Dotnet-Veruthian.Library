@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : ISequential<Nibble>, IBounded<Nibble>, IFormattable, IConvertible
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, IFormattable
     {
         private readonly byte value;
 
@@ -23,47 +23,49 @@ namespace Veruthian.Dotnet.Library.Numeric
         #region Conversion
 
         public static implicit operator byte(Nibble value) => value.value;
+
         public static implicit operator ushort(Nibble value) => value.value;
+        
         public static implicit operator uint(Nibble value) => value.value;
+        
         public static implicit operator ulong(Nibble value) => value.value;
+        
         public static implicit operator sbyte(Nibble value) => (sbyte)value.value;
+        
         public static implicit operator short(Nibble value) => value.value;
+        
         public static implicit operator int(Nibble value) => value.value;
+        
         public static implicit operator long(Nibble value) => value.value;
+        
         public static implicit operator float(Nibble value) => value.value;
+        
         public static implicit operator double(Nibble value) => value.value;
+        
         public static explicit operator char(Nibble value) => (char)value.value;
 
+
         public static implicit operator Nibble(byte value) => new Nibble(value);
+
         public static explicit operator Nibble(ushort value) => new Nibble(value);
+
         public static explicit operator Nibble(uint value) => new Nibble((int)value);
+
         public static explicit operator Nibble(ulong value) => new Nibble((int)value);
+
         public static explicit operator Nibble(sbyte value) => new Nibble(value);
+
         public static explicit operator Nibble(short value) => new Nibble(value);
+
         public static explicit operator Nibble(int value) => new Nibble(value);
+
         public static explicit operator Nibble(long value) => new Nibble((int)value);
+
         public static explicit operator Nibble(float value) => new Nibble((int)value);
+
         public static explicit operator Nibble(double value) => new Nibble((int)value);
+
         public static explicit operator Nibble(char value) => new Nibble(value);
-
-        TypeCode IConvertible.GetTypeCode() => TypeCode.Byte;
-        bool IConvertible.ToBoolean(IFormatProvider provider) => ((IConvertible)this.value).ToBoolean(provider);
-        byte IConvertible.ToByte(IFormatProvider provider) => ((IConvertible)this.value).ToByte(provider);
-        char IConvertible.ToChar(IFormatProvider provider) => ((IConvertible)this.value).ToChar(provider);
-        DateTime IConvertible.ToDateTime(IFormatProvider provider) => ((IConvertible)this.value).ToDateTime(provider);
-        decimal IConvertible.ToDecimal(IFormatProvider provider) => ((IConvertible)this.value).ToDecimal(provider);
-        double IConvertible.ToDouble(IFormatProvider provider) => ((IConvertible)this.value).ToDouble(provider);
-        short IConvertible.ToInt16(IFormatProvider provider) => ((IConvertible)this.value).ToInt16(provider);
-        int IConvertible.ToInt32(IFormatProvider provider) => ((IConvertible)this.value).ToInt32(provider);
-        long IConvertible.ToInt64(IFormatProvider provider) => ((IConvertible)this.value).ToInt64(provider);
-        sbyte IConvertible.ToSByte(IFormatProvider provider) => ((IConvertible)this.value).ToSByte(provider);
-        float IConvertible.ToSingle(IFormatProvider provider) => ((IConvertible)this.value).ToSingle(provider);
-
-        string IConvertible.ToString(IFormatProvider provider) => ((IConvertible)this.value).ToString(provider);
-        object IConvertible.ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)this.value).ToType(conversionType, provider);
-        ushort IConvertible.ToUInt16(IFormatProvider provider) => ((IConvertible)this.value).ToUInt16(provider);
-        uint IConvertible.ToUInt32(IFormatProvider provider) => ((IConvertible)this.value).ToUInt32(provider);
-        ulong IConvertible.ToUInt64(IFormatProvider provider) => ((IConvertible)this.value).ToUInt64(provider);
 
         #endregion
 
@@ -189,15 +191,35 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-        #region ISequential
+        #region INUmeric
 
         public bool Precedes(Nibble other) => this < other;
 
         public bool Follows(Nibble other) => this > other;
 
-        Nibble ISequential<Nibble>.Next => this += 1;
+        Nibble INumeric<Nibble>.Add(Nibble other) => this + other;
 
-        Nibble ISequential<Nibble>.Previous => this -= 1;
+        Nibble INumeric<Nibble>.Subtract(Nibble other) => this - other;
+
+        Nibble INumeric<Nibble>.Delta(Nibble other) => this - other;
+
+        Nibble INumeric<Nibble>.Increment() => this++;
+
+        Nibble INumeric<Nibble>.Decrement() => this--;
+
+        Nibble INumeric<Nibble>.Multiply(Nibble other) => this * other;
+
+        Nibble INumeric<Nibble>.Divide(Nibble other) => this / other;
+
+        Nibble INumeric<Nibble>.Divide(Nibble other, out Nibble remainder)
+        {
+            remainder = this % other;
+
+            return this / other;
+        }
+
+        Nibble INumeric<Nibble>.Modulus(Nibble other) => this % other;
+
 
 
         Nibble IBounded<Nibble>.MinValue => Nibble.MinValue;
