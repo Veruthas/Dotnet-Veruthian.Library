@@ -2,21 +2,15 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public interface IBinary<B>
-        where B : IBinary<B>, IIndex<bool>
+    public interface IBinary<T>
+        where T : IBinary<T>, IIndex<bool>
     {
-        B And(B other);
+        T And(T other);
 
-        B Nand(B other);
+        T Or(T other);
 
-        B Or(B other);
+        T Xor(T other);
 
-        B Nor(B other);
-
-        B Xor(B other);
-
-        B Equivalence(B other);
-
-        B Not();
+        T Not();
     }
 }

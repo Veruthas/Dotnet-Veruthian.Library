@@ -1,12 +1,13 @@
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public interface IIntegral<I> : INumeric<I>
-        where I : IIntegral<I>
+    public interface IIntegral<T> : INumeric<T>
+        where T : IIntegral<T>
     {
-        I Sign { get; }
+        T Sign { get; }
 
-        I Magnitude { get; }
+        T Magnitude { get; }
 
-        I Negate();
+
+        T Negate();
     }
 }
