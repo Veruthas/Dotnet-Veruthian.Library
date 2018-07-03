@@ -219,15 +219,9 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         Nibble IBinary<Nibble>.And(Nibble other) => this & other;
 
-        Nibble IBinary<Nibble>.Nand(Nibble other) => ~(this & other);
-
         Nibble IBinary<Nibble>.Or(Nibble other) => this | other;
 
-        Nibble IBinary<Nibble>.Nor(Nibble other) => ~(this | other);
-
         Nibble IBinary<Nibble>.Xor(Nibble other) => this ^ other;
-
-        Nibble IBinary<Nibble>.Equivalence(Nibble other) => ~(this ^ other);
 
         Nibble IBinary<Nibble>.Not() => ~this;
 
@@ -308,7 +302,6 @@ namespace Veruthian.Dotnet.Library.Numeric
                     yield return new KeyValuePair<int, bool>(i, ((this.value >> i) & 0x1) == 0x1);
             }
         }
-
 
         #endregion
     }
