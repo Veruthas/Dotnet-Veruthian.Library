@@ -2,8 +2,8 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public interface IBinary<T>
-        where T : IBinary<T>, IIndex<bool>
+    public interface ILogical<T>
+        where T : ILogical<T>
     {
         T And(T other);
 
