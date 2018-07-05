@@ -4,7 +4,7 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, IBinary<Nibble>, IIndex<bool>, IFormattable
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<bool>, IFormattable
     {
         private readonly byte value;
 
@@ -217,13 +217,13 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #region IBinary
 
-        Nibble IBinary<Nibble>.And(Nibble other) => this & other;
+        Nibble ILogical<Nibble>.And(Nibble other) => this & other;
 
-        Nibble IBinary<Nibble>.Or(Nibble other) => this | other;
+        Nibble ILogical<Nibble>.Or(Nibble other) => this | other;
 
-        Nibble IBinary<Nibble>.Xor(Nibble other) => this ^ other;
+        Nibble ILogical<Nibble>.Xor(Nibble other) => this ^ other;
 
-        Nibble IBinary<Nibble>.Not() => ~this;
+        Nibble ILogical<Nibble>.Not() => ~this;
 
 
         const int bits = 4;
