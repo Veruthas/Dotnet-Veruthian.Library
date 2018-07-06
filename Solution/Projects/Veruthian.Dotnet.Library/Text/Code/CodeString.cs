@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
+using Veruthian.Dotnet.Library.Text.Code.Extensions;
 
 namespace Veruthian.Dotnet.Library.Text.Code
 {

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Text.Code;
+using Veruthian.Dotnet.Library.Text.Code.Extensions;
 using Veruthian.Dotnet.Library.Collections;
+using Veruthian.Dotnet.Library.Collections.Extensions;
+using Veruthian.Dotnet.Library.Readers.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 

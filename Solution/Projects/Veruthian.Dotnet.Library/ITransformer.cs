@@ -7,7 +7,7 @@ namespace Veruthian.Dotnet.Library
         TTarget Process(TSource value);
     }
 
-    public static class Transformer
+    public static class TransformerUtility
     {
         public static bool TryProcess<TSource, TTarget>(this ITransformer<TSource, TTarget> transformer, TSource value, out TTarget result)
         {

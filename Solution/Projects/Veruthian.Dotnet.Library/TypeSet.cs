@@ -1,91 +1,8 @@
 namespace Veruthian.Dotnet.Library
 {
-    public interface HasType<T>
-    {
-        void Get(out T value);
-
-        void Set(T value);
-    }
 
     public static class TypeSet
     {
-        
-        /*
-            public static string MakeType(int count)
-            {
-                // public class TypeSet<T0, T1> : TypeSet<T0>, HasType<T1>
-                // {
-                //     protected T1 t1;
-                //    
-                //     protected TypeSet() {}
-                //
-                //     public TypeSet(T0 t0, T1 t1) 
-                //     {
-                //         this.t0 = t0;
-                //         this.t1 = t1;
-                //     }
-
-                //     public void Get(out T1 value) => value = t1;
-
-                //     public void Set(T1 value) => t1 = value;
-                // }
-
-
-                var builder = new System.Text.StringBuilder();
-
-                builder.AppendLine($"public class TypeSet<{MakeTypeString(count)}> : TypeSet<{MakeTypeString(count - 1)}>, HasType<T{count - 1}>");
-                builder.AppendLine("{");
-                builder.AppendLine($"\tprotected T{count - 1} t{count - 1};");
-                builder.AppendLine();
-                builder.AppendLine("public TypeSet() { }");
-                builder.AppendLine();
-                builder.AppendLine($"\tpublic TypeSet({MakeTypeString(count, true)})");
-                builder.AppendLine("\t{");
-                for (int i = 0; i < count; i++) builder.AppendLine($"\t\tthis.t{i} = t{i};");
-                builder.AppendLine("\t}");
-                builder.AppendLine();
-                builder.AppendLine($"\tpublic void Get(out T{count - 1} value) => value = t{count - 1};");
-                builder.AppendLine();
-                builder.AppendLine($"\tpublic void Set(T{count - 1} value) => t{count - 1} = value;");
-                builder.AppendLine("}");
-
-                return builder.ToString();
-            }
-
-            public static string MakeTypeConstructor(int count)
-            {
-                string typeString = MakeTypeString(count);
-
-                string paramString = MakeTypeString(count, true, true);
-
-                string variableString = MakeTypeString(count, false, true);
-
-                return $"public static TypeSet<{typeString}> Group<{typeString}>(this {paramString}) => new TypeSet<{typeString}>({variableString});";
-            }
-
-            private static string MakeTypeString(int count, bool type = true, bool variable = false)
-            {
-                var builder = new System.Text.StringBuilder();
-
-                for (int i = 0; i < count; i++)
-                {
-                    if (i != 0)
-                        builder.Append(", ");
-
-                    if (type)
-                        builder.Append("T").Append(i);
-
-                    if (type && variable)
-                        builder.Append(' ');
-
-                    if (variable)
-                        builder.Append("t").Append(i);
-                }
-
-                return builder.ToString();
-            }
-        */
-        
         public static TypeSet<T0> GroupWith<T0>(this T0 t0) => new TypeSet<T0>(t0);
         public static TypeSet<T0, T1> GroupWith<T0, T1>(this T0 t0, T1 t1) => new TypeSet<T0, T1>(t0, t1);
         public static TypeSet<T0, T1, T2> GroupWith<T0, T1, T2>(this T0 t0, T1 t1, T2 t2) => new TypeSet<T0, T1, T2>(t0, t1, t2);
@@ -108,11 +25,12 @@ namespace Veruthian.Dotnet.Library
         public static TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> GroupWith<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(this T0 t0, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19) => new TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19);
     }
 
-    public class TypeSet<T0> : HasType<T0>
+    public class TypeSet<T0> : HasSettable<T0>
     {
         protected T0 t0;
 
         public TypeSet() { }
+
         public TypeSet(T0 t0) => this.t0 = t0;
 
         public void Get(out T0 value) => value = t0;
@@ -120,7 +38,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T0 value) => this.t0 = value;
     }
 
-    public class TypeSet<T0, T1> : TypeSet<T0>, HasType<T1>
+    public class TypeSet<T0, T1> : TypeSet<T0>, HasSettable<T1>
     {
         protected T1 t1;
 
@@ -137,7 +55,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T1 value) => t1 = value;
     }
 
-    public class TypeSet<T0, T1, T2> : TypeSet<T0, T1>, HasType<T2>
+    public class TypeSet<T0, T1, T2> : TypeSet<T0, T1>, HasSettable<T2>
     {
         protected T2 t2;
 
@@ -155,7 +73,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T2 value) => t2 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3> : TypeSet<T0, T1, T2>, HasType<T3>
+    public class TypeSet<T0, T1, T2, T3> : TypeSet<T0, T1, T2>, HasSettable<T3>
     {
         protected T3 t3;
 
@@ -174,7 +92,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T3 value) => t3 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4> : TypeSet<T0, T1, T2, T3>, HasType<T4>
+    public class TypeSet<T0, T1, T2, T3, T4> : TypeSet<T0, T1, T2, T3>, HasSettable<T4>
     {
         protected T4 t4;
 
@@ -194,7 +112,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T4 value) => t4 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5> : TypeSet<T0, T1, T2, T3, T4>, HasType<T5>
+    public class TypeSet<T0, T1, T2, T3, T4, T5> : TypeSet<T0, T1, T2, T3, T4>, HasSettable<T5>
     {
         protected T5 t5;
 
@@ -215,7 +133,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T5 value) => t5 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6> : TypeSet<T0, T1, T2, T3, T4, T5>, HasType<T6>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6> : TypeSet<T0, T1, T2, T3, T4, T5>, HasSettable<T6>
     {
         protected T6 t6;
 
@@ -237,7 +155,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T6 value) => t6 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7> : TypeSet<T0, T1, T2, T3, T4, T5, T6>, HasType<T7>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7> : TypeSet<T0, T1, T2, T3, T4, T5, T6>, HasSettable<T7>
     {
         protected T7 t7;
 
@@ -260,7 +178,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T7 value) => t7 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7>, HasType<T8>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7>, HasSettable<T8>
     {
         protected T8 t8;
 
@@ -284,7 +202,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T8 value) => t8 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8>, HasType<T9>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8>, HasSettable<T9>
     {
         protected T9 t9;
 
@@ -309,7 +227,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T9 value) => t9 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>, HasType<T10>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>, HasSettable<T10>
     {
         protected T10 t10;
 
@@ -335,7 +253,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T10 value) => t10 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>, HasType<T11>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>, HasSettable<T11>
     {
         protected T11 t11;
 
@@ -362,7 +280,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T11 value) => t11 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>, HasType<T12>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>, HasSettable<T12>
     {
         protected T12 t12;
 
@@ -390,7 +308,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T12 value) => t12 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>, HasType<T13>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>, HasSettable<T13>
     {
         protected T13 t13;
 
@@ -419,7 +337,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T13 value) => t13 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>, HasType<T14>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>, HasSettable<T14>
     {
         protected T14 t14;
 
@@ -449,7 +367,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T14 value) => t14 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>, HasType<T15>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>, HasSettable<T15>
     {
         protected T15 t15;
 
@@ -480,7 +398,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T15 value) => t15 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>, HasType<T16>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>, HasSettable<T16>
     {
         protected T16 t16;
 
@@ -512,7 +430,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T16 value) => t16 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>, HasType<T17>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>, HasSettable<T17>
     {
         protected T17 t17;
 
@@ -545,7 +463,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T17 value) => t17 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>, HasType<T18>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>, HasSettable<T18>
     {
         protected T18 t18;
 
@@ -579,7 +497,7 @@ namespace Veruthian.Dotnet.Library
         public void Set(T18 value) => t18 = value;
     }
 
-    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>, HasType<T19>
+    public class TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : TypeSet<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>, HasSettable<T19>
     {
         protected T19 t19;
 

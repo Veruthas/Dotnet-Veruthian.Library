@@ -119,8 +119,6 @@ namespace Veruthian.Dotnet.Library.Collections
 
         public abstract int Count { get; }
 
-        public Density Density => Density.Dense;
-
         protected abstract T RawGet(int adjustedValidIndex);
     }
 }

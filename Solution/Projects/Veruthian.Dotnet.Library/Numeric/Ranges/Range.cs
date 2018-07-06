@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Veruthian.Dotnet.Library.Ranges
+namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
         where T : ISequential<T>, IBounded<T>, new()
@@ -13,11 +13,9 @@ namespace Veruthian.Dotnet.Library.Ranges
 
         readonly int hashcode;
 
+
         public Range(T value)
         {
-            if (value == null)
-                throw new ArgumentOutOfRangeException("value");
-
             this.low = this.high = value;
 
             hashcode = HashCodes.Default.Combine(this.low, this.high);
@@ -25,11 +23,6 @@ namespace Veruthian.Dotnet.Library.Ranges
 
         public Range(T a, T b)
         {
-            if (a == null)
-                throw new ArgumentOutOfRangeException("a");
-            if (b == null)
-                throw new ArgumentOutOfRangeException("b");
-
             int comparison = a.CompareTo(b);
 
             if (comparison > 0)
@@ -48,17 +41,55 @@ namespace Veruthian.Dotnet.Library.Ranges
             hashcode = HashCodes.Default.Combine(this.low, this.high);
         }
 
+
         public T Low => low;
 
         public T High => high;
 
+        public override int GetHashCode() => hashcode;
+
+
+        public override string ToString()
+        {
+            if (IsSingle)
+                return low.ToString();
+            else
+                return '(' + low.ToString() + " to " + high.ToString() + ')';
+        }
+
+        public string ToString(Func<T, string> toString)
+        {
+            if (IsSingle)
+                return toString(low);
+            else
+                return '(' + toString(low) + " to " + toString(high) + ')';
+        }
+
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            var current = low;
+
+            while (current.CompareTo(high) <= 0)
+            {
+                yield return current;
+
+                if (current.Equals(current.MaxValue))
+                    break;
+                else
+                    current = current.Next;
+            }
+        }
+
+        #region Comparison
 
         public bool IsComplete => low.Equals(main.MinValue) && high.Equals(main.MaxValue);
 
         public bool IsSingle => low.Equals(high);
 
 
-        // Comparison
         public bool Equals(Range<T> other) => low.Equals(other.low) && high.Equals(other.high);
 
         public override bool Equals(object other) => (other is Range<T>) ? this.Equals((Range<T>)other) : false;
@@ -71,7 +102,7 @@ namespace Veruthian.Dotnet.Library.Ranges
         public int CompareTo(Range<T> other)
         {
             int comparison = this.low.CompareTo(other.low);
-            
+
             // (A, C) <=> (B, C)
             if (comparison < 0)
                 return -1;
@@ -104,44 +135,7 @@ namespace Veruthian.Dotnet.Library.Ranges
 
         public static bool operator >=(Range<T> left, Range<T> right) => !(left < right);
 
-
-        public override int GetHashCode() => hashcode;
-
-
-        public override string ToString()
-        {
-            if (IsSingle)
-                return low.ToString();
-            else
-                return '(' + low.ToString() + " to " + high.ToString() + ')';
-        }
-
-        public string ToString(Func<T, string> toString)
-        {
-            if (IsSingle)
-                return toString(low);
-            else
-                return '(' + toString(low) + " to " + toString(high) + ')';
-        }
-
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            var current = low;
-
-            while (current.CompareTo(high) <= 0)
-            {
-                yield return current;
-
-                if (current.Equals(current.MaxValue))
-                    break;
-                else
-                    current = current.Next;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+        #endregion 
 
         #region Range Operations
 
@@ -364,9 +358,9 @@ namespace Veruthian.Dotnet.Library.Ranges
             bool started = false;
 
 
-            T low = main.Default;
+            T low = main;
 
-            T high = main.Default;
+            T high = main;
 
 
             foreach (var value in set)

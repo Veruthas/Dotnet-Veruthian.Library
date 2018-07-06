@@ -450,8 +450,6 @@ namespace Veruthian.Dotnet.Library.Text.Code
         CodePoint ISequential<CodePoint>.Previous => new CodePoint(this.value - 1);
 
 
-        CodePoint IBounded<CodePoint>.Default => default(CodePoint);
-
         CodePoint IBounded<CodePoint>.MinValue => CodePoint.MinValue;
 
         CodePoint IBounded<CodePoint>.MaxValue => CodePoint.MinValue;
