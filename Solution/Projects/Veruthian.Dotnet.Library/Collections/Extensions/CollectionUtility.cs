@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Veruthian.Dotnet.Library.Collections
+namespace Veruthian.Dotnet.Library.Collections.Extensions
 {
-    public static class CollectionUtility
+    public static class CollectionExtensions
     {
         // Stream Enumerator
         public static IEnumerator<byte> GetEnumerator(this Stream stream)

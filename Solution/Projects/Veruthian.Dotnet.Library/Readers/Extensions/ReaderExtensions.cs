@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace Veruthian.Dotnet.Library.Readers
+namespace Veruthian.Dotnet.Library.Readers.Extensions
 {
-    public static class ReaderUtility
+    public static class ReaderExtensions
     {
         // Simple Reader
         public static Reader<T> GetReader<T>(this IEnumerator<T> enumerator,

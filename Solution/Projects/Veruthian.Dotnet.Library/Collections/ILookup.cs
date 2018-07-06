@@ -2,13 +2,6 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public enum Density
-    {    
-        Sparse,
-
-        Dense
-    }
-
     public interface ILookup<TKey, TValue> : IContainer<TValue>
     {
         TValue this[TKey key] { get; }
@@ -20,7 +13,5 @@ namespace Veruthian.Dotnet.Library.Collections
         bool HasKey(TKey key);
 
         bool TryGet(TKey key, out TValue value);
-
-        Density Density { get; }
     }
 }

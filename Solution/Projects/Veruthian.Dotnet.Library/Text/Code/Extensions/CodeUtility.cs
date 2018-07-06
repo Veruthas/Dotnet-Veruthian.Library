@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Code.Encodings;
 
-namespace Veruthian.Dotnet.Library.Text.Code
+namespace Veruthian.Dotnet.Library.Text.Code.Extensions
 {
     public static class CodeUtility
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
 
-namespace Veruthian.Dotnet.Library.Ranges
+namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
         where T : ISequential<T>, IBounded<T>, new()
