@@ -21,21 +21,10 @@ namespace Veruthian.Dotnet.Library.Operations
 
         public IOperation<TState> Third => third;
 
-        public override int Count => 3;
+        protected override int Count => 3;
 
-        public override IEnumerator<IOperation<TState>> GetEnumerator()
+        protected override IOperation<TState> GetSubOperation(int index)
         {
-            yield return first;
-
-            yield return second;
-
-            yield return third;
-        }
-
-        public override IOperation<TState> GetSubOperation(int index)
-        {
-            VerifyIndex(index);
-
             switch (index)
             {
                 case 2:
