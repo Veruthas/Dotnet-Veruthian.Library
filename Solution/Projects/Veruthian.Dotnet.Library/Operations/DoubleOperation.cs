@@ -17,20 +17,12 @@ namespace Veruthian.Dotnet.Library.Operations
 
         public IOperation<TState> Second => second;
 
-        public override int Count => 2;
+        protected override int Count => 2;
 
-        public override IEnumerator<IOperation<TState>> GetEnumerator()
+
+        protected override IOperation<TState> GetSubOperation(int verifiedIndex)
         {
-            yield return first;
-
-            yield return second;
-        }
-
-        public override IOperation<TState> GetSubOperation(int index)
-        {
-            VerifyIndex(index);
-
-            switch (index)
+            switch (verifiedIndex)
             {
                 case 1:
                     return second;

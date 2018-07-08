@@ -31,7 +31,7 @@ namespace Veruthian.Dotnet.Library.Numeric
         public static uint[] Add(uint[] left, uint[] right)
         {
             return new uint[0];
-        }
+        }        
 
     }
 }

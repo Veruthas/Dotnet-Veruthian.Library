@@ -1,12 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Operations
 {
-    public abstract class Operation<TState> : IOperation<TState>
+    public abstract class Operation<TState> : IOperation<TState>, IIndex<IOperation<TState>>
     {
         public abstract string Description { get; }
+
+        public IIndex<IOperation<TState>> SubOperations => this;
+
 
         public bool Perform(TState state, IOperationTracer<TState> tracer = null)
         {
@@ -28,18 +32,104 @@ namespace Veruthian.Dotnet.Library.Operations
 
 
 
-        public abstract IOperation<TState> GetSubOperation(int index);
 
-        protected void VerifyIndex(int index)
+        protected abstract int Count { get; }
+
+        protected abstract IOperation<TState> GetSubOperation(int verifiedIndex);
+
+
+
+        #region IIndex
+
+        private void VerifyIndex(int index)
         {
-            if (index < 0 || index >= Count)
+            if (HasIndex(index))
                 throw new IndexOutOfRangeException("index");
         }
 
-        public abstract IEnumerator<IOperation<TState>> GetEnumerator();
+        private bool HasIndex(int index) => (uint)index >= Count;
 
-        public abstract int Count { get; }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        int IIndex<IOperation<TState>>.StartIndex => 0;
+
+        int IIndex<IOperation<TState>>.EndIndex => Count - 1;
+
+
+        int IContainer<IOperation<TState>>.Count => Count;
+
+
+        IOperation<TState> ILookup<int, IOperation<TState>>.this[int key]
+        {
+            get
+            {
+                VerifyIndex(key);
+
+                return GetSubOperation(key);
+            }
+        }
+
+        bool ILookup<int, IOperation<TState>>.HasKey(int key) => HasIndex(key);
+
+        bool ILookup<int, IOperation<TState>>.TryGet(int key, out IOperation<TState> value)
+        {
+            if (HasIndex(key))
+            {
+                value = GetSubOperation(key);
+                return true;
+            }
+            else
+            {
+                value = default(IOperation<TState>);
+
+                return false;
+            }
+        }
+
+        private int? IndexOf(IOperation<TState> value)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                if (GetSubOperation(i) == value)
+                    return i;
+            }
+
+            return null;
+        }
+
+        int? IIndex<IOperation<TState>>.IndexOf(IOperation<TState> value) => IndexOf(value);
+
+
+        bool IContainer<IOperation<TState>>.Contains(IOperation<TState> value) => IndexOf(value) != null;
+
+
+        IEnumerable<int> ILookup<int, IOperation<TState>>.Keys
+        {
+            get
+            {
+                for (int i = 0; i < Count; i++)
+                    yield return i;
+            }
+        }
+
+        IEnumerable<IOperation<TState>> IContainer<IOperation<TState>>.Values
+        {
+            get
+            {
+                for (int i = 0; i < Count; i++)
+                    yield return GetSubOperation(i);
+            }
+        }
+
+
+        IEnumerable<KeyValuePair<int, IOperation<TState>>> ILookup<int, IOperation<TState>>.Pairs
+        {
+            get
+            {
+                for (int i = 0; i < Count; i++)
+                    yield return new KeyValuePair<int, IOperation<TState>>(i, GetSubOperation(i));
+            }
+        }
+
+        #endregion
     }
 }

@@ -82,16 +82,16 @@ namespace Veruthian.Dotnet.Library.Operations
             {
                 int index = operations.Count;
 
-                var flattened = new FlattenedOperation<TState>(operation, operation.Count);
+                var flattened = new FlattenedOperation<TState>(operation, operation.SubOperations.Count);
 
                 operations.Add(flattened);
 
                 discovered.Add(operation, index);
 
 
-                for (int i = 0; i < operation.Count; i++)
+                for (int i = 0; i < operation.SubOperations.Count; i++)
                 {
-                    var suboperation = operation.GetSubOperation(i);
+                    var suboperation = operation.SubOperations[i];
 
                     flattened.SubOperationIndices[i] = Flatten(suboperation, operations, discovered);
                 }
