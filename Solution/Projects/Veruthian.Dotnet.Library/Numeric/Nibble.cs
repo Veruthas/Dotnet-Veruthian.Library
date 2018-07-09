@@ -124,58 +124,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #endregion
 
-        #region Strings
-
-        public string ToString(bool uppercase)
-        {
-            char result;
-
-            if (value >= 10)
-            {
-                if (uppercase)
-                {
-                    result = (char)('A' + (value - 10));
-                }
-                else
-                {
-                    result = (char)('a' + (value - 10));
-                }
-            }
-            else
-            {
-                result = (char)(value + '0');
-            }
-
-            return result.ToString();
-        }
-
-        public override string ToString() => ToString(true);
-
-        public string ToString(IFormatProvider provider) => value.ToString(provider);
-
-        public string ToString(string format) => value.ToString(format);
-
-        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);
-
-
-        public bool TryParse(string value, out Nibble result)
-        {
-            if (byte.TryParse(value, out byte byteResult) && byteResult <= 15)
-            {
-                result = new Nibble(byteResult);
-
-                return true;
-            }
-            else
-            {
-                result = default(Nibble);
-
-                return false;
-            }
-        }
-
-        #endregion
-
         #region INumeric
 
         public bool Precedes(Nibble other) => this < other;
@@ -187,10 +135,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         Nibble INumeric<Nibble>.Subtract(Nibble other) => this - other;
 
         Nibble INumeric<Nibble>.Delta(Nibble other) => this - other;
-
-        Nibble INumeric<Nibble>.Increment() => this++;
-
-        Nibble INumeric<Nibble>.Decrement() => this--;
 
         Nibble INumeric<Nibble>.Multiply(Nibble other) => this * other;
 
@@ -304,5 +248,57 @@ namespace Veruthian.Dotnet.Library.Numeric
         }
 
         #endregion
+
+        #region Strings
+
+        public string ToString(bool uppercase)
+        {
+            char result;
+
+            if (value >= 10)
+            {
+                if (uppercase)
+                {
+                    result = (char)('A' + (value - 10));
+                }
+                else
+                {
+                    result = (char)('a' + (value - 10));
+                }
+            }
+            else
+            {
+                result = (char)(value + '0');
+            }
+
+            return result.ToString();
+        }
+
+        public override string ToString() => ToString(true);
+
+        public string ToString(IFormatProvider provider) => value.ToString(provider);
+
+        public string ToString(string format) => value.ToString(format);
+
+        public string ToString(string format, IFormatProvider provider) => value.ToString(format, provider);
+
+
+        public bool TryParse(string value, out Nibble result)
+        {
+            if (byte.TryParse(value, out byte byteResult) && byteResult <= 15)
+            {
+                result = new Nibble(byteResult);
+
+                return true;
+            }
+            else
+            {
+                result = default(Nibble);
+
+                return false;
+            }
+        }
+
+        #endregion        
     }
 }
