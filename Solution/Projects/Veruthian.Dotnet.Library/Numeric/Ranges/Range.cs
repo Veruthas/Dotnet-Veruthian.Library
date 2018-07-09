@@ -453,6 +453,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             bool started = false;
 
             T min = default(T);
+            
             T max = default(T);
 
             T low = default(T);
