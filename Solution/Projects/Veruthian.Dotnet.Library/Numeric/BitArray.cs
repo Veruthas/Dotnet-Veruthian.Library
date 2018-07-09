@@ -35,7 +35,33 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public bool TryGet(int index, out bool value)
         {
-            throw new System.NotImplementedException();
+            if (HasIndex(index))
+            {
+                ulong longValue;
+
+                if (this.values == null)
+                {
+                    longValue = this.value;
+                }
+                else
+                {
+                    int segmentIndex = index / lengthOfUlong;
+
+                    index = index % lengthOfUlong;
+
+                    longValue = this.values[segmentIndex];
+                }
+
+                
+                value = ((this.value >> index) & 0x1) == 0x1;
+
+                return true;
+            }
+            else
+            {
+                value = false;
+                return false;
+            }
         }
 
         public bool TrySet(int index, bool value)
@@ -130,7 +156,9 @@ namespace Veruthian.Dotnet.Library.Numeric
         }
 
 
-        bool ILookup<int, bool>.HasKey(int index) => (uint)index < Count;
+        bool ILookup<int, bool>.HasKey(int index) => HasIndex(index);
+
+        bool HasIndex(int index) => (uint)index < Count;
 
         bool IContainer<bool>.Contains(bool value) => IndexOf(value).HasValue;
 
