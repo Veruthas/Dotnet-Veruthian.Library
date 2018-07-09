@@ -9,10 +9,6 @@ namespace Veruthian.Dotnet.Library.Numeric
     
         T Delta(T other);
 
-        T Increment();
-        
-        T Decrement();
-
         T Multiply(T other);
 
         T Divide(T other);        

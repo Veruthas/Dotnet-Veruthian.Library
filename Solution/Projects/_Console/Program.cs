@@ -8,7 +8,12 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            B b = new B(10);
+
+            float x = 10.23f;
+
+            x++;
+            Console.WriteLine(x);
+
             Pause();
         }
 
@@ -19,20 +24,6 @@ namespace _Console
             while (Console.ReadKey(true).Key != ConsoleKey.Enter) ;
 
             Console.WriteLine();
-        }
-
-        [DebuggerDisplay("{ToString(),nq}")]
-        class B 
-        {
-            int d;
-
-            public B(int d)
-            {
-                this.d = d;
-            }
-            
-
-            public override string ToString() => d.ToString();
         }
     }
 }
