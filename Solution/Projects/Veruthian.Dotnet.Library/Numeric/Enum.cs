@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public abstract class Enum<E> : IBounded<E>, ISequential<E>
+    public abstract class Enum<E> : IBounded<E>, ISequential<E>, IFormattable
         where E : Enum<E>
     {
         readonly string name;
@@ -17,6 +17,9 @@ namespace Veruthian.Dotnet.Library.Numeric
 
             this.ordinal = items.Count;
 
+            if (names.ContainsKey(name))
+                throw new ArgumentException($"Item with name '{name}' already exists!");
+
             items.Add((E)this);
 
             names.Add(name, (E)this);
@@ -27,14 +30,26 @@ namespace Veruthian.Dotnet.Library.Numeric
         public int Ordinal => ordinal;
 
 
-
         public override int GetHashCode() => ordinal.GetHashCode();
 
 
-        public static bool TryParse(string value, out E result) => names.TryGetValue(value, out result);
-
         public override string ToString() => name;
 
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            if (!string.IsNullOrEmpty(format))
+            {
+                switch (char.ToUpper(format[0]))
+                {                    
+                    case 'G':
+                        return name;
+                    default:
+                        return ordinal.ToString(format, formatProvider);
+                }
+            }
+
+            return ToString();
+        }
 
         #region Operators
 
@@ -103,6 +118,18 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         #region Items
 
+        static List<E> items = new List<E>();
+
+        static Dictionary<string, E> names = new Dictionary<string, E>();
+
+        static Enum()
+        {
+            Type enumClass = typeof(E);
+
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(enumClass.TypeHandle);
+        }
+
+
         public static IEnumerable<E> Items
         {
             get
@@ -112,11 +139,40 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        public static E GetByOrdinal(int ordinal) => (uint)ordinal >= items.Count ? throw new IndexOutOfRangeException() : items[ordinal];
 
-        static List<E> items = new List<E>();
+        public static bool TryGetByOrdinal(int ordinal, out E result)
+        {
+            if ((uint)ordinal <= items.Count)
+            {
+                result = items[ordinal];
+                return true;
+            }
+            else
+            {
+                result = default(E);
+                return false;
+            }
+        }
 
-        static Dictionary<string, E> names = new Dictionary<string, E>();
+        public static bool TryGetByName(string name, out E result)
+        {
+            return names.TryGetValue(name, out result);
+        }
+
+        public static bool TryGetByName(string name, StringComparison comparisonType, out E result)
+        {
+            foreach (var item in items)
+            {
+                if (string.Equals(name, item.name, comparisonType))
+                {
+                    result = item;
+                    return true;
+                }
+            }
+
+            result = default(E);
+            return false;
+        }
 
         #endregion
     }
