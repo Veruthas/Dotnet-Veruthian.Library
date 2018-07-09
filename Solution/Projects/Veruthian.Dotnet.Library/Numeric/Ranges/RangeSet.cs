@@ -6,7 +6,7 @@ using Veruthian.Dotnet.Library.Collections;
 namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : ISequential<T>, IBounded<T>
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
@@ -32,7 +32,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
 
 
     public abstract class RangeSet<T, TSet> : IEquatable<TSet>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : ISequential<T>, IBounded<T>
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;
