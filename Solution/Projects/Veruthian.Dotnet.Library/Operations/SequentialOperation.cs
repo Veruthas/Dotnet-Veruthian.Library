@@ -30,7 +30,7 @@ namespace Veruthian.Dotnet.Library.Operations
 
         protected override bool DoAction(TState state, IOperationTracer<TState> tracer = null)
         {
-            foreach (var operation in this)
+            foreach (var operation in SubOperations.Values)
             {
                 var result = operation.Perform(state, tracer);
 
