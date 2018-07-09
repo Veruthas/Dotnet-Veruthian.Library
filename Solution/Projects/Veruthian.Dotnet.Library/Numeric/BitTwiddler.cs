@@ -435,7 +435,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         {
             return FromShort((ushort)value);
         }
-
         public static BitTwiddler FromChars(char value0, char value1)
         {
             return FromShorts((ushort)value0, (ushort)value1);

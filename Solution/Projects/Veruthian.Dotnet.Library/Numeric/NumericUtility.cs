@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Veruthian.Dotnet.Library.Numeric
 {
     public static class NumericUtility
@@ -33,5 +35,11 @@ namespace Veruthian.Dotnet.Library.Numeric
             return new uint[0];
         }
 
+
+        public static IEnumerable<int> GetRange(int start, int end)
+        {
+            for (int i = start; i <= end; i++)
+                yield return i;
+        }
     }
 }
