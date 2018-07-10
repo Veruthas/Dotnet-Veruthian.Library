@@ -199,20 +199,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         bool ILookup<int, bool>.TryGet(int key, out bool value) => TryGet(key, out value);
 
 
-        int? IIndex<bool>.IndexOf(bool value)
-        {
-            int match = value ? 0x1 : 0x0;
-
-            for (int i = 0; i < bits; i++)
-            {
-                if (((this.value >> i) & 0x1) == match)
-                    return i;
-            }
-
-            return null;
-        }
-
-
         int IContainer<bool>.Count => bits;
 
         int IIndex<bool>.StartIndex => 0;
