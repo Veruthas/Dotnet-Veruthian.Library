@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public abstract class SpeculativeReaderBase<T> : VariableLookaheadReaderBase<T>, ISpeculativeReader<T>
+    public abstract class SpeculativeReaderBase<T> : BaseVariableLookaheadReader<T>, ISpeculativeReader<T>
     {
         protected struct MarkItem
         {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public abstract class LookaheadReaderBase<T> : ReaderBase<T>, ILookaheadReader<T>
+    public abstract class BaseLookaheadReader<T> : BaseReader<T>, ILookaheadReader<T>
     {
-        public LookaheadReaderBase() { }
+        public BaseLookaheadReader() { }
 
         public T Peek(int lookahead) => base.CheckedPeek(lookahead);
 

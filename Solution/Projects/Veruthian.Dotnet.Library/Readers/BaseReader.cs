@@ -6,7 +6,7 @@ namespace Veruthian.Dotnet.Library.Readers
     public delegate T GenerateEndItem<T>(T previous);
 
 
-    public abstract class ReaderBase<T> : IReader<T>
+    public abstract class BaseReader<T> : IReader<T>
     {
         private IEnumerator<T> enumerator;
 
@@ -19,7 +19,7 @@ namespace Veruthian.Dotnet.Library.Readers
         private T lastItem;
 
 
-        public ReaderBase() { }
+        public BaseReader() { }
 
 
         protected void SetData(IEnumerator<T> enumerator, GenerateEndItem<T> generateEndItem = null)

@@ -281,9 +281,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, VariableLookaheadReaderBase<CodePoint>>
+    public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, BaseVariableLookaheadReader<CodePoint>>
     {
-        private VariableLookaheadReaderBase<CodePoint> GetReader(CodePoint[] data)
+        private BaseVariableLookaheadReader<CodePoint> GetReader(CodePoint[] data)
         {
             return data.GetVariableLookaheadReader();
         }
