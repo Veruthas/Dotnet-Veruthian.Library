@@ -5,7 +5,7 @@ using Veruthian.Dotnet.Library.Collections.Extensions;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public class DataList<T> : ExpandableIndexBase<T>
+    public class DataList<T> : BaseExpandableIndex<T>
     {
         List<T> items;
 

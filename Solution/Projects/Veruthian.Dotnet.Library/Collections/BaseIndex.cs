@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public abstract class IndexBase<T> : IIndex<T>, IEnumerable<T>
+    public abstract class BaseIndex<T> : IIndex<T>, IEnumerable<T>
     {
         protected int startIndex;
 
 
-        protected IndexBase(int startIndex = 0) => this.startIndex = startIndex;
+        protected BaseIndex(int startIndex = 0) => this.startIndex = startIndex;
 
 
         public T this[int index]
