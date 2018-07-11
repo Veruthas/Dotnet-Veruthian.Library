@@ -37,8 +37,106 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         public bool IsInSmp => value >= 0x10000;
 
 
-        /* Operators */
         #region Operators
+
+        // TODO: Optimize and Test
+        // ToUpper/Lower        
+        public Rune ToLower()
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToLower(value);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToLower();
+            }
+        }
+
+        public Rune ToLower(CultureInfo culture)
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToLower(value, culture);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToLower(culture);
+            }
+        }
+
+        public Rune ToLowerInvariant()
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToLowerInvariant(value);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToLowerInvariant();
+            }
+        }
+
+        public Rune ToUpper()
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToUpper(value);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToUpper();
+            }
+        }
+
+        public Rune ToUpper(CultureInfo culture)
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToUpper(value, culture);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToUpper(culture);
+            }
+        }
+
+        public Rune ToUpperInvariant()
+        {
+            if (this.IsInBmp)
+            {
+                char value = (char)this;
+
+                return char.ToUpperInvariant(value);
+            }
+            else
+            {
+                string value = this;
+
+                return value.ToUpperInvariant();
+            }
+        }
+
 
         // Difference
         public static int operator -(Rune left, Rune right) => (int)left.value - (int)right.value;
@@ -138,7 +236,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
 
         // RuneString
-        public RuneString ToCodeString() => new RuneString(this);
+        public RuneString ToRuneString() => new RuneString(this);
 
         public RuneString Replicate(int count) => new RuneString(this, count);
 
@@ -171,9 +269,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-
-        /* Constructors */
-        #region Constructors        
+        #region Constructors
 
         // Utf8
         public static Rune FromUtf8(BitTwiddler bits) => new Rune(Utf8.Decoder.Decode(bits));
@@ -394,11 +490,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-
-        /* Conversion */
         #region Conversion
-
-        public static explicit operator char(Rune value) => (char)value.value;
 
         public static explicit operator byte(Rune value) => (byte)value.value;
 
@@ -416,9 +508,11 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public static implicit operator long(Rune value) => value.value;
 
+        public static explicit operator char(Rune value) => (char)value.value;
+
         public static implicit operator string(Rune value) => value.ToString();
 
-        public static implicit operator RuneString(Rune value) => value.ToCodeString();
+        public static implicit operator RuneString(Rune value) => value.ToRuneString();
 
 
         public BitTwiddler ToUtf8() => Utf8.Encoder.Encode(this);
@@ -427,11 +521,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public BitTwiddler ToUtf32(ByteOrder endianness = ByteOrder.LittleEndian) => Utf32.Encoder.Encode(this, endianness);
 
-
         #endregion
 
-
-        /* Constants */
         #region Constants
 
         public static readonly Rune Default = new Rune(0);
@@ -444,7 +535,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-        /* Orderable */
+        #region Sequential
+
         Rune ISequential<Rune>.Next => new Rune(this.value + 1);
 
         Rune ISequential<Rune>.Previous => new Rune(this.value - 1);
@@ -456,6 +548,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
 
         bool IOrderable<Rune>.Precedes(Rune other) => this.value < other.value;
+
         bool IOrderable<Rune>.Follows(Rune other) => this.value > other.value;
+
+        #endregion
     }
 }
