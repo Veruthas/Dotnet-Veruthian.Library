@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public abstract class ExpandableIndexBase<T> : MutableIndexBase<T>, IExpandableIndex<T>
+    public abstract class BaseExpandableIndex<T> : BaseMutableIndex<T>, IExpandableIndex<T>
     {
-        protected ExpandableIndexBase(int startIndex = 0)
+        protected BaseExpandableIndex(int startIndex = 0)
             : base(startIndex) { }
             
         public abstract void Add(T value);
