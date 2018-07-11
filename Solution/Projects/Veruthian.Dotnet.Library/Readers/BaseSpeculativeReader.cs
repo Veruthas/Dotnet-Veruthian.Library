@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public abstract class SpeculativeReaderBase<T> : BaseVariableLookaheadReader<T>, ISpeculativeReader<T>
+    public abstract class BaseSpeculativeReader<T> : BaseVariableLookaheadReader<T>, ISpeculativeReader<T>
     {
         protected struct MarkItem
         {
@@ -26,7 +26,7 @@ namespace Veruthian.Dotnet.Library.Readers
         Stack<MarkItem> marks = new Stack<MarkItem>();
 
 
-        public SpeculativeReaderBase() { }
+        public BaseSpeculativeReader() { }
 
         protected override void Initialize()
         {
