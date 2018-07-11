@@ -45,7 +45,7 @@ namespace Veruthian.Dotnet.Library.Readers.Extensions
             return reader;
         }
 
-        public static VariableLookaheadReaderBase<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
+        public static BaseVariableLookaheadReader<T> GetVariableLookaheadReader<T>(this IEnumerable<T> enumerable,
                                                                                 GenerateEndItem<T> generateEndItem = null)
         {
             return GetVariableLookaheadReader(enumerable.GetEnumerator(), generateEndItem);

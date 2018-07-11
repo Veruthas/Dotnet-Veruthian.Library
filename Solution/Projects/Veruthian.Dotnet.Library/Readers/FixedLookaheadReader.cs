@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public class FixedLookaheadReader<T> : LookaheadReaderBase<T>
+    public class FixedLookaheadReader<T> : BaseLookaheadReader<T>
     {
         T[] buffer;
 
