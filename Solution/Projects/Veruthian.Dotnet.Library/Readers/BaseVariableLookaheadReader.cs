@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public abstract class BaseVariableLookaheadReader<T> : LookaheadReaderBase<T>
+    public abstract class BaseVariableLookaheadReader<T> : BaseLookaheadReader<T>
     {
         List<T> items = new List<T>();
 
