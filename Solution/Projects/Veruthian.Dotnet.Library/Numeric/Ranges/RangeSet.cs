@@ -170,13 +170,13 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             return items.ToArray();
         }
 
-        public IEnumerator<Range<T>> GetRangeEnumerator()
+        public IEnumerable<Range<T>> Ranges()
         {
             foreach (var range in RangeArray)
                 yield return range;
         }
 
-        public IEnumerator<T> GetItemEnumerator()
+        public IEnumerable<T> Items()
         {
             var items = new List<T>();
 
@@ -196,11 +196,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
                 }
             }
         }
-
-        public IEnumerable<T> Items => EnumeratorGenerator<T>.Create(GetItemEnumerator);
-
-        public IEnumerable<Range<T>> Ranges => EnumeratorGenerator<Range<T>>.Create(GetRangeEnumerator);
-
+        
         #endregion
 
 
