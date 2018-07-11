@@ -1,7 +1,7 @@
 using System;
 using Veruthian.Dotnet.Library.Numeric;
 
-namespace Veruthian.Dotnet.Library.Text.Code.Encodings
+namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
 {
     public static class Utf16
     {
@@ -138,9 +138,9 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
 
         #region Errors
 
-        private static CodePointException InvalidLeadingSurrogate(ushort value)
+        private static RuneException InvalidLeadingSurrogate(ushort value)
         {
-            return new CodePointException(InvalidLeadingSurrogateMessage(value));
+            return new RuneException(InvalidLeadingSurrogateMessage(value));
         }
 
         public static string InvalidLeadingSurrogateMessage(ushort value)
@@ -149,9 +149,9 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
         }
 
 
-        private static CodePointException InvalidTrailingSurrogate(ushort value)
+        private static RuneException InvalidTrailingSurrogate(ushort value)
         {
-            return new CodePointException(InvalidTrailingSurrogateMessage(value));
+            return new RuneException(InvalidTrailingSurrogateMessage(value));
         }
 
         public static string InvalidTrailingSurrogateMessage(ushort value)
@@ -182,9 +182,9 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
         }
 
 
-        private static CodePointException InvalidCharacter(ushort value)
+        private static RuneException InvalidCharacter(ushort value)
         {
-            return new CodePointException(InvalidCharacterMessage(value));
+            return new RuneException(InvalidCharacterMessage(value));
         }
 
         public static string InvalidCharacterMessage(ushort value)
@@ -250,7 +250,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
                     if (IsTrailingSurrogate(trailing))
                         return CombineSurrogates(leading, trailing);
                     else
-                        throw new CodePointException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
+                        throw new RuneException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
                 }
                 else
                 {

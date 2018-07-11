@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Numeric;
-using Veruthian.Dotnet.Library.Text.Code.Encodings;
+using Veruthian.Dotnet.Library.Text.Runes.Encodings;
 
-namespace Veruthian.Dotnet.Library.Text.Code.Extensions
+namespace Veruthian.Dotnet.Library.Text.Runes.Extensions
 {
-    public static class CodeUtility
+    public static class RuneUtility
     {
         // Decode to CodePoint
-        public static IEnumerable<CodePoint> DecodeValues<T, TDecoder>(IEnumerable<T> items, TDecoder decoder, string onIncomplete)
+        public static IEnumerable<Rune> DecodeValues<T, TDecoder>(IEnumerable<T> items, TDecoder decoder, string onIncomplete)
             where TDecoder : ITransformer<T, uint?>
         {
             var enumerator = items.GetEnumerator();
@@ -23,15 +23,15 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
                 result = decoder.Process(enumerator.Current);
 
                 if (result != null)
-                    yield return (CodePoint)result.GetValueOrDefault();
+                    yield return (Rune)result.GetValueOrDefault();
             }
 
             if (result == null)
-                throw new CodePointException(onIncomplete);
+                throw new RuneException(onIncomplete);
         }
 
         // Utf8 -> CodePoint
-        public static IEnumerable<CodePoint> AsUtf8CodePoints(this IEnumerable<byte> bytes)
+        public static IEnumerable<Rune> AsUtf8CodePoints(this IEnumerable<byte> bytes)
         {
             var decoder = new Utf8.ByteDecoder();
 
@@ -39,7 +39,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
         }
 
         // Utf16 -> CodePoint
-        public static IEnumerable<CodePoint> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> AsUtf16CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf16.ByteDecoder(endianness);
 
@@ -48,7 +48,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
 
 
         // Utf32 -> CodePoint
-        public static IEnumerable<CodePoint> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> AsUtf32CodePoints(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
 
@@ -57,7 +57,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
 
 
         // Char -> CodePoint
-        public static IEnumerable<CodePoint> ToCodePoints(this IEnumerable<char> chars)
+        public static IEnumerable<Rune> ToCodePoints(this IEnumerable<char> chars)
         {
             var decoder = new Utf16.CharDecoder();
 
@@ -65,7 +65,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
         }
 
         // String -> CodePoint
-        public static IEnumerable<CodePoint> ToCodePoints(this string value)
+        public static IEnumerable<Rune> ToCodePoints(this string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -73,7 +73,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePoints(value, 0, value.Length);
         }
 
-        public static IEnumerable<CodePoint> ToCodePoints(this string value, int start)
+        public static IEnumerable<Rune> ToCodePoints(this string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -81,7 +81,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePoints(value, start, value.Length - start);
         }
 
-        public static IEnumerable<CodePoint> ToCodePoints(this string value, int start, int amount)
+        public static IEnumerable<Rune> ToCodePoints(this string value, int start, int amount)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -90,7 +90,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePoints(value, start, amount);
         }
 
-        private static IEnumerable<CodePoint> UncheckedToCodePoints(string value, int start, int amount)
+        private static IEnumerable<Rune> UncheckedToCodePoints(string value, int start, int amount)
         {
             if (start < 0 || start > value.Length)
                 throw new ArgumentOutOfRangeException("start");
@@ -99,7 +99,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
                 throw new ArgumentOutOfRangeException("amount");
 
 
-            var codepoints = new CodePoint[amount];
+            var codepoints = new Rune[amount];
 
 
             var decoder = new Utf16.CharDecoder();
@@ -111,18 +111,18 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
                 var utf32 = decoder.Process(value[i]);
 
                 if (utf32 != null)
-                    yield return (CodePoint)utf32.GetValueOrDefault();
+                    yield return (Rune)utf32.GetValueOrDefault();
             }
 
 
             if (!result)
-                throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
+                throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
         }
 
 
         // String -> CodePoint[]
-        public static CodePoint[] ToCodePointArray(this string value)
+        public static Rune[] ToCodePointArray(this string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -130,7 +130,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePointArray(value, 0, value.Length);
         }
 
-        public static CodePoint[] ToCodePointArray(this string value, int start)
+        public static Rune[] ToCodePointArray(this string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -138,7 +138,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePointArray(value, start, value.Length - start);
         }
 
-        public static CodePoint[] ToCodePointArray(this string value, int start, int amount)
+        public static Rune[] ToCodePointArray(this string value, int start, int amount)
         {
             if (value == null)
                 throw new ArgumentNullException(value);
@@ -146,7 +146,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return UncheckedToCodePointArray(value, start, amount);
         }
 
-        private static CodePoint[] UncheckedToCodePointArray(string value, int start, int amount)
+        private static Rune[] UncheckedToCodePointArray(string value, int start, int amount)
         {
 
             if (start < 0 || start > value.Length)
@@ -156,7 +156,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
                 throw new ArgumentOutOfRangeException("amount");
 
 
-            var codepoints = new CodePoint[amount];
+            var codepoints = new Rune[amount];
 
             int index = 0;
 
@@ -170,12 +170,12 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
                 var utf32 = decoder.Process(value[i]);
 
                 if (utf32 != null)
-                    codepoints[index++] = (CodePoint)utf32.GetValueOrDefault();
+                    codepoints[index++] = (Rune)utf32.GetValueOrDefault();
             }
 
 
             if (!result)
-                throw new CodePointException(Utf16.MissingTrailingSurrogateMessage());
+                throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
 
             if (index < codepoints.Length)
@@ -184,47 +184,47 @@ namespace Veruthian.Dotnet.Library.Text.Code.Extensions
             return codepoints;
         }
 
-        public static bool IsNullOrEmpty(this CodeString value) => CodeString.IsNullOrEmpty(value);
+        public static bool IsNullOrEmpty(this RuneString value) => RuneString.IsNullOrEmpty(value);
 
 
 
         // CodeString
-        public static CodeString ToCodeString(this ICollection<CodePoint> codepoints)
+        public static RuneString ToCodeString(this ICollection<Rune> codepoints)
         {
-            return new CodeString(codepoints);
+            return new RuneString(codepoints);
         }
-        public static CodeString ToCodeString(this IList<CodePoint> codepoints, int index)
+        public static RuneString ToCodeString(this IList<Rune> codepoints, int index)
         {
-            return new CodeString(codepoints, index);
+            return new RuneString(codepoints, index);
         }
-        public static CodeString ToCodeString(this IList<CodePoint> codepoints, int index, int length)
+        public static RuneString ToCodeString(this IList<Rune> codepoints, int index, int length)
         {
-            return new CodeString(codepoints, index, length);
-        }
-
-        public static CodeString ToCodeString(this IEnumerable<CodePoint> codepoints)
-        {
-            return new CodeString(codepoints);
+            return new RuneString(codepoints, index, length);
         }
 
-        public static CodeString ToCodeString(this IEnumerable<char> chars)
+        public static RuneString ToCodeString(this IEnumerable<Rune> codepoints)
         {
-            return new CodeString(ToCodePoints(chars));
+            return new RuneString(codepoints);
         }
 
-        public static CodeString ToCodeString(this string value)
+        public static RuneString ToCodeString(this IEnumerable<char> chars)
         {
-            return new CodeString(value);
+            return new RuneString(ToCodePoints(chars));
         }
 
-        public static CodeString ToCodeString(this string value, int start)
+        public static RuneString ToCodeString(this string value)
         {
-            return new CodeString(value, start);
+            return new RuneString(value);
         }
 
-        public static CodeString ToCodeString(this string value, int start, int amount)
+        public static RuneString ToCodeString(this string value, int start)
         {
-            return new CodeString(value, start, amount);
+            return new RuneString(value, start);
+        }
+
+        public static RuneString ToCodeString(this string value, int start, int amount)
+        {
+            return new RuneString(value, start, amount);
         }
     }
 }
