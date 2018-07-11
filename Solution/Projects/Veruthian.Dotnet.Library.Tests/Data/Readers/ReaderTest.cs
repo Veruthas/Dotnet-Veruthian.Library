@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Veruthian.Dotnet.Library.Text.Code;
-using Veruthian.Dotnet.Library.Text.Code.Extensions;
+using Veruthian.Dotnet.Library.Text.Runes;
+using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 using Veruthian.Dotnet.Library.Collections;
 using Veruthian.Dotnet.Library.Collections.Extensions;
 using Veruthian.Dotnet.Library.Readers.Extensions;
@@ -162,9 +162,9 @@ namespace Veruthian.Dotnet.Library.Readers
 
 
 
-    public class ReaderTest : ReaderTest<CodePoint, Reader<CodePoint>>
+    public class ReaderTest : ReaderTest<Rune, Reader<Rune>>
     {
-        private Reader<CodePoint> GetReader(CodePoint[] data)
+        private Reader<Rune> GetReader(Rune[] data)
         {
             return data.GetReader();
         }
@@ -202,9 +202,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class FixedLookaheadReaderTest : LookaheadReaderTest<CodePoint, FixedLookaheadReader<CodePoint>>
+    public class FixedLookaheadReaderTest : LookaheadReaderTest<Rune, FixedLookaheadReader<Rune>>
     {
-        private FixedLookaheadReader<CodePoint> GetReader(CodePoint[] data, int lookahead)
+        private FixedLookaheadReader<Rune> GetReader(Rune[] data, int lookahead)
         {
             return data.GetFixedLookaheadReader(lookahead);
         }
@@ -281,9 +281,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, BaseVariableLookaheadReader<CodePoint>>
+    public class VariableLookaheadReaderTest : LookaheadReaderTest<Rune, BaseVariableLookaheadReader<Rune>>
     {
-        private BaseVariableLookaheadReader<CodePoint> GetReader(CodePoint[] data)
+        private BaseVariableLookaheadReader<Rune> GetReader(Rune[] data)
         {
             return data.GetVariableLookaheadReader();
         }
@@ -348,9 +348,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class SpeculativeReaderTest : SpeculativeReaderTest<CodePoint, SpeculativeReader<CodePoint>>
+    public class SpeculativeReaderTest : SpeculativeReaderTest<Rune, SpeculativeReader<Rune>>
     {
-        private SpeculativeReader<CodePoint> GetReader(CodePoint[] data)
+        private SpeculativeReader<Rune> GetReader(Rune[] data)
         {
             return data.GetSpeculativeReader();
         }
