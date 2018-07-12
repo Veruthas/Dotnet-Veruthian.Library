@@ -52,8 +52,6 @@ namespace Veruthian.Dotnet.Library.Operations
 
         int IContainer<IOperation<TState>>.Count => Count;
 
-        LookupDensity ILookup<int, IOperation<TState>>.Density => LookupDensity.Dense;
-
         IOperation<TState> ILookup<int, IOperation<TState>>.this[int key]
         {
             get

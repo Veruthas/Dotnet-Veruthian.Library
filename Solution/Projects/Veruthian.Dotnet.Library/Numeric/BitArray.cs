@@ -200,8 +200,6 @@ namespace Veruthian.Dotnet.Library.Numeric
                 }
             }
         }
-
-        LookupDensity ILookup<int, bool>.Density => LookupDensity.Dense;
         
         bool ILookup<int, bool>.HasKey(int index) => HasIndex(index);
 
