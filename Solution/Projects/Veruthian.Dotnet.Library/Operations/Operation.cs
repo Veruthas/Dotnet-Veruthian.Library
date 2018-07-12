@@ -52,6 +52,7 @@ namespace Veruthian.Dotnet.Library.Operations
 
         int IContainer<IOperation<TState>>.Count => Count;
 
+        LookupDensity ILookup<int, IOperation<TState>>.Density => LookupDensity.Dense;
 
         IOperation<TState> ILookup<int, IOperation<TState>>.this[int key]
         {
@@ -80,20 +81,16 @@ namespace Veruthian.Dotnet.Library.Operations
             }
         }
 
-        private int? IndexOf(IOperation<TState> value)
+        bool IContainer<IOperation<TState>>.Contains(IOperation<TState> value)
         {
             for (int i = 0; i < Count; i++)
             {
                 if (GetSubOperation(i) == value)
-                    return i;
+                    return true;
             }
 
-            return null;
+            return false;
         }
-
-
-        bool IContainer<IOperation<TState>>.Contains(IOperation<TState> value) => IndexOf(value) != null;
-
 
         IEnumerable<int> ILookup<int, IOperation<TState>>.Keys
         {
@@ -112,7 +109,6 @@ namespace Veruthian.Dotnet.Library.Operations
                     yield return GetSubOperation(i);
             }
         }
-
 
         IEnumerable<KeyValuePair<int, IOperation<TState>>> ILookup<int, IOperation<TState>>.Pairs
         {

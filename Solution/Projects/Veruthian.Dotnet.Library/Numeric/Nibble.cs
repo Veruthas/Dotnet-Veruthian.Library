@@ -210,6 +210,8 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
+        LookupDensity ILookup<int, bool>.Density => LookupDensity.Dense;
+
         IEnumerable<bool> IContainer<bool>.Values
         {
             get

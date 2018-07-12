@@ -4,6 +4,9 @@ namespace Veruthian.Dotnet.Library.Collections
 {
     public interface ILookup<TKey, TValue> : IContainer<TValue>
     {
+        LookupDensity Density { get; }
+
+        
         TValue this[TKey key] { get; }
 
         IEnumerable<TKey> Keys { get; }
