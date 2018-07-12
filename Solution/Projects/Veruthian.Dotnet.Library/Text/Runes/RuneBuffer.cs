@@ -7,16 +7,16 @@ using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 
 namespace Veruthian.Dotnet.Library.Text.Runes
 {
-    public class RuneStringBuilder : IEnumerable<Rune>
+    public class RuneBuffer : IEnumerable<Rune>
     {
         List<Rune> runes;
 
 
-        public RuneStringBuilder() => runes = new List<Rune>();
+        public RuneBuffer() => runes = new List<Rune>();
 
-        public RuneStringBuilder(int capacity) => runes = new List<Rune>(capacity);
+        public RuneBuffer(int capacity) => runes = new List<Rune>(capacity);
 
-        public RuneStringBuilder(IEnumerable<Rune> runes) => runes = new List<Rune>(runes);
+        public RuneBuffer(IEnumerable<Rune> runes) => runes = new List<Rune>(runes);
 
 
         public int Length => runes.Count;
@@ -28,13 +28,13 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Runes
-        public RuneStringBuilder Append(Rune value)
+        public RuneBuffer Append(Rune value)
         {
             runes.Add(value);
 
             return this;
         }
-        public RuneStringBuilder Insert(int index, Rune value)
+        public RuneBuffer Insert(int index, Rune value)
         {
             runes.Insert(index, value);
 
@@ -42,7 +42,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
 
-        public RuneStringBuilder Append(IEnumerable<Rune> values)
+        public RuneBuffer Append(IEnumerable<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
@@ -51,7 +51,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder Append(IEnumerator<Rune> values)
+        public RuneBuffer Append(IEnumerator<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
@@ -62,7 +62,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, IEnumerable<Rune> values)
+        public RuneBuffer Insert(int index, IEnumerable<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
@@ -72,7 +72,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, IEnumerator<Rune> values)
+        public RuneBuffer Insert(int index, IEnumerator<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
@@ -84,7 +84,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // CodeString
-        public RuneStringBuilder Append(RuneString value)
+        public RuneBuffer Append(RuneString value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -94,7 +94,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Append(RuneString value, int start)
+        public RuneBuffer Append(RuneString value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -102,7 +102,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return Append(value, start, value.Length - start);
         }
 
-        public RuneStringBuilder Append(RuneString value, int start, int length)
+        public RuneBuffer Append(RuneString value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -113,7 +113,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, RuneString value)
+        public RuneBuffer Insert(int index, RuneString value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -124,7 +124,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         }
 
-        public RuneStringBuilder Insert(int index, RuneString value, int start)
+        public RuneBuffer Insert(int index, RuneString value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -132,7 +132,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return Append(value, start, value.Length - start);
         }
 
-        public RuneStringBuilder Insert(int index, RuneString value, int start, int length)
+        public RuneBuffer Insert(int index, RuneString value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -144,7 +144,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Chars
-        public RuneStringBuilder Append(IEnumerable<char> value)
+        public RuneBuffer Append(IEnumerable<char> value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -154,7 +154,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, IEnumerable<char> value)
+        public RuneBuffer Insert(int index, IEnumerable<char> value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -165,7 +165,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Strings
-        public RuneStringBuilder Append(string value)
+        public RuneBuffer Append(string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -174,7 +174,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder Append(string value, int start)
+        public RuneBuffer Append(string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -183,7 +183,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder Append(string value, int start, int length)
+        public RuneBuffer Append(string value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -193,7 +193,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, string value)
+        public RuneBuffer Insert(int index, string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -202,7 +202,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder Insert(int index, string value, int start)
+        public RuneBuffer Insert(int index, string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -211,7 +211,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder Insert(int index, string value, int start, int length)
+        public RuneBuffer Insert(int index, string value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -223,14 +223,14 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
 
         // Objects
-        public RuneStringBuilder Append(object value)
+        public RuneBuffer Append(object value)
         {
             Append(value.ToString());
 
             return this;
         }
 
-        public RuneStringBuilder Insert(int index, object value)
+        public RuneBuffer Insert(int index, object value)
         {
             Insert(index, value.ToString());
 
@@ -238,7 +238,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Formatted strings
-        public RuneStringBuilder AppendFormat(string format, object arg0)
+        public RuneBuffer AppendFormat(string format, object arg0)
         {
             string value = string.Format(format, arg0);
 
@@ -246,7 +246,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(string format, object arg0, object arg1)
+        public RuneBuffer AppendFormat(string format, object arg0, object arg1)
         {
             string value = string.Format(format, arg0, arg1);
 
@@ -254,7 +254,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(string format, object arg0, object arg1, object arg2)
+        public RuneBuffer AppendFormat(string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(format, arg0, arg1, arg2);
 
@@ -262,7 +262,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(string format, params object[] args)
+        public RuneBuffer AppendFormat(string format, params object[] args)
         {
             string value = string.Format(format, args);
 
@@ -271,7 +271,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0)
         {
             string value = string.Format(provider, format, arg0);
 
@@ -279,7 +279,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0, object arg1)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1)
         {
             string value = string.Format(provider, format, arg0, arg1);
 
@@ -287,7 +287,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(provider, format, arg0, arg1, arg2);
 
@@ -295,7 +295,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder AppendFormat(IFormatProvider provider, string format, params object[] args)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, params object[] args)
         {
             string value = string.Format(provider, format, args);
 
@@ -304,7 +304,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder InsertFormat(int index, string format, object arg0)
+        public RuneBuffer InsertFormat(int index, string format, object arg0)
         {
             string value = string.Format(format, arg0);
 
@@ -312,7 +312,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, string format, object arg0, object arg1)
+        public RuneBuffer InsertFormat(int index, string format, object arg0, object arg1)
         {
             string value = string.Format(format, arg0, arg1);
 
@@ -320,7 +320,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer InsertFormat(int index, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(format, arg0, arg1, arg2);
 
@@ -328,7 +328,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, string format, params object[] args)
+        public RuneBuffer InsertFormat(int index, string format, params object[] args)
         {
             string value = string.Format(format, args);
 
@@ -337,7 +337,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return this;
         }
 
-        public RuneStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0)
         {
             string value = string.Format(provider, format, arg0);
 
@@ -345,7 +345,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1)
         {
             string value = string.Format(provider, format, arg0, arg1);
 
@@ -353,7 +353,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(provider, format, arg0, arg1, arg2);
 
@@ -361,7 +361,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return this;
         }
-        public RuneStringBuilder InsertFormat(int index, IFormatProvider provider, string format, params object[] args)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, params object[] args)
         {
             string value = string.Format(provider, format, args);
 
@@ -371,35 +371,35 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Remove
-        public RuneStringBuilder Remove(Rune value)
+        public RuneBuffer Remove(Rune value)
         {
             runes.Remove(value);
 
             return this;
         }
 
-        public RuneStringBuilder Remove(int index)
+        public RuneBuffer Remove(int index)
         {
             runes.RemoveAt(index);
 
             return this;
         }
 
-        public RuneStringBuilder Remove(int index, int length)
+        public RuneBuffer Remove(int index, int length)
         {
             runes.RemoveRange(index, length);
 
             return this;
         }
 
-        public RuneStringBuilder Remove(Predicate<Rune> match)
+        public RuneBuffer Remove(Predicate<Rune> match)
         {
             runes.RemoveAll(match);
 
             return this;
         }
 
-        public RuneStringBuilder Clear()
+        public RuneBuffer Clear()
         {
             runes.Clear();
 
@@ -408,14 +408,14 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
 
         // Reverse
-        public RuneStringBuilder Reverse()
+        public RuneBuffer Reverse()
         {
             runes.Reverse();
 
             return this;
         }
 
-        public RuneStringBuilder Reverse(int index, int length)
+        public RuneBuffer Reverse(int index, int length)
         {
             runes.Reverse(index, length);
 
@@ -423,9 +423,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         // Replace
-        public RuneStringBuilder Replace(Rune oldValue, Rune newValue) => Replace(oldValue, newValue, 0, Length);
+        public RuneBuffer Replace(Rune oldValue, Rune newValue) => Replace(oldValue, newValue, 0, Length);
 
-        public RuneStringBuilder Replace(Rune oldValue, Rune newValue, int index, int length)
+        public RuneBuffer Replace(Rune oldValue, Rune newValue, int index, int length)
         {
             VerifyInRange(index, length);
 
