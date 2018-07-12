@@ -123,13 +123,13 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
         {
             string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
 
-            return new RuneException(string.Format(message, value.ToString()));
+            return new EncodingException(string.Format(message, value.ToString()));
         }
 
         private static Exception InvalidCodeUnitSequence(byte value)
         {
             string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
-            return new RuneException(string.Format(message, value.ToString()));
+            return new EncodingException(string.Format(message, value.ToString()));
         }
 
 
@@ -181,7 +181,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
                 }
                 else
                 {
-                    throw new RuneException(Utf32.CodePointOutOfRangeMessage((int)value));
+                    throw new EncodingException(Utf32.CodePointOutOfRangeMessage((int)value));
                 }
             }
         }

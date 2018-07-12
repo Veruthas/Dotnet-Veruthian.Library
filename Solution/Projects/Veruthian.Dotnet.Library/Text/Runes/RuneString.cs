@@ -12,7 +12,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
     {
         readonly int hashcode;
 
-        readonly Rune[] codepoints;
+        readonly Rune[] runes;
 
 
         #region Constructors
@@ -22,9 +22,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             this.hashcode = HashCodes.Default.Combine(runes);
 
             if (clone)
-                this.codepoints = (Rune[])runes.Clone();
+                this.runes = (Rune[])runes.Clone();
             else
-                this.codepoints = runes;
+                this.runes = runes;
         }
 
         public RuneString(Rune rune)
@@ -41,18 +41,21 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         {
             var result = new List<Rune>();
 
-            foreach(var codepoint in runes)
-                result.Add(codepoint);
+            foreach(var rune in runes)
+                result.Add(rune);
 
             return result.ToArray();
         }
 
         public RuneString(ICollection<Rune> runes)
                 : this(GetFromCollection(runes), false) { }
+
         public RuneString(IList<Rune> runes, int index)
             : this(GetFromList(runes, index, runes.Count - index), false) { }
+
         public RuneString(IList<Rune> runes, int index, int length)
             : this(GetFromList(runes, index, length), false) { }
+
         private static Rune[] GetFromCollection(ICollection<Rune> ruins)
         {
             if (ruins == null)
@@ -64,6 +67,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return values;
         }
+
         private static Rune[] GetFromList(IList<Rune> runes, int index, int length)
         {
             if (runes == null)
@@ -88,6 +92,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             return values;
         }
+
         private static Rune[] GetFromIndex(IIndex<Rune> runes, int index, int length)
         {
             if (runes == null)
@@ -114,24 +119,24 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         }
 
         public RuneString(Rune value, int count)
-            : this(ReplicateCodePoint(value, count), false) { }
+            : this(ReplicateRune(value, count), false) { }
 
         public RuneString(string value)
-            : this(value.ToCodePointArray(), false) { }
+            : this(value.ToRuneArray(), false) { }
 
         public RuneString(string value, int start)
-            : this(value.ToCodePointArray(start), false) { }
+            : this(value.ToRuneArray(start), false) { }
 
         public RuneString(string value, int start, int length)
-            : this(value.ToCodePointArray(start, length), false) { }
+            : this(value.ToRuneArray(start, length), false) { }
 
 
         #endregion
 
         
-        public Rune this[int index] => codepoints[index];
+        public Rune this[int index] => runes[index];
 
-        public int Length => codepoints.Length;
+        public int Length => runes.Length;
 
         public bool IsEmpty => Length == 0;
 
@@ -144,8 +149,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         {
             get
             {
-                foreach (var codepoint in codepoints)
-                    if (codepoint.IsInvalid)
+                foreach (var rune in runes)
+                    if (rune.IsInvalid)
                         return false;
 
                 return true;
@@ -154,8 +159,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public void Validate()
         {
-            foreach (var codepoint in codepoints)
-                codepoint.VerifyIsValid();
+            foreach (var rune in runes)
+                rune.VerifyIsValid();
         }
 
         #endregion
@@ -179,9 +184,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             }
             else if (this.hashcode == other.hashcode && this.Length == other.Length)
             {
-                for (int i = 0; i < codepoints.Length; i++)
+                for (int i = 0; i < runes.Length; i++)
                 {
-                    if (codepoints[i] != other.codepoints[i])
+                    if (runes[i] != other.runes[i])
                         return false;
                 }
 
@@ -221,16 +226,16 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             for (int i = 0; i < length; i++)
             {
-                var thispoint = this.codepoints[i];
-                var otherpoint = other.codepoints[i];
+                var thisRune = this.runes[i];
+                var otherRune = other.runes[i];
 
-                var result = thispoint.CompareTo(otherpoint);
+                var result = thisRune.CompareTo(otherRune);
 
                 if (result != 0)
                     return result;
             }
 
-            // All codepoints that line up match up, so we have to sort by length
+            // All runes that line up match up, so we have to sort by length
             if (this.Length < other.Length)
                 return -1;
             else if (this.Length > other.Length)
@@ -283,9 +288,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             var combined = new Rune[left.Length + right.Length];
 
-            Array.Copy(left.codepoints, 0, combined, 0, left.Length);
+            Array.Copy(left.runes, 0, combined, 0, left.Length);
 
-            Array.Copy(right.codepoints, left.Length, combined, 0, right.Length);
+            Array.Copy(right.runes, left.Length, combined, 0, right.Length);
 
             return new RuneString(combined, false);
         }
@@ -297,7 +302,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             var combined = new Rune[left.Length + 1];
 
-            Array.Copy(left.codepoints, 0, combined, 0, left.Length);
+            Array.Copy(left.runes, 0, combined, 0, left.Length);
 
             combined[left.Length] = right;
 
@@ -314,7 +319,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             combined[0] = left;
 
-            Array.Copy(right.codepoints, 1, combined, 0, right.Length);
+            Array.Copy(right.runes, 1, combined, 0, right.Length);
 
             return new RuneString(combined, false);
         }
@@ -339,7 +344,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             {
                 if (value != null)
                 {
-                    Array.Copy(value.codepoints, 0, combined, index, value.Length);
+                    Array.Copy(value.runes, 0, combined, index, value.Length);
                     index += value.Length;
                 }
             }
@@ -411,17 +416,17 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #region Replicate
 
-        private static Rune[] ReplicateCodePoint(Rune value, int count)
+        private static Rune[] ReplicateRune(Rune value, int count)
         {
             if (count < 0)
                 throw new ArgumentOutOfRangeException("length", count, "length cannot be a negative number.");
 
-            Rune[] codepoints = new Rune[count];
+            Rune[] runes = new Rune[count];
 
             for (int i = 0; i < count; i++)
-                codepoints[i] = value;
+                runes[i] = value;
 
-            return codepoints;
+            return runes;
         }
 
         public static RuneString operator *(RuneString value, int count) => Replicate(value, count);
@@ -495,7 +500,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             var subpoints = new Rune[length];
 
             for (int i = 0, s = start; i < length; i++, s++)
-                subpoints[i] = codepoints[s];
+                subpoints[i] = runes[s];
 
             return new RuneString(subpoints, false);
         }
@@ -505,7 +510,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             var reversed = new Rune[Length];
 
             for (int i = 0, r = Length - 1; i < Length; i++, r--)
-                reversed[i] = codepoints[r];
+                reversed[i] = runes[r];
 
             return new RuneString(reversed, false);
         }
@@ -519,8 +524,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             // should this be cached?
             StringBuilder builder = new StringBuilder();
 
-            foreach (var codepoint in codepoints)
-                builder.Append(codepoint.ToString());
+            foreach (var rune in runes)
+                builder.Append(rune.ToString());
 
             return builder.ToString();
         }
@@ -531,12 +536,12 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #region Enumerator
 
-        public Rune[] ToCodePointArray() => (Rune[])codepoints.Clone();
+        public Rune[] ToRuneArray() => (Rune[])runes.Clone();
 
         public IEnumerator<Rune> GetEnumerator()
         {
-            foreach (Rune codepoint in codepoints)
-                yield return codepoint;
+            foreach (Rune rune in runes)
+                yield return rune;
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

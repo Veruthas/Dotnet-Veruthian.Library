@@ -138,9 +138,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
 
         #region Errors
 
-        private static RuneException InvalidLeadingSurrogate(ushort value)
+        private static EncodingException InvalidLeadingSurrogate(ushort value)
         {
-            return new RuneException(InvalidLeadingSurrogateMessage(value));
+            return new EncodingException(InvalidLeadingSurrogateMessage(value));
         }
 
         public static string InvalidLeadingSurrogateMessage(ushort value)
@@ -149,9 +149,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
         }
 
 
-        private static RuneException InvalidTrailingSurrogate(ushort value)
+        private static EncodingException InvalidTrailingSurrogate(ushort value)
         {
-            return new RuneException(InvalidTrailingSurrogateMessage(value));
+            return new EncodingException(InvalidTrailingSurrogateMessage(value));
         }
 
         public static string InvalidTrailingSurrogateMessage(ushort value)
@@ -182,9 +182,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
         }
 
 
-        private static RuneException InvalidCharacter(ushort value)
+        private static EncodingException InvalidCharacter(ushort value)
         {
-            return new RuneException(InvalidCharacterMessage(value));
+            return new EncodingException(InvalidCharacterMessage(value));
         }
 
         public static string InvalidCharacterMessage(ushort value)
@@ -250,7 +250,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
                     if (IsTrailingSurrogate(trailing))
                         return CombineSurrogates(leading, trailing);
                     else
-                        throw new RuneException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
+                        throw new EncodingException("Invalid trailing surrogate '0x" + Convert.ToString((ushort)trailing, 2) + "'.");
                 }
                 else
                 {
