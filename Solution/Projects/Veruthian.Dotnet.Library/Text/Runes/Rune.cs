@@ -170,7 +170,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public static string operator +(Rune left, string right) => left.ToString() + right;
 
-        public string ToCodePointFormat()
+        public string ToRuneFormat()
         {
             // Format (U+[Y][Y]XXXX)
             return "U+" + value.ToString("X4");
@@ -201,7 +201,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
                         break;
                     default:
                         if (char.IsControl(asChar))
-                            result = ToCodePointFormat();
+                            result = ToRuneFormat();
                         else
                             result = asChar.ToString();
                         break;

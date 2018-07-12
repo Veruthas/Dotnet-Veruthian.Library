@@ -119,14 +119,14 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
             return bytesRemaining == 0;
         }
 
-        private static Exception CodePointNotSmallestSequence(byte value)
+        private static EncodingException CodePointNotSmallestSequence(byte value)
         {
             string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
 
             return new EncodingException(string.Format(message, value.ToString()));
         }
 
-        private static Exception InvalidCodeUnitSequence(byte value)
+        private static EncodingException InvalidCodeUnitSequence(byte value)
         {
             string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
             return new EncodingException(string.Format(message, value.ToString()));
