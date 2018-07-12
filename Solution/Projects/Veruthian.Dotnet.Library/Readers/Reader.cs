@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public class Reader<T> : ReaderBase<T>
+    public class Reader<T> : BaseReader<T>
     {
         T item;
 

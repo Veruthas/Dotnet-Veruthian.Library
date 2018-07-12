@@ -1,6 +1,6 @@
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public abstract class OrderedIndexBase<T> : IndexBase<T>, IOrderedIndex<T>
+    public abstract class BaseOrderedIndex<T> : BaseIndex<T>, IOrderedIndex<T>
     {
         public abstract void Add(T value);
         

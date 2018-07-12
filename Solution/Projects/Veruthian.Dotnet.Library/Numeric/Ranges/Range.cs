@@ -5,10 +5,8 @@ using System.Collections.Generic;
 namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : ISequential<T>, IBounded<T>
     {
-        static T main = new T();
-
         readonly T low, high;
 
         readonly int hashcode;
@@ -85,7 +83,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
 
         #region Comparison
 
-        public bool IsComplete => low.Equals(main.MinValue) && high.Equals(main.MaxValue);
+        public bool IsComplete => low.Equals(low.MinValue) && high.Equals(low.MaxValue);
 
         public bool IsSingle => low.Equals(high);
 
@@ -358,9 +356,9 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             bool started = false;
 
 
-            T low = main;
+            T low = default(T);
 
-            T high = main;
+            T high = default(T);
 
 
             foreach (var value in set)
@@ -436,7 +434,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             return list.ToArray();
         }
 
-        // Complement        
+        // Complement
         public static Range<T>[] UnnormalizedComplement(IEnumerable<Range<T>> ranges)
         {
             var orderedSet = NormalizeUnordered(ranges);
@@ -446,18 +444,33 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             return complement;
         }
 
-        public static Range<T>[] NormalizedComplement(IEnumerable<Range<T>> ranges) => NormalizedComplement(ranges, main.MinValue, main.MaxValue);
-
-        private static Range<T>[] NormalizedComplement(IEnumerable<Range<T>> ranges, T min, T max)
+        public static Range<T>[] NormalizedComplement(IEnumerable<Range<T>> ranges)
         {
             // Complement just creates ranges that exclude the ranges in the set
             // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
             var complement = new List<Range<T>>();
 
-            T low = min;
+            bool started = false;
+
+            T min = default(T);
+            
+            T max = default(T);
+
+            T low = default(T);
 
             foreach (var range in ranges)
             {
+                if (!started)
+                {
+                    started = true;
+
+                    min = range.low.MinValue;
+
+                    max = range.low.MaxValue;
+
+                    low = min;
+                }
+
                 if (!range.Low.Equals(min))
                 {
                     var newRange = new Range<T>(low.Next, range.Low.Previous);
@@ -468,7 +481,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
                 low = range.High;
             }
 
-            if (!low.Equals(max))
+            if (started && !low.Equals(max))
             {
                 var newLow = low.Equals(min) ? low : low.Next;
 

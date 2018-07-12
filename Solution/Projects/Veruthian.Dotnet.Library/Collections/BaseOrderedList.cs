@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public  class OrderedListBase<T> : OrderedIndexBase<T>
+    public  class BaseOrderedList<T> : BaseOrderedIndex<T>
     {
         protected List<T> items;
 
         protected readonly IComparer<T> comparer;
 
-        protected OrderedListBase(List<T> items, IComparer<T> comparer)
+        protected BaseOrderedList(List<T> items, IComparer<T> comparer = null)
         {
             this.items = items;
 

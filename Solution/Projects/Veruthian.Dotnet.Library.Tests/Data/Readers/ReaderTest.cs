@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Veruthian.Dotnet.Library.Text.Code;
-using Veruthian.Dotnet.Library.Text.Code.Extensions;
+using Veruthian.Dotnet.Library.Text.Runes;
+using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 using Veruthian.Dotnet.Library.Collections;
 using Veruthian.Dotnet.Library.Collections.Extensions;
 using Veruthian.Dotnet.Library.Readers.Extensions;
@@ -162,9 +162,9 @@ namespace Veruthian.Dotnet.Library.Readers
 
 
 
-    public class ReaderTest : ReaderTest<CodePoint, Reader<CodePoint>>
+    public class ReaderTest : ReaderTest<Rune, Reader<Rune>>
     {
-        private Reader<CodePoint> GetReader(CodePoint[] data)
+        private Reader<Rune> GetReader(Rune[] data)
         {
             return data.GetReader();
         }
@@ -174,7 +174,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadAndPeek(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadAndPeek(GetReader(codes), codes);
         }
 
@@ -188,7 +188,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2)]
         public void TestSkip(string data, int skipInterval)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
 
@@ -197,14 +197,14 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadEnumerable(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadEnumerable(GetReader(codes), codes);
         }
     }
 
-    public class FixedLookaheadReaderTest : LookaheadReaderTest<CodePoint, FixedLookaheadReader<CodePoint>>
+    public class FixedLookaheadReaderTest : LookaheadReaderTest<Rune, FixedLookaheadReader<Rune>>
     {
-        private FixedLookaheadReader<CodePoint> GetReader(CodePoint[] data, int lookahead)
+        private FixedLookaheadReader<Rune> GetReader(Rune[] data, int lookahead)
         {
             return data.GetFixedLookaheadReader(lookahead);
         }
@@ -212,7 +212,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [Fact]
         public void TestZeroLookahead()
         {
-            Assert.ThrowsAny<Exception>(() => GetReader("".ToCodePointArray(), 0));
+            Assert.ThrowsAny<Exception>(() => GetReader("".ToRuneArray(), 0));
         }
 
 
@@ -224,7 +224,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 20)]
         public void TestReadAndPeek(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadAndPeek(GetReader(codes, lookahead), codes);
         }
 
@@ -240,7 +240,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2, 3)]
         public void TestSkip(string data, int lookahead, int skipInterval)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestSkip(GetReader(codes, lookahead), codes, skipInterval);
         }
 
@@ -249,7 +249,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2)]
         public void TestReadEnumerable(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadEnumerable(GetReader(codes, lookahead), codes);
         }
 
@@ -259,7 +259,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 4)]
         public void TestLookahead(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes, lookahead);
 
@@ -273,7 +273,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDE", 6, 5)]
         public void TestPeekEnumerable(string data, int lookahead, int chunkSize)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes, lookahead);
 
@@ -281,9 +281,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class VariableLookaheadReaderTest : LookaheadReaderTest<CodePoint, VariableLookaheadReaderBase<CodePoint>>
+    public class VariableLookaheadReaderTest : LookaheadReaderTest<Rune, BaseVariableLookaheadReader<Rune>>
     {
-        private VariableLookaheadReaderBase<CodePoint> GetReader(CodePoint[] data)
+        private BaseVariableLookaheadReader<Rune> GetReader(Rune[] data)
         {
             return data.GetVariableLookaheadReader();
         }
@@ -293,7 +293,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadAndPeek(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadAndPeek(GetReader(codes), codes);
         }
 
@@ -307,7 +307,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2)]
         public void TestSkip(string data, int skipInterval)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
 
@@ -316,7 +316,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadEnumerable(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadEnumerable(GetReader(codes), codes);
         }
 
@@ -326,7 +326,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 4)]
         public void TestLookahead(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
 
@@ -340,7 +340,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDE", 5)]
         public void TestPeekEnumerable(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
 
@@ -348,9 +348,9 @@ namespace Veruthian.Dotnet.Library.Readers
         }
     }
 
-    public class SpeculativeReaderTest : SpeculativeReaderTest<CodePoint, SpeculativeReader<CodePoint>>
+    public class SpeculativeReaderTest : SpeculativeReaderTest<Rune, SpeculativeReader<Rune>>
     {
-        private SpeculativeReader<CodePoint> GetReader(CodePoint[] data)
+        private SpeculativeReader<Rune> GetReader(Rune[] data)
         {
             return data.GetSpeculativeReader();
         }
@@ -360,7 +360,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadAndPeek(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
             BaseTestReadAndPeek(GetReader(codes), codes);
         }
 
@@ -374,7 +374,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2)]
         public void TestSkip(string data, int skipInterval)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
@@ -384,7 +384,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM")]
         public void TestReadEnumerable(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             BaseTestReadEnumerable(GetReader(codes), codes);
         }
@@ -398,7 +398,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 2)]
         public void TestRollbackSkip(string data, int skipInterval)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
 
@@ -418,7 +418,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDEFGHIJKLM", 4)]
         public void TestLookahead(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
 
@@ -432,7 +432,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDE", 5)]
         public void TestPeekEnumerable(string data, int lookahead)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
 
@@ -445,7 +445,7 @@ namespace Veruthian.Dotnet.Library.Readers
         [InlineData("ABCDE")]
         public void TestPeekFromMark(string data)
         {
-            var codes = data.ToCodePointArray();
+            var codes = data.ToRuneArray();
 
             var reader = GetReader(codes);
             

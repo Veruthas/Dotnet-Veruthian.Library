@@ -5,7 +5,5 @@ namespace Veruthian.Dotnet.Library.Collections
         int StartIndex { get; }
 
         int EndIndex { get; }
-
-        int? IndexOf(T value);
     }
 }

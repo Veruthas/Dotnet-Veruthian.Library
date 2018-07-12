@@ -6,7 +6,7 @@ using Veruthian.Dotnet.Library.Collections;
 namespace Veruthian.Dotnet.Library.Numeric.Ranges
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : ISequential<T>, IBounded<T>
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
@@ -32,7 +32,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
 
 
     public abstract class RangeSet<T, TSet> : IEquatable<TSet>
-        where T : ISequential<T>, IBounded<T>, new()
+        where T : ISequential<T>, IBounded<T>
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;
@@ -170,13 +170,13 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
             return items.ToArray();
         }
 
-        public IEnumerator<Range<T>> GetRangeEnumerator()
+        public IEnumerable<Range<T>> Ranges()
         {
             foreach (var range in RangeArray)
                 yield return range;
         }
 
-        public IEnumerator<T> GetItemEnumerator()
+        public IEnumerable<T> Items()
         {
             var items = new List<T>();
 
@@ -196,11 +196,7 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
                 }
             }
         }
-
-        public IEnumerable<T> Items => EnumeratorGenerator<T>.Create(GetItemEnumerator);
-
-        public IEnumerable<Range<T>> Ranges => EnumeratorGenerator<Range<T>>.Create(GetRangeEnumerator);
-
+        
         #endregion
 
 
@@ -230,9 +226,9 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
 
         public static TSet List(IEnumerable<T> items) => FromList(items);
 
-        protected static TSet FromList(IEnumerable<T> codepoints)
+        protected static TSet FromList(IEnumerable<T> items)
         {
-            var ranges = Range<T>.FromUnorderedList(codepoints);
+            var ranges = Range<T>.FromUnorderedList(items);
 
             return Create(ranges);
         }
