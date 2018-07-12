@@ -4,9 +4,6 @@ namespace Veruthian.Dotnet.Library.Collections
 {
     public abstract class BaseExpandableIndex<T> : BaseMutableIndex<T>, IExpandableIndex<T>
     {
-        protected BaseExpandableIndex(int startIndex = 0)
-            : base(startIndex) { }
-            
         public abstract void Add(T value);
 
         public abstract void AddRange(IEnumerable<T> values);
