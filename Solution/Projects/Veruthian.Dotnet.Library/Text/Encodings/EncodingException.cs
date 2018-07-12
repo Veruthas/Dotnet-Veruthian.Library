@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
+namespace Veruthian.Dotnet.Library.Text.Encodings
 {
     public class EncodingException : Exception
     {

@@ -1,7 +1,7 @@
 using System;
 using Veruthian.Dotnet.Library.Numeric;
 
-namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
+namespace Veruthian.Dotnet.Library.Text.Encodings
 {
     public static class Utf16
     {
