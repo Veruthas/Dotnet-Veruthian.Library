@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Veruthian.Dotnet.Library.Text.Runes.Encodings;
+using Veruthian.Dotnet.Library.Text.Encodings;
 using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 
 namespace Veruthian.Dotnet.Library.Text.Runes

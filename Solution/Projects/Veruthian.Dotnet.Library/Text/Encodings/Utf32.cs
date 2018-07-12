@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Numeric;
 
-namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
+namespace Veruthian.Dotnet.Library.Text.Encodings
 {
     public static class Utf32
     {
@@ -119,7 +119,11 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
                 if (reverse)
                     value = value.ReverseBytesInInts();
 
-                return Rune.FromUtf32(value.GetInt());
+                var result = value.GetInt();
+
+                Utf32.VerifyInRange(result);
+                
+                return result;
             }
 
 

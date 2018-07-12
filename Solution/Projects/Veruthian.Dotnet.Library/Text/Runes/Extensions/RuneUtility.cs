@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Numeric;
-using Veruthian.Dotnet.Library.Text.Runes.Encodings;
+using Veruthian.Dotnet.Library.Text.Encodings;
 
 namespace Veruthian.Dotnet.Library.Text.Runes.Extensions
 {
