@@ -201,10 +201,6 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         int IContainer<bool>.Count => bits;
 
-        int IIndex<bool>.StartIndex => 0;
-
-        int IIndex<bool>.EndIndex => bits - 1;
-
         IEnumerable<int> ILookup<int, bool>.Keys
         {
             get
