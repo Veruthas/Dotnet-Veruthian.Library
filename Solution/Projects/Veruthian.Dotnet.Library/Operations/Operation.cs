@@ -50,11 +50,6 @@ namespace Veruthian.Dotnet.Library.Operations
         private bool HasIndex(int index) => (uint)index >= Count;
 
 
-        int IIndex<IOperation<TState>>.StartIndex => 0;
-
-        int IIndex<IOperation<TState>>.EndIndex => Count - 1;
-
-
         int IContainer<IOperation<TState>>.Count => Count;
 
 
@@ -95,8 +90,6 @@ namespace Veruthian.Dotnet.Library.Operations
 
             return null;
         }
-
-        int? IIndex<IOperation<TState>>.IndexOf(IOperation<TState> value) => IndexOf(value);
 
 
         bool IContainer<IOperation<TState>>.Contains(IOperation<TState> value) => IndexOf(value) != null;

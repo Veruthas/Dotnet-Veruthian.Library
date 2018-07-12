@@ -122,10 +122,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         public int Count => count;
 
 
-        int IIndex<bool>.StartIndex => 0;
-
-        int IIndex<bool>.EndIndex => Count - 1;
-
         IEnumerable<int> ILookup<int, bool>.Keys => NumericUtility.GetRange(0, Count - 1);
 
 

@@ -1,36 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Dotnet.Library.Numeric;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
     public abstract class BaseIndex<T> : IIndex<T>, IEnumerable<T>
     {
-        protected int startIndex;
-
-
-        protected BaseIndex(int startIndex = 0) => this.startIndex = startIndex;
-
-
         public T this[int index]
         {
-            get => TryGet(index, out var value) ? value : throw new IndexOutOfRangeException();
+            get => IsValidIndex(index) ? RawGet(index) : throw new IndexOutOfRangeException();
         }
-
-        public int StartIndex
-        {
-            get => startIndex;
-            set => this.startIndex = value;
-        }
-
-        public int EndIndex => startIndex + Count - 1;
 
         IEnumerable<int> ILookup<int, T>.Keys
         {
             get
             {
-                for (int i = StartIndex; i < StartIndex + Count; i++)
-                    yield return i;
+                return NumericUtility.GetRange(0, Count - 1);
             }
         }
 
@@ -47,7 +33,7 @@ namespace Veruthian.Dotnet.Library.Collections
         {
             get
             {
-                for (int i = 0, index = StartIndex; i < Count; i++, index++)
+                for (int i = 0, index = 0; i < Count; i++, index++)
                 {
                     var item = RawGet(i);
 
@@ -61,7 +47,7 @@ namespace Veruthian.Dotnet.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
 
 
-        public bool IsValidIndex(int index) => index >= StartIndex && index < StartIndex + Count;
+        public bool IsValidIndex(int index) => (uint)index < Count;
 
         bool ILookup<int, T>.HasKey(int index) => IsValidIndex(index);
 
@@ -92,7 +78,7 @@ namespace Veruthian.Dotnet.Library.Collections
         {
             if (IsValidIndex(index))
             {
-                value = RawGet(index + StartIndex);
+                value = RawGet(index);
 
                 return true;
             }
@@ -107,6 +93,6 @@ namespace Veruthian.Dotnet.Library.Collections
 
         public abstract int Count { get; }
 
-        protected abstract T RawGet(int adjustedValidIndex);
+        protected abstract T RawGet(int validIndex);
     }
 }
