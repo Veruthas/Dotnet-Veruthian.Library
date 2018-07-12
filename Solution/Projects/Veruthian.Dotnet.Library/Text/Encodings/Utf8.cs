@@ -1,7 +1,7 @@
 using System;
 using Veruthian.Dotnet.Library.Numeric;
 
-namespace Veruthian.Dotnet.Library.Text.Code.Encodings
+namespace Veruthian.Dotnet.Library.Text.Encodings
 {
     public static class Utf8
     {
@@ -119,17 +119,17 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
             return bytesRemaining == 0;
         }
 
-        private static Exception CodePointNotSmallestSequence(byte value)
+        private static EncodingException CodePointNotSmallestSequence(byte value)
         {
             string message = "Invalid UTF8 code unit (0:X4), CodePoint must be represented in the smallest possible byte sequence.";
 
-            return new CodePointException(string.Format(message, value.ToString()));
+            return new EncodingException(string.Format(message, value.ToString()));
         }
 
-        private static Exception InvalidCodeUnitSequence(byte value)
+        private static EncodingException InvalidCodeUnitSequence(byte value)
         {
             string message = "Invalid UTF8 code unit sequence (0:X4), invalid prefix.";
-            return new CodePointException(string.Format(message, value.ToString()));
+            return new EncodingException(string.Format(message, value.ToString()));
         }
 
 
@@ -181,7 +181,7 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
                 }
                 else
                 {
-                    throw new CodePointException(Utf32.CodePointOutOfRangeMessage((int)value));
+                    throw new EncodingException(Utf32.CodePointOutOfRangeMessage((int)value));
                 }
             }
         }

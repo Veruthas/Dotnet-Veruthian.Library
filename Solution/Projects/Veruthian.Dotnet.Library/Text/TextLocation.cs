@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Veruthian.Dotnet.Library.Text.Code;
+using Veruthian.Dotnet.Library.Text.Runes;
 
 namespace Veruthian.Dotnet.Library.Text
 {
@@ -59,20 +59,20 @@ namespace Veruthian.Dotnet.Library.Text
             }
         }
 
-        public TextLocation MoveToNext(CodePoint current, CodePoint next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
+        public TextLocation MoveToNext(Rune current, Rune next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
 
         public TextLocation MoveToNext(char current, char next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
 
 
-        // MoveThrough CodePoints
-        public TextLocation MoveThrough(CodePoint current, CodeString following, bool acceptNulls = true)
-            => MoveThrough(current, (IEnumerable<CodePoint>)following, acceptNulls);
+        // MoveThrough Runes
+        public TextLocation MoveThrough(Rune current, RuneString following, bool acceptNulls = true)
+            => MoveThrough(current, (IEnumerable<Rune>)following, acceptNulls);
 
-        public TextLocation MoveThrough(CodePoint current, IEnumerable<CodePoint> following, bool acceptNulls = true)
+        public TextLocation MoveThrough(Rune current, IEnumerable<Rune> following, bool acceptNulls = true)
         {
             TextLocation result = this;
 
-            foreach (CodePoint next in following)
+            foreach (Rune next in following)
             {
                 result = result.MoveToNext(current, next, acceptNulls);
 

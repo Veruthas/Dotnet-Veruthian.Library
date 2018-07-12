@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Numeric;
 
-namespace Veruthian.Dotnet.Library.Text.Code.Encodings
+namespace Veruthian.Dotnet.Library.Text.Encodings
 {
     public static class Utf32
     {
@@ -58,9 +58,9 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
 
         #region Errors
 
-        private static CodePointException CodePointOutOfRange(int value)
+        private static EncodingException CodePointOutOfRange(int value)
         {
-            return new CodePointException(CodePointOutOfRangeMessage(value));
+            return new EncodingException(CodePointOutOfRangeMessage(value));
         }
 
         public static string CodePointOutOfRangeMessage(int value)
@@ -69,9 +69,9 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
         }
 
 
-        private static CodePointException InvalidCodePoint(uint value)
+        private static EncodingException InvalidCodePoint(uint value)
         {
-            return new CodePointException(InvalidCodePointMessage(value));
+            return new EncodingException(InvalidCodePointMessage(value));
         }
 
         public static string InvalidCodePointMessage(uint value)
@@ -119,7 +119,11 @@ namespace Veruthian.Dotnet.Library.Text.Code.Encodings
                 if (reverse)
                     value = value.ReverseBytesInInts();
 
-                return CodePoint.FromUtf32(value.GetInt());
+                var result = value.GetInt();
+
+                Utf32.VerifyInRange(result);
+                
+                return result;
             }
 
 

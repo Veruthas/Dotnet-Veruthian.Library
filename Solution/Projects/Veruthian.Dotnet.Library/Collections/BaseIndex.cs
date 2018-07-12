@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public abstract class IndexBase<T> : IIndex<T>, IEnumerable<T>
+    public abstract class BaseIndex<T> : IIndex<T>, IEnumerable<T>
     {
         protected int startIndex;
 
 
-        protected IndexBase(int startIndex = 0) => this.startIndex = startIndex;
+        protected BaseIndex(int startIndex = 0) => this.startIndex = startIndex;
 
 
         public T this[int index]
@@ -68,18 +68,6 @@ namespace Veruthian.Dotnet.Library.Collections
 
         public bool Contains(T value)
         {
-            return UnadjustedIndexOf(value) != -1;
-        }
-
-        public int? IndexOf(T value)
-        {
-            var result = UnadjustedIndexOf(value);
-
-            return result == -1 ? (int?)null : result;
-        }
-
-        private int UnadjustedIndexOf(T value)
-        {
             for (int i = 0; i < Count; i++)
             {
                 var item = RawGet(i);
@@ -87,16 +75,16 @@ namespace Veruthian.Dotnet.Library.Collections
                 if (item == null)
                 {
                     if (value == null)
-                        return i;
+                        return true;
                 }
                 else
                 {
                     if (item.Equals(value))
-                        return i;
+                        return true;
                 }
             }
 
-            return -1;
+            return false;
         }
 
 

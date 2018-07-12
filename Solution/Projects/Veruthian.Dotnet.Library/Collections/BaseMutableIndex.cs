@@ -2,9 +2,9 @@ using System;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public abstract class MutableIndexBase<T> : IndexBase<T>, IMutableIndex<T>
+    public abstract class BaseMutableIndex<T> : BaseIndex<T>, IMutableIndex<T>
     {
-        protected MutableIndexBase(int startIndex = 0)
+        protected BaseMutableIndex(int startIndex = 0)
             : base(startIndex) { }
 
         public new T this[int index]

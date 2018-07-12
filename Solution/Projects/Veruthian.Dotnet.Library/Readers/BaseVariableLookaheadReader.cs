@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Readers
 {
-    public abstract class VariableLookaheadReaderBase<T> : LookaheadReaderBase<T>
+    public abstract class BaseVariableLookaheadReader<T> : BaseLookaheadReader<T>
     {
         List<T> items = new List<T>();
 
         int index;
 
 
-        public VariableLookaheadReaderBase() { }
+        public BaseVariableLookaheadReader() { }
 
 
         protected int Index { get => index; set => index = value; }

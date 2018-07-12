@@ -4,7 +4,7 @@ using Veruthian.Dotnet.Library.Collections.Extensions;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public class DataArray<T> : MutableIndexBase<T>
+    public class DataArray<T> : BaseMutableIndex<T>
     {
         T[] items;
 

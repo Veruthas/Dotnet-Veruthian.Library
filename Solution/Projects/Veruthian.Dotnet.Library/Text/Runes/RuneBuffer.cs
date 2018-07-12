@@ -2,99 +2,99 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Veruthian.Dotnet.Library.Text.Code.Encodings;
-using Veruthian.Dotnet.Library.Text.Code.Extensions;
+using Veruthian.Dotnet.Library.Text.Encodings;
+using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 
-namespace Veruthian.Dotnet.Library.Text.Code
+namespace Veruthian.Dotnet.Library.Text.Runes
 {
-    public class CodeStringBuilder : IEnumerable<CodePoint>
+    public class RuneBuffer : IEnumerable<Rune>
     {
-        List<CodePoint> codepoints;
+        List<Rune> runes;
 
 
-        public CodeStringBuilder() => codepoints = new List<CodePoint>();
+        public RuneBuffer() => runes = new List<Rune>();
 
-        public CodeStringBuilder(int capacity) => codepoints = new List<CodePoint>(capacity);
+        public RuneBuffer(int capacity) => runes = new List<Rune>(capacity);
 
-        public CodeStringBuilder(IEnumerable<CodePoint> codepoints) => codepoints = new List<CodePoint>(codepoints);
+        public RuneBuffer(IEnumerable<Rune> runes) => runes = new List<Rune>(runes);
 
 
-        public int Length => codepoints.Count;
+        public int Length => runes.Count;
 
-        public CodePoint this[int index]
+        public Rune this[int index]
         {
-            get => codepoints[index];
-            set => codepoints[index] = value;
+            get => runes[index];
+            set => runes[index] = value;
         }
 
-        // CodePoints
-        public CodeStringBuilder Append(CodePoint value)
+        // Runes
+        public RuneBuffer Append(Rune value)
         {
-            codepoints.Add(value);
+            runes.Add(value);
 
             return this;
         }
-        public CodeStringBuilder Insert(int index, CodePoint value)
+        public RuneBuffer Insert(int index, Rune value)
         {
-            codepoints.Insert(index, value);
+            runes.Insert(index, value);
 
             return this;
         }
 
 
-        public CodeStringBuilder Append(IEnumerable<CodePoint> values)
+        public RuneBuffer Append(IEnumerable<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
 
-            codepoints.AddRange(values);
+            runes.AddRange(values);
 
             return this;
         }
-        public CodeStringBuilder Append(IEnumerator<CodePoint> values)
-        {
-            if (values == null)
-                throw new ArgumentNullException("values");
-
-            while (values.MoveNext())
-                codepoints.Add(values.Current);
-
-            return this;
-        }
-
-        public CodeStringBuilder Insert(int index, IEnumerable<CodePoint> values)
-        {
-            if (values == null)
-                throw new ArgumentNullException("values");
-
-            codepoints.InsertRange(index, values);
-
-            return this;
-        }
-
-        public CodeStringBuilder Insert(int index, IEnumerator<CodePoint> values)
+        public RuneBuffer Append(IEnumerator<Rune> values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
 
             while (values.MoveNext())
-                codepoints.Insert(index, values.Current);
+                runes.Add(values.Current);
+
+            return this;
+        }
+
+        public RuneBuffer Insert(int index, IEnumerable<Rune> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException("values");
+
+            runes.InsertRange(index, values);
+
+            return this;
+        }
+
+        public RuneBuffer Insert(int index, IEnumerator<Rune> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException("values");
+
+            while (values.MoveNext())
+                runes.Insert(index, values.Current);
 
             return this;
         }
 
         // CodeString
-        public CodeStringBuilder Append(CodeString value)
+        public RuneBuffer Append(RuneString value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            codepoints.AddRange(value);
+            runes.AddRange(value);
 
             return this;
         }
 
-        public CodeStringBuilder Append(CodeString value, int start)
+        public RuneBuffer Append(RuneString value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -102,29 +102,29 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return Append(value, start, value.Length - start);
         }
 
-        public CodeStringBuilder Append(CodeString value, int start, int length)
+        public RuneBuffer Append(RuneString value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
             for (int i = start; i < start + length; i++)
-                codepoints.Add(value[i]);
+                runes.Add(value[i]);
 
             return this;
         }
 
-        public CodeStringBuilder Insert(int index, CodeString value)
+        public RuneBuffer Insert(int index, RuneString value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            codepoints.InsertRange(index, value);
+            runes.InsertRange(index, value);
 
             return this;
 
         }
 
-        public CodeStringBuilder Insert(int index, CodeString value, int start)
+        public RuneBuffer Insert(int index, RuneString value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -132,105 +132,105 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return Append(value, start, value.Length - start);
         }
 
-        public CodeStringBuilder Insert(int index, CodeString value, int start, int length)
+        public RuneBuffer Insert(int index, RuneString value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
             for (int i = start; i < start + length; i++)
-                codepoints.Insert(index++, value[i]);
+                runes.Insert(index++, value[i]);
 
             return this;
         }
 
         // Chars
-        public CodeStringBuilder Append(IEnumerable<char> value)
+        public RuneBuffer Append(IEnumerable<char> value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints());
+            Append(value.ToRunes());
 
             return this;
         }
 
-        public CodeStringBuilder Insert(int index, IEnumerable<char> value)
+        public RuneBuffer Insert(int index, IEnumerable<char> value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints());
+            Insert(index, value.ToRunes());
 
             return this;
         }
 
         // Strings
-        public CodeStringBuilder Append(string value)
+        public RuneBuffer Append(string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints());
+            Append(value.ToRunes());
 
             return this;
         }
-        public CodeStringBuilder Append(string value, int start)
+        public RuneBuffer Append(string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints(start));
+            Append(value.ToRunes(start));
 
             return this;
         }
-        public CodeStringBuilder Append(string value, int start, int length)
+        public RuneBuffer Append(string value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints(start, length));
+            Append(value.ToRunes(start, length));
 
             return this;
         }
 
-        public CodeStringBuilder Insert(int index, string value)
+        public RuneBuffer Insert(int index, string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints());
+            Insert(index, value.ToRunes());
 
             return this;
         }
-        public CodeStringBuilder Insert(int index, string value, int start)
+        public RuneBuffer Insert(int index, string value, int start)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints(start));
+            Insert(index, value.ToRunes(start));
 
             return this;
         }
-        public CodeStringBuilder Insert(int index, string value, int start, int length)
+        public RuneBuffer Insert(int index, string value, int start, int length)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints(start, length));
+            Insert(index, value.ToRunes(start, length));
 
             return this;
         }
 
 
         // Objects
-        public CodeStringBuilder Append(object value)
+        public RuneBuffer Append(object value)
         {
             Append(value.ToString());
 
             return this;
         }
 
-        public CodeStringBuilder Insert(int index, object value)
+        public RuneBuffer Insert(int index, object value)
         {
             Insert(index, value.ToString());
 
@@ -238,7 +238,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
         }
 
         // Formatted strings
-        public CodeStringBuilder AppendFormat(string format, object arg0)
+        public RuneBuffer AppendFormat(string format, object arg0)
         {
             string value = string.Format(format, arg0);
 
@@ -246,7 +246,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(string format, object arg0, object arg1)
+        public RuneBuffer AppendFormat(string format, object arg0, object arg1)
         {
             string value = string.Format(format, arg0, arg1);
 
@@ -254,7 +254,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(string format, object arg0, object arg1, object arg2)
+        public RuneBuffer AppendFormat(string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(format, arg0, arg1, arg2);
 
@@ -262,7 +262,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(string format, params object[] args)
+        public RuneBuffer AppendFormat(string format, params object[] args)
         {
             string value = string.Format(format, args);
 
@@ -271,7 +271,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return this;
         }
 
-        public CodeStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0)
         {
             string value = string.Format(provider, format, arg0);
 
@@ -279,7 +279,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0, object arg1)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1)
         {
             string value = string.Format(provider, format, arg0, arg1);
 
@@ -287,7 +287,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(provider, format, arg0, arg1, arg2);
 
@@ -295,7 +295,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder AppendFormat(IFormatProvider provider, string format, params object[] args)
+        public RuneBuffer AppendFormat(IFormatProvider provider, string format, params object[] args)
         {
             string value = string.Format(provider, format, args);
 
@@ -304,7 +304,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return this;
         }
 
-        public CodeStringBuilder InsertFormat(int index, string format, object arg0)
+        public RuneBuffer InsertFormat(int index, string format, object arg0)
         {
             string value = string.Format(format, arg0);
 
@@ -312,7 +312,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, string format, object arg0, object arg1)
+        public RuneBuffer InsertFormat(int index, string format, object arg0, object arg1)
         {
             string value = string.Format(format, arg0, arg1);
 
@@ -320,7 +320,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer InsertFormat(int index, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(format, arg0, arg1, arg2);
 
@@ -328,7 +328,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, string format, params object[] args)
+        public RuneBuffer InsertFormat(int index, string format, params object[] args)
         {
             string value = string.Format(format, args);
 
@@ -337,7 +337,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             return this;
         }
 
-        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0)
         {
             string value = string.Format(provider, format, arg0);
 
@@ -345,7 +345,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1)
         {
             string value = string.Format(provider, format, arg0, arg1);
 
@@ -353,7 +353,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, object arg0, object arg1, object arg2)
         {
             string value = string.Format(provider, format, arg0, arg1, arg2);
 
@@ -361,7 +361,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
             return this;
         }
-        public CodeStringBuilder InsertFormat(int index, IFormatProvider provider, string format, params object[] args)
+        public RuneBuffer InsertFormat(int index, IFormatProvider provider, string format, params object[] args)
         {
             string value = string.Format(provider, format, args);
 
@@ -371,68 +371,68 @@ namespace Veruthian.Dotnet.Library.Text.Code
         }
 
         // Remove
-        public CodeStringBuilder Remove(CodePoint value)
+        public RuneBuffer Remove(Rune value)
         {
-            codepoints.Remove(value);
+            runes.Remove(value);
 
             return this;
         }
 
-        public CodeStringBuilder Remove(int index)
+        public RuneBuffer Remove(int index)
         {
-            codepoints.RemoveAt(index);
+            runes.RemoveAt(index);
 
             return this;
         }
 
-        public CodeStringBuilder Remove(int index, int length)
+        public RuneBuffer Remove(int index, int length)
         {
-            codepoints.RemoveRange(index, length);
+            runes.RemoveRange(index, length);
 
             return this;
         }
 
-        public CodeStringBuilder Remove(Predicate<CodePoint> match)
+        public RuneBuffer Remove(Predicate<Rune> match)
         {
-            codepoints.RemoveAll(match);
+            runes.RemoveAll(match);
 
             return this;
         }
 
-        public CodeStringBuilder Clear()
+        public RuneBuffer Clear()
         {
-            codepoints.Clear();
+            runes.Clear();
 
             return this;
         }
 
 
         // Reverse
-        public CodeStringBuilder Reverse()
+        public RuneBuffer Reverse()
         {
-            codepoints.Reverse();
+            runes.Reverse();
 
             return this;
         }
 
-        public CodeStringBuilder Reverse(int index, int length)
+        public RuneBuffer Reverse(int index, int length)
         {
-            codepoints.Reverse(index, length);
+            runes.Reverse(index, length);
 
             return this;
         }
 
         // Replace
-        public CodeStringBuilder Replace(CodePoint oldValue, CodePoint newValue) => Replace(oldValue, newValue, 0, Length);
+        public RuneBuffer Replace(Rune oldValue, Rune newValue) => Replace(oldValue, newValue, 0, Length);
 
-        public CodeStringBuilder Replace(CodePoint oldValue, CodePoint newValue, int index, int length)
+        public RuneBuffer Replace(Rune oldValue, Rune newValue, int index, int length)
         {
             VerifyInRange(index, length);
 
             for (int i = index; i < index + length; i++)
             {
-                if (codepoints[i] == oldValue)
-                    codepoints[i] = newValue;
+                if (runes[i] == oldValue)
+                    runes[i] = newValue;
             }
 
             return this;
@@ -440,32 +440,32 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         
         // Conversion
-        public CodeString ToCodeString()
+        public RuneString ToCodeString()
         {
-            return new CodeString(codepoints);
+            return new RuneString(runes);
         }
-        public CodeString ToCodeString(int index)
+        public RuneString ToCodeString(int index)
         {
-            return new CodeString(codepoints, index);
+            return new RuneString(runes, index);
         }
-        public CodeString ToCodeString(int index, int length)
+        public RuneString ToCodeString(int index, int length)
         {
-            return new CodeString(codepoints, index, length);
+            return new RuneString(runes, index, length);
         }
 
-        public CodePoint[] ToCodePoints()
+        public Rune[] ToRunes()
         {
-            return codepoints.ToArray();
+            return runes.ToArray();
         }
-        public CodePoint[] ToCodePoints(int index) => ToCodePoints(index, Length - index);
+        public Rune[] ToRunes(int index) => ToRunes(index, Length - index);
 
-        public CodePoint[] ToCodePoints(int index, int length)
+        public Rune[] ToRunes(int index, int length)
         {
             VerifyInRange(index, length);
 
-            CodePoint[] result = new CodePoint[length];
+            Rune[] result = new Rune[length];
 
-            codepoints.CopyTo(index, result, 0, length);
+            runes.CopyTo(index, result, 0, length);
 
             return result;
         }
@@ -475,8 +475,8 @@ namespace Veruthian.Dotnet.Library.Text.Code
         {
             var builder = new StringBuilder();
 
-            foreach (var codepoint in codepoints)
-                builder.Append(codepoint.ToString());
+            foreach (var rune in runes)
+                builder.Append(rune.ToString());
 
             return builder.ToString();
         }
@@ -490,7 +490,7 @@ namespace Veruthian.Dotnet.Library.Text.Code
             var builder = new StringBuilder();
 
             for (int i = index; i < index + length; i++)
-                builder.Append(codepoints[i].ToString());
+                builder.Append(runes[i].ToString());
 
             return builder.ToString();
         }
@@ -498,13 +498,13 @@ namespace Veruthian.Dotnet.Library.Text.Code
 
         private void VerifyInRange(int index, int length)
         {
-            if (index < 0 || index > codepoints.Count)
+            if (index < 0 || index > runes.Count)
                 throw new ArgumentOutOfRangeException("index");
-            if (length < 0 || index + length > codepoints.Count)
+            if (length < 0 || index + length > runes.Count)
                 throw new ArgumentOutOfRangeException("length");
         }
 
-        public IEnumerator<CodePoint> GetEnumerator() => codepoints.GetEnumerator();
+        public IEnumerator<Rune> GetEnumerator() => runes.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
