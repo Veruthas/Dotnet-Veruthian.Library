@@ -226,9 +226,9 @@ namespace Veruthian.Dotnet.Library.Numeric.Ranges
 
         public static TSet List(IEnumerable<T> items) => FromList(items);
 
-        protected static TSet FromList(IEnumerable<T> codepoints)
+        protected static TSet FromList(IEnumerable<T> items)
         {
-            var ranges = Range<T>.FromUnorderedList(codepoints);
+            var ranges = Range<T>.FromUnorderedList(items);
 
             return Create(ranges);
         }

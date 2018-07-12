@@ -9,34 +9,34 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 {
     public class RuneStringBuilder : IEnumerable<Rune>
     {
-        List<Rune> codepoints;
+        List<Rune> runes;
 
 
-        public RuneStringBuilder() => codepoints = new List<Rune>();
+        public RuneStringBuilder() => runes = new List<Rune>();
 
-        public RuneStringBuilder(int capacity) => codepoints = new List<Rune>(capacity);
+        public RuneStringBuilder(int capacity) => runes = new List<Rune>(capacity);
 
-        public RuneStringBuilder(IEnumerable<Rune> codepoints) => codepoints = new List<Rune>(codepoints);
+        public RuneStringBuilder(IEnumerable<Rune> runes) => runes = new List<Rune>(runes);
 
 
-        public int Length => codepoints.Count;
+        public int Length => runes.Count;
 
         public Rune this[int index]
         {
-            get => codepoints[index];
-            set => codepoints[index] = value;
+            get => runes[index];
+            set => runes[index] = value;
         }
 
-        // CodePoints
+        // Runes
         public RuneStringBuilder Append(Rune value)
         {
-            codepoints.Add(value);
+            runes.Add(value);
 
             return this;
         }
         public RuneStringBuilder Insert(int index, Rune value)
         {
-            codepoints.Insert(index, value);
+            runes.Insert(index, value);
 
             return this;
         }
@@ -47,7 +47,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (values == null)
                 throw new ArgumentNullException("values");
 
-            codepoints.AddRange(values);
+            runes.AddRange(values);
 
             return this;
         }
@@ -57,7 +57,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
                 throw new ArgumentNullException("values");
 
             while (values.MoveNext())
-                codepoints.Add(values.Current);
+                runes.Add(values.Current);
 
             return this;
         }
@@ -67,7 +67,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (values == null)
                 throw new ArgumentNullException("values");
 
-            codepoints.InsertRange(index, values);
+            runes.InsertRange(index, values);
 
             return this;
         }
@@ -78,7 +78,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
                 throw new ArgumentNullException("values");
 
             while (values.MoveNext())
-                codepoints.Insert(index, values.Current);
+                runes.Insert(index, values.Current);
 
             return this;
         }
@@ -89,7 +89,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            codepoints.AddRange(value);
+            runes.AddRange(value);
 
             return this;
         }
@@ -108,7 +108,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
                 throw new ArgumentNullException("value");
 
             for (int i = start; i < start + length; i++)
-                codepoints.Add(value[i]);
+                runes.Add(value[i]);
 
             return this;
         }
@@ -118,7 +118,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            codepoints.InsertRange(index, value);
+            runes.InsertRange(index, value);
 
             return this;
 
@@ -138,7 +138,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
                 throw new ArgumentNullException("value");
 
             for (int i = start; i < start + length; i++)
-                codepoints.Insert(index++, value[i]);
+                runes.Insert(index++, value[i]);
 
             return this;
         }
@@ -149,7 +149,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints());
+            Append(value.ToRunes());
 
             return this;
         }
@@ -159,7 +159,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints());
+            Insert(index, value.ToRunes());
 
             return this;
         }
@@ -170,7 +170,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints());
+            Append(value.ToRunes());
 
             return this;
         }
@@ -179,7 +179,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints(start));
+            Append(value.ToRunes(start));
 
             return this;
         }
@@ -188,7 +188,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Append(value.ToCodePoints(start, length));
+            Append(value.ToRunes(start, length));
 
             return this;
         }
@@ -198,7 +198,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints());
+            Insert(index, value.ToRunes());
 
             return this;
         }
@@ -207,7 +207,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints(start));
+            Insert(index, value.ToRunes(start));
 
             return this;
         }
@@ -216,7 +216,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Insert(index, value.ToCodePoints(start, length));
+            Insert(index, value.ToRunes(start, length));
 
             return this;
         }
@@ -373,35 +373,35 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         // Remove
         public RuneStringBuilder Remove(Rune value)
         {
-            codepoints.Remove(value);
+            runes.Remove(value);
 
             return this;
         }
 
         public RuneStringBuilder Remove(int index)
         {
-            codepoints.RemoveAt(index);
+            runes.RemoveAt(index);
 
             return this;
         }
 
         public RuneStringBuilder Remove(int index, int length)
         {
-            codepoints.RemoveRange(index, length);
+            runes.RemoveRange(index, length);
 
             return this;
         }
 
         public RuneStringBuilder Remove(Predicate<Rune> match)
         {
-            codepoints.RemoveAll(match);
+            runes.RemoveAll(match);
 
             return this;
         }
 
         public RuneStringBuilder Clear()
         {
-            codepoints.Clear();
+            runes.Clear();
 
             return this;
         }
@@ -410,14 +410,14 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         // Reverse
         public RuneStringBuilder Reverse()
         {
-            codepoints.Reverse();
+            runes.Reverse();
 
             return this;
         }
 
         public RuneStringBuilder Reverse(int index, int length)
         {
-            codepoints.Reverse(index, length);
+            runes.Reverse(index, length);
 
             return this;
         }
@@ -431,8 +431,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
             for (int i = index; i < index + length; i++)
             {
-                if (codepoints[i] == oldValue)
-                    codepoints[i] = newValue;
+                if (runes[i] == oldValue)
+                    runes[i] = newValue;
             }
 
             return this;
@@ -442,30 +442,30 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         // Conversion
         public RuneString ToCodeString()
         {
-            return new RuneString(codepoints);
+            return new RuneString(runes);
         }
         public RuneString ToCodeString(int index)
         {
-            return new RuneString(codepoints, index);
+            return new RuneString(runes, index);
         }
         public RuneString ToCodeString(int index, int length)
         {
-            return new RuneString(codepoints, index, length);
+            return new RuneString(runes, index, length);
         }
 
-        public Rune[] ToCodePoints()
+        public Rune[] ToRunes()
         {
-            return codepoints.ToArray();
+            return runes.ToArray();
         }
-        public Rune[] ToCodePoints(int index) => ToCodePoints(index, Length - index);
+        public Rune[] ToRunes(int index) => ToRunes(index, Length - index);
 
-        public Rune[] ToCodePoints(int index, int length)
+        public Rune[] ToRunes(int index, int length)
         {
             VerifyInRange(index, length);
 
             Rune[] result = new Rune[length];
 
-            codepoints.CopyTo(index, result, 0, length);
+            runes.CopyTo(index, result, 0, length);
 
             return result;
         }
@@ -475,8 +475,8 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         {
             var builder = new StringBuilder();
 
-            foreach (var codepoint in codepoints)
-                builder.Append(codepoint.ToString());
+            foreach (var rune in runes)
+                builder.Append(rune.ToString());
 
             return builder.ToString();
         }
@@ -490,7 +490,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             var builder = new StringBuilder();
 
             for (int i = index; i < index + length; i++)
-                builder.Append(codepoints[i].ToString());
+                builder.Append(runes[i].ToString());
 
             return builder.ToString();
         }
@@ -498,13 +498,13 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         private void VerifyInRange(int index, int length)
         {
-            if (index < 0 || index > codepoints.Count)
+            if (index < 0 || index > runes.Count)
                 throw new ArgumentOutOfRangeException("index");
-            if (length < 0 || index + length > codepoints.Count)
+            if (length < 0 || index + length > runes.Count)
                 throw new ArgumentOutOfRangeException("length");
         }
 
-        public IEnumerator<Rune> GetEnumerator() => codepoints.GetEnumerator();
+        public IEnumerator<Rune> GetEnumerator() => runes.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

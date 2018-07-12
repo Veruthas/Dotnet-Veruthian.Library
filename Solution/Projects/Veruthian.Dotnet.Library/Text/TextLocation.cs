@@ -64,7 +64,7 @@ namespace Veruthian.Dotnet.Library.Text
         public TextLocation MoveToNext(char current, char next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
 
 
-        // MoveThrough CodePoints
+        // MoveThrough Runes
         public TextLocation MoveThrough(Rune current, RuneString following, bool acceptNulls = true)
             => MoveThrough(current, (IEnumerable<Rune>)following, acceptNulls);
 

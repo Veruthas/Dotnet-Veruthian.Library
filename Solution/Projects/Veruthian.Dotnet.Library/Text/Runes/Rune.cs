@@ -142,27 +142,27 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         public static int operator -(Rune left, Rune right) => (int)left.value - (int)right.value;
 
 
-        public static Rune operator +(Rune codepoint, int offset)
+        public static Rune operator +(Rune rune, int offset)
         {
-            int value = (int)codepoint.value;
+            int value = (int)rune.value;
 
             value += offset;
 
             return new Rune(value);
         }
 
-        public static Rune operator -(Rune codepoint, int offset)
+        public static Rune operator -(Rune rune, int offset)
         {
-            int value = (int)codepoint.value;
+            int value = (int)rune.value;
 
             value -= offset;
 
             return new Rune(value);
         }
 
-        public static Rune operator ++(Rune codepoint) => codepoint + 1;
+        public static Rune operator ++(Rune rune) => rune + 1;
 
-        public static Rune operator --(Rune codepoint) => codepoint - 1;
+        public static Rune operator --(Rune rune) => rune - 1;
 
 
         // String

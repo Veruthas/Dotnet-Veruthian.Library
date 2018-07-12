@@ -58,9 +58,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
 
         #region Errors
 
-        private static RuneException CodePointOutOfRange(int value)
+        private static EncodingException CodePointOutOfRange(int value)
         {
-            return new RuneException(CodePointOutOfRangeMessage(value));
+            return new EncodingException(CodePointOutOfRangeMessage(value));
         }
 
         public static string CodePointOutOfRangeMessage(int value)
@@ -69,9 +69,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes.Encodings
         }
 
 
-        private static RuneException InvalidCodePoint(uint value)
+        private static EncodingException InvalidCodePoint(uint value)
         {
-            return new RuneException(InvalidCodePointMessage(value));
+            return new EncodingException(InvalidCodePointMessage(value));
         }
 
         public static string InvalidCodePointMessage(uint value)

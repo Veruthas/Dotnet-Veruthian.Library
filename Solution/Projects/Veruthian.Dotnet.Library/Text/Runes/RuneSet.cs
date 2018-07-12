@@ -34,7 +34,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public static RuneSet List(RuneString runes) => FromList(runes);
 
-        public static RuneSet List(string runes) => FromList(runes.ToCodePoints());
+        public static RuneSet List(string runes) => FromList(runes.ToRunes());
 
         // Sets            
         public static readonly RuneSet Complete = Range(Rune.MinValue, Rune.MaxValue);
