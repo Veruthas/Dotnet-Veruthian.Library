@@ -7,6 +7,7 @@ namespace Veruthian.Dotnet.Library.Collections
 {
     public abstract class BaseIndex<T> : IIndex<T>, IEnumerable<T>
     {
+        
         public T this[int index]
         {
             get => IsValidIndex(index) ? RawGet(index) : throw new IndexOutOfRangeException();
@@ -19,6 +20,8 @@ namespace Veruthian.Dotnet.Library.Collections
                 return NumericUtility.GetRange(0, Count - 1);
             }
         }
+
+        public LookupDensity Density => LookupDensity.Dense;
 
         public IEnumerable<T> Values
         {
