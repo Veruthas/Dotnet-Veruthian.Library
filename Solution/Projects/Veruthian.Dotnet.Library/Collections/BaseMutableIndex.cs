@@ -4,9 +4,6 @@ namespace Veruthian.Dotnet.Library.Collections
 {
     public abstract class BaseMutableIndex<T> : BaseIndex<T>, IMutableIndex<T>
     {
-        protected BaseMutableIndex(int startIndex = 0)
-            : base(startIndex) { }
-
         public new T this[int index]
         {
             get => base[index];
@@ -21,7 +18,7 @@ namespace Veruthian.Dotnet.Library.Collections
         {
             if (IsValidIndex(index))
             {
-                RawSet(index + StartIndex, value);
+                RawSet(index, value);
                 return true;
             }
             else
