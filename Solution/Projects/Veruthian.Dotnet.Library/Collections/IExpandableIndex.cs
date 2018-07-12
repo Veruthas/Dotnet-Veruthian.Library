@@ -6,8 +6,8 @@ namespace Veruthian.Dotnet.Library.Collections
     {
         void AddRange(IEnumerable<T> values);
 
-        void InsertRange(int index, IEnumerable<T> values);
-
-        void RemoveRange(int start, int count);
+        void InsertRange(int key, IEnumerable<T> values);
+        
+        void RemoveRange(int key, int count);
     }
 }

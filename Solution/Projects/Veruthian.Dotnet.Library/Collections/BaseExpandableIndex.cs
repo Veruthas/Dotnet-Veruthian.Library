@@ -15,11 +15,10 @@ namespace Veruthian.Dotnet.Library.Collections
 
 
         public abstract bool Remove(T value);
-        
+
         public abstract void RemoveBy(int index);
 
-        public abstract void RemoveRange(int start, int count);
-
+        public abstract void RemoveRange(int index, int count);
 
         public abstract void Clear();
     }

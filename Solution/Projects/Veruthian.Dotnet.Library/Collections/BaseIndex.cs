@@ -21,8 +21,6 @@ namespace Veruthian.Dotnet.Library.Collections
             }
         }
 
-        public LookupDensity Density => LookupDensity.Dense;
-
         public IEnumerable<T> Values
         {
             get
