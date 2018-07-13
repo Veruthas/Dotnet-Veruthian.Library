@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
+using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 
 namespace Veruthian.Dotnet.Library.Text.Runes
 {
-    public class RuneString : IEquatable<RuneString>, IComparable<RuneString>, IEnumerable<Rune>
+    public class RuneString : IIndex<int, Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
     {
+        public static readonly RuneString Empty = new RuneString(new Rune[] { }, false);
+
         readonly int hashcode;
 
         readonly Rune[] runes;
@@ -41,7 +44,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         {
             var result = new List<Rune>();
 
-            foreach(var rune in runes)
+            foreach (var rune in runes)
                 result.Add(rune);
 
             return result.ToArray();
@@ -55,6 +58,12 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         public RuneString(IList<Rune> runes, int index, int length)
             : this(GetFromList(runes, index, length), false) { }
+
+        public RuneString(IIndex<int, Rune> runes, int index)
+            : this(GetFromIndex(runes, index, runes.Count - index), false) { }
+
+        public RuneString(IIndex<int, Rune> runes, int index, int length)
+            : this(GetFromIndex(runes, index, length), false) { }
 
         private static Rune[] GetFromCollection(ICollection<Rune> ruins)
         {
@@ -133,16 +142,6 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-        
-        public Rune this[int index] => runes[index];
-
-        public int Length => runes.Length;
-
-        public bool IsEmpty => Length == 0;
-
-
-        #region Operations
-
         #region Validation
 
         public bool IsValid
@@ -215,7 +214,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
         #endregion
 
         #region Comparison
-        
+
+        public bool IsEmpty => Length == 0;
+
         public int CompareTo(RuneString other)
         {
             // Treat null like empty
@@ -354,66 +355,6 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-        #region Unoptimized
-        
-        public RuneString Normalize()
-        {
-            string converted = this.ToString().Normalize();
-
-            return new RuneString(converted);
-        }
-
-        public RuneString Normalize(NormalizationForm form)
-        {
-            string converted = this.ToString().Normalize(form);
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToUpper()
-        {
-            string converted = this.ToString().ToUpper();
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToUpper(CultureInfo culture)
-        {
-            string converted = this.ToString().ToUpper(culture);
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToUpperInvariant()
-        {
-            string converted = this.ToString().ToUpperInvariant();
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToLower()
-        {
-            string converted = this.ToString().ToLower();
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToLower(CultureInfo culture)
-        {
-            string converted = this.ToString().ToLower(culture);
-
-            return new RuneString(converted);
-        }
-
-        public RuneString ToLowerInvariant()
-        {
-            string converted = this.ToString().ToLowerInvariant();
-
-            return new RuneString(converted);
-        }
-
-        #endregion
-
         #region Replicate
 
         private static Rune[] ReplicateRune(Rune value, int count)
@@ -485,11 +426,11 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
-        #region SubString
+        #region Slice
 
-        public RuneString Substring(int start) => Substring(start, Length - start);
+        public RuneString Slice(int start) => Slice(start, Length - start);
 
-        public RuneString Substring(int start, int length)
+        public RuneString Slice(int start, int length)
         {
             if (start < 0 || start > Length)
                 throw new ArgumentOutOfRangeException("start");
@@ -505,6 +446,9 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return new RuneString(subpoints, false);
         }
 
+        #endregion
+
+        #region Reverse
         public RuneString Reverse()
         {
             var reversed = new Rune[Length];
@@ -548,10 +492,138 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         #endregion
 
+        #region Index
+
+        int IIndex<int, Rune>.Start => 0;
+
+
+        public int Length => runes.Length;
+
+        int IContainer<Rune>.Count => Length;
+
+        IEnumerable<int> ILookup<int, Rune>.Keys => NumericUtility.GetRange(0, Length);
+
+        IEnumerable<Rune> IContainer<Rune>.Values
+        {
+            get
+            {
+                for (int i = 0; i < Length; i++)
+                    yield return runes[i];
+            }
+        }        
+
+        IEnumerable<KeyValuePair<int, Rune>> ILookup<int, Rune>.Pairs
+        {
+            get
+            {
+                for (int i = 0; i < Length; i++)
+                    yield return new KeyValuePair<int, Rune>(i, runes[i]);
+            }
+        }
+
+        public Rune this[int index]
+        {
+            get
+            {
+                if (HasIndex(index))
+                    return runes[index];
+                else
+                    throw new IndexOutOfRangeException();
+            }
+        }
+
+        bool ILookup<int, Rune>.TryGet(int index, out Rune value)
+        {
+            if (HasIndex(index))
+            {
+                value = runes[index];
+
+                return true;
+            }
+            else
+            {
+                value = default(Rune);
+
+                return false;
+            }
+        }
+
+        private bool HasIndex(int index) => (uint)index < Length;
+
+        bool ILookup<int, Rune>.HasKey(int index) => HasIndex(index);
+
+
+        bool IContainer<Rune>.Contains(Rune value)
+        {
+            foreach (var rune in runes)
+            {
+                if (rune == value)
+                    return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
+        #region Unoptimized
 
-        // Constants
-        public static readonly RuneString Empty = new RuneString(new Rune[] { }, false);
+        public RuneString Normalize()
+        {
+            string converted = this.ToString().Normalize();
+
+            return new RuneString(converted);
+        }
+
+        public RuneString Normalize(NormalizationForm form)
+        {
+            string converted = this.ToString().Normalize(form);
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToUpper()
+        {
+            string converted = this.ToString().ToUpper();
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToUpper(CultureInfo culture)
+        {
+            string converted = this.ToString().ToUpper(culture);
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToUpperInvariant()
+        {
+            string converted = this.ToString().ToUpperInvariant();
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToLower()
+        {
+            string converted = this.ToString().ToLower();
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToLower(CultureInfo culture)
+        {
+            string converted = this.ToString().ToLower(culture);
+
+            return new RuneString(converted);
+        }
+
+        public RuneString ToLowerInvariant()
+        {
+            string converted = this.ToString().ToLowerInvariant();
+
+            return new RuneString(converted);
+        }
+
+        #endregion
     }
 }
