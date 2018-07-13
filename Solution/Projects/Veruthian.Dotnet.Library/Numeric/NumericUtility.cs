@@ -33,13 +33,6 @@ namespace Veruthian.Dotnet.Library.Numeric
         public static uint[] Add(uint[] left, uint[] right)
         {
             return new uint[0];
-        }        
-
-
-        public static IEnumerable<int> GetRange(int start, int end)
-        {
-            for (int i = start; i <= end; i++)
-                yield return i;
         }
     }
 }
