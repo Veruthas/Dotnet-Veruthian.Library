@@ -4,7 +4,7 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<bool>, IFormattable
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<int, bool>, IFormattable
     {
         private readonly byte value;
 
@@ -172,6 +172,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         const int bits = 4;
 
+        int IIndex<int, bool>.Start => 0;
 
         bool ILookup<int, bool>.this[int key] => TryGet(key, out var result) ? result : throw new IndexOutOfRangeException();
 

@@ -4,7 +4,7 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Numeric
 {
-    public sealed class BitArray : IMutableIndex<bool>
+    public sealed class BitArray : IMutableIndex<int, bool>
     {
         const int lengthOfUlong = 64;
 
@@ -121,6 +121,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         public int Count => count;
 
+        int IIndex<int, bool>.Start => 0;
 
         IEnumerable<int> ILookup<int, bool>.Keys => NumericUtility.GetRange(0, Count - 1);
 

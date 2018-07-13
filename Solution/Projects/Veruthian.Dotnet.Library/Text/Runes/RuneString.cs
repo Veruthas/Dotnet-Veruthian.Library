@@ -93,7 +93,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             return values;
         }
 
-        private static Rune[] GetFromIndex(IIndex<Rune> runes, int index, int length)
+        private static Rune[] GetFromIndex(IIndex<int, Rune> runes, int index, int length)
         {
             if (runes == null)
                 throw new ArgumentNullException("runes");

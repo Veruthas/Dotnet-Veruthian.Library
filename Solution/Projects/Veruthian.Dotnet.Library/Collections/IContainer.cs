@@ -15,10 +15,10 @@ namespace Veruthian.Dotnet.Library.Collections
         IMutableLookup<K, V> : ILookup<K, V>
         IExpandableLookup<K, V> : IMutableLookup<K, V> => DataMap
 
-        IIndex<T> : ILookup<int, T>
-        IMutableIndex<T> : IIndex<T>, IMutableLookup<int, T> => DataArray
-        IOrderedIndex<T> : IIndex<T>, IExpandableContainer<T> => SortedDataList, SortedDataSet
-        IExpandableIndex<T> : IMutableIndex<T>, IExpandableLookup<int, T>, IExpandableContainer<T> => DataList
+        IIndex<K, V>: ILookup<K, V>
+        IMutableIndex<K, V>: IIndex<K, V>, IMutableLookup<K, V> => DataArray
+        IOrderedIndex<K, V>: IIndex<K, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
+        IExpandableIndex<K, V> : IMutableIndex<K, V>, IExpandableLookup<K, V>, IExpandableContainer<V> => DataList
     */
 
     public interface IContainer<T>

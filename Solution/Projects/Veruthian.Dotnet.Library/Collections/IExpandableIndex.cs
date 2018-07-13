@@ -2,12 +2,12 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public interface IExpandableIndex<T> : IMutableIndex<T>, IExpandableContainer<T>, IExpandableLookup<int, T>
+    public interface IExpandableIndex<K, V> : IMutableIndex<K, V>, IExpandableContainer<V>, IExpandableLookup<K, V>
     {
-        void AddRange(IEnumerable<T> values);
+        void AddRange(IEnumerable<V> values);
 
-        void InsertRange(int key, IEnumerable<T> values);
+        void InsertRange(K key, IEnumerable<V> values);
         
-        void RemoveRange(int key, int count);
+        void RemoveRange(K key, int count);
     }
 }
