@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Dotnet.Library.Collections;
-using Veruthian.Dotnet.Library.Numeric;
 using Veruthian.Dotnet.Library.Text.Runes.Extensions;
 
 namespace Veruthian.Dotnet.Library.Text.Runes
@@ -501,7 +500,7 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         int IContainer<Rune>.Count => Length;
 
-        IEnumerable<int> ILookup<int, Rune>.Keys => NumericUtility.GetRange(0, Length);
+        IEnumerable<int> ILookup<int, Rune>.Keys => Enumerables.GetRange(0, Length);
 
         IEnumerable<Rune> IContainer<Rune>.Values
         {

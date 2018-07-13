@@ -123,7 +123,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         int IIndex<int, bool>.Start => 0;
 
-        IEnumerable<int> ILookup<int, bool>.Keys => NumericUtility.GetRange(0, Count - 1);
+        IEnumerable<int> ILookup<int, bool>.Keys => Enumerables.GetRange(0, Count - 1);
 
 
         IEnumerable<bool> IContainer<bool>.Values
