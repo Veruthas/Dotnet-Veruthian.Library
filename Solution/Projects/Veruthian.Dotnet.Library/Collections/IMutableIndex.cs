@@ -1,6 +1,6 @@
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public interface IMutableIndex<T> : IIndex<T>, IMutableLookup<int, T>
+    public interface IMutableIndex<K, V> : IIndex<K, V>, IMutableLookup<K, V>
     {
 
     }

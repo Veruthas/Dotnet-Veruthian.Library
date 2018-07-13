@@ -5,11 +5,11 @@ using Veruthian.Dotnet.Library.Collections;
 
 namespace Veruthian.Dotnet.Library.Operations
 {
-    public abstract class Operation<TState> : IOperation<TState>, IIndex<IOperation<TState>>
+    public abstract class Operation<TState> : IOperation<TState>, IIndex<int, IOperation<TState>>
     {
         public abstract string Description { get; }
 
-        public IIndex<IOperation<TState>> SubOperations => this;
+        public IIndex<int, IOperation<TState>> SubOperations => this;
 
 
         public bool Perform(TState state, IOperationTracer<TState> tracer = null)
@@ -40,6 +40,8 @@ namespace Veruthian.Dotnet.Library.Operations
 
 
         #region IIndex
+
+        int IIndex<int, IOperation<TState>>.Start => 0;
 
         private void VerifyIndex(int index)
         {

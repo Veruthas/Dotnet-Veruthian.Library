@@ -9,6 +9,6 @@ namespace Veruthian.Dotnet.Library.Operations
 
         bool Perform(TState state, IOperationTracer<TState> tracer = null);
 
-        IIndex<IOperation<TState>> SubOperations { get; }
+        IIndex<int, IOperation<TState>> SubOperations { get; }
     }
 }

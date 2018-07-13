@@ -1,7 +1,7 @@
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public interface IIndex<T> : ILookup<int, T>
+    public interface IIndex<K, T> : ILookup<K, T>
     {
-
+        K Start { get; }
     }
 }
