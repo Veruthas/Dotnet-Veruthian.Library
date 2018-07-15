@@ -2,16 +2,16 @@ using System.Collections.Generic;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public interface ILookup<TKey, TValue> : IContainer<TValue>
+    public interface ILookup<K, V> : IContainer<V>
     {        
-        TValue this[TKey key] { get; }
+        V this[K key] { get; }
 
-        IEnumerable<TKey> Keys { get; }
+        IEnumerable<K> Keys { get; }
 
-        IEnumerable<KeyValuePair<TKey, TValue>> Pairs { get; }
+        IEnumerable<KeyValuePair<K, V>> Pairs { get; }
 
-        bool HasKey(TKey key);
+        bool HasKey(K key);
 
-        bool TryGet(TKey key, out TValue value);
+        bool TryGet(K key, out V value);
     }
 }
