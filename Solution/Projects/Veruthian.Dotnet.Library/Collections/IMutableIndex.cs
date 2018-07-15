@@ -4,4 +4,9 @@ namespace Veruthian.Dotnet.Library.Collections
     {
 
     }
+
+    public interface IMutableIndex<V> : IMutableIndex<int, V>, IIndex<V>
+    {
+        
+    }
 }

@@ -4,4 +4,9 @@ namespace Veruthian.Dotnet.Library.Collections
     {
         K Start { get; }
     }
+
+    public interface IIndex<V> : IIndex<int, V>
+    {
+
+    }
 }
