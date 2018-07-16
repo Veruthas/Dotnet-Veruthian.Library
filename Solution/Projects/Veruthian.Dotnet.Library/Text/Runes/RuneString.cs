@@ -511,12 +511,12 @@ namespace Veruthian.Dotnet.Library.Text.Runes
             }
         }        
 
-        IEnumerable<KeyValuePair<int, Rune>> ILookup<int, Rune>.Pairs
+        IEnumerable<(int, Rune)> ILookup<int, Rune>.Pairs
         {
             get
             {
                 for (int i = 0; i < Length; i++)
-                    yield return new KeyValuePair<int, Rune>(i, runes[i]);
+                    yield return (i, runes[i]);
             }
         }
 

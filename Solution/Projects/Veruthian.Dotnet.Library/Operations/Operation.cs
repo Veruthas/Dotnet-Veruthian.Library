@@ -110,12 +110,12 @@ namespace Veruthian.Dotnet.Library.Operations
             }
         }
 
-        IEnumerable<KeyValuePair<int, IOperation<TState>>> ILookup<int, IOperation<TState>>.Pairs
+        IEnumerable<(int, IOperation<TState>)> ILookup<int, IOperation<TState>>.Pairs
         {
             get
             {
                 for (int i = 0; i < Count; i++)
-                    yield return new KeyValuePair<int, IOperation<TState>>(i, GetSubOperation(i));
+                    yield return (i, GetSubOperation(i));
             }
         }
 

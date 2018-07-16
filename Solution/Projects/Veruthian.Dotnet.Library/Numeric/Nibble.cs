@@ -221,12 +221,12 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        IEnumerable<KeyValuePair<int, bool>> ILookup<int, bool>.Pairs
+        IEnumerable<(int, bool)> ILookup<int, bool>.Pairs
         {
             get
             {
                 for (int i = 0; i < bits; i++)
-                    yield return new KeyValuePair<int, bool>(i, ((this.value >> i) & 0x1) == 0x1);
+                    yield return (i, ((this.value >> i) & 0x1) == 0x1);
             }
         }
 
