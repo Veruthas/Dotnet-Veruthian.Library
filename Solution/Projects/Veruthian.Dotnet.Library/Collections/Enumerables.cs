@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public class Enumerables
+    public static class Enumerables
     {
         #region Empty
 
@@ -17,6 +18,43 @@ namespace Veruthian.Dotnet.Library.Collections
         }
 
         public static IEnumerable<T> GetEmpty<T>() => EmptyEnumerable<T>.Default;
+
+        #endregion
+
+        #region Notifying
+
+        public delegate void MoveNext<T>(bool success, T current);
+
+        public static IEnumerable<T> GetNotifyingEnumerable<T>(IEnumerable<T> enumerable, MoveNext<T> notify)
+        {
+            foreach(var item in enumerable)
+            {
+                if (notify != null)
+                    notify(true, item);
+
+                yield return item;
+            }
+
+            if (notify != null)
+                notify(false, default(T));            
+        }
+
+        #endregion
+
+        #region Stream
+
+        public static IEnumerator<byte> GetStreamEnumerator(Stream stream)
+        {
+            while (true)
+            {
+                int value = stream.ReadByte();
+
+                if (value != -1)
+                    yield return (byte)value;
+                else
+                    yield break;
+            }
+        }
 
         #endregion
 
