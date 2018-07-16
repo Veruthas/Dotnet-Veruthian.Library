@@ -8,7 +8,7 @@ namespace Veruthian.Dotnet.Library.Collections
 
         IEnumerable<K> Keys { get; }
 
-        IEnumerable<KeyValuePair<K, V>> Pairs { get; }
+        IEnumerable<(K, V)> Pairs { get; }
 
         bool HasKey(K key);
 

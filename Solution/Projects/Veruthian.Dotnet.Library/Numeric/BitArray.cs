@@ -164,7 +164,7 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        IEnumerable<KeyValuePair<int, bool>> ILookup<int, bool>.Pairs
+        IEnumerable<(int, bool)> ILookup<int, bool>.Pairs
         {
             get
             {
@@ -178,7 +178,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
                         current >>= 1;
 
-                        yield return new KeyValuePair<int, bool>(i, value);
+                        yield return (i, value);
                     }
                 }
                 else
@@ -196,7 +196,7 @@ namespace Veruthian.Dotnet.Library.Numeric
 
                         current >>= 1;
 
-                        yield return new KeyValuePair<int, bool>(i, value);
+                        yield return (i, value);
                     }
                 }
             }
