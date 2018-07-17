@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Veruthian.Dotnet.Library.Collections.Extensions;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
@@ -18,7 +19,7 @@ namespace Veruthian.Dotnet.Library.Collections
         {
             get
             {
-                ValidateIndex(index);
+                VerifyIndex(index);
 
                 return RawGet(index);
             }
@@ -43,7 +44,7 @@ namespace Veruthian.Dotnet.Library.Collections
         public abstract bool Contains(T value);
 
 
-        protected void ValidateIndex(int index)
+        protected void VerifyIndex(int index)
         {
             if (!IsValidIndex(index))
                 throw new IndexOutOfRangeException();
@@ -54,7 +55,7 @@ namespace Veruthian.Dotnet.Library.Collections
         bool ILookup<int, T>.HasKey(int index) => IsValidIndex(index);
 
 
-        IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(0, Count);
+        IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(0, Count - 1);
 
         IEnumerable<T> IContainer<T>.Values
         {
@@ -83,27 +84,6 @@ namespace Veruthian.Dotnet.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append('[');
-
-            bool started = false;
-
-            foreach (var item in this)
-            {
-                if (started)
-                    builder.Append(", ");
-                else
-                    started = true;
-
-                builder.Append(item.ToString());
-            }
-
-            builder.Append(']');
-
-            return builder.ToString();
-        }
+        public override string ToString() => this.ToListString();
     }
 }
