@@ -1,72 +1,54 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public class DataArray<T> : IMutableIndex<T>, IEnumerable<T>
+    public sealed class DataArray<T> : BaseMutableIndex<T>
     {
         T[] items;
 
-
-        public T this[int key] { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
-        T ILookup<int, T>.this[int key] => throw new System.NotImplementedException();
-
-        int IIndex<int, T>.Start => 0;
-
-
-        public int Count => throw new System.NotImplementedException();
-
-
-        bool IsValidIndex(int index) => (uint)index < Count;
-
-        bool IContainer<T>.Contains(T value)
+        public DataArray(int count)
         {
-            throw new System.NotImplementedException();
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count", count, "Count cannot be negative");
+
+            this.items = new T[count];
         }
 
-        bool ILookup<int, T>.HasKey(int key)
+        public DataArray(params T[] items) => this.items = (T[])items.Clone();
+
+        public DataArray(IEnumerable<T> items) => this.items = items.ToArray();
+
+
+        public override int Count => items.Length;
+
+        protected override T RawGet(int verifiedIndex) => items[verifiedIndex];
+
+        protected override void RawSet(int verifiedIndex, T value) => items[verifiedIndex] = value;
+
+        public override bool Contains(T value)
         {
-            throw new System.NotImplementedException();
-        }
-
-        bool ILookup<int, T>.TryGet(int key, out T value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        bool IMutableLookup<int, T>.TrySet(int key, T value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-
-        IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(0, Count);
-
-        IEnumerable<T> IContainer<T>.Values
-        {
-            get
+            if (value == null)
             {
                 foreach (var item in items)
-                    yield return item;
+                {
+                    if (item == null)
+                        return true;
+                }
             }
-        }
-
-        public IEnumerable<(int, T)> Pairs
-        {
-            get
+            else
             {
-                for(var i = 0; i < Count; i++)
-                    yield return (i, items[i]);
+                foreach (var item in items)
+                {
+                    if (item.Equals(value))
+                        return true;
+                }
             }
-        }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            foreach(var item in items)
-                yield return item;
+            return false;
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
