@@ -4,7 +4,7 @@ namespace Veruthian.Dotnet.Library.Collections
     {
         void Insert(K key, V value);        
 
-        bool RemoveBy(K key);
+        void RemoveBy(K key);
 
         void Clear();
     }
