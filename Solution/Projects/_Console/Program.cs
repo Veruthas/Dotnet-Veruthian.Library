@@ -1,4 +1,5 @@
 ﻿using System;
+using Veruthian.Dotnet.Library.Collections;
 
 namespace _Console
 {
@@ -6,6 +7,14 @@ namespace _Console
     {
         static void Main(string[] args)
         {
+            var a = new DataArray<int>(1, 2, 3);
+
+
+            foreach (var p in a.Pairs)
+                Console.WriteLine(p);
+
+            Console.WriteLine(a);
+
             Pause();
         }
 
