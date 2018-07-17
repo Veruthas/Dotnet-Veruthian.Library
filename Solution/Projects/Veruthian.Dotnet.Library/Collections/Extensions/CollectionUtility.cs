@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Veruthian.Dotnet.Library.Collections.Extensions
 {
-    public static class CollectionExtensions
+    public static class CollectionUtility
     {
         // Array extensions
         public static T[] Resize<T>(this T[] array, int newSize)
@@ -41,6 +42,29 @@ namespace Veruthian.Dotnet.Library.Collections.Extensions
                 items.Add(value);
 
             return items;
+        }
+
+        public static string ToListString<T>(this IEnumerable<T> items, string start = "[", string end = "]", string separator = ", ")
+        {
+            var builder = new StringBuilder();
+
+            builder.Append(start);
+
+            bool started = false;
+
+            foreach (var item in items)
+            {
+                if (started)
+                    builder.Append(separator);
+                else
+                    started = true;
+
+                builder.Append(item.ToString());
+            }
+
+            builder.Append(end);
+
+            return builder.ToString();
         }
     }    
 }

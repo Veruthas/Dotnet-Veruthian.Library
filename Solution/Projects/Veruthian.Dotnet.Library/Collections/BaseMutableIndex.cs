@@ -6,13 +6,13 @@ namespace Veruthian.Dotnet.Library.Collections
         {
             get
             {
-                ValidateIndex(index);
+                VerifyIndex(index);
 
                 return RawGet(index);
             }
             set
             {
-                ValidateIndex(index);
+                VerifyIndex(index);
 
                 RawSet(index, value);
             }

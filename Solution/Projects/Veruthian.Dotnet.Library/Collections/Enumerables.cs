@@ -60,15 +60,15 @@ namespace Veruthian.Dotnet.Library.Collections
 
         #region Ranges
 
-        public static IEnumerable<int> GetRange(int start, int end)
+        public static IEnumerable<int> GetRange(int start, int end, int step = 1)
         {
-            for (int i = start; i <= end; i++)
+            for (int i = start; i <= end; i += step)
                 yield return i;
         }
 
-        public static IEnumerable<long> GetRange(long start, long end)
+        public static IEnumerable<long> GetRange(long start, long end, long step = 1)
         {
-            for (long i = start; i <= end; i++)
+            for (long i = start; i <= end; i += step)
                 yield return i;
         }
 
