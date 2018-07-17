@@ -4,4 +4,9 @@ namespace Veruthian.Dotnet.Library.Collections
     {
         void RemoveBy(K key);
     }
+
+    public interface IOrderedIndex<V> : IOrderedIndex<int, V>, IIndex<V>
+    {
+
+    }
 }
