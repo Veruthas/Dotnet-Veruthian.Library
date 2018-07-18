@@ -92,21 +92,22 @@ namespace Veruthian.Dotnet.Library.Operations
             return false;
         }
 
+        private IEnumerator<IOperation<TState>> GetEnumerator()
+        {
+            for (int i = 0; i < Count; i++)
+                yield return GetSubOperation(i);
+        }
+
+        IEnumerator<IOperation<TState>> IEnumerable<IOperation<TState>>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         IEnumerable<int> ILookup<int, IOperation<TState>>.Keys
         {
             get
             {
                 for (int i = 0; i < Count; i++)
                     yield return i;
-            }
-        }
-
-        IEnumerable<IOperation<TState>> IContainer<IOperation<TState>>.Values
-        {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return GetSubOperation(i);
             }
         }
 

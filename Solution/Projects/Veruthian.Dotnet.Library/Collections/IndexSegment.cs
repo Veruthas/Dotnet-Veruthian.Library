@@ -113,15 +113,6 @@ namespace Veruthian.Dotnet.Library.Collections
         IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(StartIndex, EndIndex);
 
 
-        IEnumerable<T> IContainer<T>.Values
-        {
-            get
-            {
-                for (int i = 0; i < count; i++)
-                    yield return (index[offset + i]);
-            }
-        }
-
         public IEnumerable<(int, T)> Pairs
         {
             get

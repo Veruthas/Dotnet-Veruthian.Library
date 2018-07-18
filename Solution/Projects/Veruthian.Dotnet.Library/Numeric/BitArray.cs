@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Collections;
 
@@ -125,8 +126,11 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         IEnumerable<int> ILookup<int, bool>.Keys => Enumerables.GetRange(0, Count - 1);
 
+        public IEnumerator<bool> GetEnumerator()=> Values.GetEnumerator();
 
-        IEnumerable<bool> IContainer<bool>.Values
+        IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
+
+        private IEnumerable<bool> Values
         {
             get
             {
@@ -200,8 +204,7 @@ namespace Veruthian.Dotnet.Library.Numeric
                     }
                 }
             }
-        }
-        
+        }        
         bool ILookup<int, bool>.HasKey(int index) => HasIndex(index);
 
         bool HasIndex(int index) => (uint)index < Count;

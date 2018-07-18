@@ -502,15 +502,6 @@ namespace Veruthian.Dotnet.Library.Text.Runes
 
         IEnumerable<int> ILookup<int, Rune>.Keys => Enumerables.GetRange(0, Length);
 
-        IEnumerable<Rune> IContainer<Rune>.Values
-        {
-            get
-            {
-                for (int i = 0; i < Length; i++)
-                    yield return runes[i];
-            }
-        }        
-
         IEnumerable<(int, Rune)> ILookup<int, Rune>.Pairs
         {
             get

@@ -57,15 +57,6 @@ namespace Veruthian.Dotnet.Library.Collections
 
         IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(0, Count - 1);
 
-        IEnumerable<T> IContainer<T>.Values
-        {
-            get
-            {
-                for (int i = 0; i < Count; i++)
-                    yield return RawGet(i);
-            }
-        }
-
         public IEnumerable<(int, T)> Pairs
         {
             get

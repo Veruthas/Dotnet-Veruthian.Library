@@ -20,12 +20,10 @@ namespace Veruthian.Dotnet.Library.Collections
         IExpandableIndex<K, V> : IIndex<K, V>, IExpandableLookup<K, V>, IExpandableContainer<V> => DataList
     */
 
-    public interface IContainer<T>
+    public interface IContainer<T> : IEnumerable<T>
     {
         int Count { get; }
 
         bool Contains(T value);
-
-        IEnumerable<T> Values { get; }
     }
 }
