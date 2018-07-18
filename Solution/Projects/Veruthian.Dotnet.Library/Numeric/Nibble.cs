@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Dotnet.Library.Collections;
 
@@ -202,22 +203,21 @@ namespace Veruthian.Dotnet.Library.Numeric
 
         int IContainer<bool>.Count => bits;
 
+
+        public IEnumerator<bool> GetEnumerator()
+        {
+            for (int i = 0; i < bits; i++)
+                yield return ((this.value >> i) & 0x1) == 0x1;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        
         IEnumerable<int> ILookup<int, bool>.Keys
         {
             get
             {
                 for (int i = 0; i < bits; i++)
                     yield return i;
-            }
-        }
-
-        IEnumerable<bool> IContainer<bool>.Values
-        {
-            get
-            {
-                for (int i = 0; i < bits; i++)
-                    yield return ((this.value >> i) & 0x1) == 0x1;
-
             }
         }
 
@@ -282,6 +282,6 @@ namespace Veruthian.Dotnet.Library.Numeric
             }
         }
 
-        #endregion        
+        #endregion
     }
 }

@@ -33,8 +33,6 @@ namespace Veruthian.Dotnet.Library.Collections
         public void Clear() => items.Clear();
 
 
-        IEnumerable<T> IContainer<T>.Values => items;
-
         public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
