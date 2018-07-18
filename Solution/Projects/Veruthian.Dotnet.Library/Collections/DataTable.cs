@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Dotnet.Library.Collections.Extensions;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
@@ -85,5 +86,7 @@ namespace Veruthian.Dotnet.Library.Collections
         public void RemoveBy(K key) => dictionary.Remove(key);
 
         public void Clear() => dictionary.Clear();
+
+        public override string ToString() => CollectionUtility.ToTableString(Pairs);
     }
 }
