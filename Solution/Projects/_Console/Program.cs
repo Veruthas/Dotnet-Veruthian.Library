@@ -22,6 +22,17 @@ namespace _Console
             Console.WriteLine();
             Console.WriteLine(s);
 
+            var table = new DataTable<int, int>();
+
+            table.Insert(-10, 1);
+
+            table.Insert(-9, 2);
+
+            table.Insert(-8, 3);
+
+            foreach (var p in table.Pairs)
+                Console.WriteLine(p);
+
             Pause();
         }
 

@@ -9,6 +9,9 @@ namespace Veruthian.Dotnet.Library.Collections
         Dictionary<K, V> dictionary;
 
 
+        public DataTable() => this.dictionary = new Dictionary<K, V>();
+
+
         public V this[K key]
         {
             get => dictionary.ContainsKey(key) ? dictionary[key] : throw new KeyNotFoundException();
