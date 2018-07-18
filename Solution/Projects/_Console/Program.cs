@@ -7,33 +7,45 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var a = new DataArray<int>(1, 2, 3);
+            IPool<string, int> pool = new DataPool<string, int>();
 
-            var s = new IndexSegment<int>(a, 1, a.Count - 1, -10);
+            pool.Resolve("Hello", 10);
 
-            foreach (var k in ((ILookup<int, int>)s).Keys)
-                Console.WriteLine($"[{k}]: {s[k]}");
+            pool.Resolve("Goodbye", 10);
 
-            Console.WriteLine();
+            while (true)
+            {
+                var r = GetPair();
 
-            foreach (var p in s.Pairs)
-                Console.WriteLine(p);
+                if (!r.success)
+                    break;
 
-            Console.WriteLine();
-            Console.WriteLine(s);
+                var a = pool.Resolve(r.pair.key, r.pair.value);
+            }
 
-            var table = new DataTable<int, int>();
-
-            table.Insert(-10, 1);
-
-            table.Insert(-9, 2);
-
-            table.Insert(-8, 3);
-
-            foreach (var p in table.Pairs)
-                Console.WriteLine(p);
+            Console.WriteLine(pool);
 
             Pause();
+        }
+
+        private static (bool success, (string key, int value) pair) GetPair()
+        {
+            Console.Write("Enter a key: ");
+
+            var key = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(key))
+            
+                return (false, default((string, int)));
+            
+
+            Console.Write("Enter a number: ");
+
+            var value = Console.ReadLine();
+
+            int.TryParse(value, out var num);
+
+            return (true, (key, num));
         }
 
         static void Pause()
