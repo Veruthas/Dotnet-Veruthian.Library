@@ -18,7 +18,7 @@ namespace Veruthian.Dotnet.Library.Collections.Extensions
         }
 
         // Repeat
-        public static IEnumerable<T> RepeatAsEnumerable<T>(this T value, int times = 1)
+        public static IEnumerable<T> Repeat<T>(this T value, int times = 1)
         {
             for (int i = 0; i < times; i++)
                 yield return value;
@@ -44,6 +44,27 @@ namespace Veruthian.Dotnet.Library.Collections.Extensions
             return items;
         }
 
+        public static DataArray<T> RepeatAsDataArray<T>(this T value, int times = 1)
+        {
+            var items = new DataArray<T>(times);
+
+            for (int i = 0; i < times; i++)
+                items[i] = value;
+
+            return items;
+        }
+
+        public static DataList<T> RepeatAsDataList<T>(this T value, int times = 1)
+        {
+            var items = new DataList<T>(times);
+
+            for (int i = 0; i < times; i++)
+                items.Add( value);                
+
+            return items;
+        }
+
+        // Strings
         public static string ToListString<T>(this IEnumerable<T> items, string start = "[", string end = "]", string separator = ", ")
         {
             var builder = new StringBuilder();
