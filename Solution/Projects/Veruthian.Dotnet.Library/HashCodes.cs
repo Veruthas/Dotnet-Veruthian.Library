@@ -17,60 +17,86 @@ namespace Veruthian.Dotnet.Library
 
         public int Combine<T0, T1>(T0 a, T1 b)
         {
-            int hash = primeBase;
-            hash = (hash * primeOffset) + a.GetHashCode();
-            hash = (hash * primeOffset) + b.GetHashCode();
-            return hash;
+            unchecked
+            {
+                int hash = primeBase;
+
+                hash = (hash * primeOffset) + a.GetHashCode();
+                hash = (hash * primeOffset) + b.GetHashCode();
+
+                return hash;
+            }
         }
 
         public int Combine<T0, T1, T2>(T0 a, T1 b, T2 c)
         {
-            int hash = primeBase;
-            hash = (hash * primeOffset) + a.GetHashCode();
-            hash = (hash * primeOffset) + b.GetHashCode();
-            hash = (hash * primeOffset) + c.GetHashCode();
-            return hash;
+            unchecked
+            {
+                int hash = primeBase;
+
+                hash = (hash * primeOffset) + a.GetHashCode();
+                hash = (hash * primeOffset) + b.GetHashCode();
+                hash = (hash * primeOffset) + c.GetHashCode();
+
+                return hash;
+            }
         }
 
         public int Combine<T0, T1, T2, T3>(T0 a, T1 b, T2 c, T3 d)
         {
-            int hash = primeBase;
-            hash = (hash * primeOffset) + a.GetHashCode();
-            hash = (hash * primeOffset) + b.GetHashCode();
-            hash = (hash * primeOffset) + c.GetHashCode();
-            hash = (hash * primeOffset) + d.GetHashCode();
-            return hash;
+            unchecked
+            {
+                int hash = primeBase;
+
+                hash = (hash * primeOffset) + a.GetHashCode();
+                hash = (hash * primeOffset) + b.GetHashCode();
+                hash = (hash * primeOffset) + c.GetHashCode();
+                hash = (hash * primeOffset) + d.GetHashCode();
+
+                return hash;
+            }
         }
 
         public int Combine<T0, T1, T2, T3, T4>(T0 a, T1 b, T2 c, T3 d, T4 e)
         {
-            int hash = primeBase;
-            hash = (hash * primeOffset) + a.GetHashCode();
-            hash = (hash * primeOffset) + b.GetHashCode();
-            hash = (hash * primeOffset) + c.GetHashCode();
-            hash = (hash * primeOffset) + d.GetHashCode();
-            hash = (hash * primeOffset) + e.GetHashCode();
-            return hash;
-        }      
+            unchecked
+            {
+                int hash = primeBase;
+
+                hash = (hash * primeOffset) + a.GetHashCode();
+                hash = (hash * primeOffset) + b.GetHashCode();
+                hash = (hash * primeOffset) + c.GetHashCode();
+                hash = (hash * primeOffset) + d.GetHashCode();
+                hash = (hash * primeOffset) + e.GetHashCode();
+                
+                return hash;
+            }
+        }
 
         public int Combine<T>(IEnumerable<T> items)
         {
-            int hash = primeBase;
-            
-            foreach (var item in items)
-                hash = (hash * primeOffset) + item.GetHashCode();
+            unchecked
+            {
+                int hash = primeBase;
 
-            return hash;
+                foreach (var item in items)
+                    hash = (hash * primeOffset) + item.GetHashCode();
+
+                return hash;
+            }
         }
 
         public int Combine<T>(params T[] items)
         {
-            int hash = primeBase;
+            unchecked
+            {
+                int hash = primeBase;
 
-            foreach (var item in items)
-                hash = (hash * primeOffset) + item.GetHashCode();
+                foreach (var item in items)
+                    hash = (hash * primeOffset) + item.GetHashCode();
 
-            return hash;
+                return hash;
+            }
         }
     }
 }
