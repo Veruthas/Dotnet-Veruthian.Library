@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -5,65 +6,81 @@ namespace Veruthian.Dotnet.Library.Collections
 {
     public class DataTable<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
     {
+        Dictionary<K, V> dictionary;
+
+
         public V this[K key]
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => dictionary.ContainsKey(key) ? dictionary[key] : throw new KeyNotFoundException();
+            set => dictionary[key] = dictionary.ContainsKey(key) ? value : throw new KeyNotFoundException();
         }
 
-        V ILookup<K, V>.this[K key] => throw new System.NotImplementedException();
-
-        public int Count => throw new System.NotImplementedException();
-
-
-        public IEnumerable<K> Keys => throw new System.NotImplementedException();
-
-        public IEnumerable<(K, V)> Pairs => throw new System.NotImplementedException();
-
-
-        public void Clear()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool Contains(V value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IEnumerator<V> GetEnumerator()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool HasKey(K key)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Insert(K key, V value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void RemoveBy(K key)
-        {
-            throw new System.NotImplementedException();
-        }
+        V ILookup<K, V>.this[K key] => this[key];
 
         public bool TryGet(K key, out V value)
         {
-            throw new System.NotImplementedException();
+            if (dictionary.ContainsKey(key))
+            {
+                value = dictionary[key];
+
+                return true;
+            }
+            else
+            {
+                value = default(V);
+
+                return false;
+            }
         }
 
         public bool TrySet(K key, V value)
         {
-            throw new System.NotImplementedException();
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary[key] = value;
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+
+        public int Count => dictionary.Count;
+
+
+        public IEnumerable<K> Keys => dictionary.Keys;
+
+        public IEnumerable<(K, V)> Pairs
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                foreach (var pair in dictionary)
+                    yield return (pair.Key, pair.Value);
+            }
         }
+
+        public IEnumerator<V> GetEnumerator() => dictionary.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+        public bool Contains(V value) => dictionary.ContainsValue(value);
+
+        public bool HasKey(K key) => dictionary.ContainsKey(key);
+
+        public void Insert(K key, V value)
+        {
+            if (dictionary.ContainsKey(key))
+                throw new ArgumentException($"Key {key.ToString()} already exists", "key");
+
+            dictionary.Add(key, value);
+        }
+
+        public void RemoveBy(K key) => dictionary.Remove(key);
+
+        public void Clear() => dictionary.Clear();
     }
 }
