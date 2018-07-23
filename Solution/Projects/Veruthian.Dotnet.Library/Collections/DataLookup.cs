@@ -5,12 +5,12 @@ using Veruthian.Dotnet.Library.Collections.Extensions;
 
 namespace Veruthian.Dotnet.Library.Collections
 {
-    public class DataTable<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
+    public class DataLookup<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
     {
         Dictionary<K, V> dictionary;
 
 
-        public DataTable() => this.dictionary = new Dictionary<K, V>();
+        public DataLookup() => this.dictionary = new Dictionary<K, V>();
 
 
         public V this[K key]
