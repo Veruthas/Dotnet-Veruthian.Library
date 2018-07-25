@@ -1,5 +1,5 @@
 ﻿using System;
-using Veruthian.Dotnet.Library.Collections;
+using Veruthian.Library.Collections;
 
 namespace _Console
 {
