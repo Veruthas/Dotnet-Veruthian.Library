@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Veruthian.Dotnet.Library\Veruthian.Dotnet.Library.csproj" />
+    <ProjectReference Include="..\Veruthian.Library\Veruthian.Library.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
