@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -5,7 +6,7 @@ namespace Veruthian.Library.Collections
 {
     public class NestedDataLookup<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
     {
-        Dictionary<K, (V value, bool active)> items = new Dictionary<K, ( V, bool)>();
+        Dictionary<K, (V value, bool active)> items = new Dictionary<K, (V, bool)>();
 
         ILookup<K, V> parent;
 
@@ -18,8 +19,12 @@ namespace Veruthian.Library.Collections
 
         public V this[K key]
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => TryGet(key, out var value) ? value : throw new KeyNotFoundException();
+            set
+            {
+                if (!TrySet(key, value))
+                    throw new KeyNotFoundException();
+            }
         }
 
         V ILookup<K, V>.this[K key] => this[key];
@@ -67,11 +72,11 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public int Count => throw new System.NotImplementedException();
+        public int Count => items.Count;
 
         public void Clear()
         {
-            throw new System.NotImplementedException();
+            items.Clear();
         }
 
         public bool Contains(V value)
@@ -84,19 +89,26 @@ namespace Veruthian.Library.Collections
             throw new System.NotImplementedException();
         }
 
-        public bool HasKey(K key)
-        {
-            throw new System.NotImplementedException();
-        }
+        public bool HasKey(K key) => this.items.ContainsKey(key) || this.parent.HasKey(key);
 
         public void Insert(K key, V value)
         {
-            throw new System.NotImplementedException();
+            if (HasKey(key))
+                throw new ArgumentException($"Key {key.ToString()} already exists", "key");
+
+            items.Add(key, (value, true));
         }
 
         public void RemoveBy(K key)
         {
-            throw new System.NotImplementedException();
+            if (this.items.TryGetValue(key, out var value))
+            {
+                items[key] = (value.value, false);
+            }
+            else if (this.parent.HasKey(key))
+            {
+                items.Add(key, (default(V), false));
+            }
         }
 
 
@@ -105,6 +117,13 @@ namespace Veruthian.Library.Collections
 
         public IEnumerable<(K, V)> Pairs => throw new System.NotImplementedException();
 
+        public IEnumerable<(K, V)> UniquePairs
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+        }
         IEnumerator IEnumerable.GetEnumerator()
         {
             throw new System.NotImplementedException();
