@@ -83,7 +83,13 @@ namespace Veruthian.Library.Collections
             dictionary.Add(key, value);
         }
 
-        public void RemoveBy(K key) => dictionary.Remove(key);
+        public void RemoveBy(K key)
+        {
+            if (!HasKey(key))
+                throw new ArgumentException($"Key {key.ToString()} does not exist", "key");
+                
+            dictionary.Remove(key);
+        }
 
         public void Clear() => dictionary.Clear();
 
