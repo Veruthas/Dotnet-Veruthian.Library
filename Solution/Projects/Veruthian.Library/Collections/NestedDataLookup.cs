@@ -39,15 +39,15 @@ namespace Veruthian.Library.Collections
 
                     return true;
                 }
-                else
-                {
-                    value = default(V);
-
-                    return false;
-                }
+            }
+            else if (parent != null)
+            {
+                return parent.TryGet(key, out value);
             }
 
-            return parent.TryGet(key, out value);
+            value = default(V);
+
+            return false;
         }
 
         public bool TrySet(K key, V value)
@@ -64,7 +64,7 @@ namespace Veruthian.Library.Collections
                     return false;
                 }
             }
-            else if (parent.HasKey(key))
+            else if (parent != null && parent.HasKey(key))
             {
                 items.Add(key, (value, true));
             }
@@ -105,13 +105,16 @@ namespace Veruthian.Library.Collections
             {
                 items[key] = (value.value, false);
             }
-            else if (this.parent.HasKey(key))
+            else if (this.parent != null)
             {
-                items.Add(key, (default(V), false));
+                if (this.parent.HasKey(key))
+                    items.Add(key, (default(V), false));
+            }
+            else
+            {
+                throw new ArgumentException($"Key {key.ToString()} does not exist", "key");
             }
         }
-
-
 
         public IEnumerable<K> Keys => throw new System.NotImplementedException();
 
