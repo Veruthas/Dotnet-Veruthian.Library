@@ -72,24 +72,80 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public int Count => items.Count;
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+
+                // Should I cache this value?
+                foreach (var item in items.Values)
+                    if (item.active)
+                        count++;
+
+                foreach (var pair in parent.Pairs)
+                    if (!items.ContainsKey(pair.Item1))
+                        count++;
+
+                return count;
+            }
+        }
+
+        public void Reset() => items.Clear();
 
         public void Clear()
         {
             items.Clear();
+            parent = null;
         }
 
         public bool Contains(V value)
         {
-            throw new System.NotImplementedException();
+            if (value == null)
+            {
+                foreach (var item in items.Values)
+                {
+                    if (item.active && item.value == null)
+                        return true;
+                }
+
+                foreach (var item in parent)
+                {
+                    if (item == null)
+                        return true;
+                }
+            }
+            else
+            {
+                foreach (var item in items.Values)
+                {
+                    if (item.active && value.Equals(item.value))
+                        return true;
+                }
+
+                foreach (var item in parent)
+                {
+                    if (value.Equals(item))
+                        return true;
+                }
+            }
+
+            return false;
         }
 
-        public IEnumerator<V> GetEnumerator()
+
+        public bool HasKey(K key)
         {
-            throw new System.NotImplementedException();
+            if (items.TryGetValue(key, out var item))
+            {
+                return item.active;
+            }
+            else
+            {
+                return parent.HasKey(key);
+            }
         }
 
-        public bool HasKey(K key) => this.items.ContainsKey(key) || this.parent.HasKey(key);
 
         public void Insert(K key, V value)
         {
@@ -116,20 +172,57 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<K> Keys => throw new System.NotImplementedException();
-
-        public IEnumerable<(K, V)> Pairs => throw new System.NotImplementedException();
-
-        public IEnumerable<(K, V)> UniquePairs
+        public IEnumerable<K> Keys
         {
             get
             {
-                throw new System.NotImplementedException();
+                foreach (var pair in items)
+                {
+                    if (pair.Value.active)
+                        yield return pair.Key;
+                }
+
+                foreach (var key in parent.Keys)
+                {
+                    if (!items.ContainsKey(key))
+                        yield return key;
+                }
             }
         }
-        IEnumerator IEnumerable.GetEnumerator()
+
+        public IEnumerable<(K, V)> Pairs
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                foreach (var pair in items)
+                {
+                    if (pair.Value.active)
+                        yield return (pair.Key, pair.Value.value);
+                }
+
+                foreach (var pair in parent.Pairs)
+                {
+                    if (!items.ContainsKey(pair.Item1))
+                        yield return pair;
+                }
+            }
         }
+
+        public IEnumerator<V> GetEnumerator()
+        {
+            foreach (var pair in items)
+            {
+                if (pair.Value.active)
+                    yield return pair.Value.value;
+            }
+
+            foreach (var pair in parent.Pairs)
+            {
+                if (!items.ContainsKey(pair.Item1))
+                    yield return pair.Item2;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
