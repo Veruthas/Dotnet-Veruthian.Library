@@ -11,6 +11,8 @@ namespace Veruthian.Library.Collections
         ILookup<K, V> parent;
 
 
+        public NestedDataLookup() { }
+
         public NestedDataLookup(ILookup<K, V> parent) => this.parent = parent;
 
 
@@ -80,12 +82,19 @@ namespace Veruthian.Library.Collections
 
                 // Should I cache this value?
                 foreach (var item in items.Values)
+                {
                     if (item.active)
                         count++;
+                }
 
-                foreach (var pair in parent.Pairs)
-                    if (!items.ContainsKey(pair.Item1))
-                        count++;
+                if (parent != null)
+                {
+                    foreach (var pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.Item1))
+                            count++;
+                    }
+                }
 
                 return count;
             }
@@ -96,6 +105,7 @@ namespace Veruthian.Library.Collections
         public void Clear()
         {
             items.Clear();
+
             parent = null;
         }
 
@@ -109,10 +119,13 @@ namespace Veruthian.Library.Collections
                         return true;
                 }
 
-                foreach (var item in parent)
+                if (parent != null)
                 {
-                    if (item == null)
-                        return true;
+                    foreach ((K key, V value) pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.key) && pair.value == null)
+                            return true;
+                    }
                 }
             }
             else
@@ -123,10 +136,13 @@ namespace Veruthian.Library.Collections
                         return true;
                 }
 
-                foreach (var item in parent)
+                if (parent != null)
                 {
-                    if (value.Equals(item))
-                        return true;
+                    foreach ((K key, V value) pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.key) && pair.value.Equals(value))
+                            return true;
+                    }
                 }
             }
 
@@ -137,13 +153,9 @@ namespace Veruthian.Library.Collections
         public bool HasKey(K key)
         {
             if (items.TryGetValue(key, out var item))
-            {
                 return item.active;
-            }
             else
-            {
-                return parent.HasKey(key);
-            }
+                return parent != null && parent.HasKey(key);
         }
 
 
@@ -164,10 +176,11 @@ namespace Veruthian.Library.Collections
             else
             {
                 Insert(key, value);
+                
                 return value;
             }
         }
-        
+
         public void RemoveBy(K key)
         {
             if (this.items.TryGetValue(key, out var value))
@@ -195,10 +208,13 @@ namespace Veruthian.Library.Collections
                         yield return pair.Key;
                 }
 
-                foreach (var key in parent.Keys)
+                if (parent != null)
                 {
-                    if (!items.ContainsKey(key))
-                        yield return key;
+                    foreach (var key in parent.Keys)
+                    {
+                        if (!items.ContainsKey(key))
+                            yield return key;
+                    }
                 }
             }
         }
@@ -213,10 +229,13 @@ namespace Veruthian.Library.Collections
                         yield return (pair.Key, pair.Value.value);
                 }
 
-                foreach (var pair in parent.Pairs)
+                if (parent != null)
                 {
-                    if (!items.ContainsKey(pair.Item1))
-                        yield return pair;
+                    foreach (var pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.Item1))
+                            yield return pair;
+                    }
                 }
             }
         }
@@ -229,10 +248,13 @@ namespace Veruthian.Library.Collections
                     yield return pair.Value.value;
             }
 
-            foreach (var pair in parent.Pairs)
+            if (parent != null)
             {
-                if (!items.ContainsKey(pair.Item1))
-                    yield return pair.Item2;
+                foreach (var pair in parent.Pairs)
+                {
+                    if (!items.ContainsKey(pair.Item1))
+                        yield return pair.Item2;
+                }
             }
         }
 
