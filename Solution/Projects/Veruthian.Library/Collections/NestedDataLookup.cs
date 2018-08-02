@@ -155,6 +155,19 @@ namespace Veruthian.Library.Collections
             items.Add(key, (value, true));
         }
 
+        public V GetOrInsert(K key, V value)
+        {
+            if (TryGet(key, out var result))
+            {
+                return result;
+            }
+            else
+            {
+                Insert(key, value);
+                return value;
+            }
+        }
+        
         public void RemoveBy(K key)
         {
             if (this.items.TryGetValue(key, out var value))
