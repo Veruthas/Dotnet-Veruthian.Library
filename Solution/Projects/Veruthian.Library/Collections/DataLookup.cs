@@ -83,16 +83,31 @@ namespace Veruthian.Library.Collections
             dictionary.Add(key, value);
         }
 
+        public V GetOrInsert(K key, V value)
+        {
+            if (TryGet(key, out var result))
+            {
+                return result;
+            }
+            else
+            {
+                Insert(key, value);
+                return value;
+            }
+        }
+
         public void RemoveBy(K key)
         {
             if (!HasKey(key))
                 throw new ArgumentException($"Key {key.ToString()} does not exist", "key");
-                
+
             dictionary.Remove(key);
         }
 
         public void Clear() => dictionary.Clear();
 
         public override string ToString() => CollectionUtility.ToTableString(Pairs);
+
+
     }
 }
