@@ -7,6 +7,11 @@ namespace Veruthian.Library.Collections
     {
         List<ILookup<K, V>> lookups;
 
+
+        public SequentialDataLookup() => lookups = new List<ILookup<K, V>>();
+
+
+
         public V this[K key]
         {
             get
