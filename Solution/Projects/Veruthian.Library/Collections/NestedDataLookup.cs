@@ -11,6 +11,8 @@ namespace Veruthian.Library.Collections
         ILookup<K, V> parent;
 
 
+        public NestedDataLookup() { }
+
         public NestedDataLookup(ILookup<K, V> parent) => this.parent = parent;
 
 
@@ -72,24 +74,90 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public int Count => items.Count;
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+
+                // Should I cache this value?
+                foreach (var item in items.Values)
+                {
+                    if (item.active)
+                        count++;
+                }
+
+                if (parent != null)
+                {
+                    foreach (var pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.Item1))
+                            count++;
+                    }
+                }
+
+                return count;
+            }
+        }
+
+        public void Reset() => items.Clear();
 
         public void Clear()
         {
             items.Clear();
+
+            parent = null;
         }
 
         public bool Contains(V value)
         {
-            throw new System.NotImplementedException();
+            if (value == null)
+            {
+                foreach (var item in items.Values)
+                {
+                    if (item.active && item.value == null)
+                        return true;
+                }
+
+                if (parent != null)
+                {
+                    foreach ((K key, V value) pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.key) && pair.value == null)
+                            return true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in items.Values)
+                {
+                    if (item.active && value.Equals(item.value))
+                        return true;
+                }
+
+                if (parent != null)
+                {
+                    foreach ((K key, V value) pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.key) && pair.value.Equals(value))
+                            return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
-        public IEnumerator<V> GetEnumerator()
+
+        public bool HasKey(K key)
         {
-            throw new System.NotImplementedException();
+            if (items.TryGetValue(key, out var item))
+                return item.active;
+            else
+                return parent != null && parent.HasKey(key);
         }
 
-        public bool HasKey(K key) => this.items.ContainsKey(key) || this.parent.HasKey(key);
 
         public void Insert(K key, V value)
         {
@@ -97,6 +165,20 @@ namespace Veruthian.Library.Collections
                 throw new ArgumentException($"Key {key.ToString()} already exists", "key");
 
             items.Add(key, (value, true));
+        }
+
+        public V GetOrInsert(K key, V value)
+        {
+            if (TryGet(key, out var result))
+            {
+                return result;
+            }
+            else
+            {
+                Insert(key, value);
+                
+                return value;
+            }
         }
 
         public void RemoveBy(K key)
@@ -116,20 +198,66 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<K> Keys => throw new System.NotImplementedException();
-
-        public IEnumerable<(K, V)> Pairs => throw new System.NotImplementedException();
-
-        public IEnumerable<(K, V)> UniquePairs
+        public IEnumerable<K> Keys
         {
             get
             {
-                throw new System.NotImplementedException();
+                foreach (var pair in items)
+                {
+                    if (pair.Value.active)
+                        yield return pair.Key;
+                }
+
+                if (parent != null)
+                {
+                    foreach (var key in parent.Keys)
+                    {
+                        if (!items.ContainsKey(key))
+                            yield return key;
+                    }
+                }
             }
         }
-        IEnumerator IEnumerable.GetEnumerator()
+
+        public IEnumerable<(K, V)> Pairs
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                foreach (var pair in items)
+                {
+                    if (pair.Value.active)
+                        yield return (pair.Key, pair.Value.value);
+                }
+
+                if (parent != null)
+                {
+                    foreach (var pair in parent.Pairs)
+                    {
+                        if (!items.ContainsKey(pair.Item1))
+                            yield return pair;
+                    }
+                }
+            }
         }
+
+        public IEnumerator<V> GetEnumerator()
+        {
+            foreach (var pair in items)
+            {
+                if (pair.Value.active)
+                    yield return pair.Value.value;
+            }
+
+            if (parent != null)
+            {
+                foreach (var pair in parent.Pairs)
+                {
+                    if (!items.ContainsKey(pair.Item1))
+                        yield return pair.Item2;
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
