@@ -31,7 +31,7 @@ namespace Veruthian.Library.Collections
             return pair;
         }
 
-        public override string ToString() => CollectionUtility.ToTableString(this);
+        public override string ToString() => this.ToTableString();
     }
 
     public class DataPool<K> : DataPool<K, object>

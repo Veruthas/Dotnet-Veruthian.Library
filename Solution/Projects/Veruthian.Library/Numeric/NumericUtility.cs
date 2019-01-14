@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Numeric.Extensions
 {
     public static class NumericUtility
     {
