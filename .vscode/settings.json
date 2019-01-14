@@ -1,6 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "dotnet-test-explorer.testProjectPath": ".\\Solution\\Projects\\Veruthian.Dotnet.Library.Tests",
+    "dotnet-test-explorer.testProjectPath": ".\\Solution\\Projects\\Veruthian.Library.Tests",
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
