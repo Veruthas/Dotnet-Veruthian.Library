@@ -5,10 +5,10 @@ using Veruthian.Library.Text.Encodings;
 
 namespace Veruthian.Library.Text.Runes.Extensions
 {
-    public static class RuneUtility
+    public static class RuneExtensions
     {
         // Decode to Rune
-        public static IEnumerable<Rune> DecodeValues<T, TDecoder>(IEnumerable<T> items, TDecoder decoder, string onIncomplete)
+        public static IEnumerable<Rune> DecodeValues<T, TDecoder>(this IEnumerable<T> items, TDecoder decoder, string onIncomplete)
             where TDecoder : ITransformer<T, uint?>
         {
             var enumerator = items.GetEnumerator();

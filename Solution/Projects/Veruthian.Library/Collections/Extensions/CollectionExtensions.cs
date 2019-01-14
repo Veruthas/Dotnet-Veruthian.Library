@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Veruthian.Library.Collections.Extensions
 {
-    public static class CollectionUtility
+    public static class CollectionExtensions
     {
         // Array extensions
         public static T[] Resize<T>(this T[] array, int newSize)

@@ -106,7 +106,7 @@ namespace Veruthian.Library.Collections
 
         public void Clear() => dictionary.Clear();
 
-        public override string ToString() => CollectionUtility.ToTableString(Pairs);
+        public override string ToString() => Pairs.ToTableString();
 
 
     }
