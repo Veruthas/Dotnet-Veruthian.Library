@@ -14,7 +14,7 @@ namespace Veruthian.Library.Text
         {
             table = new List<(int Start, int Length, LineEnding ending)>();
 
-            table.Add((0, 0, LineEnding.None));
+            table.Add((0, -1, LineEnding.None));
         }
 
 
@@ -30,9 +30,9 @@ namespace Veruthian.Library.Text
             }
             else
             {
-                table[table.Count - 1] = (lineIndex.Start, lineIndex.Length, ending);
+                table[table.Count - 1] = (lineIndex.Start, lineIndex.Length + 1, ending);
 
-                table.Add((lineIndex.Start + lineIndex.Length, 0, LineEnding.None));
+                table.Add((lineIndex.Start + lineIndex.Length + 1, 0, LineEnding.None));
             }
 
         }
