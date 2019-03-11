@@ -63,18 +63,6 @@ namespace Veruthian.Library.Readers
             TestIsAtEnd(reader, data);
         }
 
-        protected void BaseTestReadEnumerable(TReader reader, T[] data)
-        {
-            int i = 0;
-
-            foreach (var item in reader.Read(data.Length))
-            {
-                Assert.Equal(data[i++], item);
-            }
-
-            TestIsAtEnd(reader, data);
-        }
-
         protected void TestIsAtEnd(TReader reader, T[] data)
         {
             Assert.Equal(data.Length, reader.Position);
@@ -192,14 +180,6 @@ namespace Veruthian.Library.Readers
             BaseTestSkip(GetReader(codes), codes, skipInterval);
         }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData("ABCDEFGHIJKLM")]
-        public void TestReadEnumerable(string data)
-        {
-            var codes = data.ToRuneArray();
-            BaseTestReadEnumerable(GetReader(codes), codes);
-        }
     }
 
     public class FixedLookaheadReaderTest : LookaheadReaderTest<Rune, FixedLookaheadReader<Rune>>
@@ -242,15 +222,6 @@ namespace Veruthian.Library.Readers
         {
             var codes = data.ToRuneArray();
             BaseTestSkip(GetReader(codes, lookahead), codes, skipInterval);
-        }
-
-        [Theory]
-        [InlineData("", 2)]
-        [InlineData("ABCDEFGHIJKLM", 2)]
-        public void TestReadEnumerable(string data, int lookahead)
-        {
-            var codes = data.ToRuneArray();
-            BaseTestReadEnumerable(GetReader(codes, lookahead), codes);
         }
 
         [Theory]
@@ -312,15 +283,6 @@ namespace Veruthian.Library.Readers
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData("ABCDEFGHIJKLM")]
-        public void TestReadEnumerable(string data)
-        {
-            var codes = data.ToRuneArray();
-            BaseTestReadEnumerable(GetReader(codes), codes);
-        }
-
-        [Theory]
         [InlineData("", 4)]
         [InlineData("ABCD", 4)]
         [InlineData("ABCDEFGHIJKLM", 4)]
@@ -377,16 +339,6 @@ namespace Veruthian.Library.Readers
             var codes = data.ToRuneArray();
 
             BaseTestSkip(GetReader(codes), codes, skipInterval);
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData("ABCDEFGHIJKLM")]
-        public void TestReadEnumerable(string data)
-        {
-            var codes = data.ToRuneArray();
-
-            BaseTestReadEnumerable(GetReader(codes), codes);
         }
 
         [Theory]

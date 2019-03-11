@@ -104,7 +104,6 @@ namespace Veruthian.Library.Readers
             return current;
         }
 
-
         // Read
         public T Read()
         {
@@ -113,17 +112,6 @@ namespace Veruthian.Library.Readers
             MoveNext();
 
             return current;
-        }
-
-        public IEnumerable<T> Read(int amount, bool includeEnd = false)
-        {
-            TryPreload(amount);
-
-            for (int i = 0; i < amount; i++)
-            {
-                if (!IsEnd || includeEnd)
-                    yield return Read();
-            }
         }
 
         // Skip

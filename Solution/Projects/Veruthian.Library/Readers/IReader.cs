@@ -13,8 +13,6 @@ namespace Veruthian.Library.Readers
 
         T Read();
 
-        IEnumerable<T> Read(int amount, bool includeEnd = false);
-
         void Skip(int amount);
     }
 }
