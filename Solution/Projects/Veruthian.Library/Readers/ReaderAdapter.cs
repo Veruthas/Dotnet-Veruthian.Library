@@ -36,18 +36,6 @@ namespace Veruthian.Library.Readers
 
         protected virtual void OnItemRead(T item) { }
 
-
-        public virtual IEnumerable<T> Read(int amount, bool includeEnd = false)
-        {
-            var items = Reader.Read(amount, includeEnd);
-
-            OnItemsRead(items);
-
-            return items;
-        }
-
-        protected virtual void OnItemsRead(IEnumerable<T> items) { }
-
         public virtual void Skip(int amount)
         {
             int position = Reader.Position;
