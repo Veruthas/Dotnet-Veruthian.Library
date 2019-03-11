@@ -7,7 +7,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
 {
     public static class RuneExtensions
     {
-        // Decode to Rune
+        // Rune Decoder
         public static IEnumerable<Rune> DecodeValues<T, TDecoder>(this IEnumerable<T> items, TDecoder decoder, string onIncomplete)
             where TDecoder : ITransformer<T, uint?>
         {
@@ -30,7 +30,8 @@ namespace Veruthian.Library.Text.Runes.Extensions
                 throw new RuneException(onIncomplete);
         }
 
-        // Utf8 -> Rune
+
+        // byte.Utf8... -> Rune
         public static IEnumerable<Rune> AsUtf8Runes(this IEnumerable<byte> bytes)
         {
             var decoder = new Utf8.ByteDecoder();
@@ -38,7 +39,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return DecodeValues(bytes, decoder, "Ill-formed Utf8.");
         }
 
-        // Utf16 -> Rune
+        // byte.Utf16... -> Rune
         public static IEnumerable<Rune> AsUtf16Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf16.ByteDecoder(endianness);
@@ -47,7 +48,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
 
-        // Utf32 -> Rune
+        // byte.Utf32... -> Rune
         public static IEnumerable<Rune> AsUtf32Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
@@ -56,7 +57,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
 
-        // Char -> Rune
+        // char... -> Rune...
         public static IEnumerable<Rune> ToRunes(this IEnumerable<char> chars)
         {
             var decoder = new Utf16.CharDecoder();
@@ -64,7 +65,8 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return DecodeValues(chars, decoder, Utf16.MissingTrailingSurrogateMessage());
         }
 
-        // String -> Rune
+
+        // string -> Rune...
         public static IEnumerable<Rune> ToRunes(this string value)
         {
             if (value == null)
@@ -121,7 +123,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
 
-        // String -> Rune[]
+        // string -> Rune[]
         public static Rune[] ToRuneArray(this string value)
         {
             if (value == null)
@@ -184,49 +186,51 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return runes;
         }
 
-        public static bool IsNullOrEmpty(this RuneString value) => RuneString.IsNullOrEmpty(value);
+        
 
-
-
-        // CodeString
-        public static RuneString ToCodeString(this ICollection<Rune> runes)
+        // -> RuneString
+        public static RuneString ToRuneString(this ICollection<Rune> runes)
         {
             return new RuneString(runes);
         }
 
-        public static RuneString ToCodeString(this IList<Rune> runes, int index)
+        public static RuneString ToRuneString(this IList<Rune> runes, int index)
         {
             return new RuneString(runes, index);
         }
 
-        public static RuneString ToCodeString(this IList<Rune> runes, int index, int length)
+        public static RuneString ToRuneString(this IList<Rune> runes, int index, int length)
         {
             return new RuneString(runes, index, length);
         }
 
-        public static RuneString ToCodeString(this IEnumerable<Rune> runes)
+        public static RuneString ToRuneString(this IEnumerable<Rune> runes)
         {
             return new RuneString(runes);
         }
 
-        public static RuneString ToCodeString(this IEnumerable<char> chars)
+        public static RuneString ToRuneString(this IEnumerable<char> chars)
         {
             return new RuneString(ToRunes(chars));
         }
 
-        public static RuneString ToCodeString(this string value)
+        public static RuneString ToRuneString(this string value)
         {
             return new RuneString(value);
         }
 
-        public static RuneString ToCodeString(this string value, int start)
+        public static RuneString ToRuneString(this string value, int start)
         {
             return new RuneString(value, start);
         }
 
-        public static RuneString ToCodeString(this string value, int start, int amount)
+        public static RuneString ToRuneString(this string value, int start, int amount)
         {
             return new RuneString(value, start, amount);
         }
+
+
+        // RuneString
+        public static bool IsNullOrEmpty(this RuneString value) => RuneString.IsNullOrEmpty(value);
     }
 }

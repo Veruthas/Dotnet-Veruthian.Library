@@ -55,6 +55,36 @@ namespace Veruthian.Library.Text.Encodings
                 throw CodePointOutOfRange(value);
         }
 
+        public static bool IsNewLine(uint previous, uint value, uint next)
+        {
+            if (value == Chars.Lf)
+                return previous != Chars.Cr;
+            else if (value == Chars.Cr)
+                return next == Chars.Lf;
+            else
+                return false;
+        }
+
+
+        public static class Chars
+        {
+            public const uint Null = (uint)'\0';
+
+            public const uint Tab = (uint)'\t';
+
+
+            public const uint NewLine = (uint)'\n';
+
+            public const uint LineFeed = (uint)'\n';
+
+            public const uint Lf = (uint)'\n';
+
+
+            public const uint CarriageReturn = (uint)'\r';
+
+            public const uint Cr = (uint)'\r';
+        }
+
 
         #region Errors
 
@@ -122,7 +152,7 @@ namespace Veruthian.Library.Text.Encodings
                 var result = value.GetInt();
 
                 Utf32.VerifyInRange(result);
-                
+
                 return result;
             }
 
