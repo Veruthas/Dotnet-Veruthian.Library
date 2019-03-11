@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text
@@ -34,47 +35,23 @@ namespace Veruthian.Library.Text
         }
 
 
-        const uint Null = (uint)'\0';
-
-        const uint Lf = (uint)'\n';
-
-        const uint Cr = (uint)'\r';
+        private TextLocation MoveToNextUtf32(uint previous, uint current, uint next) => Utf32.IsNewLine(previous, current, next) ? this.IncrementLine() : this + 1;
 
 
-        private TextLocation MoveToNextUtf32(uint current, uint next, bool acceptNulls)
-        {
-            switch (current)
-            {
-                case Null:
-                    return (acceptNulls) ? this + 1 : this;
+        public TextLocation MoveToNext(Rune previous, Rune current, Rune next) => MoveToNextUtf32(previous, current, next);
 
-                case Lf:
-                    return this.IncrementLine();
-
-                case Cr:
-                    return (next == Lf) ? this + 1 : this.IncrementLine();
-
-                default:
-                    return this + 1;
-            }
-        }
-
-        public TextLocation MoveToNext(Rune current, Rune next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
-
-        public TextLocation MoveToNext(char current, char next, bool acceptNulls = true) => MoveToNextUtf32(current, next, acceptNulls);
+        public TextLocation MoveToNext(char previous, char current, char next) => MoveToNextUtf32(previous, current, next);
 
 
-        // MoveThrough Runes
-        public TextLocation MoveThrough(Rune current, RuneString following, bool acceptNulls = true)
-            => MoveThrough(current, (IEnumerable<Rune>)following, acceptNulls);
-
-        public TextLocation MoveThrough(Rune current, IEnumerable<Rune> following, bool acceptNulls = true)
+        public TextLocation MoveThrough(Rune previous, Rune current, IEnumerable<Rune> following)
         {
             TextLocation result = this;
 
-            foreach (Rune next in following)
+            foreach (var next in following)
             {
-                result = result.MoveToNext(current, next, acceptNulls);
+                result = result.MoveToNext(previous, current, next);
+
+                previous = current;
 
                 current = next;
             }
@@ -82,17 +59,15 @@ namespace Veruthian.Library.Text
             return result;
         }
 
-        // MoveThrough Chars
-        public TextLocation MoveThrough(char current, string following, bool acceptNulls = true)
-            => MoveThrough(current, (IEnumerable<char>)following, acceptNulls);
-
-        public TextLocation MoveThrough(char current, IEnumerable<char> following, bool acceptNulls = true)
+        public TextLocation MoveThrough(char previous, char current, IEnumerable<char> following)
         {
             TextLocation result = this;
 
-            foreach (char next in following)
+            foreach (var next in following)
             {
-                result = result.MoveToNext(current, next, acceptNulls);
+                result = result.MoveToNext(previous, current, next);
+
+                previous = current;
 
                 current = next;
             }
@@ -101,11 +76,16 @@ namespace Veruthian.Library.Text
         }
 
 
-        // HashCode
-        public override int GetHashCode()
+        public static TextLocation operator +(TextLocation position, int amount)
         {
-            return HashCodes.Default.Combine(Position, Line, Column);
+            return new TextLocation(position.position + amount, position.line, position.column + amount);
         }
+
+        public static TextLocation operator ++(TextLocation position)
+        {
+            return new TextLocation(position.position + 1, position.line, position.column + 1);
+        }
+
 
         // Equals
         public override bool Equals(object obj) => (obj is TextLocation) ? Equals((TextLocation)obj) : false;
@@ -129,14 +109,10 @@ namespace Veruthian.Library.Text
         }
 
 
-        public static TextLocation operator +(TextLocation position, int amount)
+        // HashCode
+        public override int GetHashCode()
         {
-            return new TextLocation(position.position + amount, position.line, position.column + amount);
-        }
-
-        public static TextLocation operator ++(TextLocation position)
-        {
-            return new TextLocation(position.position + 1, position.line, position.column + 1);
+            return HashCodes.Default.Combine(Position, Line, Column);
         }
 
 
