@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Readers
 {
-    public delegate T GenerateEndItem<T>(T previous);
-
-
     public abstract class BaseReader<T> : IReader<T>
     {
         private IEnumerator<T> enumerator;

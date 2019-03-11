@@ -193,10 +193,12 @@ namespace Veruthian.Library.Text.Runes.Extensions
         {
             return new RuneString(runes);
         }
+
         public static RuneString ToCodeString(this IList<Rune> runes, int index)
         {
             return new RuneString(runes, index);
         }
+
         public static RuneString ToCodeString(this IList<Rune> runes, int index, int length)
         {
             return new RuneString(runes, index, length);
