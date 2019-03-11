@@ -35,23 +35,21 @@ namespace Veruthian.Library.Text
         }
 
 
-        private TextLocation MoveToNextUtf32(uint previous, uint current, uint next) => Utf32.IsNewLine(previous, current, next) ? this.IncrementLine() : this + 1;
+        private TextLocation MoveToNextUtf32(uint current, uint next) => Utf32.IsNewLine(current, next) ? this.IncrementLine() : this + 1;
 
 
-        public TextLocation MoveToNext(Rune previous, Rune current, Rune next) => MoveToNextUtf32(previous, current, next);
+        public TextLocation MoveToNext(Rune current, Rune next) => MoveToNextUtf32(current, next);
 
-        public TextLocation MoveToNext(char previous, char current, char next) => MoveToNextUtf32(previous, current, next);
+        public TextLocation MoveToNext(char current, char next) => MoveToNextUtf32(current, next);
 
 
-        public TextLocation MoveThrough(Rune previous, Rune current, IEnumerable<Rune> following)
+        public TextLocation MoveThrough(Rune current, IEnumerable<Rune> following)
         {
             TextLocation result = this;
 
             foreach (var next in following)
             {
-                result = result.MoveToNext(previous, current, next);
-
-                previous = current;
+                result = result.MoveToNext(current, next);
 
                 current = next;
             }
@@ -59,15 +57,13 @@ namespace Veruthian.Library.Text
             return result;
         }
 
-        public TextLocation MoveThrough(char previous, char current, IEnumerable<char> following)
+        public TextLocation MoveThrough(char current, IEnumerable<char> following)
         {
             TextLocation result = this;
 
             foreach (var next in following)
             {
-                result = result.MoveToNext(previous, current, next);
-
-                previous = current;
+                result = result.MoveToNext(current, next);
 
                 current = next;
             }
