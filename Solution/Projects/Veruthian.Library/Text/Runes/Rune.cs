@@ -8,7 +8,7 @@ namespace Veruthian.Library.Text.Runes
 {
     public struct Rune : ISequential<Rune>, IBounded<Rune>
     {
-        uint value;
+        readonly uint value;
 
 
         private Rune(uint value)
