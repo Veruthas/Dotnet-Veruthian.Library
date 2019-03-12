@@ -12,14 +12,14 @@ namespace _Console
 
             LineIndexTable lines = new LineIndexTable();
 
-            lines.MoveThrough('\0', value);
+            lines.MoveThrough('\0', value + '\0');
 
 
-            foreach(var line in lines.ExtractLines(value))
+            foreach (var line in lines.ExtractLines(value))
             {
                 string result = "";
 
-                foreach(var rune in line)
+                foreach (var rune in line)
                 {
                     result += rune.ToPrintableString();
                 }
@@ -27,9 +27,24 @@ namespace _Console
                 Console.WriteLine($"'{result}'");
             }
 
+            Console.WriteLine();
+
+            foreach (var line in lines.ExtractLines(value, false))
+            {
+                string result = "";
+
+                foreach (var rune in line)
+                {
+                    result += rune.ToPrintableString();
+                }
+
+                Console.WriteLine($"'{result}'");
+            }
+
+
             Pause();
         }
-        
+
         static void Pause()
         {
             Console.Write("Press any key to continue...");

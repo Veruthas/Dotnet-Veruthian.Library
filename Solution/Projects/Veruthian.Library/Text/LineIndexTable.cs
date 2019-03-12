@@ -7,12 +7,12 @@ namespace Veruthian.Library.Text
     // Due to Utf16 vs Utf32 differences, don't mix chars and Runes.
     public class LineIndexTable
     {
-        List<(int Start, int Length, LineEnding ending)> table;
+        List<(int Start, int Length, LineEnding Ending)> table;
 
 
         public LineIndexTable()
         {
-            table = new List<(int Start, int Length, LineEnding ending)>();
+            table = new List<(int Start, int Length, LineEnding Ending)>();
 
             table.Add((0, -1, LineEnding.None));
         }
@@ -20,21 +20,26 @@ namespace Veruthian.Library.Text
 
         private void MoveToNextUtf32(uint current, uint next)
         {
-            var lineIndex = table[table.Count - 1];
+            int lineIndex = table.Count - 1;
 
-            var ending = Utf32.GetNewLine(current, next);
+            var line = table[lineIndex];
 
-            if (ending == LineEnding.None)
+            var ending = line.Ending;
+
+
+            if (ending == LineEnding.CrLf)
             {
-                table[table.Count - 1] = (lineIndex.Start, lineIndex.Length + 1, ending);
+                table.Add((line.Start + line.Length + 1, 0, LineEnding.None));
             }
             else
             {
-                table[table.Count - 1] = (lineIndex.Start, lineIndex.Length + 1, ending);
+                ending = Utf32.GetNewLine(current, next);
 
-                table.Add((lineIndex.Start + lineIndex.Length + 1, 0, LineEnding.None));
+                if (ending == LineEnding.Cr || ending == LineEnding.Lf )
+                    table.Add((line.Start + line.Length + 1, 0, LineEnding.None));                
             }
 
+            table[lineIndex] = (line.Start, line.Length + 1, ending);
         }
 
 
@@ -81,13 +86,13 @@ namespace Veruthian.Library.Text
             }
         }
 
-        public RuneString ExtractLine(RuneString value, int lineNumber)
+        public RuneString ExtractLine(RuneString value, int lineNumber, bool includeEnd = true)
         {
             if (lineNumber > 0 && lineNumber < table.Count)
             {
                 var line = table[lineNumber];
 
-                return ExtractLine(value, line.Start, line.Length);
+                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
             }
             else
             {
@@ -95,12 +100,10 @@ namespace Veruthian.Library.Text
             }
         }
 
-        public IEnumerable<RuneString> ExtractLines(RuneString value)
+        public IEnumerable<RuneString> ExtractLines(RuneString value, bool includeEnd = true)
         {
             foreach (var line in table)
-            {
-                yield return ExtractLine(value, line.Start, line.Length);
-            }
+                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
         }
 
 
@@ -121,13 +124,13 @@ namespace Veruthian.Library.Text
             }
         }
 
-        public string ExtractLine(string value, int lineNumber)
+        public string ExtractLine(string value, int lineNumber, bool includeEnd = true)
         {
             if (lineNumber > 0 && lineNumber < table.Count)
             {
                 var line = table[lineNumber];
 
-                return ExtractLine(value, line.Start, line.Length);
+                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
             }
             else
             {
@@ -135,12 +138,10 @@ namespace Veruthian.Library.Text
             }
         }
 
-        public IEnumerable<string> ExtractLines(string value)
+        public IEnumerable<string> ExtractLines(string value, bool includeEnd = true)
         {
             foreach (var line in table)
-            {
-                yield return ExtractLine(value, line.Start, line.Length);
-            }
+                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
         }
     }
 }
