@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Runes;
@@ -5,41 +6,78 @@ using Veruthian.Library.Text.Runes;
 namespace Veruthian.Library.Text
 {
     // Due to Utf16 vs Utf32 differences, don't mix chars and Runes.
-    public class LineIndexTable
+    public class LineIndexTable : IEnumerable<(int Start, int Length, LineEnding ending)>
     {
-        List<(int Start, int Length, LineEnding Ending)> table;
+        List<(int Start, int Length, LineEnding Ending)> lines;
 
 
         public LineIndexTable()
         {
-            table = new List<(int Start, int Length, LineEnding Ending)>();
+            lines = new List<(int Start, int Length, LineEnding Ending)>();
 
-            table.Add((0, -1, LineEnding.None));
+            lines.Add((0, -1, LineEnding.None));
         }
 
 
+
+        public int Count => lines.Count;
+
+        public (int Start, int Length, LineEnding ending) GetLine(int lineNumber) => lines[lineNumber];
+
+        public int GetLineNumber(int position)
+        {
+            var low = 0;
+
+            var high = lines.Count - 1;
+
+            while (low <= high)
+            {
+                var middle = (low + high) / 2;
+
+                var line = lines[middle];
+
+                if (position < line.Start)
+                    high = middle - 1;
+                else if (position >= line.Start + line.Length)
+                    low = middle + 1;
+                else
+                    return middle;
+            }
+
+            return -1;
+        }
+
+        public TextLocation GetTextLocation(int position)
+        {
+            var lineNumber = GetLineNumber(position);
+
+            var line = lines[lineNumber];
+
+            return new TextLocation(position, lineNumber, position - line.Start);
+        }
+
         private void MoveToNextUtf32(uint current, uint next)
         {
-            int lineIndex = table.Count - 1;
+            int lineIndex = lines.Count - 1;
 
-            var line = table[lineIndex];
+            var line = lines[lineIndex];
 
             var ending = line.Ending;
 
 
             if (ending == LineEnding.CrLf)
             {
-                table.Add((line.Start + line.Length + 1, 0, LineEnding.None));
+                lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
             }
             else
             {
                 ending = Utf32.GetNewLine(current, next);
 
-                if (ending == LineEnding.Cr || ending == LineEnding.Lf )
-                    table.Add((line.Start + line.Length + 1, 0, LineEnding.None));                
+                if (ending == LineEnding.Cr || ending == LineEnding.Lf)
+                    lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
             }
 
-            table[lineIndex] = (line.Start, line.Length + 1, ending);
+            lines[lineIndex] = (line.Start, line.Length + 1, ending);
         }
 
 
@@ -88,9 +126,9 @@ namespace Veruthian.Library.Text
 
         public RuneString ExtractLine(RuneString value, int lineNumber, bool includeEnd = true)
         {
-            if (lineNumber > 0 && lineNumber < table.Count)
+            if (lineNumber > 0 && lineNumber < lines.Count)
             {
-                var line = table[lineNumber];
+                var line = lines[lineNumber];
 
                 return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
             }
@@ -102,7 +140,7 @@ namespace Veruthian.Library.Text
 
         public IEnumerable<RuneString> ExtractLines(RuneString value, bool includeEnd = true)
         {
-            foreach (var line in table)
+            foreach (var line in lines)
                 yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
         }
 
@@ -126,9 +164,9 @@ namespace Veruthian.Library.Text
 
         public string ExtractLine(string value, int lineNumber, bool includeEnd = true)
         {
-            if (lineNumber > 0 && lineNumber < table.Count)
+            if (lineNumber > 0 && lineNumber < lines.Count)
             {
-                var line = table[lineNumber];
+                var line = lines[lineNumber];
 
                 return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
             }
@@ -140,8 +178,13 @@ namespace Veruthian.Library.Text
 
         public IEnumerable<string> ExtractLines(string value, bool includeEnd = true)
         {
-            foreach (var line in table)
+            foreach (var line in lines)
                 yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
         }
+
+
+        public IEnumerator<(int Start, int Length, LineEnding ending)> GetEnumerator() => this.lines.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
