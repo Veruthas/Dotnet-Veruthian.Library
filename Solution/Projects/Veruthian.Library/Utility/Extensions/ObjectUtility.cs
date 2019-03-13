@@ -1,4 +1,4 @@
-namespace Veruthian.Library
+namespace Veruthian.Library.Utility.Extensions
 {
     public static class ObjectUtility
     {

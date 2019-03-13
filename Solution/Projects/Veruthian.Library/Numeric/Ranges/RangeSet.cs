@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Numeric.Ranges
 {

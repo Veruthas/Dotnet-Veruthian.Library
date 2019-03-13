@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Numeric.Ranges
 {

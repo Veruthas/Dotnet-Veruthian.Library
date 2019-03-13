@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Runes;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Text
 {

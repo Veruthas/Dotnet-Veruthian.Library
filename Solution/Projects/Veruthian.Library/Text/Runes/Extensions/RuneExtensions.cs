@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Processing;
 using Veruthian.Library.Text.Encodings;
 
 namespace Veruthian.Library.Text.Runes.Extensions
