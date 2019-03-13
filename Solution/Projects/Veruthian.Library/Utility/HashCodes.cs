@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Veruthian.Library
+namespace Veruthian.Library.Utility
 {
     public class HashCodes
     {

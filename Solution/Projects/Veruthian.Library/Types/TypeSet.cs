@@ -1,4 +1,4 @@
-namespace Veruthian.Library
+namespace Veruthian.Library.Types
 {
 
     public static class TypeSet

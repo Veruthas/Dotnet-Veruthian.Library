@@ -1,4 +1,4 @@
-namespace Veruthian.Library
+namespace Veruthian.Library.Processing
 {
     public interface IProcessor<in TState>
     {

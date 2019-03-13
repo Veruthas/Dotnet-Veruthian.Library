@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library
+namespace Veruthian.Library.Processing
 {
     public interface ITransformer<in TSource, out TTarget>
     {

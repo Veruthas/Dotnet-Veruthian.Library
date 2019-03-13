@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Text;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Text.Runes.Extensions;
+using Veruthian.Library.Utility;
+using Veruthian.Library.Utility.Extensions;
 
 namespace Veruthian.Library.Text.Runes
 {
