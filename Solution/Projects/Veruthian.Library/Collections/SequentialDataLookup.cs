@@ -11,7 +11,6 @@ namespace Veruthian.Library.Collections
         public SequentialDataLookup() => lookups = new List<ILookup<K, V>>();
 
 
-
         public V this[K key]
         {
             get
@@ -26,41 +25,107 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<K> Keys => throw new System.NotImplementedException();
+        public bool Contains(V value)
+        {
+            foreach (var lookup in lookups)
+                if (lookup.Contains(value))
+                    return true;
 
-        public IEnumerable<(K, V)> Pairs => throw new System.NotImplementedException();
+            return false;
+        }
+
+        public bool HasKey(K key)
+        {
+            foreach (var lookup in lookups)
+                if (lookup.HasKey(key))
+                    return true;
+
+            return false;
+        }
+
+        public bool TryGet(K key, out V value)
+        {
+            foreach (var lookup in lookups)
+                if (lookup.TryGet(key, out value))
+                    return true;
+
+            value = default(V);
+
+            return false;
+        }
 
         public int Count
         {
             get
             {
-                return 0;
+                var keys = new HashSet<K>();
+
+                foreach (var lookup in lookups)
+                    foreach (var key in lookup.Keys)
+                        keys.Add(key);
+
+                return keys.Count;
             }
         }
 
-        public bool Contains(V value)
+        public IEnumerable<(K, V)> Pairs
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                var keys = new HashSet<K>();
+
+                foreach (var lookup in lookups)
+                {
+                    foreach ((K Key, V Value) pair in lookup.Pairs)
+                    {
+                        if (!keys.Contains(pair.Key))
+                        {
+                            keys.Add(pair.Key);
+                            yield return pair;
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<K> Keys
+        {
+            get
+            {
+                var keys = new HashSet<K>();
+
+                foreach (var lookup in lookups)
+                {
+                    foreach (var key in lookup.Keys)
+                    {
+                        if (!keys.Contains(key))
+                        {
+                            keys.Add(key);
+                            yield return key;
+                        }
+                    }
+                }
+            }
         }
 
         public IEnumerator<V> GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            var keys = new HashSet<K>();
+
+            foreach (var lookup in lookups)
+            {
+                foreach ((K Key, V Value) pair in lookup.Pairs)
+                {
+                    if (!keys.Contains(pair.Key))
+                    {
+                        keys.Add(pair.Key);
+                        
+                        yield return pair.Value;
+                    }
+                }
+            }
         }
 
-        public bool HasKey(K key)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool TryGet(K key, out V value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new System.NotImplementedException();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
