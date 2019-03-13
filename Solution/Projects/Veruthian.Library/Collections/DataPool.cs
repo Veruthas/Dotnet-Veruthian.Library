@@ -25,7 +25,7 @@ namespace Veruthian.Library.Collections
             {
                 pair = (key, attribute);
 
-                items.Add(key, pair);             
+                items.Add(key, pair);
             }
 
             return pair;
@@ -34,8 +34,5 @@ namespace Veruthian.Library.Collections
         public override string ToString() => this.ToTableString();
     }
 
-    public class DataPool<K> : DataPool<K, object>
-    {
-
-    }
+    public class DataPool<K> : DataPool<K, object> { }
 }
