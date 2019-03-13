@@ -186,7 +186,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return runes;
         }
 
-        
+
 
         // -> RuneString
         public static RuneString ToRuneString(this ICollection<Rune> runes)
@@ -232,5 +232,30 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
         // RuneString
         public static bool IsNullOrEmpty(this RuneString value) => RuneString.IsNullOrEmpty(value);
+
+
+        // LineTracking
+        public static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, out LineIndexTable lines)
+        {
+            lines = new LineIndexTable();
+
+            return ProcessLines(runes, lines);
+        }
+
+        private static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, LineIndexTable lines)
+        {
+            Rune current = '\0';
+
+            foreach (var rune in runes)
+            {
+                lines.MoveToNext(current, rune);
+
+                yield return rune;
+
+                current = rune;
+            }
+
+            lines.MoveToNext(current, '\0');
+        }
     }
 }
