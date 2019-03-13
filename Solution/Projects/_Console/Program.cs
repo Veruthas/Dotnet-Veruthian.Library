@@ -1,6 +1,7 @@
 ﻿using System;
 using Veruthian.Library.Text;
 using Veruthian.Library.Text.Runes;
+using Veruthian.Library.Text.Runes.Extensions;
 
 namespace _Console
 {
@@ -12,33 +13,42 @@ namespace _Console
 
             LineIndexTable lines = new LineIndexTable();
 
-            lines.MoveThrough('\0', value + '\0');
+            foreach(var rune in value.ProcessLines(out lines))
+                Console.Write(rune.ToPrintableString());
+
+            Console.WriteLine("\nRESULTS\n");
+
+            // foreach (var line in lines.ExtractLines(value))
+            // {
+            //     string result = "";
+
+            //     foreach (var rune in line)
+            //     {
+            //         result += rune.ToPrintableString();
+            //     }
+
+            //     Console.WriteLine($"'{result}'");
+            // }
+
+            // Console.WriteLine();
+
+            // foreach (var line in lines.ExtractLines(value, false))
+            // {
+            //     string result = "";
+
+            //     foreach (var rune in line)
+            //     {
+            //         result += rune.ToPrintableString();
+            //     }
+
+            //     Console.WriteLine($"'{result}'");
+            // }
 
 
-            foreach (var line in lines.ExtractLines(value))
+            for (int i = 0; i < value.Length; i++)
             {
-                string result = "";
-
-                foreach (var rune in line)
-                {
-                    result += rune.ToPrintableString();
-                }
-
-                Console.WriteLine($"'{result}'");
-            }
-
-            Console.WriteLine();
-
-            foreach (var line in lines.ExtractLines(value, false))
-            {
-                string result = "";
-
-                foreach (var rune in line)
-                {
-                    result += rune.ToPrintableString();
-                }
-
-                Console.WriteLine($"'{result}'");
+                var location = lines.GetTextLocation(i);
+                Console.WriteLine($"{i}: '{value[i].ToPrintableString()}' @ {location}");
             }
 
 
