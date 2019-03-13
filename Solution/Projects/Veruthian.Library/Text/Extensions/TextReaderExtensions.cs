@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Veruthian.Library.Text.Characters.Extensions
+namespace Veruthian.Library.Text.Extensions
 {
-    public static class CharacterExtensions
+    public static class TextReaderExtensions
     {
         // Enumerators
         public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
@@ -49,39 +49,5 @@ namespace Veruthian.Library.Text.Characters.Extensions
 
             return GetTextReader(stream, encoding);
         }
-
-        // Printable Chars
-        public static string GetAsPrintable(this char value)
-        {
-            switch (value)
-            {
-                case '\n':
-                    return "\\n";
-                case '\r':
-                    return "\\r";
-                case '\t':
-                    return "\\t";
-                case '\0':
-                    return "\\0";
-                default:
-                    return value.ToString();
-            }
-        }
-
-        public static string GetAsPrintable(this string value)
-        {
-            var builder = new StringBuilder();
-
-            foreach (char c in value)
-                builder.Append(GetAsPrintable(c));
-
-            return builder.ToString();
-        }
-
-    
-        // String extensions
-        public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
-
-        public static bool IsNullOrWhitespace(this string value) => string.IsNullOrWhiteSpace(value);
     }
 }
