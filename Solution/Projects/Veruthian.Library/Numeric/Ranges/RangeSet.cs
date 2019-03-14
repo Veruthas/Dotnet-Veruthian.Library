@@ -103,7 +103,9 @@ namespace Veruthian.Library.Numeric.Ranges
         public override int GetHashCode() => ranges == null ? defaultHashcode : hashcode;
 
 
-        public string ToString(Func<T, string> toString)
+        const string RangeSeparator = " + ";
+
+        public string ToString(Func<T, string> toString, string separator = RangeSeparator)
         {
             bool initialized = false;
 
@@ -112,7 +114,7 @@ namespace Veruthian.Library.Numeric.Ranges
             foreach (var range in RangeArray)
             {
                 if (initialized)
-                    builder.Append(" | ");
+                    builder.Append(separator);
 
                 builder.Append(range.ToString(toString));
 
@@ -122,7 +124,7 @@ namespace Veruthian.Library.Numeric.Ranges
             return builder.ToString();
         }
 
-        public override string ToString()
+        public string ToString(string separator)
         {
             bool initialized = false;
 
@@ -131,7 +133,7 @@ namespace Veruthian.Library.Numeric.Ranges
             foreach (var range in RangeArray)
             {
                 if (initialized)
-                    builder.Append(" | ");
+                    builder.Append(separator);
 
                 builder.Append(range.ToString());
 
@@ -141,7 +143,7 @@ namespace Veruthian.Library.Numeric.Ranges
             return builder.ToString();
         }
 
-
+        public override string ToString() => ToString(RangeSeparator);
 
         #region IEnumerable
 
