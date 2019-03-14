@@ -7,7 +7,7 @@ namespace Veruthian.Library.Text.Extensions
     public static class TextReaderExtensions
     {
         // Enumerators
-        public static IEnumerator<char> GetCharEnumerator(this TextReader reader)
+        public static IEnumerator<char> GetChars(this TextReader reader)
         {
             while (true)
             {
@@ -22,18 +22,18 @@ namespace Veruthian.Library.Text.Extensions
             reader.Dispose();
         }
 
-        public static IEnumerator<char> GetCharEnumerator(this Stream stream, Encoding encoding = null)
+        public static IEnumerator<char> GetChars(this Stream stream, Encoding encoding = null)
         {
             var reader = GetTextReader(stream, encoding);
 
-            return GetCharEnumerator(reader);
+            return GetChars(reader);
         }
 
-        public static IEnumerator<char> GetCharEnumerator(string filepath, Encoding encoding = null)
+        public static IEnumerator<char> GetChars(string filepath, Encoding encoding = null)
         {
             var reader = GetTextReader(filepath, encoding);
 
-            return GetCharEnumerator(reader);
+            return GetChars(reader);
         }
 
 
