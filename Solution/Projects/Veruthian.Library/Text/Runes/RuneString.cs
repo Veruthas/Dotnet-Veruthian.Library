@@ -41,16 +41,6 @@ namespace Veruthian.Library.Text.Runes
         public RuneString(IEnumerable<Rune> runes)
             : this(System.Linq.Enumerable.ToArray(runes), false) { }
 
-        private static Rune[] GetFromEnumerator(IEnumerable<Rune> runes)
-        {
-            var result = new List<Rune>();
-
-            foreach (var rune in runes)
-                result.Add(rune);
-
-            return result.ToArray();
-        }
-
         public RuneString(ICollection<Rune> runes)
                 : this(GetFromCollection(runes), false) { }
 
@@ -475,8 +465,6 @@ namespace Veruthian.Library.Text.Runes
             return builder.ToString();
         }
 
-        public static implicit operator string(RuneString value) => value.IsNull() ? null : value.ToString();
-
         #endregion
 
         #region Enumerator
@@ -555,6 +543,20 @@ namespace Veruthian.Library.Text.Runes
 
             return false;
         }
+
+        #endregion
+
+        #region Conversions
+
+        public static implicit operator RuneString(Rune value) => new RuneString(value);
+
+        public static implicit operator string(RuneString value) => value.IsNull() ? null : value.ToString();
+
+        public static implicit operator RuneString(string value) => value.IsNull() ? null : new RuneString(value);
+
+        public static implicit operator Rune[] (RuneString value) => value.IsNull() ? new Rune[0] : value.ToRuneArray();
+
+        public static implicit operator RuneString(Rune[] value) => value.IsNull() || value.Length == 0 ? RuneString.Empty : new RuneString(value);
 
         #endregion
 
