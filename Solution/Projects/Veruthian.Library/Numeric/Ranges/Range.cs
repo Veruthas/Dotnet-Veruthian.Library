@@ -45,24 +45,8 @@ namespace Veruthian.Library.Numeric.Ranges
 
         public T High => high;
 
+
         public override int GetHashCode() => hashcode;
-
-
-        public override string ToString()
-        {
-            if (IsSingle)
-                return low.ToString();
-            else
-                return '(' + low.ToString() + " to " + high.ToString() + ')';
-        }
-
-        public string ToString(Func<T, string> toString)
-        {
-            if (IsSingle)
-                return toString(low);
-            else
-                return '(' + toString(low) + " to " + toString(high) + ')';
-        }
 
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -81,6 +65,33 @@ namespace Veruthian.Library.Numeric.Ranges
                     current = current.Next;
             }
         }
+
+        const string StringStart = "(";
+
+        const string StringMiddle = " to ";
+
+        const string StringEnd = ")";
+
+
+        public override string ToString() => ToString(StringStart, StringMiddle, StringEnd);
+
+        public string ToString(string start, string middle, string end)
+        {
+            if (IsSingle)
+                return low.ToString();
+            else
+                return start + low.ToString() + middle + high.ToString() + end;
+        }
+
+
+        public string ToString(Func<T, string> toString, string start = StringStart, string middle = StringMiddle, string end = StringEnd)
+        {
+            if (IsSingle)
+                return toString(low);
+            else
+                return start + toString(low) + middle + toString(high) + end;
+        }
+
 
         #region Comparison
 
@@ -454,7 +465,7 @@ namespace Veruthian.Library.Numeric.Ranges
             bool started = false;
 
             T min = default(T);
-            
+
             T max = default(T);
 
             T low = default(T);
