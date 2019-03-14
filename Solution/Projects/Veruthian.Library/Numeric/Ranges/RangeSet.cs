@@ -11,7 +11,7 @@ namespace Veruthian.Library.Numeric.Ranges
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
 
-        public RangeSet<T> Complement() => Complement();
+        public RangeSet<T> Complement() => Complement(this);
 
 
         public static bool operator ==(RangeSet<T> left, RangeSet<T> right) => left.Equals(right);
@@ -267,7 +267,6 @@ namespace Veruthian.Library.Numeric.Ranges
 
         // From Complement
         public static TSet Complement(TSet set) => FromComplement(set);
-
 
         protected static TSet FromComplement(TSet set)
         {
