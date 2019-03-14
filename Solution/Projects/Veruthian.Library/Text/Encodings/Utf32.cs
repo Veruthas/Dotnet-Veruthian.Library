@@ -55,44 +55,7 @@ namespace Veruthian.Library.Text.Encodings
             if (IsOutOfRange(value))
                 throw CodePointOutOfRange(value);
         }
-
-        public static bool IsNewLine(uint value, uint next)
-        {
-            // \r
-            if (value == Chars.Cr)
-                // only newline if not \r\n
-                return next != Chars.Lf;
-            // \n
-            else if (value == Chars.Lf)
-                return true;
-            else
-                return false;
-        }
-
-        public static LineEnding GetNewLine(uint value, uint next)
-        {
-            if (value == Chars.Cr)
-                return next == Chars.Lf ? LineEnding.CrLf : LineEnding.Cr;
-            else if (value == Chars.Lf)
-                return LineEnding.Lf;
-            else
-                return LineEnding.None;
-        }
-
-        public static int GetLineEndingSize(LineEnding ending)
-        {
-            switch (ending)
-            {
-                case LineEnding.Cr:
-                case LineEnding.Lf:
-                    return 1;
-                case LineEnding.CrLf:
-                    return 2;
-                default:
-                    return 0;
-            }
-        }
-
+       
 
         public static class Chars
         {

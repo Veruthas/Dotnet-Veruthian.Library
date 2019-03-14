@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Runes;
 
-namespace Veruthian.Library.Text
+namespace Veruthian.Library.Text.Lines
 {
     // Due to Utf16 vs Utf32 differences, don't mix chars and Runes.
     public class LineIndexTable : IEnumerable<(int Start, int Length, LineEnding ending)>
@@ -71,7 +71,7 @@ namespace Veruthian.Library.Text
             }
             else
             {
-                ending = Utf32.GetNewLine(current, next);
+                ending = LineEndings.GetNewLine(current, next);
 
                 if (ending == LineEnding.Cr || ending == LineEnding.Lf)
                     lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
@@ -130,7 +130,7 @@ namespace Veruthian.Library.Text
             {
                 var line = lines[lineNumber];
 
-                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
+                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
             }
             else
             {
@@ -141,7 +141,7 @@ namespace Veruthian.Library.Text
         public IEnumerable<RuneString> ExtractLines(RuneString value, bool includeEnd = true)
         {
             foreach (var line in lines)
-                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
+                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
         }
 
 
@@ -168,7 +168,7 @@ namespace Veruthian.Library.Text
             {
                 var line = lines[lineNumber];
 
-                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
+                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
             }
             else
             {
@@ -179,7 +179,7 @@ namespace Veruthian.Library.Text
         public IEnumerable<string> ExtractLines(string value, bool includeEnd = true)
         {
             foreach (var line in lines)
-                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : Utf32.GetLineEndingSize(line.Ending)));
+                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
         }
 
 
