@@ -465,6 +465,16 @@ namespace Veruthian.Library.Text.Runes
             return builder.ToString();
         }
 
+        public string ToPrintableString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach(var rune in runes)            
+                builder.Append(rune.ToPrintableString());
+
+            return builder.ToString();
+        }
+        
         #endregion
 
         #region Enumerator
