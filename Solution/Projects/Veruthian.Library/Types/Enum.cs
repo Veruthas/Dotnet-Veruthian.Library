@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Types
 {
     public abstract class Enum<E> : IBounded<E>, ISequential<E>, IFormattable
         where E : Enum<E>
