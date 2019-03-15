@@ -4,7 +4,7 @@ using System.Text;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Numeric.Ranges
+namespace Veruthian.Library.Numeric
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
         where T : ISequential<T>, IBounded<T>

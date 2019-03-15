@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Numeric.Ranges
+namespace Veruthian.Library.Numeric
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
         where T : ISequential<T>, IBounded<T>
