@@ -4,7 +4,7 @@ using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Runes;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Text
+namespace Veruthian.Library.Text.Lines
 {
     public struct TextLocation : IEquatable<TextLocation>
     {
@@ -36,7 +36,7 @@ namespace Veruthian.Library.Text
         }
 
 
-        private TextLocation MoveToNextUtf32(uint current, uint next) => Utf32.IsNewLine(current, next) ? this.IncrementLine() : this + 1;
+        private TextLocation MoveToNextUtf32(uint current, uint next) => LineEndings.IsNewLine(current, next) ? this.IncrementLine() : this + 1;
 
 
         public TextLocation MoveToNext(Rune current, Rune next) => MoveToNextUtf32(current, next);
