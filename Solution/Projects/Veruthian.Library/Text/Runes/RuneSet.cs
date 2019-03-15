@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections;
-using Veruthian.Library.Numeric.Ranges;
+using Veruthian.Library.Numeric;
 using Veruthian.Library.Text.Runes.Extensions;
 
 namespace Veruthian.Library.Text.Runes
