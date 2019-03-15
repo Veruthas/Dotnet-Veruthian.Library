@@ -72,7 +72,7 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                ending = LineEndings.GetNewLine(current, next);
+                ending = LineEnding.FromValues(current, next);
 
                 if (ending == LineEnding.Cr || ending == LineEnding.Lf)
                     lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
@@ -121,7 +121,7 @@ namespace Veruthian.Library.Text.Lines
             {
                 var line = lines[lineNumber];
 
-                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
+                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : line.Ending.Size));
             }
             else
             {
@@ -132,7 +132,7 @@ namespace Veruthian.Library.Text.Lines
         public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
         {
             foreach (var line in lines)
-                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
+                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : line.Ending.Size));
         }
 
 

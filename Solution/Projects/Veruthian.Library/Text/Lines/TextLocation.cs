@@ -36,7 +36,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        private TextLocation MoveToNextUtf32(uint current, uint next) => LineEndings.IsNewLine(current, next) ? this.IncrementLine() : this + 1;
+        private TextLocation MoveToNextUtf32(uint current, uint next) => LineEnding.IsNewLine(current, next) ? this.IncrementLine() : this + 1;
 
 
         public TextLocation MoveToNext(Rune current, Rune next) => MoveToNextUtf32(current, next);

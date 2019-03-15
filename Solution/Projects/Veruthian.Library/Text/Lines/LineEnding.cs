@@ -1,45 +1,34 @@
+using Veruthian.Library.Types;
 using Veruthian.Library.Text.Encodings;
 using static Veruthian.Library.Text.Encodings.Utf32;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public enum LineEnding
+    public sealed class LineEnding : Enum<LineEnding>
     {
-        None,
+        readonly string abberviated;
 
-        Cr,
+        readonly string value;
 
-        Lf,
+        readonly int size;
 
-        CrLf,
 
-        NewLine = Lf,
-
-        LineFeed = Lf,
-
-        CarriageReturn = Cr,
-
-        CarriageReturnLineFeed = CrLf,
-
-        EndOfFile
-    }
-
-    public static class LineEndings
-    {
-        public static string GetNewLineString(LineEnding ending)
+        private LineEnding(string name, string abberivated, string value, int size) : base(name)
         {
-            switch (ending)
-            {
-                case LineEnding.Cr:
-                    return "\r";
-                case LineEnding.Lf:
-                    return "\n";
-                case LineEnding.CrLf:
-                    return "\r\n";
-                default:
-                    return "";
-            }
+            this.abberviated = abberivated;
+
+            this.value = value;
+
+            this.size = size;
         }
+
+
+        public string AbbreviatedName => abberviated;
+
+        public string Value => value;
+
+        public int Size => size;
+
 
         public static bool IsNewLine(uint value, uint next)
         {
@@ -53,7 +42,7 @@ namespace Veruthian.Library.Text.Lines
                 return false;
         }
 
-        public static LineEnding GetNewLine(uint value, uint next)
+        public static LineEnding FromValues(uint value, uint next)
         {
             if (value == Utf32.Chars.Cr)
                 return next == Utf32.Chars.Lf ? LineEnding.CrLf : LineEnding.Cr;
@@ -63,19 +52,19 @@ namespace Veruthian.Library.Text.Lines
                 return LineEnding.None;
         }
 
-        public static int GetLineEndingSize(LineEnding ending)
-        {
-            switch (ending)
-            {
-                case LineEnding.Cr:
-                case LineEnding.Lf:
-                    return 1;
-                case LineEnding.CrLf:
-                    return 2;
-                default:
-                    return 0;
-            }
-        }
 
+        public static readonly LineEnding None = new LineEnding("None", "None", "", 0);
+
+        public static readonly LineEnding CarriageReturn = new LineEnding("CarriageReturn", "Cr", "\r", 1);
+
+        public static readonly LineEnding LineFeed = new LineEnding("LineFeed", "Lf", "\n", 1);
+
+        public static readonly LineEnding CarriageReturnLineFeed = new LineEnding("CarriageReturnLineFeed", "CrLf", "\r\n", 2);
+
+        public static readonly LineEnding Cr = CarriageReturn;
+
+        public static readonly LineEnding Lf = LineFeed;
+
+        public static readonly LineEnding CrLf = CarriageReturnLineFeed;
     }
 }
