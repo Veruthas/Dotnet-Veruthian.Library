@@ -130,7 +130,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
         public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
-        {
+        {                        
             foreach (var line in lines)
                 yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : line.Ending.Size));
         }
