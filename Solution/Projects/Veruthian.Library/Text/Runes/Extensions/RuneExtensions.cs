@@ -237,14 +237,14 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // LineTracking
-        public static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, out LineIndexTable lines)
+        public static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, out RuneLineTable lines)
         {
-            lines = new LineIndexTable();
+            lines = new RuneLineTable();
 
             return ProcessLines(runes, lines);
         }
 
-        private static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, LineIndexTable lines)
+        private static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, RuneLineTable lines)
         {
             Rune current = '\0';
 

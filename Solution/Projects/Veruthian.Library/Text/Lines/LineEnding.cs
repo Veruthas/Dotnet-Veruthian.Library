@@ -1,3 +1,4 @@
+using Veruthian.Library.Text.Encodings;
 using static Veruthian.Library.Text.Encodings.Utf32;
 
 namespace Veruthian.Library.Text.Lines
@@ -43,10 +44,10 @@ namespace Veruthian.Library.Text.Lines
         public static bool IsNewLine(uint value, uint next)
         {
             // \r
-            if (value == Chars.Cr)
-                return next != Chars.Lf; // only newline if not \r\n
+            if (value == Utf32.Chars.Cr)
+                return next != Utf32.Chars.Lf; // only newline if not \r\n
             // \n
-            else if (value == Chars.Lf)
+            else if (value == Utf32.Chars.Lf)
                 return true;
             else
                 return false;
@@ -54,9 +55,9 @@ namespace Veruthian.Library.Text.Lines
 
         public static LineEnding GetNewLine(uint value, uint next)
         {
-            if (value == Chars.Cr)
-                return next == Chars.Lf ? LineEnding.CrLf : LineEnding.Cr;
-            else if (value == Chars.Lf)
+            if (value == Utf32.Chars.Cr)
+                return next == Utf32.Chars.Lf ? LineEnding.CrLf : LineEnding.Cr;
+            else if (value == Utf32.Chars.Lf)
                 return LineEnding.Lf;
             else
                 return LineEnding.None;

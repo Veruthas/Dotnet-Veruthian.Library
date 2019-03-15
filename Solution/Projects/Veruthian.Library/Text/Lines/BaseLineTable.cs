@@ -5,13 +5,13 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    // Due to Utf16 vs Utf32 differences, don't mix chars and Runes.
-    public class LineIndexTable : IEnumerable<(int Start, int Length, LineEnding ending)>
+    public abstract class BaseLineTable<U, S> : IEnumerable<(int Start, int Length, LineEnding ending)>
+        where S : IEnumerable<U>
     {
         List<(int Start, int Length, LineEnding Ending)> lines;
 
 
-        public LineIndexTable()
+        public BaseLineTable()
         {
             lines = new List<(int Start, int Length, LineEnding Ending)>();
 
@@ -56,6 +56,7 @@ namespace Veruthian.Library.Text.Lines
             return new TextLocation(position, lineNumber, position - line.Start);
         }
 
+
         private void MoveToNextUtf32(uint current, uint next)
         {
             int lineIndex = lines.Count - 1;
@@ -81,22 +82,10 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        public void MoveToNext(Rune current, Rune next) => MoveToNextUtf32(current, next);
-
-        public void MoveToNext(char current, char next) => MoveToNextUtf32(current, next);
+        public void MoveToNext(U current, U next) => MoveToNextUtf32(ConvertToUtf32(current), ConvertToUtf32(next));
 
 
-        public void MoveThrough(Rune current, IEnumerable<Rune> following)
-        {
-            foreach (var next in following)
-            {
-                MoveToNext(current, next);
-
-                current = next;
-            }
-        }
-
-        public void MoveThrough(char current, IEnumerable<char> following)
+        public void MoveThrough(U current, IEnumerable<U> following)
         {
             foreach (var next in following)
             {
@@ -107,24 +96,26 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        private RuneString ExtractLine(RuneString value, int start, int length)
+        private S ExtractLine(S value, int start, int length)
         {
-            if (start <= value.Length)
+            var valueLength = GetLength(value);
+
+            if (start <= valueLength)
             {
                 var end = start + length;
 
-                if (end > value.Length)
-                    end = value.Length - start;
+                if (end > valueLength)
+                    end = valueLength - start;
 
-                return value.Slice(start, length);
+                return Slice(value, start, length);
             }
             else
             {
-                return null;
+                return default(S);
             }
         }
 
-        public RuneString ExtractLine(RuneString value, int lineNumber, bool includeEnd = true)
+        public S ExtractLine(S value, int lineNumber, bool includeEnd = true)
         {
             if (lineNumber > 0 && lineNumber < lines.Count)
             {
@@ -134,57 +125,27 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                return null;
+                return default(S);
             }
         }
 
-        public IEnumerable<RuneString> ExtractLines(RuneString value, bool includeEnd = true)
+        public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
         {
             foreach (var line in lines)
                 yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
         }
 
-
-        private string ExtractLine(string value, int start, int length)
-        {
-            if (start <= value.Length)
-            {
-                var end = start + length;
-
-                if (end > value.Length)
-                    end = value.Length - start;
-
-                return value.Substring(start, length);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public string ExtractLine(string value, int lineNumber, bool includeEnd = true)
-        {
-            if (lineNumber > 0 && lineNumber < lines.Count)
-            {
-                var line = lines[lineNumber];
-
-                return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public IEnumerable<string> ExtractLines(string value, bool includeEnd = true)
-        {
-            foreach (var line in lines)
-                yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : LineEndings.GetLineEndingSize(line.Ending)));
-        }
 
 
         public IEnumerator<(int Start, int Length, LineEnding ending)> GetEnumerator() => this.lines.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+        protected abstract uint ConvertToUtf32(U value);
+
+        protected abstract int GetLength(S value);
+
+        protected abstract S Slice(S value, int start, int length);
     }
 }
