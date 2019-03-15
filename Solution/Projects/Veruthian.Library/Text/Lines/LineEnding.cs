@@ -6,16 +6,16 @@ namespace Veruthian.Library.Text.Lines
 {
     public sealed class LineEnding : Enum<LineEnding>
     {
-        readonly string abberviated;
+        readonly string description;
 
         readonly string value;
 
         readonly int size;
 
 
-        private LineEnding(string name, string abberivated, string value, int size) : base(name)
+        private LineEnding(string name, string description, string value, int size) : base(name)
         {
-            this.abberviated = abberivated;
+            this.description = description;
 
             this.value = value;
 
@@ -23,7 +23,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        public string AbbreviatedName => abberviated;
+        public string Description => description;
 
         public string Value => value;
 
@@ -53,18 +53,18 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        public static readonly LineEnding None = new LineEnding("None", "None", "", 0);
+        public static readonly LineEnding None = new LineEnding("None", "None or End of File", "", 0);
 
-        public static readonly LineEnding CarriageReturn = new LineEnding("CarriageReturn", "Cr", "\r", 1);
+        public static readonly LineEnding Cr = new LineEnding("Cr", "Carriage Return", "\r", 1);
 
-        public static readonly LineEnding LineFeed = new LineEnding("LineFeed", "Lf", "\n", 1);
+        public static readonly LineEnding Lf= new LineEnding("Lf", "Line Feed", "\n", 1);
 
-        public static readonly LineEnding CarriageReturnLineFeed = new LineEnding("CarriageReturnLineFeed", "CrLf", "\r\n", 2);
+        public static readonly LineEnding CrLf= new LineEnding("CrLf", "Carriage Return + Line Feed", "\r\n", 2);
 
-        public static readonly LineEnding Cr = CarriageReturn;
+        public static readonly LineEnding CarriageReturn = Cr;
 
-        public static readonly LineEnding Lf = LineFeed;
+        public static readonly LineEnding LineFeed = Lf ;
 
-        public static readonly LineEnding CrLf = CarriageReturnLineFeed;
+        public static readonly LineEnding CarriageReturnLineFeed= CrLf;
     }
 }
