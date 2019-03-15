@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace Veruthian.Library.Text.Extensions
+namespace Veruthian.Library.Text.Chars.Extensions
 {
-    public static class StringExtensions
+    public static class CharExtensions
     {
         // Printable Chars
         public static string GetAsPrintable(this char value)
