@@ -890,5 +890,1227 @@ namespace Veruthian.Library.Types.Extensions
         #endregion
 
         #endregion
+
+        #region Get
+
+        public static T Get<T>(this (T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+                case 25:
+                    return tuple.Item26;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+                case 25:
+                    return tuple.Item26;
+                case 26:
+                    return tuple.Item27;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+                case 25:
+                    return tuple.Item26;
+                case 26:
+                    return tuple.Item27;
+                case 27:
+                    return tuple.Item28;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+                case 25:
+                    return tuple.Item26;
+                case 26:
+                    return tuple.Item27;
+                case 27:
+                    return tuple.Item28;
+                case 28:
+                    return tuple.Item29;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        public static T Get<T>(this (T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T) tuple, int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return tuple.Item1;
+                case 1:
+                    return tuple.Item2;
+                case 2:
+                    return tuple.Item3;
+                case 3:
+                    return tuple.Item4;
+                case 4:
+                    return tuple.Item5;
+                case 5:
+                    return tuple.Item6;
+                case 6:
+                    return tuple.Item7;
+                case 7:
+                    return tuple.Item8;
+                case 8:
+                    return tuple.Item9;
+                case 9:
+                    return tuple.Item10;
+                case 10:
+                    return tuple.Item11;
+                case 11:
+                    return tuple.Item12;
+                case 12:
+                    return tuple.Item13;
+                case 13:
+                    return tuple.Item14;
+                case 14:
+                    return tuple.Item15;
+                case 15:
+                    return tuple.Item16;
+                case 16:
+                    return tuple.Item17;
+                case 17:
+                    return tuple.Item18;
+                case 18:
+                    return tuple.Item19;
+                case 19:
+                    return tuple.Item20;
+                case 20:
+                    return tuple.Item21;
+                case 21:
+                    return tuple.Item22;
+                case 22:
+                    return tuple.Item23;
+                case 23:
+                    return tuple.Item24;
+                case 24:
+                    return tuple.Item25;
+                case 25:
+                    return tuple.Item26;
+                case 26:
+                    return tuple.Item27;
+                case 27:
+                    return tuple.Item28;
+                case 28:
+                    return tuple.Item29;
+                case 29:
+                    return tuple.Item30;
+
+                default:
+                    return default(T);
+            }
+        }
+
+        #endregion
     }
 }

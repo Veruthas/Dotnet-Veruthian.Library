@@ -18,56 +18,41 @@ namespace _Console
         // Enumerate
         public static string GenerateTupleEnumerate(int size)
         {
-            string value = "";
-            value += "public static IEnumerable<T> Enumerate<T>(this (";
+            string template =
+@"public static IEnumerable<T> Enumerate<T>(this(*ITEMS*) tuple)
+{
+*YIELDS*}
+";
+
+            string itemsString = "";
 
             for (int i = 0; i < size; i++)
-                value += i == 0 ? "T" : ", T";
+            {
+                if (i != 0) itemsString += ", ";
 
-            value += ") tuple)\n";
-            value += "{\n";
+                itemsString += "T";
+            }
 
-            for (int i = 0; i < size; i++)
-                value += $"\tyield return tuple.Item{i + 1};\n";
-
-            value += "}\n\n";
-
-            return value;
-        }
-
-        public static string GenerateCastedTupleEnumerate(int size)
-        {
-            string value = "";
-            value += "public static IEnumerable<T> Enumerate<T";
+            string yieldsString = "";
 
             for (int i = 0; i < size; i++)
-                value += $", T{i + 1}";
+            {
+                yieldsString += $"\tyield return tuple.Item{i + 1};\n";
+            }
 
-            value += ">(this (";
 
-            for (int i = 0; i < size; i++)
-                value += i == 0 ? "T" : ", T";
+            template = template.Replace("*ITEMS*", itemsString);
 
-            value += ") tuple)\n";
+            template = template.Replace("*YIELDS*", yieldsString);
 
-            for (int i = 0; i < size; i++)
-                value += $"\twhere T{i + 1} : T\n";
-
-            value += "{\n";
-
-            for (int i = 0; i < size; i++)
-                value += $"\tyield return (T)tuple.Item{i + 1};\n";
-
-            value += "}\n\n";
-
-            return value;
+            return template;
         }
 
 
         // Count
         public static string GenerateTupleCount(int size)
         {
-            string template = 
+            string template =
 @"public static int Count<*GENERICS*>(this (*ITEMS*) tuple)
 {
     return *SIZE*;
@@ -100,7 +85,7 @@ namespace _Console
 
         public static string GenerateCastedTupleCount(int size)
         {
-            string template = 
+            string template =
 @"public static int Count<*GENERICS*>(this (*ITEMS*) tuple)
 {
     return *SIZE*;
@@ -128,6 +113,50 @@ namespace _Console
             template = template.Replace("*SIZE*", sizeString);
 
             return template;
-        }    
+        }
+
+
+        // Get
+        public static string GenerateTupleGet(int size)
+        {
+            string template =
+@"public static T Get<T*GENERICS*>(this (*ITEMS*) tuple, int index)
+{
+    switch (index)
+    {
+*SWITCH*
+        default:
+            return default(T);
+    }
+}
+
+";
+            string genericsString = "";
+
+            string itemsString = "";
+
+            for (int i = 0; i < size; i++)
+            {
+                if (i != 0) itemsString += ", ";
+
+                itemsString += $"T";
+            }
+
+            string switchString = "";
+
+            for (int i = 0; i < size; i++)
+            {
+                switchString += $"\t\tcase {i}:\n";
+                switchString += $"\t\t\treturn tuple.Item{i + 1};\n";
+            }
+
+            template = template.Replace("*GENERICS*", genericsString);
+
+            template = template.Replace("*ITEMS*", itemsString);
+
+            template = template.Replace("*SWITCH*", switchString);
+
+            return template;
+        }
     }
 }
