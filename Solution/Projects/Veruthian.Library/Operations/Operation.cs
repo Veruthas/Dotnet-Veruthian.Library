@@ -101,20 +101,30 @@ namespace Veruthian.Library.Operations
         }
 
         IEnumerator<IOperation<TState>> IEnumerable<IOperation<TState>>.GetEnumerator() => GetEnumerator();
-        
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         IEnumerable<int> ILookup<int, IOperation<TState>>.Keys => Enumerables.GetRange(0, Count);
 
-        IEnumerable<(int, IOperation<TState>)> ILookup<int, IOperation<TState>>.Pairs 
+        IEnumerable<(int, IOperation<TState>)> ILookup<int, IOperation<TState>>.Pairs
         {
             get
             {
-                for (int i = 0; i < Count;i++)
+                for (int i = 0; i < Count; i++)
                     yield return (i, GetSubOperation(i));
             }
         }
 
         #endregion
+
+        #region Validation Helpers
+
+        protected void CheckForNullOperation(IOperation<TState> operation, string name = null)
+        {
+            if (operation == null)
+                throw new ArgumentNullException($"Operation {(string.IsNullOrWhiteSpace(name) ? "${name} " : "")}cannot be null!");
+        }
+
+        #endregion        
     }
 }

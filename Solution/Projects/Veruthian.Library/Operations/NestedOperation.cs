@@ -6,13 +6,7 @@ namespace Veruthian.Library.Operations
     {
         readonly IOperation<TState> operation;
 
-        public NestedOperation(IOperation<TState> operation)
-        {
-            if (operation == null)
-                throw new ArgumentNullException("Operation cannot be null!");
-
-            this.operation = operation;
-        }
+        public NestedOperation(IOperation<TState> operation) => this.operation = operation;
 
 
         protected IOperation<TState> Operation => operation;
