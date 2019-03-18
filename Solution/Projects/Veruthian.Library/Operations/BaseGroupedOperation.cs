@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Veruthian.Library.Operations
 {
-    public abstract class GroupedOperation<TState> : Operation<TState>
+    public abstract class BaseGroupedOperation<TState> : BaseOperation<TState>
     {
         private IOperation<TState>[] operations;
 
 
-        protected GroupedOperation(IEnumerable<IOperation<TState>> items) => this.operations = items.ToArray();
+        protected BaseGroupedOperation(IEnumerable<IOperation<TState>> items) => this.operations = items.ToArray();
 
-        protected GroupedOperation(GroupedOperation<TState> left, GroupedOperation<TState> right)
+        protected BaseGroupedOperation(BaseGroupedOperation<TState> left, BaseGroupedOperation<TState> right)
         {
             this.operations = new IOperation<TState>[left.operations.Length + right.operations.Length];
 
@@ -23,7 +23,7 @@ namespace Veruthian.Library.Operations
                 operations[offset + i] = left.operations[i];
         }
 
-        protected GroupedOperation(IEnumerable<GroupedOperation<TState>> groups)
+        protected BaseGroupedOperation(IEnumerable<BaseGroupedOperation<TState>> groups)
         {
             var items = groups.ToArray();
 

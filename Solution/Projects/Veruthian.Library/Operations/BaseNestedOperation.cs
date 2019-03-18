@@ -2,11 +2,11 @@ using System;
 
 namespace Veruthian.Library.Operations
 {
-    public abstract class NestedOperation<TState> : Operation<TState>
+    public abstract class BaseNestedOperation<TState> : BaseOperation<TState>
     {
         readonly IOperation<TState> operation;
 
-        public NestedOperation(IOperation<TState> operation) => this.operation = operation;
+        public BaseNestedOperation(IOperation<TState> operation) => this.operation = operation;
 
 
         protected IOperation<TState> Operation => operation;

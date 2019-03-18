@@ -6,7 +6,7 @@ using Veruthian.Library.Collections;
 namespace Veruthian.Library.Operations
 {
 
-    public abstract class Operation<TState> : IOperation<TState>, IIndex<IOperation<TState>>
+    public abstract class BaseOperation<TState> : IOperation<TState>, IIndex<IOperation<TState>>
     {
         #region Abstracts
 

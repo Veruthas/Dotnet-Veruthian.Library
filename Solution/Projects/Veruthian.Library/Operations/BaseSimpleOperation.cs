@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Operations
 {
-    public abstract class SimpleOperation<TState> : Operation<TState>
+    public abstract class BaseSimpleOperation<TState> : BaseOperation<TState>
     {
         protected override int Count => 0;
 
