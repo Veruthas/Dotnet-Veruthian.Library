@@ -24,12 +24,12 @@ namespace Veruthian.Library.Operations
         public bool Perform(TState state, ITracer<TState> tracer = null)
         {
             if (tracer != null)
-                tracer.OnStarting(this, state);
+                tracer.OnStart(this, state);
 
             bool result = DoAction(state, tracer);
 
             if (tracer != null)
-                tracer.OnFinishing(this, state, result);
+                tracer.OnFinish(this, state, result);
 
             return result;
         }
