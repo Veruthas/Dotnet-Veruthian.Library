@@ -8,7 +8,6 @@ namespace Veruthian.Library.Collections.Extensions
     public static class CollectionExtensions
     {
         // Helpers
-
         private static void VerifyPositive(int value, string argument)
         {
             if (value < 0)
@@ -19,9 +18,26 @@ namespace Veruthian.Library.Collections.Extensions
         {
             if (index < start || index >= end)
                 throw new IndexOutOfRangeException();
-        }        
+        }
+
 
         // Array extensions
+        public static T[] Copy<T>(this T[] array)
+        {
+            if (array == null)
+            {
+                return null;
+            }
+            else
+            {
+                var newArray = new T[array.Length];
+
+                Array.Copy(array, newArray, array.Length);
+
+                return newArray;
+            }
+        }
+
         public static T[] Resize<T>(this T[] array, int size)
         {
             VerifyPositive(size, nameof(size));
@@ -41,8 +57,7 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
-
-        public static T[] Append<T>(this T[] array, int amount)
+        public static T[] AppendSpace<T>(this T[] array, int amount)
         {
             VerifyPositive(amount, nameof(amount));
 
@@ -62,7 +77,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] Prepend<T>(this T[] array, int amount)
+        public static T[] PrependSpace<T>(this T[] array, int amount)
         {
             VerifyPositive(amount, nameof(amount));
 
@@ -71,7 +86,7 @@ namespace Veruthian.Library.Collections.Extensions
                 return new T[amount];
             }
             else
-            {                
+            {
                 int size = array.Length + amount;
 
                 var newArray = new T[size];
@@ -82,15 +97,15 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] Insert<T>(this T[] array, int index, int amount)
+        public static T[] InsertSpace<T>(this T[] array, int index, int amount)
         {
             if (index == 0)
             {
-                return Prepend(array, amount);
+                return PrependSpace(array, amount);
             }
             else if (index == array.Length)
             {
-                return Append(array, amount);
+                return AppendSpace(array, amount);
             }
             else
             {
@@ -108,29 +123,39 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] Copy<T>(this T[] array)
+
+
+        public static T[] Append<T>(this T[] array, T item)
         {
-            if (array == null)
-            {
-                return null;
-            }            
-            else
-            {
-                var newArray = new T[array.Length];
+            var newArray = array.AppendSpace(1);
 
-                Array.Copy(array, newArray, array.Length);
+            newArray[array.Length] = item;
 
-                return newArray;
-            }
+            return newArray;
         }
+
+        public static T[] Prepend<T>(this T[] array, T item)
+        {
+            var newArray = array.PrependSpace(1);
+
+            newArray[0] = item;
+
+            return newArray;
+        }
+
+        public static T[] Insert<T>(this T[] array, int index, T item)
+        {
+            var newArray = array.InsertSpace(index, 1);
+
+            newArray[index] = item;
+
+            return newArray;
+        }
+
 
 
         // Repeat
-        public static IEnumerable<T> Repeat<T>(this T value, int times = 1)
-        {
-            for (int i = 0; i < times; i++)
-                yield return value;
-        }
+        public static IEnumerable<T> Repeat<T>(this T value, int times = 1) => Enumerables.Repeat(value, times);
 
         public static T[] RepeatAsArray<T>(this T value, int times = 1)
         {
