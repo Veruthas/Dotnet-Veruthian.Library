@@ -14,11 +14,24 @@ namespace Veruthian.Library.Collections
 
         public DataList(int capacity) => this.items = new List<T>(capacity);
 
-        public DataList(IEnumerable<T> items)
+        public DataList(IEnumerable<T> items) => this.items = new List<T>(items);
+
+        public DataList(IEnumerable<T> items, int capacity)
         {
-            this.items = new List<T>(items);
+            this.items = new List<T>(capacity);
 
             this.items.AddRange(items);
+        }
+
+
+        public static DataList<T> New(int size)
+        {
+            var list = new DataList<T>(size);
+
+            for (int i = 0; i < size; i++)
+                list.Add(default(T));
+
+            return list;
         }
 
         public static DataList<T> Of(T item)
@@ -35,7 +48,6 @@ namespace Veruthian.Library.Collections
         public static DataList<T> Extract(IEnumerable<T> items) => new DataList<T>(items);
 
         public static DataList<T> Extract(IEnumerable<T> items, int amount) => new DataList<T>(items.Extract(amount));
-
 
 
         public sealed override int Count => items.Count;
