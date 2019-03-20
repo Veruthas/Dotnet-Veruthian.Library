@@ -27,7 +27,7 @@ namespace Veruthian.Library.Collections
 
         public static IEnumerable<T> GetNotifyingEnumerable<T>(IEnumerable<T> enumerable, MoveNext<T> notify)
         {
-            foreach(var item in enumerable)
+            foreach (var item in enumerable)
             {
                 if (notify != null)
                     notify(true, item);
@@ -36,7 +36,7 @@ namespace Veruthian.Library.Collections
             }
 
             if (notify != null)
-                notify(false, default(T));            
+                notify(false, default(T));
         }
 
         #endregion
@@ -60,16 +60,24 @@ namespace Veruthian.Library.Collections
 
         #region Ranges
 
-        public static IEnumerable<int> GetRange(int start, int end, int step = 1)
+        public static IEnumerable<int> GetRange(int first, int last, int step = 1)
         {
-            for (int i = start; i <= end; i += step)
-                yield return i;
+            if (first < last)
+                for (var i = first; i <= last; i += step)
+                    yield return i;
+            else
+                for (var i = first; i >= last; i -= step)
+                    yield return i;
         }
 
-        public static IEnumerable<long> GetRange(long start, long end, long step = 1)
+        public static IEnumerable<long> GetRange(long first, long last, long step = 1)
         {
-            for (long i = start; i <= end; i += step)
-                yield return i;
+            if (first < last)
+                for (var i = first; i <= last; i += step)
+                    yield return i;
+            else
+                for (var i = first; i >= last; i -= step)
+                    yield return i;
         }
 
         #endregion

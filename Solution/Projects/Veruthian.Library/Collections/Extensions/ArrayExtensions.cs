@@ -1,29 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections.Extensions
 {
     public static class ArrayExtensions
     {
-        // Helpers
-        private static void VerifyPositive(int value, string argument)
-        {
-            if (value < 0)
-                throw new ArgumentException(argument);
-        }
-
-        private static void VerifyBounds(int index, int start, int end)
-        {
-            if (index < start || index >= end)
-                throw new IndexOutOfRangeException();
-        }
-
-
         // Resize
         public static T[] Resize<T>(this T[] array, int size)
         {
-            VerifyPositive(size, nameof(size));
+            ExceptionHelper.VerifyPositive(size, nameof(size));
 
             if (array == null || array.Length == 0)
             {
@@ -56,7 +43,6 @@ namespace Veruthian.Library.Collections.Extensions
                 return newArray;
             }
         }
-
 
         // Copy To
         public static void CopyTo<T>(this T[] source, T[] destination)
@@ -95,7 +81,7 @@ namespace Veruthian.Library.Collections.Extensions
         // Insert Space
         public static T[] AppendSpace<T>(this T[] array, int amount)
         {
-            VerifyPositive(amount, nameof(amount));
+            ExceptionHelper.VerifyPositive(amount, nameof(amount));
 
             if (array == null || array.Length == 0)
             {
@@ -115,7 +101,7 @@ namespace Veruthian.Library.Collections.Extensions
 
         public static T[] PrependSpace<T>(this T[] array, int amount)
         {
-            VerifyPositive(amount, nameof(amount));
+            ExceptionHelper.VerifyPositive(amount, nameof(amount));
 
             if (array == null || array.Length == 0)
             {
@@ -145,7 +131,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                VerifyBounds(index, 0, array.Length);
+                ExceptionHelper.VerifyIndexInBounds(index, 0, array.Length);
 
                 int size = array.Length + amount;
 
@@ -332,10 +318,7 @@ namespace Veruthian.Library.Collections.Extensions
         // Combine
         public static T[] Combine<T>(params T[][] arrays) => Combine((IEnumerable<T[]>)arrays);
 
-        public static T[] Combine<T>(IEnumerable<T[]> arrays)
-        {
-            return Combine(arrays.GetEnumerator(), 0);
-        }
+        public static T[] Combine<T>(IEnumerable<T[]> arrays) => Combine(arrays.GetEnumerator(), 0);
 
         private static T[] Combine<T>(IEnumerator<T[]> arrays, int size)
         {
@@ -353,6 +336,20 @@ namespace Veruthian.Library.Collections.Extensions
             {
                 return new T[size];
             }
+        }
+
+
+        // Mutliply
+        public static T[] Multiply<T>(this T[] array, int times)
+        {
+            ExceptionHelper.VerifyPositive(times, nameof(times));
+
+            var newArray = new T[array.Length * times];
+
+            for (int i = 0; i < times; i++)
+                newArray.CopyFrom(array, 0, i * array.Length, array.Length);
+
+            return newArray;
         }
     }
 }

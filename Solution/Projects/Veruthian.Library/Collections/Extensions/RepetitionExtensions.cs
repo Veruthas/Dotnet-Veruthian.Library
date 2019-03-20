@@ -28,7 +28,7 @@ namespace Veruthian.Library.Collections.Extensions
 
         public static DataArray<T> RepeatAsDataArray<T>(this T value, int times = 1)
         {
-            var items = new DataArray<T>(times);
+            var items = DataArray<T>.New(times);
 
             for (int i = 0; i < times; i++)
                 items[i] = value;
