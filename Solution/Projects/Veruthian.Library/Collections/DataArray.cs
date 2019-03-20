@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
@@ -10,32 +12,25 @@ namespace Veruthian.Library.Collections
     {
         T[] items;
 
-        public DataArray() : this(0) { }
+        public DataArray() => items = new T[0];
 
-        public DataArray(params T[] items) => this.items = (T[])items.Clone();
+        private DataArray(T[] items) => this.items = items;
 
-        public DataArray(IEnumerable<T> items) => this.items = items.ToArray();
 
-        public DataArray(int size)
+        public static DataArray<T> New(int size)
         {
-            if (size < 0)
-                throw new ArgumentOutOfRangeException("size", size, "Size cannot be negative");
+            ExceptionHelper.VerifyPositive(size, nameof(size));
 
-            this.items = new T[size];
+            return new DataArray<T>(new T[size]);
         }
-        
-        public DataArray(int size, IEnumerable<T> items) : this(size)
-        {
-            var i = 0;
 
-            foreach (var item in items)
-            {
-                if (i < size)
-                    this.items[i++] = item;
-                else
-                    break;
-            }
-        }
+        public static DataArray<T> Of(T item) => new DataArray<T>(new T[] {item});
+
+        public static DataArray<T> From(params T[] items) => new DataArray<T>(items.Copy());
+
+        public static DataArray<T> Extract(IEnumerable<T> items) => new DataArray<T>(items.ToArray());
+
+        public static DataArray<T> Extract(IEnumerable<T> items, int amount) => new DataArray<T>(items.ToArray(amount));
 
 
         public sealed override int Count => items.Length;
@@ -65,5 +60,33 @@ namespace Veruthian.Library.Collections
 
             return false;
         }
+
+
+        public static implicit operator DataArray<T>(T item) => new DataArray<T>(new T[] { item });
+
+        public static DataArray<T> operator +(DataArray<T> items, T item) => new DataArray<T>(items.items.Append(item));
+
+        public static DataArray<T> operator +(T item, DataArray<T> items) => new DataArray<T>(items.items.Prepend(item));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, T[] right) => new DataArray<T>(left.items.AppendArray(right));
+
+        public static DataArray<T> operator +(T[] left, DataArray<T> right) => new DataArray<T>(right.items.PrependArray(left));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, IEnumerable<T> right) => new DataArray<T>(left.items.AppendEnumerable(right));
+
+        public static DataArray<T> operator +(IEnumerable<T> left, DataArray<T> right) => new DataArray<T>(right.items.PrependEnumerable(left));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, IContainer<T> right) => new DataArray<T>(left.items.AppendContainer(right));
+
+        public static DataArray<T> operator +(IContainer<T> left, DataArray<T> right) => new DataArray<T>(right.items.PrependContainer(left));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, DataArray<T> right) => new DataArray<T>(left.items.AppendContainer(right));
+
+
+        public static DataArray<T> operator *(DataArray<T> items, int times) => new DataArray<T>(items.items.Multiply(times));
     }
 }
