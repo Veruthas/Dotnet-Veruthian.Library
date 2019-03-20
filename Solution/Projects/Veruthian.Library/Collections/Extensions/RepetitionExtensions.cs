@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections.Extensions
 {
-    public static class RepititionExtensions
+    public static class RepetitionExtensions
     {
         public static IEnumerable<T> Repeat<T>(this T value, int times = 1) => Enumerables.Repeat(value, times);
 

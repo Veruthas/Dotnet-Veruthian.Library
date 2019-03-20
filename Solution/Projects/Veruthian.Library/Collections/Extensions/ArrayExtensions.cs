@@ -263,7 +263,7 @@ namespace Veruthian.Library.Collections.Extensions
             return array.InsertArray(index, items.ToArray());
         }
 
-       
+
         // Insert Container
         public static T[] AppendContainer<T>(this T[] array, IContainer<T> items)
         {
@@ -325,6 +325,33 @@ namespace Veruthian.Library.Collections.Extensions
                     newArray[index++] = item;
 
                 return newArray;
+            }
+        }
+
+
+        // Combine
+        public static T[] Combine<T>(params T[][] arrays) => Combine((IEnumerable<T[]>)arrays);
+
+        public static T[] Combine<T>(IEnumerable<T[]> arrays)
+        {
+            return Combine(arrays.GetEnumerator(), 0);
+        }
+
+        private static T[] Combine<T>(IEnumerator<T[]> arrays, int size)
+        {
+            if (arrays.MoveNext())
+            {
+                var array = arrays.Current;
+
+                var newArray = Combine(arrays, size + array.Length);
+
+                newArray.CopyFrom(array, 0, size, array.Length);
+
+                return newArray;
+            }
+            else
+            {
+                return new T[size];
             }
         }
     }
