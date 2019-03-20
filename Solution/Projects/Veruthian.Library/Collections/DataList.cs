@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
@@ -9,24 +10,32 @@ namespace Veruthian.Library.Collections
         List<T> items;
 
 
-        public DataList() : this(0) { }
+        public DataList() => this.items = new List<T>();
 
-        public DataList(params T[] items) => this.items = new List<T>(items);
+        public DataList(int capacity) => this.items = new List<T>(capacity);
 
-        public DataList(IEnumerable<T> items) => this.items = items.ToList();
-
-        public DataList(int capacity)
+        public DataList(IEnumerable<T> items)
         {
-            if (capacity < 0)
-                throw new ArgumentOutOfRangeException("capacity", capacity, "Capacity cannot be negative");
+            this.items = new List<T>(items);
 
-            this.items = new List<T>(capacity);
-        }
-
-        public DataList(int size, IEnumerable<T> items) : this(size)
-        {
             this.items.AddRange(items);
         }
+
+        public static DataList<T> Of(T item)
+        {
+            var list = new DataList<T>();
+
+            list.Add(item);
+
+            return list;
+        }
+
+        public static DataList<T> From(params T[] items) => new DataList<T>(items);
+
+        public static DataList<T> Extract(IEnumerable<T> items) => new DataList<T>(items);
+
+        public static DataList<T> Extract(IEnumerable<T> items, int amount) => new DataList<T>(items.Extract(amount));
+
 
 
         public sealed override int Count => items.Count;
