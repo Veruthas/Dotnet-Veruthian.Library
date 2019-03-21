@@ -10,12 +10,16 @@ namespace Veruthian.Library.Text.Lines
     {
         List<(int Start, int Length, LineEnding Ending)> lines;
 
+        int length;
+
 
         public BaseLineTable()
         {
-            lines = new List<(int Start, int Length, LineEnding Ending)>();
+            this.lines = new List<(int Start, int Length, LineEnding Ending)>();
 
-            lines.Add((0, -1, LineEnding.None));
+            this.lines.Add((0, 0, LineEnding.None));
+
+            this.length = 0;
         }
 
 
@@ -96,6 +100,52 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
+        private int LastIndex => lines.Count - 1;
+
+
+        public void Prepend(U value)
+        {
+
+        }
+
+        public void Prepend(IEnumerable<U> value)
+        {
+
+        }
+
+        public void Append(U value)
+        {
+            
+        }
+
+        public void Append(IEnumerable<U> values)
+        {
+
+        }
+
+
+        public void Insert(int index, U value)
+        {
+
+        }
+
+        public void Insert(int index, IEnumerable<U> value)
+        {
+
+        }
+
+
+        private void ResyncLines(int lineIndex, int offset)
+        {
+            for (int i = lineIndex; i < lines.Count; lineIndex++)
+            {
+                var line = lines[i];
+
+                line = (line.Start + offset, line.Length, line.Ending);
+            }
+        }
+
+
         private S ExtractLine(S value, int start, int length)
         {
             var valueLength = GetLength(value);
@@ -130,7 +180,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
         public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
-        {                        
+        {
             foreach (var line in lines)
                 yield return ExtractLine(value, line.Start, line.Length - (includeEnd ? 0 : line.Ending.Size));
         }
