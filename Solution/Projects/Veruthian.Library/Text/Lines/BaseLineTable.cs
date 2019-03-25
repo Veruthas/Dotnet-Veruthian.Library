@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Text.Encodings;
@@ -66,57 +67,67 @@ namespace Veruthian.Library.Text.Lines
             return new TextLocation(position, lineNumber, position - line.Start);
         }
 
-        
+
         public void Prepend(I value)
         {
-
+            // Special Case: lines[0] = (0, 1, Lf) and value == Cr, and endingType = None || endingType == CrLf
         }
 
         public void Prepend(IEnumerable<I> value)
         {
-
+            // Special Case: lines[0] = (0, 1, Lf) and value.Last == Cr and endingType = None || endingType == CrLf
         }
 
-    
+
         public void Append(I value)
         {
-           
+            // Special Case: #lines > 1 and lines[last - 2].Ending = Cr and value = Lf and endingType = None || endingType == CrLf
         }
 
         public void Append(IEnumerable<I> values)
         {
-
+            // Special Case: #lines > 1 and lines[last - 2].Ending = Cr and value.First = Lf and endingType = None || endingType == CrLf
         }
 
 
-        public void Insert(int index, I value)
+        public void Insert(int position, I value)
         {
-            if (index == 0)
+            if (position == 0)
                 Prepend(value);
-            else if (index == length)
+            else if (position == length)
                 Append(value);
+            else if (position < 0 || position > length)
+                throw new ArgumentOutOfRangeException(nameof(position));
             else
             {
-
+                var lineNumber = GetLineNumber(position);
             }
         }
 
-        public void Insert(int index, IEnumerable<I> values)
+        public void Insert(int position, IEnumerable<I> values)
         {
-            if (index == 0)
+            if (position == 0)
                 Prepend(values);
-            else if (index == length)
+            else if (position == length)
                 Append(values);
+            else if (position < 0 || position > length)
+                throw new ArgumentOutOfRangeException(nameof(position));
             else
             {
-
+                var lineNumber = GetLineNumber(position);
             }
         }
 
 
-        public void Remove(int index, int amount)
+        public void Remove(int position, int amount)
         {
-            
+            if (position < 0 || position > length)
+                throw new ArgumentOutOfRangeException(nameof(position));
+
+            if (amount < 0 || position + amount > length)
+                throw new ArgumentOutOfRangeException(nameof(amount));
+
+            var lineNumber = GetLineNumber(position);
         }
 
 
