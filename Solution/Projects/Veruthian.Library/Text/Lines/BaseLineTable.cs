@@ -82,6 +82,11 @@ namespace Veruthian.Library.Text.Lines
 
         private bool AllowsCrLf => endingType == LineEnding.None || endingType == LineEnding.CrLf;
 
+        private bool MatchesType(LineEnding matcher, LineEnding value)
+        {
+            return matcher == LineEnding.None || matcher == value;
+        }
+
 
 
         public (int LineNumber, int Position, int Length, LineEnding Ending) GetLine(int lineNumber)
@@ -140,10 +145,6 @@ namespace Veruthian.Library.Text.Lines
             return index != -1 ? lines[index].LineNumber : -1;
         }
 
-        private bool MatchesType(LineEnding matcher, LineEnding value)
-        {
-            return matcher == LineEnding.None || matcher == value;
-        }
 
         private LineSegment JoinSegments((int first, int last) segments)
         {
@@ -247,62 +248,10 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        public void Prepend(I value)
-        {
-            var line = lines[0];
+        // Prepend
+        public void Prepend(I value) => Prepend(null, value);
 
-            var utf32 = ConvertToUtf32(value);
-
-            // Special Case: lines[0] = (0, 1, Lf) and value == Cr and endingType = CrLf|None
-            if (LineEnding.IsCarriageReturn(utf32))
-            {
-                // CrLf                
-                if ((line.Length == 1) && (line.Ending == LineEnding.Lf) && (endingType == LineEnding.None || endingType == LineEnding.CrLf))
-                {
-                    line.Length++;
-
-                    line.Ending = LineEnding.CrLf;
-
-                    lines[0] = line;
-
-                    Adjust(1, 0, 1);
-                }
-                // Cr
-                else
-                {
-                    var newline = (0, 0, 1, LineEnding.Cr);
-
-                    lines.Insert(0, newline);
-
-                    var lineOffset = endingType == LineEnding.Cr || endingType == LineEnding.None ? 1 : 0;
-
-                    Adjust(1, lineOffset, 1);
-                }
-            }
-            // Lf
-            else if (LineEnding.IsLineFeed(utf32))
-            {
-                var newline = (0, 0, 1, LineEnding.Lf);
-
-                lines.Insert(0, newline);
-
-                var lineOffset = endingType == LineEnding.Lf || endingType == LineEnding.None ? 1 : 0;
-
-                Adjust(1, lineOffset, 1);
-            }
-            else
-            {
-                line.Length++;
-
-                lines[0] = line;
-
-                Adjust(1, 0, 1);
-            }
-        }
-
-        public void Prepend(IEnumerable<I> values)
-        {
-        }
+        public void Prepend(IEnumerable<I> values) => Prepend(values, default(I));
 
         private void Prepend(IEnumerable<I> values, I value)
         {
@@ -329,7 +278,7 @@ namespace Veruthian.Library.Text.Lines
 
             void ProcessItem(I item)
             {
-                var utf32 = ConvertToUtf32(value);
+                var utf32 = ConvertToUtf32(item);
 
                 // Cr
                 if (LineEnding.IsCarriageReturn(utf32))
@@ -381,13 +330,17 @@ namespace Veruthian.Library.Text.Lines
                         // Merge on special case of <....Cr> + <Lf>
                         if (AllowsCrLf && segment.Ending == LineEnding.Cr && nextline.Length == 1 && nextline.Ending == LineEnding.Lf)
                         {
+                            positionOffset += segment.Length;
+
                             nextline.Position = segment.Position;
 
                             nextline.Length += segment.Length;
 
+                            nextline.LineNumber += lineOffset;
+
                             nextline.Ending = LineEnding.CrLf;
 
-                            lines[segments] = nextline;
+                            lines[segments++] = nextline;
                         }
                         else
                         {
@@ -397,9 +350,15 @@ namespace Veruthian.Library.Text.Lines
                     // Merge
                     else
                     {
+                        positionOffset += segment.Length;
+
+                        nextline.Position = segment.Position;
+
                         nextline.Length += segment.Length;
 
-                        lines[segments] = nextline;
+                        nextline.LineNumber += lineOffset;
+
+                        lines[segments++] = nextline;                        
                     }
                 }
             }
@@ -414,36 +373,27 @@ namespace Veruthian.Library.Text.Lines
 
             ProcessFinal();
 
-            if (segments != 0)
+            if (positionOffset != 0)
                 Adjust(positionOffset, lineOffset, segments);
         }
 
-        public void Append(I value)
-        {
-            // Special Case: #lines > 1 and lines[last - 2].Ending = Cr and value = Lf
-        }
+        // Append
+        public void Append(I value) => Append(null, value);
 
-        public void Append(IEnumerable<I> values)
+        public void Append(IEnumerable<I> values) => Append(values, default(I));        
+
+        private void Append(IEnumerable<I> values, I value)
         {
             // Special Case: #lines > 1 and lines[last - 2].Ending = Cr and value.First = Lf
         }
 
 
-        public void Insert(int position, I value)
-        {
-            if (position == 0)
-                Prepend(value);
-            else if (position == length)
-                Append(value);
-            else if (position < 0 || position > length)
-                throw new ArgumentOutOfRangeException(nameof(position));
-            else
-            {
-                var lineNumber = GetLineNumber(position);
-            }
-        }
+        // Insert
+        public void Insert(int position, I value) => Insert(position, null, value);
 
-        public void Insert(int position, IEnumerable<I> values)
+        public void Insert(int position, IEnumerable<I> values) => Insert(position, values, default(I));
+
+        public void Insert(int position, IEnumerable<I> values, I value)
         {
             if (position == 0)
                 Prepend(values);
@@ -458,6 +408,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
+        // Remove
         public void Remove(int position, int amount)
         {
             if (position < 0 || position > length)
