@@ -5,21 +5,27 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<U, S> : IEnumerable<(int Start, int Length, LineEnding ending)>
-        where S : IEnumerable<U>
+    public abstract class BaseLineTable<I, S> : IEnumerable<(int Start, int Length, LineEnding ending)>
+        where S : IEnumerable<I>
     {
         List<(int Start, int Length, LineEnding Ending)> lines;
 
         int length;
 
+        LineEnding endingType;
 
-        public BaseLineTable()
+
+        public BaseLineTable() : this(LineEnding.None) { }
+
+        public BaseLineTable(LineEnding endingType)
         {
             this.lines = new List<(int Start, int Length, LineEnding Ending)>();
 
             this.lines.Add((0, 0, LineEnding.None));
 
             this.length = 0;
+
+            this.endingType = endingType;
         }
 
 
@@ -61,75 +67,86 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        private void MoveToNextUtf32(uint current, uint next)
+
+        public void Prepend(I value)
         {
-            int lineIndex = lines.Count - 1;
 
-            var line = lines[lineIndex];
+        }
 
-            var ending = line.Ending;
+        public void Prepend(IEnumerable<I> value)
+        {
+
+        }
+
+        public void Append(I value)
+        {
+            var index = lines.Count - 1;
+
+            var line = lines[index];
+
+            var utf32 = ConvertToUtf32(value);
 
 
-            if (ending == LineEnding.CrLf)
+            if ((line.Length == 0) && (utf32 == Utf32.Chars.Lf) && (index != 0))
             {
-                lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
+                var lastIndex = index - 1;
+
+                var lastLine = lines[lastIndex];
+
+                if (lastLine.Ending == LineEnding.Cr)
+                {
+                    lines[lastIndex] = (lastLine.Start, lastLine.Length + 1, LineEnding.CrLf);
+
+                    lines[index] = (line.Start + 1, line.Length, line.Ending);
+
+                    length++;
+
+                    return;
+                }
             }
+
+            var ending = LineEnding.From(utf32);
+
+            lines[index] = (line.Start, line.Length + 1, line.Ending);
+
+            length++;
+
+            if (ending.IsNewLine())
+                lines.Add((length, 0, LineEnding.None));
+        }
+
+        public void Append(IEnumerable<I> values)
+        {
+            foreach (var value in values)
+                Append(value);
+        }
+
+
+        public void Insert(int index, I value)
+        {
+            if (index == 0)
+                Prepend(value);
+            else if (index == length)
+                Append(value);
             else
             {
-                ending = LineEnding.FromValues(current, next);
 
-                if (ending == LineEnding.Cr || ending == LineEnding.Lf)
-                    lines.Add((line.Start + line.Length + 1, 0, LineEnding.None));
             }
-
-            lines[lineIndex] = (line.Start, line.Length + 1, ending);
         }
 
-
-        public void MoveToNext(U current, U next) => MoveToNextUtf32(ConvertToUtf32(current), ConvertToUtf32(next));
-
-
-        public void MoveThrough(U current, IEnumerable<U> following)
+        public void Insert(int index, IEnumerable<I> values)
         {
-            foreach (var next in following)
+            if (index == 0)
+                Prepend(values);
+            else if (index == length)
+                Append(values);
+            else
             {
-                MoveToNext(current, next);
 
-                current = next;
             }
         }
 
-
-        private int LastIndex => lines.Count - 1;
-
-
-        public void Prepend(U value)
-        {
-
-        }
-
-        public void Prepend(IEnumerable<U> value)
-        {
-
-        }
-
-        public void Append(U value)
-        {
-            
-        }
-
-        public void Append(IEnumerable<U> values)
-        {
-
-        }
-
-
-        public void Insert(int index, U value)
-        {
-
-        }
-
-        public void Insert(int index, IEnumerable<U> value)
+        public void Remove(int index, int amount)
         {
 
         }
@@ -192,7 +209,7 @@ namespace Veruthian.Library.Text.Lines
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-        protected abstract uint ConvertToUtf32(U value);
+        protected abstract uint ConvertToUtf32(I value);
 
         protected abstract int GetLength(S value);
 

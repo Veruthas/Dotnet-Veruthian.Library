@@ -6,7 +6,7 @@ namespace Veruthian.Library.Text.Chars.Extensions
     public static class CharExtensions
     {
         // Printable Chars
-        public static string GetAsPrintable(this char value)
+        public static string AsPrintable(this char value)
         {
             switch (value)
             {
@@ -23,38 +23,32 @@ namespace Veruthian.Library.Text.Chars.Extensions
             }
         }
 
-        public static string GetAsPrintable(this string value)
+        public static string AsPrintable(this string value)
         {
             var builder = new StringBuilder();
 
             foreach (char c in value)
-                builder.Append(GetAsPrintable(c));
+                builder.Append(AsPrintable(c));
 
             return builder.ToString();
         }
 
         // LineTracking
-        public static IEnumerable<char> ProcessLines(this IEnumerable<char> runes, out CharLineTable lines)
+        public static IEnumerable<char> ProcessLines(this IEnumerable<char> chars, out CharLineTable lines)
         {
             lines = new CharLineTable();
 
-            return ProcessLines(runes, lines);
+            return ProcessLines(chars, lines);
         }
 
-        private static IEnumerable<char> ProcessLines(this IEnumerable<char> runes, CharLineTable lines)
-        {
-            char current = '\0';
-
-            foreach (var rune in runes)
+        private static IEnumerable<char> ProcessLines(this IEnumerable<char> chars, CharLineTable lines)
+        {            
+            foreach (var rune in chars)
             {
-                lines.MoveToNext(current, rune);
+                lines.Append(rune);
 
                 yield return rune;
-
-                current = rune;
             }
-
-            lines.MoveToNext(current, '\0');
         }
 
 

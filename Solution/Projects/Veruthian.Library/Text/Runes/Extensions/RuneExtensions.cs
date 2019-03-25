@@ -246,18 +246,12 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
         private static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, RuneLineTable lines)
         {
-            Rune current = '\0';
-
             foreach (var rune in runes)
             {
-                lines.MoveToNext(current, rune);
+                lines.Append(rune);
 
                 yield return rune;
-
-                current = rune;
             }
-
-            lines.MoveToNext(current, '\0');
         }
     }
 }
