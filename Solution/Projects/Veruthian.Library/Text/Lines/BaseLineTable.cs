@@ -358,7 +358,7 @@ namespace Veruthian.Library.Text.Lines
 
                         nextline.LineNumber += lineOffset;
 
-                        lines[segments++] = nextline;                        
+                        lines[segments++] = nextline;
                     }
                 }
             }
@@ -377,14 +377,105 @@ namespace Veruthian.Library.Text.Lines
                 Adjust(positionOffset, lineOffset, segments);
         }
 
+
         // Append
         public void Append(I value) => Append(null, value);
 
-        public void Append(IEnumerable<I> values) => Append(values, default(I));        
+        public void Append(IEnumerable<I> values) => Append(values, default(I));
 
         private void Append(IEnumerable<I> values, I value)
         {
-            // Special Case: #lines > 1 and lines[last - 2].Ending = Cr and value.First = Lf
+            var segment = lines[lines.Count - 1];
+
+            void UpdateSegment()
+            {
+                lines[lines.Count - 1] = segment;
+
+                if (segment.Ending != LineEnding.None)
+                {
+                    var lineNumber = segment.LineNumber + (MatchesType(endingType, segment.Ending) ? 1 : 0);
+
+                    segment = new LineSegment(lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
+
+                    lines.Add(segment);
+                }
+            }
+
+            void ProcessItem(I item)
+            {
+                var utf32 = ConvertToUtf32(item);
+
+                // Cr
+                if (LineEnding.IsCarriageReturn(utf32))
+                {
+                    if (segment.Ending != LineEnding.None)
+                        UpdateSegment();
+
+                    segment.Ending = LineEnding.Cr;
+
+                    segment.Length++;
+                }
+                // Lf
+                else if (LineEnding.IsLineFeed(utf32))
+                {
+                    // If <...Lf> + <Cr>
+                    if (AllowsCrLf)
+                    {
+                        if (segment.Ending == LineEnding.Cr)
+                        {                            
+                            segment.Length++;
+
+                            segment.Ending = LineEnding.CrLf;                            
+                        }
+                        // Picked up wrong segment initially
+                        else if (segment.Length == 0 && lines.Count > 1 && lines[lines.Count - 2].Ending == LineEnding.Cr)
+                        {
+                            var lastsegment = lines[lines.Count - 2];
+
+                            lastsegment.Length++;
+
+                            lastsegment.Ending = LineEnding.CrLf;
+
+                            lines[lines.Count - 2] = lastsegment;
+
+                            segment.Position++;
+                        }                        
+                        else
+                        {
+                            if (segment.Ending != LineEnding.None)
+                                UpdateSegment();
+
+                            segment.Ending = LineEnding.Lf;
+
+                            segment.Length++;
+                        }
+                    }
+                    else
+                    {
+                        if (segment.Ending != LineEnding.None)
+                            UpdateSegment();
+
+                        segment.Ending = LineEnding.Lf;
+
+                        segment.Length++;
+                    }
+                }
+                else
+                {
+                    if (segment.Ending != LineEnding.None)
+                        UpdateSegment();
+
+                    segment.Length++;
+                }
+            }
+
+            if (values != null)
+                foreach (var item in values)
+                    ProcessItem(item);
+            else
+                ProcessItem(value);
+
+            UpdateSegment();
         }
 
 
