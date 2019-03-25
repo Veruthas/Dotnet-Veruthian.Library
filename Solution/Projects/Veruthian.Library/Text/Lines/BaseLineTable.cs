@@ -66,8 +66,7 @@ namespace Veruthian.Library.Text.Lines
             return new TextLocation(position, lineNumber, position - line.Start);
         }
 
-
-
+        
         public void Prepend(I value)
         {
 
@@ -78,47 +77,15 @@ namespace Veruthian.Library.Text.Lines
 
         }
 
+    
         public void Append(I value)
         {
-            var index = lines.Count - 1;
-
-            var line = lines[index];
-
-            var utf32 = ConvertToUtf32(value);
-
-
-            if ((line.Length == 0) && (utf32 == Utf32.Chars.Lf) && (index != 0))
-            {
-                var lastIndex = index - 1;
-
-                var lastLine = lines[lastIndex];
-
-                if (lastLine.Ending == LineEnding.Cr)
-                {
-                    lines[lastIndex] = (lastLine.Start, lastLine.Length + 1, LineEnding.CrLf);
-
-                    lines[index] = (line.Start + 1, line.Length, line.Ending);
-
-                    length++;
-
-                    return;
-                }
-            }
-
-            var ending = LineEnding.From(utf32);
-
-            lines[index] = (line.Start, line.Length + 1, line.Ending);
-
-            length++;
-
-            if (ending.IsNewLine())
-                lines.Add((length, 0, LineEnding.None));
+           
         }
 
         public void Append(IEnumerable<I> values)
         {
-            foreach (var value in values)
-                Append(value);
+
         }
 
 
@@ -146,9 +113,10 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
+
         public void Remove(int index, int amount)
         {
-
+            
         }
 
 
