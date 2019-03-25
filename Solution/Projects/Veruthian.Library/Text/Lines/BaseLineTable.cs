@@ -480,11 +480,11 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Insert
-        public void Insert(int position, I value) => Insert(position, null, value);
+        public void Insert(int position, I value) => RoutedInsert(position, null, value);
 
-        public void Insert(int position, IEnumerable<I> values) => Insert(position, values, default(I));
+        public void Insert(int position, IEnumerable<I> values) => RoutedInsert(position, values, default(I));
 
-        public void Insert(int position, IEnumerable<I> values, I value)
+        private void RoutedInsert(int position, IEnumerable<I> values, I value)
         {
             if (position == 0)
                 Prepend(values);
@@ -493,9 +493,12 @@ namespace Veruthian.Library.Text.Lines
             else if (position < 0 || position > length)
                 throw new ArgumentOutOfRangeException(nameof(position));
             else
-            {
-                var lineNumber = GetLineNumber(position);
-            }
+                Insert(position, values, value);
+        }
+
+        private void Insert(int position, IEnumerable<I> values, I value)
+        {
+            var index = GetLineIndexFromPosition(position);
         }
 
 
