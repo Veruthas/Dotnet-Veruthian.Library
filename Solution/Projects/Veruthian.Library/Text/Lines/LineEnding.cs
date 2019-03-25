@@ -33,6 +33,12 @@ namespace Veruthian.Library.Text.Lines
         public bool IsNewLine() => this != None;
 
 
+        public static bool IsNewLine(uint value) => value == Utf32.Chars.Lf || value == Utf32.Chars.Cr;
+
+        public static bool IsCarriageReturn(uint value) => value == Utf32.Chars.Cr;
+
+        public static bool IsLineFeed(uint value) => value == Utf32.Chars.Lf;
+
         public static bool IsNewLine(uint value, uint next)
         {
             // \r
@@ -44,6 +50,7 @@ namespace Veruthian.Library.Text.Lines
             else
                 return false;
         }
+
 
         public static LineEnding From(uint value)
         {
@@ -93,6 +100,7 @@ namespace Veruthian.Library.Text.Lines
                 }
             }
         }
+
 
 
         public static readonly LineEnding None = new LineEnding("None", "None or End of File", "", 0);
