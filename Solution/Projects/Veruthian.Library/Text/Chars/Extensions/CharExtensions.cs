@@ -6,7 +6,7 @@ namespace Veruthian.Library.Text.Chars.Extensions
     public static class CharExtensions
     {
         // Printable Chars
-        public static string AsPrintable(this char value)
+        public static string ToPrintableString(this char value)
         {
             switch (value)
             {
@@ -23,12 +23,12 @@ namespace Veruthian.Library.Text.Chars.Extensions
             }
         }
 
-        public static string AsPrintable(this string value)
+        public static string ToPrintableString(this string value)
         {
             var builder = new StringBuilder();
 
             foreach (char c in value)
-                builder.Append(AsPrintable(c));
+                builder.Append(ToPrintableString(c));
 
             return builder.ToString();
         }
