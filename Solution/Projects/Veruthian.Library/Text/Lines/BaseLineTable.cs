@@ -9,7 +9,6 @@ namespace Veruthian.Library.Text.Lines
     public abstract class BaseLineTable<I, S> : IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)>
         where S : IEnumerable<I>
     {
-
         private struct LineSegment
         {
             public int LineNumber;
@@ -78,15 +77,7 @@ namespace Veruthian.Library.Text.Lines
         public int Count => segments[segments.Count - 1].LineNumber + 1;
 
 
-        public LineEnding EndingType => LineEnding.None;
-
-        private bool AllowsCrLf => endingType == LineEnding.None || endingType == LineEnding.CrLf;
-
-        private bool MatchesType(LineEnding matcher, LineEnding value)
-        {
-            return matcher == LineEnding.None || matcher == value;
-        }
-
+        public LineEnding EndingType => endingType;
 
 
         public (int LineNumber, int Position, int Length, LineEnding Ending) GetLine(int lineNumber)
@@ -231,9 +222,9 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        private void Adjust(int positionOffset, int lineOffset, int start)
+        private void Adjust(int lineOffset, int positionOffset, int index)
         {
-            for (int i = start; i < segments.Count; i++)
+            for (int i = index; i < segments.Count; i++)
             {
                 var line = segments[i];
 
@@ -243,8 +234,6 @@ namespace Veruthian.Library.Text.Lines
 
                 segments[i] = line;
             }
-
-            length += positionOffset;
         }
 
 
@@ -257,13 +246,17 @@ namespace Veruthian.Library.Text.Lines
         {
             var segment = segments[segments.Count - 1];
 
+            var added = 0;
+
             void UpdateSegment()
             {
                 segments[segments.Count - 1] = segment;
 
                 if (segment.Ending != LineEnding.None)
                 {
-                    var lineNumber = segment.LineNumber + (MatchesType(endingType, segment.Ending) ? 1 : 0);
+                    var isNewLine = (endingType != LineEnding.CrLf || segment.Ending == LineEnding.CrLf ? 1 : 0);
+
+                    var lineNumber = segment.LineNumber + isNewLine;
 
                     segment = new LineSegment(lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
 
@@ -276,7 +269,7 @@ namespace Veruthian.Library.Text.Lines
                 var utf32 = ConvertToUtf32(item);
 
                 // Cr
-                if (endingType != LineEnding.LineFeed && LineEnding.IsCarriageReturn(utf32))
+                if (endingType != LineEnding.Lf && LineEnding.IsCarriageReturn(utf32))
                 {
                     if (segment.Ending != LineEnding.None)
                         UpdateSegment();
@@ -286,18 +279,19 @@ namespace Veruthian.Library.Text.Lines
                     segment.Length++;
                 }
                 // Lf
-                else if (endingType != LineEnding.CarriageReturn && LineEnding.IsLineFeed(utf32))
+                else if (endingType != LineEnding.Cr && LineEnding.IsLineFeed(utf32))
                 {
-                    // If <...Lf> + <Cr>
-                    if (endingType != LineEnding.LineFeed)
+                    // If allows CrLf
+                    if (endingType != LineEnding.Lf)
                     {
+                        // If <...Lf> + <Cr>
                         if (segment.Ending == LineEnding.Cr)
                         {
                             segment.Length++;
 
                             segment.Ending = LineEnding.CrLf;
                         }
-                        // Picked up wrong segment initially
+                        // On <...Lf> + <Cr> when first character of entire append is Cr
                         else if (segment.Length == 0 && segments.Count > 1 && segments[segments.Count - 2].Ending == LineEnding.Cr)
                         {
                             var lastsegment = segments[segments.Count - 2];
@@ -310,6 +304,7 @@ namespace Veruthian.Library.Text.Lines
 
                             segment.Position++;
                         }
+                        // Lf
                         else
                         {
                             if (segment.Ending != LineEnding.None)
@@ -320,6 +315,7 @@ namespace Veruthian.Library.Text.Lines
                             segment.Length++;
                         }
                     }
+                    // Lf
                     else
                     {
                         if (segment.Ending != LineEnding.None)
@@ -330,6 +326,7 @@ namespace Veruthian.Library.Text.Lines
                         segment.Length++;
                     }
                 }
+                // None
                 else
                 {
                     if (segment.Ending != LineEnding.None)
@@ -337,6 +334,8 @@ namespace Veruthian.Library.Text.Lines
 
                     segment.Length++;
                 }
+
+                added++;
             }
 
             if (values != null)
@@ -346,8 +345,9 @@ namespace Veruthian.Library.Text.Lines
                 ProcessItem(value);
 
             UpdateSegment();
-        }
 
+            length += added;
+        }
 
 
         // Prepend
@@ -355,130 +355,12 @@ namespace Veruthian.Library.Text.Lines
 
         public void Prepend(IEnumerable<I> values) => Prepend(values, default(I));
 
-        private void Prepend(IEnumerable<I> values, I value) => Insert(0, 0, values, value);
-
-        private void OldPrepend(IEnumerable<I> values, I value)
+        private void Prepend(IEnumerable<I> values, I value)
         {
-            var segment = new LineSegment(0, 0, 0, LineEnding.None);
-
-            var lineOffset = 0;
-
-            var positionOffset = 0;
-
-            var segments = 0;
-
-
-            void InsertSegment()
-            {
-                positionOffset += segment.Length;
-
-                if (MatchesType(endingType, segment.Ending))
-                    lineOffset++;
-
-                this.segments.Insert(segments++, segment);
-
-                segment = (lineOffset, positionOffset, 0, LineEnding.None);
-            }
-
-            void ProcessItem(I item)
-            {
-                var utf32 = ConvertToUtf32(item);
-
-                // Cr
-                if (LineEnding.IsCarriageReturn(utf32))
-                {
-                    if (segment.Ending != LineEnding.None)
-                        InsertSegment();
-
-                    segment.Ending = LineEnding.Cr;
-
-                    segment.Length++;
-                }
-                // Lf
-                else if (LineEnding.IsLineFeed(utf32))
-                {
-                    // CrLf
-                    if (segment.Ending == LineEnding.Cr && AllowsCrLf)
-                    {
-                        segment.Ending = LineEnding.CrLf;
-
-                        segment.Length++;
-                    }
-                    else
-                    {
-                        if (segment.Ending != LineEnding.None)
-                            InsertSegment();
-
-                        segment.Ending = LineEnding.Lf;
-
-                        segment.Length++;
-                    }
-                }
-                else
-                {
-                    if (segment.Ending != LineEnding.None)
-                        InsertSegment();
-
-                    segment.Length++;
-                }
-            }
-
-            void ProcessFinal()
-            {
-                if (segment.Length != 0)
-                {
-                    var nextline = this.segments[segments];
-
-                    if (segment.Ending.IsNewLine())
-                    {
-                        // Merge on special case of <....Cr> + <Lf>
-                        if (AllowsCrLf && segment.Ending == LineEnding.Cr && nextline.Length == 1 && nextline.Ending == LineEnding.Lf)
-                        {
-                            positionOffset += segment.Length;
-
-                            nextline.Position = segment.Position;
-
-                            nextline.Length += segment.Length;
-
-                            nextline.LineNumber += lineOffset;
-
-                            nextline.Ending = LineEnding.CrLf;
-
-                            this.segments[segments++] = nextline;
-                        }
-                        else
-                        {
-                            InsertSegment();
-                        }
-                    }
-                    // Merge
-                    else
-                    {
-                        positionOffset += segment.Length;
-
-                        nextline.Position = segment.Position;
-
-                        nextline.Length += segment.Length;
-
-                        nextline.LineNumber += lineOffset;
-
-                        this.segments[segments++] = nextline;
-                    }
-                }
-            }
-
-
-            if (values != null)
-                foreach (var item in values)
-                    ProcessItem(item);
+            if (length == 0)
+                Append(values, value);
             else
-                ProcessItem(value);
-
-
-            ProcessFinal();
-
-            if (positionOffset != 0)
-                Adjust(positionOffset, lineOffset, segments);
+                Insert(0, 0, values, value);
         }
 
 
@@ -516,23 +398,74 @@ namespace Veruthian.Library.Text.Lines
 
             var lastsegment = index > 0 ? this.segments[index - 1] : new LineSegment();
 
+            var split = false;
+
+            var columnOffset = 0;
+
             var lineOffset = 0;
 
             var positionOffset = 0;
 
-            var segments = 0;
 
-
-            void InsertSegment()
+            void SplitSegment(LineEnding ending)
             {
-                positionOffset += segment.Length;
+                var isNewLine = (endingType != LineEnding.CrLf || ending == LineEnding.CrLf ? 1 : 0);
 
-                if (MatchesType(endingType, segment.Ending))
-                    lineOffset++;
+                lastsegment = new LineSegment(segment.LineNumber, segment.Position, column + columnOffset, ending);
 
-                this.segments.Insert(segments++, segment);
+                segment = new LineSegment(segment.LineNumber + isNewLine, segment.Position + lastsegment.Length, segment.Length - lastsegment.Length, segment.Ending);
 
-                segment = (lineOffset, positionOffset, 0, LineEnding.None);
+
+                segments[index++] = lastsegment;
+
+                segments.Insert(index, segment);
+
+
+                lineOffset += isNewLine;
+
+                positionOffset += columnOffset;
+
+                column = columnOffset = 0;
+            }
+
+            void MergeSegment(LineEnding ending)
+            {
+                segment.Ending = ending;
+
+                segment.Length++;
+
+                columnOffset++;
+
+                segments.RemoveAt(index + 1);
+            }
+
+
+            void ProcessInitial()
+            {
+                if (column == segment.Length - 1)
+                {
+                    // Split a <..Lf> into <..> + <Lf>
+                    if (segment.Ending == LineEnding.Lf && endingType != LineEnding.Lf)
+                    {
+                        segment.Ending = LineEnding.None;
+                        
+                        split = true;
+                    }
+                    // Split a <..CrLf> into <..Cr> + <Lf>
+                    else if (segment.Ending == LineEnding.CrLf)
+                    {
+                        segment.Ending = LineEnding.Cr;
+
+                        split = true;
+                    }
+
+                    if (split)
+                    {
+                        segments.Insert(index + 1, new LineSegment(segment.LineNumber, segment.Position + segment.Length, 1, LineEnding.Lf));
+
+                        segment.Length--;
+                    }
+                }
             }
 
             void ProcessItem(I item)
@@ -540,88 +473,74 @@ namespace Veruthian.Library.Text.Lines
                 var utf32 = ConvertToUtf32(item);
 
                 // Cr
-                if (LineEnding.IsCarriageReturn(utf32))
+                if (endingType != LineEnding.Lf && LineEnding.IsCarriageReturn(utf32))
                 {
-                    if (segment.Ending != LineEnding.None)
-                        InsertSegment();
-
-                    segment.Ending = LineEnding.Cr;
-
                     segment.Length++;
+
+                    columnOffset++;
+
+                    SplitSegment(LineEnding.Cr);
                 }
                 // Lf
-                else if (LineEnding.IsLineFeed(utf32))
+                else if (endingType != LineEnding.Cr && LineEnding.IsLineFeed(utf32))
                 {
-                    // CrLf
-                    if (segment.Ending == LineEnding.Cr && AllowsCrLf)
+                    // CrLf <..Cr> + [Lf]
+                    if (endingType != LineEnding.Lf && lastsegment.Ending == LineEnding.Cr && column + columnOffset == 0)
                     {
-                        segment.Ending = LineEnding.CrLf;
+                        lastsegment.Length++;
 
-                        segment.Length++;
+                        lastsegment.Ending = LineEnding.CrLf;
+
+                        segments[index - 1] = lastsegment;
+
+                        segment.Position++;
+
+                        positionOffset++;
+
+                        if (endingType == LineEnding.CrLf)
+                        {
+                            segment.LineNumber++;
+
+                            lineOffset++;
+                        }
                     }
+                    // Lf
                     else
                     {
-                        if (segment.Ending != LineEnding.None)
-                            InsertSegment();
-
-                        segment.Ending = LineEnding.Lf;
-
                         segment.Length++;
+
+                        columnOffset++;
+
+                        SplitSegment(LineEnding.Lf);
                     }
                 }
+                // None
                 else
                 {
-                    if (segment.Ending != LineEnding.None)
-                        InsertSegment();
-
                     segment.Length++;
+
+                    columnOffset++;
                 }
             }
 
             void ProcessFinal()
             {
-                if (segment.Length != 0)
+                // Check for merge from a split                
+                if (split)
                 {
-                    var nextline = this.segments[segments];
-
-                    if (segment.Ending.IsNewLine())
-                    {
-                        // Merge on special case of <....Cr> + <Lf>
-                        if (AllowsCrLf && segment.Ending == LineEnding.Cr && nextline.Length == 1 && nextline.Ending == LineEnding.Lf)
-                        {
-                            positionOffset += segment.Length;
-
-                            nextline.Position = segment.Position;
-
-                            nextline.Length += segment.Length;
-
-                            nextline.LineNumber += lineOffset;
-
-                            nextline.Ending = LineEnding.CrLf;
-
-                            this.segments[segments++] = nextline;
-                        }
-                        else
-                        {
-                            InsertSegment();
-                        }
-                    }
-                    // Merge
-                    else
-                    {
-                        positionOffset += segment.Length;
-
-                        nextline.Position = segment.Position;
-
-                        nextline.Length += segment.Length;
-
-                        nextline.LineNumber += lineOffset;
-
-                        this.segments[segments++] = nextline;
-                    }
+                    if (segment.Ending == LineEnding.None)
+                        MergeSegment(LineEnding.Lf);
+                    else if (segment.Ending == LineEnding.Cr)
+                        MergeSegment(LineEnding.CrLf);
                 }
+
+                segments[index++] = segment;
+
+                positionOffset += columnOffset;
             }
 
+
+            ProcessInitial();
 
             if (values != null)
                 foreach (var item in values)
@@ -629,11 +548,13 @@ namespace Veruthian.Library.Text.Lines
             else
                 ProcessItem(value);
 
-
             ProcessFinal();
 
+
             if (positionOffset != 0)
-                Adjust(positionOffset, lineOffset, segments);
+                Adjust(lineOffset, positionOffset, index);
+
+            length += positionOffset;
         }
 
 
@@ -697,7 +618,7 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                int lineNumber = 0;
+                var lineNumber = 0;
 
                 var segment = segments[0];
 
