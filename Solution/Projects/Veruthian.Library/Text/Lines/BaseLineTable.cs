@@ -409,7 +409,9 @@ namespace Veruthian.Library.Text.Lines
 
             void SplitSegment(LineEnding ending)
             {
+                // Is either a newline or a \r|\n note for future inserts
                 var isNewLine = (endingType != LineEnding.CrLf || ending == LineEnding.CrLf ? 1 : 0);
+
 
                 lastsegment = new LineSegment(segment.LineNumber, segment.Position, column + columnOffset, ending);
 
@@ -434,21 +436,20 @@ namespace Veruthian.Library.Text.Lines
 
                 segment.Length++;
 
-                columnOffset++;
-
                 segments.RemoveAt(index + 1);
             }
 
 
             void ProcessInitial()
             {
+                // Push off <...[?]Lf> processing until end
                 if (column == segment.Length - 1)
                 {
                     // Split a <..Lf> into <..> + <Lf>
                     if (segment.Ending == LineEnding.Lf && endingType != LineEnding.Lf)
                     {
                         segment.Ending = LineEnding.None;
-                        
+
                         split = true;
                     }
                     // Split a <..CrLf> into <..Cr> + <Lf>
@@ -528,6 +529,13 @@ namespace Veruthian.Library.Text.Lines
                 // Check for merge from a split                
                 if (split)
                 {
+                    // <..?> + <> + <Lf>
+                    if (segment.Length == 0)
+                    {
+                        segments.RemoveAt(index--);
+                        segment = segments[index];
+                    }
+
                     if (segment.Ending == LineEnding.None)
                         MergeSegment(LineEnding.Lf);
                     else if (segment.Ending == LineEnding.Cr)
