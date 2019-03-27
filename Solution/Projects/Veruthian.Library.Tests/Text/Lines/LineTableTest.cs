@@ -3,14 +3,14 @@ using Veruthian.Library.Text.Chars;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public class CharLineBuilder
+    public class LineBuilder<U>
     {
         public string value;
 
         public CharLineTable lines;
 
 
-        public CharLineBuilder(LineEnding ending)
+        public LineBuilder(LineEnding ending)
         {
             value = string.Empty;
 

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Text.Runes.Extensions;
 using Veruthian.Library.Utility;
 using Veruthian.Library.Utility.Extensions;
 
 namespace Veruthian.Library.Text.Runes
 {
-    public class RuneString : IIndex<int, Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
+    public class RuneString : IIndex<int, Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>, IEditableText<Rune, RuneString>
     {
         public static readonly RuneString Empty = new RuneString(new Rune[] { }, false);
 
@@ -344,6 +345,22 @@ namespace Veruthian.Library.Text.Runes
             return new RuneString(combined, false);
         }
 
+
+        public static RuneString Insert(RuneString into, int position, RuneString value)
+        {
+            return new RuneString(into.runes.InsertEnumerable(position, value), false);
+        }
+
+        public static RuneString Insert(RuneString into, int position, Rune value)
+        {
+            return new RuneString(into.runes.Insert(position, value), false);
+        }
+
+        public static RuneString Remove(RuneString from, int position, int amount)
+        {
+            return new RuneString(from.runes.Remove(position, amount), false);
+        }
+
         #endregion
 
         #region Replicate
@@ -469,12 +486,12 @@ namespace Veruthian.Library.Text.Runes
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach(var rune in runes)            
+            foreach (var rune in runes)
                 builder.Append(rune.ToPrintableString());
 
             return builder.ToString();
         }
-        
+
         #endregion
 
         #region Enumerator
@@ -627,6 +644,24 @@ namespace Veruthian.Library.Text.Runes
 
             return new RuneString(converted);
         }
+
+        #endregion
+
+        #region IEditableText<Rune, RuneString>
+
+        void IEditableText<Rune, RuneString>.Append(Rune value) => Combine(this, value);
+
+        void IEditableText<Rune, RuneString>.Append(RuneString values) => Combine(this, values);
+
+        void IEditableText<Rune, RuneString>.Prepend(Rune value) => Combine(value, this);
+
+        void IEditableText<Rune, RuneString>.Prepend(RuneString values) => Combine(values, this);
+
+        void IEditableText<Rune, RuneString>.Insert(int position, Rune value) => Insert(this, position, value);
+
+        void IEditableText<Rune, RuneString>.Insert(int position, RuneString values) => Insert(this, position, values);
+
+        void IEditableText<Rune, RuneString>.Remove(int position, int amount) => Remove(this, position, amount);
 
         #endregion
     }

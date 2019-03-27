@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Text
 {
-    public interface IEditableText<U, S>
+    public interface IEditableText<in U, in S>
         where S : IEnumerable<U>
     {
         void Append(U value);

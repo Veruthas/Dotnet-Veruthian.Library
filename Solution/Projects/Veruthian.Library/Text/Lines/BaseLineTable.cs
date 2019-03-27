@@ -6,8 +6,7 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<U, S> : IEditableText<U, IEnumerable<U>>
-        where S : IEnumerable<U>
+    public abstract class BaseLineTable<U> : IEditableText<U, IEnumerable<U>>        
     {
         private struct LineSegment
         {
@@ -76,7 +75,6 @@ namespace Veruthian.Library.Text.Lines
 
         public int Count => segments[segments.Count - 1].LineNumber + 1;
 
-
         public LineEnding EndingType => endingType;
 
 
@@ -137,6 +135,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
+        // Helpers
         private LineSegment JoinSegments((int first, int last) segments)
         {
             var segment = this.segments[segments.first];
@@ -220,7 +219,6 @@ namespace Veruthian.Library.Text.Lines
 
             return -1;
         }
-
 
         private void Adjust(int lineOffset, int positionOffset, int index)
         {
@@ -746,43 +744,6 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        // Extract
-        private S ExtractLine(S value, int position, int length)
-        {
-            var valueLength = GetLength(value);
-
-            if (position <= valueLength)
-            {
-                var end = position + length;
-
-                if (end > valueLength)
-                    end = valueLength - position;
-
-                return Slice(value, position, length);
-            }
-            else
-            {
-                return default(S);
-            }
-        }
-
-        public S ExtractLine(S value, int lineNumber, bool includeEnd = true)
-        {
-            if (lineNumber < 0 || lineNumber >= Count)
-                throw new ArgumentOutOfRangeException(nameof(lineNumber));
-
-            var line = GetLine(lineNumber);
-
-            return ExtractLine(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
-        }
-
-        public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
-        {
-            foreach (var line in Lines)
-                yield return ExtractLine(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
-        }
-
-
         // Enumerator
         public IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)> Lines
         {
@@ -828,8 +789,24 @@ namespace Veruthian.Library.Text.Lines
         // Abstract
         protected abstract uint ConvertToUtf32(U value);
 
-        protected abstract int GetLength(S value);
 
-        protected abstract S Slice(S value, int start, int length);
-    }
+        // Extract
+        public S Extract<S>(S value, int lineNumber, SliceText<S> slice, bool includeEnd = true)
+            where S : IEnumerable<U>
+        {
+            if (lineNumber < 0 || lineNumber >= Count)
+                throw new ArgumentOutOfRangeException(nameof(lineNumber));
+
+            var line = GetLine(lineNumber);
+
+            return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
+        }
+
+        public IEnumerable<S> Extract<S>(S value, SliceText<S> slice, bool includeEnd = true)
+            where S : IEnumerable<U>
+        {
+            foreach (var line in Lines)
+                yield return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
+        }        
+    }    
 }
