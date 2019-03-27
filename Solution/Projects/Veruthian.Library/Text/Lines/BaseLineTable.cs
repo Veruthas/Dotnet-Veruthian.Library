@@ -6,7 +6,7 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<I, S> 
+    public abstract class BaseLineTable<I, S>
         where S : IEnumerable<I>
     {
         private struct LineSegment
@@ -400,7 +400,7 @@ namespace Veruthian.Library.Text.Lines
 
             var lastsegment = index > 0 ? this.segments[index - 1] : new LineSegment();
 
-            var split = false;
+            var postponedLf = false;
 
             var columnOffset = 0;
 
@@ -499,7 +499,7 @@ namespace Veruthian.Library.Text.Lines
 
                         segment.Length--;
 
-                        split = true;
+                        postponedLf = true;
                     }
                     // Split a <..CrLf> into <..Cr> + <> + {Lf}
                     else if (segment.Ending == LineEnding.CrLf)
@@ -510,7 +510,7 @@ namespace Veruthian.Library.Text.Lines
                         lastsegment.Ending = LineEnding.Cr;
 
                         lastsegment.Length--;
-                    
+
 
                         // Add new empty segment
                         var newlineOffset = NewLineOffset(LineEnding.Cr);
@@ -525,14 +525,14 @@ namespace Veruthian.Library.Text.Lines
                         // If Cr is not considered a line
                         lineOffset -= (newlineOffset ^ 1);
 
-                        split = true;
+                        postponedLf = true;
                     }
                 }
             }
 
             void ProcessFinal()
             {
-                if (split)
+                if (postponedLf)
                 {
                     // <...?> + <> + {Lf}
                     if (segment.Length == 0)
@@ -595,7 +595,7 @@ namespace Veruthian.Library.Text.Lines
                 // Otherwise just update the last segment
                 else
                 {
-                    segments[index++] = segment;                    
+                    segments[index++] = segment;
                 }
 
                 positionOffset += columnOffset;
@@ -629,7 +629,120 @@ namespace Veruthian.Library.Text.Lines
             if (amount < 0 || position + amount > length)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            var lineNumber = GetLineNumber(position);
+
+            var index = GetIndexFromPosition(position);
+
+            var segment = segments[index];
+
+            var column = position - segment.Position;
+
+
+            var segmentCount = 0;
+
+
+            var lineOffset = 0;
+
+            var positionOffset = amount;
+
+
+            var lastLineNumber = segment.LineNumber;
+
+
+            // If removing within a segment
+            if (column + amount < segment.Length)
+            {
+                segment.Length -= amount;
+
+                segments[index] = segment;
+
+                Adjust(0, amount, index + 1);
+            }
+            // If removing one or more segments
+            else
+            {
+                var dangling = segment;
+
+                // If removing end of first segment
+                if (column != 0)
+                {
+                    dangling.Length -= column;
+
+                    dangling.Ending = LineEnding.None;
+
+                    amount -= dangling.Length;
+
+                    lineOffset++;
+
+                    index++;
+                }
+
+                // If removing rest of segments
+                if (position + amount == length)
+                {
+                    segments.RemoveRange(index, segments.Count - index);
+
+                    if (column != 0)
+                        segments[index - 1] = dangling;
+                }
+                // Otherwise            
+                else
+                {
+
+                    while (amount > 0)
+                    {
+                        segment = segments[index + segmentCount];
+
+                        // If entire segment is being removed
+                        if (segment.Length >= amount)
+                        {
+                            amount -= segment.Length;
+
+                            segment.Length = 0;
+
+                            segmentCount++;
+
+                            // Increment LineOffset for adjustment
+                            if (segment.LineNumber != lastLineNumber)
+                            {
+                                lineOffset++;
+
+                                lastLineNumber = segment.LineNumber;
+                            }
+                        }
+                        // If removing beginning of last segment 
+                        else
+                        {
+                            segment.Position += amount;
+
+                            segment.Length -= amount;
+                        }
+                    }                    
+
+                    // Need to merge in dangling
+                    if (column != 0)
+                    {
+                        // If removed entire last segment, get next for dangling
+                        if (segment.Length == 0)
+                            segment = segments[index + segmentCount + 1];
+
+                        dangling.Length += segment.Length;
+
+                        dangling.Ending = segment.Ending;
+
+                        segments[index - 1] = dangling;
+                    }
+                    // If removed only beginning of last segment
+                    else if (segment.Length != 0)
+                    {
+                        segments[index + segmentCount] = segment;
+                    }
+
+                    // Remove and adjust
+                    segments.RemoveRange(index, segmentCount);
+
+                    Adjust(lineOffset, positionOffset, index);
+                }
+            }
         }
 
 
