@@ -6,8 +6,8 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<I, S>
-        where S : IEnumerable<I>
+    public abstract class BaseLineTable<U, S> : IEditableText<U, IEnumerable<U>>
+        where S : IEnumerable<U>
     {
         private struct LineSegment
         {
@@ -70,7 +70,7 @@ namespace Veruthian.Library.Text.Lines
 
             this.length = 0;
 
-            this.endingType = endingType;
+            this.endingType = endingType ?? LineEnding.None;
         }
 
 
@@ -240,11 +240,11 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Append
-        public void Append(I value) => Append(null, value);
+        public void Append(U value) => Append(null, value);
 
-        public void Append(IEnumerable<I> values) => Append(values, default(I));
+        public void Append(IEnumerable<U> values) => Append(values, default(U));
 
-        private void Append(IEnumerable<I> values, I value)
+        private void Append(IEnumerable<U> values, U value)
         {
             var segment = segments[segments.Count - 1];
 
@@ -266,7 +266,7 @@ namespace Veruthian.Library.Text.Lines
                 }
             }
 
-            void ProcessItem(I item)
+            void ProcessItem(U item)
             {
                 var utf32 = ConvertToUtf32(item);
 
@@ -353,11 +353,11 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Prepend
-        public void Prepend(I value) => Prepend(null, value);
+        public void Prepend(U value) => Prepend(null, value);
 
-        public void Prepend(IEnumerable<I> values) => Prepend(values, default(I));
+        public void Prepend(IEnumerable<U> values) => Prepend(values, default(U));
 
-        private void Prepend(IEnumerable<I> values, I value)
+        private void Prepend(IEnumerable<U> values, U value)
         {
             if (length == 0)
                 Append(values, value);
@@ -367,11 +367,11 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Insert
-        public void Insert(int position, I value) => RoutedInsert(position, null, value);
+        public void Insert(int position, U value) => RoutedInsert(position, null, value);
 
-        public void Insert(int position, IEnumerable<I> values) => RoutedInsert(position, values, default(I));
+        public void Insert(int position, IEnumerable<U> values) => RoutedInsert(position, values, default(U));
 
-        private void RoutedInsert(int position, IEnumerable<I> values, I value)
+        private void RoutedInsert(int position, IEnumerable<U> values, U value)
         {
             if (position == length)
                 Append(values, value);
@@ -383,7 +383,7 @@ namespace Veruthian.Library.Text.Lines
                 Insert(position, values, value);
         }
 
-        private void Insert(int position, IEnumerable<I> values, I value)
+        private void Insert(int position, IEnumerable<U> values, U value)
         {
             var index = GetIndexFromPosition(position);
 
@@ -394,7 +394,7 @@ namespace Veruthian.Library.Text.Lines
             Insert(index, column, values, value);
         }
 
-        private void Insert(int index, int column, IEnumerable<I> values, I value)
+        private void Insert(int index, int column, IEnumerable<U> values, U value)
         {
             var segment = this.segments[index];
 
@@ -431,7 +431,7 @@ namespace Veruthian.Library.Text.Lines
                 column = columnOffset = 0;
             }
 
-            void ProcessItem(I item)
+            void ProcessItem(U item)
             {
                 var utf32 = ConvertToUtf32(item);
 
@@ -716,7 +716,7 @@ namespace Veruthian.Library.Text.Lines
 
                             segment.Length -= amount;
                         }
-                    }                    
+                    }
 
                     // Need to merge in dangling
                     if (column != 0)
@@ -826,7 +826,7 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Abstract
-        protected abstract uint ConvertToUtf32(I value);
+        protected abstract uint ConvertToUtf32(U value);
 
         protected abstract int GetLength(S value);
 
