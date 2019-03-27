@@ -6,7 +6,7 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<I, S> : IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)>
+    public abstract class BaseLineTable<I, S> 
         where S : IEnumerable<I>
     {
         private struct LineSegment
@@ -504,14 +504,15 @@ namespace Veruthian.Library.Text.Lines
                     // Split a <..CrLf> into <..Cr> + <> + {Lf}
                     else if (segment.Ending == LineEnding.CrLf)
                     {
-                        segment.Ending = LineEnding.Cr;
-
-                        segment.Length--;
-
-
+                        // <..Cr>|{Lf}
                         lastsegment = segment;
 
+                        lastsegment.Ending = LineEnding.Cr;
 
+                        lastsegment.Length--;
+                    
+
+                        // Add new empty segment
                         var newlineOffset = NewLineOffset(LineEnding.Cr);
 
                         segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + segment.Length, 0, LineEnding.None);
@@ -520,6 +521,9 @@ namespace Veruthian.Library.Text.Lines
 
                         column = columnOffset = 0;
 
+
+                        // If Cr is not considered a line
+                        lineOffset -= (newlineOffset ^ 1);
 
                         split = true;
                     }
@@ -533,7 +537,7 @@ namespace Veruthian.Library.Text.Lines
                     // <...?> + <> + {Lf}
                     if (segment.Length == 0)
                     {
-                        // <...Cr> + <> + {Lf}
+                        // <...Cr> + <> + {Lf} & endingType = CrLf | None
                         if (lastsegment.Ending == LineEnding.Cr && (endingType == LineEnding.CrLf || endingType == LineEnding.None))
                         {
                             segments.RemoveAt(index);
@@ -542,7 +546,10 @@ namespace Veruthian.Library.Text.Lines
 
                             lastsegment.Ending = LineEnding.CrLf;
 
-                            segments[--index] = lastsegment;
+                            segments[index - 1] = lastsegment;
+
+                            // Increment line if Cr is not a newline
+                            lineOffset += (NewLineOffset(LineEnding.Cr) ^ 1);
                         }
                         // <...?> + <{Lf}>
                         else
@@ -570,7 +577,10 @@ namespace Veruthian.Library.Text.Lines
 
                         segment.Ending = LineEnding.CrLf;
 
-                        segments[index++] = segment;              
+                        segments[index++] = segment;
+
+                        // Increment line if Cr is not a newline
+                        lineOffset += (NewLineOffset(LineEnding.Cr) ^ 1);
                     }
                     // <...?> + <{Lf}>
                     else
@@ -582,6 +592,7 @@ namespace Veruthian.Library.Text.Lines
                         segments.Insert(index++, segment);
                     }
                 }
+                // Otherwise just update the last segment
                 else
                 {
                     segments[index++] = segment;                    
@@ -654,50 +665,51 @@ namespace Veruthian.Library.Text.Lines
 
         public IEnumerable<S> ExtractLines(S value, bool includeEnd = true)
         {
-            foreach (var line in this)
+            foreach (var line in Lines)
                 yield return ExtractLine(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
         }
 
 
         // Enumerator
-        public IEnumerator<(int LineNumber, int Position, int Length, LineEnding Ending)> GetEnumerator()
+        public IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)> Lines
         {
-            if (endingType != LineEnding.CrLf)
+            get
             {
-                foreach (var line in segments)
-                    yield return line;
-            }
-            else
-            {
-                var lineNumber = 0;
-
-                var segment = segments[0];
-
-                for (int i = 1; i < segments.Count; i++)
+                if (endingType != LineEnding.CrLf)
                 {
-                    var nextSegment = segments[i];
-
-                    if (nextSegment.LineNumber == lineNumber)
-                    {
-                        segment.Length += nextSegment.Length;
-
-                        segment.Ending = nextSegment.Ending;
-                    }
-                    else
-                    {
-                        yield return segment;
-
-                        lineNumber++;
-
-                        segment = nextSegment;
-                    }
+                    foreach (var line in segments)
+                        yield return line;
                 }
+                else
+                {
+                    var lineNumber = 0;
 
-                yield return segment;
+                    var segment = segments[0];
+
+                    for (int i = 1; i < segments.Count; i++)
+                    {
+                        var nextSegment = segments[i];
+
+                        if (nextSegment.LineNumber == lineNumber)
+                        {
+                            segment.Length += nextSegment.Length;
+
+                            segment.Ending = nextSegment.Ending;
+                        }
+                        else
+                        {
+                            yield return segment;
+
+                            lineNumber++;
+
+                            segment = nextSegment;
+                        }
+                    }
+
+                    yield return segment;
+                }
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         // Abstract

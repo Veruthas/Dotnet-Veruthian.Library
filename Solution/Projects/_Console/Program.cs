@@ -11,7 +11,7 @@ namespace _Console
         {
             var s = "Hello\r\nMy\nName\ris Levi";
 
-            var l = new CharLineTable(LineEnding.None);
+            var l = new CharLineTable(LineEnding.CrLf);
 
             // for (int i = s.Length - 1; i >= 0; i--)
             //     l.Prepend(s[i]);
