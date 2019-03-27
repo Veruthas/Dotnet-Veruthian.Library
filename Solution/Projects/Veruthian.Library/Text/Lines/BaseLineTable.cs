@@ -790,8 +790,8 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Extract
-        public S Extract<S>(S value, int lineNumber, SliceText<S> slice, bool includeEnd = true)
-            where S : IEnumerable<U>
+        public E Extract<E>(E value, int lineNumber, SliceText<E> slice, bool includeEnd = true)
+            where E : IEnumerable<U>
         {
             if (lineNumber < 0 || lineNumber >= Count)
                 throw new ArgumentOutOfRangeException(nameof(lineNumber));
@@ -801,8 +801,8 @@ namespace Veruthian.Library.Text.Lines
             return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
         }
 
-        public IEnumerable<S> Extract<S>(S value, SliceText<S> slice, bool includeEnd = true)
-            where S : IEnumerable<U>
+        public IEnumerable<E> Extract<E>(E value, SliceText<E> slice, bool includeEnd = true)
+            where E : IEnumerable<U>
         {
             foreach (var line in Lines)
                 yield return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
