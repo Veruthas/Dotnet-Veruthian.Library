@@ -6,7 +6,8 @@ using Veruthian.Library.Text.Runes;
 
 namespace Veruthian.Library.Text.Lines
 {
-    public abstract class BaseLineTable<U> : IEditableText<U, IEnumerable<U>>        
+    public abstract class BaseLineTable<U, S> : IEditableText<U, S>
+        where S : IEnumerable<U>
     {
         private struct LineSegment
         {
@@ -238,11 +239,11 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Append
-        public void Append(U value) => Append(null, value);
+        public void Append(U value) => Append(false, default(S), value);
 
-        public void Append(IEnumerable<U> values) => Append(values, default(U));
+        public void Append(S values) => Append(true, values, default(U));
 
-        private void Append(IEnumerable<U> values, U value)
+        private void Append(bool enumerate, S values, U value)
         {
             var segment = segments[segments.Count - 1];
 
@@ -338,7 +339,7 @@ namespace Veruthian.Library.Text.Lines
                 added++;
             }
 
-            if (values != null)
+            if (enumerate)
                 foreach (var item in values)
                     ProcessItem(item);
             else
@@ -351,37 +352,35 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Prepend
-        public void Prepend(U value) => Prepend(null, value);
+        public void Prepend(U value) => Prepend(false, default(S), value);
 
-        public void Prepend(IEnumerable<U> values) => Prepend(values, default(U));
+        public void Prepend(S values) => Prepend(true, values, default(U));
 
-        private void Prepend(IEnumerable<U> values, U value)
+        private void Prepend(bool enumerate, S values, U value)
         {
             if (length == 0)
-                Append(values, value);
+                Append(enumerate, values, value);
             else
-                Insert(0, 0, values, value);
+                Insert(enumerate, 0, 0, values, value);
         }
 
 
         // Insert
-        public void Insert(int position, U value) => RoutedInsert(position, null, value);
+        public void Insert(int position, U value) => RoutedInsert(false, position, default(S), value);
 
-        public void Insert(int position, IEnumerable<U> values) => RoutedInsert(position, values, default(U));
+        public void Insert(int position, S values) => RoutedInsert(true, position, values, default(U));
 
-        private void RoutedInsert(int position, IEnumerable<U> values, U value)
+        private void RoutedInsert(bool enumerate, int position, S values, U value)
         {
             if (position == length)
-                Append(values, value);
-            else if (position == 0)
-                Prepend(values, value);
+                Append(enumerate, values, value);
             else if (position < 0 || position > length)
                 throw new ArgumentOutOfRangeException(nameof(position));
             else
-                Insert(position, values, value);
+                Insert(enumerate, position, values, value);
         }
 
-        private void Insert(int position, IEnumerable<U> values, U value)
+        private void Insert(bool enumerate, int position, S values, U value)
         {
             var index = GetIndexFromPosition(position);
 
@@ -389,10 +388,10 @@ namespace Veruthian.Library.Text.Lines
 
             var column = position - segment.Position;
 
-            Insert(index, column, values, value);
+            Insert(enumerate, index, column, values, value);
         }
 
-        private void Insert(int index, int column, IEnumerable<U> values, U value)
+        private void Insert(bool enumerate, int index, int column, S values, U value)
         {
             var segment = this.segments[index];
 
@@ -602,7 +601,7 @@ namespace Veruthian.Library.Text.Lines
 
             ProcessInitial();
 
-            if (values != null)
+            if (enumerate)
                 foreach (var item in values)
                     ProcessItem(item);
             else
@@ -807,6 +806,6 @@ namespace Veruthian.Library.Text.Lines
         {
             foreach (var line in Lines)
                 yield return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
-        }        
-    }    
+        }
+    }
 }
