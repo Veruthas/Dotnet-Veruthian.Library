@@ -236,6 +236,8 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
+        private int NewLineOffset(LineEnding ending) => (endingType != LineEnding.CrLf || ending == LineEnding.CrLf ? 1 : 0);
+
 
         // Append
         public void Append(I value) => Append(null, value);
@@ -254,9 +256,9 @@ namespace Veruthian.Library.Text.Lines
 
                 if (segment.Ending != LineEnding.None)
                 {
-                    var isNewLine = (endingType != LineEnding.CrLf || segment.Ending == LineEnding.CrLf ? 1 : 0);
+                    var newlineOffset = NewLineOffset(segment.Ending);
 
-                    var lineNumber = segment.LineNumber + isNewLine;
+                    var lineNumber = segment.LineNumber + newlineOffset;
 
                     segment = new LineSegment(lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
 
@@ -409,13 +411,12 @@ namespace Veruthian.Library.Text.Lines
 
             void SplitSegment(LineEnding ending)
             {
-                // Is either a newline or a \r|\n note for future inserts
-                var isNewLine = (endingType != LineEnding.CrLf || ending == LineEnding.CrLf ? 1 : 0);
+                var newlineOffset = NewLineOffset(ending);
 
 
                 lastsegment = new LineSegment(segment.LineNumber, segment.Position, column + columnOffset, ending);
 
-                segment = new LineSegment(segment.LineNumber + isNewLine, segment.Position + lastsegment.Length, segment.Length - lastsegment.Length, segment.Ending);
+                segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + lastsegment.Length, segment.Length - lastsegment.Length, segment.Ending);
 
 
                 segments[index++] = lastsegment;
@@ -423,50 +424,11 @@ namespace Veruthian.Library.Text.Lines
                 segments.Insert(index, segment);
 
 
-                lineOffset += isNewLine;
+                lineOffset += newlineOffset;
 
                 positionOffset += columnOffset;
 
                 column = columnOffset = 0;
-            }
-
-            void MergeSegment(LineEnding ending)
-            {
-                segment.Ending = ending;
-
-                segment.Length++;
-
-                segments.RemoveAt(index + 1);
-            }
-
-
-            void ProcessInitial()
-            {
-                // Push off <...[?]Lf> processing until end
-                if (column == segment.Length - 1)
-                {
-                    // Split a <..Lf> into <..> + <Lf>
-                    if (segment.Ending == LineEnding.Lf && endingType != LineEnding.Lf)
-                    {
-                        segment.Ending = LineEnding.None;
-
-                        split = true;
-                    }
-                    // Split a <..CrLf> into <..Cr> + <Lf>
-                    else if (segment.Ending == LineEnding.CrLf)
-                    {
-                        segment.Ending = LineEnding.Cr;
-
-                        split = true;
-                    }
-
-                    if (split)
-                    {
-                        segments.Insert(index + 1, new LineSegment(segment.LineNumber, segment.Position + segment.Length, 1, LineEnding.Lf));
-
-                        segment.Length--;
-                    }
-                }
             }
 
             void ProcessItem(I item)
@@ -524,25 +486,106 @@ namespace Veruthian.Library.Text.Lines
                 }
             }
 
+
+            void ProcessInitial()
+            {
+                // Push off <...[?]Lf> processing until end
+                if (column == segment.Length - 1)
+                {
+                    // Split a <..Lf> into <..> + {Lf}
+                    if (segment.Ending == LineEnding.Lf && endingType != LineEnding.Lf)
+                    {
+                        segment.Ending = LineEnding.None;
+
+                        segment.Length--;
+
+                        split = true;
+                    }
+                    // Split a <..CrLf> into <..Cr> + <> + {Lf}
+                    else if (segment.Ending == LineEnding.CrLf)
+                    {
+                        segment.Ending = LineEnding.Cr;
+
+                        segment.Length--;
+
+
+                        lastsegment = segment;
+
+
+                        var newlineOffset = NewLineOffset(LineEnding.Cr);
+
+                        segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + segment.Length, 0, LineEnding.None);
+
+                        segments.Insert(++index, segment);
+
+                        column = columnOffset = 0;
+
+
+                        split = true;
+                    }
+                }
+            }
+
             void ProcessFinal()
             {
-                // Check for merge from a split                
                 if (split)
                 {
-                    // <..?> + <> + <Lf>
+                    // <...?> + <> + {Lf}
                     if (segment.Length == 0)
                     {
-                        segments.RemoveAt(index--);
-                        segment = segments[index];
+                        // <...Cr> + <> + {Lf}
+                        if (lastsegment.Ending == LineEnding.Cr && (endingType == LineEnding.CrLf || endingType == LineEnding.None))
+                        {
+                            segments.RemoveAt(index);
+
+                            lastsegment.Length++;
+
+                            lastsegment.Ending = LineEnding.CrLf;
+
+                            segments[--index] = lastsegment;
+                        }
+                        // <...?> + <{Lf}>
+                        else
+                        {
+                            segment.Length = 1;
+
+                            segment.Ending = LineEnding.Lf;
+
+                            segments[index++] = segment;
+                        }
                     }
+                    // <...None> + {Lf}
+                    else if (segment.Ending == LineEnding.None)
+                    {
+                        segment.Length++;
 
-                    if (segment.Ending == LineEnding.None)
-                        MergeSegment(LineEnding.Lf);
-                    else if (segment.Ending == LineEnding.Cr)
-                        MergeSegment(LineEnding.CrLf);
+                        segment.Ending = LineEnding.Lf;
+
+                        segments[index++] = segment;
+                    }
+                    // <...Cr> + {Lf} & endingType = CrLf | None
+                    else if (segment.Ending == LineEnding.Cr && (endingType == LineEnding.CrLf || endingType == LineEnding.None))
+                    {
+                        segment.Length++;
+
+                        segment.Ending = LineEnding.CrLf;
+
+                        segments[index++] = segment;              
+                    }
+                    // <...?> + <{Lf}>
+                    else
+                    {
+                        segments[index++] = segment;
+
+                        segment = new LineSegment(segment.LineNumber, segment.Position + segment.Length, 1, LineEnding.Lf);
+
+                        segments.Insert(index++, segment);
+                    }
                 }
-
-                segments[index++] = segment;
+                else
+                {
+                    segments[index++] = segment;                    
+                }
 
                 positionOffset += columnOffset;
             }
