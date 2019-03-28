@@ -1,7 +1,4 @@
 ﻿using System;
-using Veruthian.Library.Text.Lines;
-using Veruthian.Library.Text.Chars.Extensions;
-using System.Text;
 
 namespace _Console
 {
@@ -11,7 +8,6 @@ namespace _Console
         {
             Pause();
         }
-
 
         static void Pause()
         {
