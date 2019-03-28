@@ -121,7 +121,7 @@ namespace Veruthian.Library.Text.Lines
 
 
 
-        public static IEnumerable<S> Split<U, S, B>(IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+        public static IEnumerable<S> GetLines<U, S, B>(IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
             where B : IEditableText<U>
         {
             if (ending == null)

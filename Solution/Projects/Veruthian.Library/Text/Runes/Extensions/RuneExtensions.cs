@@ -255,11 +255,11 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
         // Split
-        public static IEnumerable<string> Split(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<string> GetLines(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
         {
             RuneBuffer buffer = new RuneBuffer();
 
-            return LineEnding.Split(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
+            return LineEnding.GetLines(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
         }
     }
 }

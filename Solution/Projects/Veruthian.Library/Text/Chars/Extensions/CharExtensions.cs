@@ -54,11 +54,11 @@ namespace Veruthian.Library.Text.Chars.Extensions
         }
 
         // Split
-        public static IEnumerable<string> Split(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
         {
             StringBuffer buffer = new StringBuffer();
             
-            return LineEnding.Split(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
+            return LineEnding.GetLines(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
         }
 
 
