@@ -72,6 +72,14 @@ namespace Veruthian.Library.Text.Lines
 
             this.Lines.Remove(position, amount);
         }
+    
+        public void Clear()
+        {
+            Value.Clear();
+
+            Lines.Clear();
+        }
+
     }
 
     public enum LineCommandType

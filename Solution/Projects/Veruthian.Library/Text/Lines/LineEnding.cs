@@ -1,6 +1,8 @@
 using Veruthian.Library.Types;
 using Veruthian.Library.Text.Encodings;
 using static Veruthian.Library.Text.Encodings.Utf32;
+using System.Collections.Generic;
+using System;
 
 namespace Veruthian.Library.Text.Lines
 {
@@ -116,5 +118,105 @@ namespace Veruthian.Library.Text.Lines
         public static readonly LineEnding LineFeed = Lf;
 
         public static readonly LineEnding CarriageReturnLineFeed = CrLf;
+
+
+
+        public static IEnumerable<S> Split<U, S, B>(IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+            where B : IEditableText<U>
+        {
+            if (ending == null)
+                ending = LineEnding.None;
+
+            bool allowCrLf = ending == CrLf || ending == None;
+
+            bool allowLf = ending == Lf || ending == None;
+
+            bool allowCr = ending == Cr || ending == None;
+
+
+            LineEnding found = None;
+
+            bool empty = true;
+
+
+            foreach (var value in values)
+            {
+                uint utf32 = getUtf32(value);
+
+                if (found == LineEnding.Cr)
+                {
+                    // CrLf
+                    if (allowCrLf && utf32 == Utf32.Chars.Lf)
+                    {
+                        if (keepEnding)
+                            builder.Append(value);
+
+                        yield return getItem(builder);
+
+                        builder.Clear();
+
+                        empty = true;
+
+                        found = LineEnding.None;
+
+                        continue;
+                    }
+                    // Cr                    
+                    else if (allowCr)
+                    {
+                        yield return getItem(builder);
+
+                        builder.Clear();
+
+                        empty = true;
+                    }
+                }
+                // Lf
+                else if (found == LineEnding.Lf)
+                {
+                    if (allowLf)
+                    {
+                        yield return getItem(builder);
+
+                        builder.Clear();
+
+                        empty = true;
+                    }
+                }
+
+                if (utf32 == Utf32.Chars.Cr)
+                {
+                    found = LineEnding.Cr;
+
+                    if (keepEnding)
+                        builder.Append(value);
+                }
+                else if (utf32 == Utf32.Chars.Lf)
+                {
+                    found = LineEnding.Lf;
+
+                    if (keepEnding)
+                        builder.Append(value);
+                }
+                else
+                {
+                    builder.Append(value);
+
+                    found = LineEnding.None;
+
+                    empty = false;
+                }
+            }
+
+            if (!empty)
+            {
+                yield return getItem(builder);
+
+                builder.Clear();
+
+                if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
+                    yield return getItem(builder);
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
+using Veruthian.Library.Text.Encodings;
+using Veruthian.Library.Text.Lines;
 
 namespace Veruthian.Library.Text.Chars.Extensions
 {
@@ -33,22 +35,30 @@ namespace Veruthian.Library.Text.Chars.Extensions
             return builder.ToString();
         }
 
-        // LineTracking
-        public static IEnumerable<char> ProcessLines(this IEnumerable<char> chars, out CharLineTable lines)
+        // LineTable
+        public static IEnumerable<char> ProcessLines(this IEnumerable<char> values, out CharLineTable lines)
         {
             lines = new CharLineTable();
 
-            return ProcessLines(chars, lines);
+            return ProcessLines(values, lines);
         }
 
-        private static IEnumerable<char> ProcessLines(this IEnumerable<char> chars, CharLineTable lines)
-        {            
-            foreach (var rune in chars)
+        private static IEnumerable<char> ProcessLines(this IEnumerable<char> values, CharLineTable lines)
+        {
+            foreach (var rune in values)
             {
                 lines.Append(rune);
 
                 yield return rune;
             }
+        }
+
+        // Split
+        public static IEnumerable<string> Split(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        {
+            StringBuffer buffer = new StringBuffer();
+            
+            return LineEnding.Split(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
         }
 
 

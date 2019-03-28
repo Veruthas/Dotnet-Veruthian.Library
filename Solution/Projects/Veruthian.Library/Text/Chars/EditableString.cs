@@ -42,6 +42,9 @@ namespace Veruthian.Library.Text.Chars
         public void Remove(int position, int amount) => this.value = this.value.Remove(position, amount);
 
 
+        public void Clear() => this.value = string.Empty;
+
+
         public static implicit operator string(EditableString value) => value.value;
 
         public static implicit operator EditableString(string value) => new EditableString(value);

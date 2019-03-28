@@ -8,7 +8,7 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Text.Runes
 {
-    public class RuneBuffer : IEnumerable<Rune>, IEditableText<Rune, IEnumerable<Rune>>, IEditableText<Rune, RuneString>
+    public class RuneBuffer : IEnumerable<Rune>, IEditableText<Rune>, IEditableText<Rune, IEnumerable<Rune>>, IEditableText<Rune, RuneString>
     {
         List<Rune> runes;
 
@@ -123,7 +123,7 @@ namespace Veruthian.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            return Append(value, start, value.Length - start);
+            return Insert(position, value, start, value.Length - start);
         }
 
         public RuneBuffer Insert(int position, RuneString value, int start, int length)
@@ -491,9 +491,9 @@ namespace Veruthian.Library.Text.Runes
             return new RuneString(runes, position);
         }
 
-        public RuneString ToRuneString(int position, int length)
+        public RuneString ToRuneString(int position, int amount)
         {
-            return new RuneString(runes, position, length);
+            return new RuneString(runes, position, amount);
         }
 
         public Rune[] ToRunes()
@@ -542,42 +542,36 @@ namespace Veruthian.Library.Text.Runes
         }
 
 
-
         // Enumerator
         public IEnumerator<Rune> GetEnumerator() => runes.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        // IEditableText<Rune>
+        void IEditableText<Rune>.Insert(int position, Rune value) => Insert(position, value);
+
+        void IEditableText<Rune>.Remove(int position, int amount) => Remove(position, amount);
+
+        void IEditableText<Rune>.Clear() => Clear();
         
+
         // IEditableText<Rune, IEnumerable<Rune>>
-        void IEditableText<Rune, IEnumerable<Rune>>.Append(Rune value) => Append(value);
-
         void IEditableText<Rune, IEnumerable<Rune>>.Append(IEnumerable<Rune> values) => Append(values);
-
-        void IEditableText<Rune, IEnumerable<Rune>>.Prepend(Rune value) => Prepend(value);
 
         void IEditableText<Rune, IEnumerable<Rune>>.Prepend(IEnumerable<Rune> values) => Prepend(values);
 
-        void IEditableText<Rune, IEnumerable<Rune>>.Insert(int position, Rune value) => Insert(position, value);
-
         void IEditableText<Rune, IEnumerable<Rune>>.Insert(int position, IEnumerable<Rune> values) => Insert(position, values);
 
-        void IEditableText<Rune, IEnumerable<Rune>>.Remove(int position, int amount) => Remove(position, amount);
 
-
-        // IEditableText<Rune, RuneString>
-        void IEditableText<Rune, RuneString>.Append(Rune value) => Append(value);
-        
+        // IEditableText<Rune, RuneString>        
         void IEditableText<Rune, RuneString>.Append(RuneString values) => Append(values);
-
-        void IEditableText<Rune, RuneString>.Prepend(Rune value) => Prepend(value);
 
         void IEditableText<Rune, RuneString>.Prepend(RuneString values) => Prepend(values);
 
-        void IEditableText<Rune, RuneString>.Insert(int position, Rune value) => Insert(position, value);
-
         void IEditableText<Rune, RuneString>.Insert(int position, RuneString values) => Insert(position, values);
 
-        void IEditableText<Rune, RuneString>.Remove(int position, int amount) => Remove(position, amount);
+        void IEditableText<Rune>.Append(Rune value) => Append(value);
+
+        void IEditableText<Rune>.Prepend(Rune value) => Prepend(value);
     }
 }

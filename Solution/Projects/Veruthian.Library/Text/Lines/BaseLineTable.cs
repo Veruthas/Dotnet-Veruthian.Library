@@ -75,7 +75,7 @@ namespace Veruthian.Library.Text.Lines
 
 
         public int Count => segments[segments.Count - 1].LineNumber + 1;
-
+    
         public LineEnding EndingType => endingType;
 
 
@@ -742,6 +742,12 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
+        // Clear
+        public void Clear()
+        {
+            segments.Clear();
+            length = 0;
+        }
 
         // Enumerator
         public IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)> Lines
@@ -782,7 +788,7 @@ namespace Veruthian.Library.Text.Lines
                     yield return segment;
                 }
             }
-        }
+        }        
 
 
         // Abstract
@@ -790,7 +796,7 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Extract
-        public E Extract<E>(E value, int lineNumber, SliceText<E> slice, bool includeEnd = true)
+        public E Extract<E>(E value, int lineNumber, SliceText<E> slice, bool keepEnding = true)
             where E : IEnumerable<U>
         {
             if (lineNumber < 0 || lineNumber >= Count)
@@ -798,14 +804,14 @@ namespace Veruthian.Library.Text.Lines
 
             var line = GetLine(lineNumber);
 
-            return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
+            return slice(value, line.Position, line.Length - (keepEnding ? 0 : line.Ending.Size));
         }
 
-        public IEnumerable<E> Extract<E>(E value, SliceText<E> slice, bool includeEnd = true)
+        public IEnumerable<E> Extract<E>(E value, SliceText<E> slice, bool keepEnding = true)
             where E : IEnumerable<U>
         {
             foreach (var line in Lines)
-                yield return slice(value, line.Position, line.Length - (includeEnd ? 0 : line.Ending.Size));
+                yield return slice(value, line.Position, line.Length - (keepEnding ? 0 : line.Ending.Size));
         }
     }
 }
