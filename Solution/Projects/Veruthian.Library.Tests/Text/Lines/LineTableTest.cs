@@ -130,4 +130,29 @@ namespace Veruthian.Library.Text.Lines
             : base(new EditableRuneString(), new RuneLineTable<EditableRuneString>(ending), new RuneBuffer(), Slice, (r => (uint)r), (b => b.ToRuneString())) { }
     }
 
+
+    public static class CharLineTester
+    {
+        static Dictionary<string, Action<CharLineBuilder>> actions = new Dictionary<string, Action<CharLineBuilder>>();
+
+        static CharLineTester()
+        {
+            actions.Add("Append", b => b.Append("Hello, world!"));
+        }
+
+        [InlineData("Append", "None", true)]
+        [Theory]
+        public static void TestLines(string action, string ending, bool keepEnd)
+        {
+            LineEnding.TryGetByName(ending, out var lineEnding);
+
+            var builder = new CharLineBuilder(lineEnding);
+
+            var actionFunc = actions[action];
+
+            actionFunc(builder);
+
+            builder.Compare(keepEnd);
+        }
+    }
 }

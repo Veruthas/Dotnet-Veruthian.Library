@@ -104,6 +104,20 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
+        public static LineEnding From(string value)
+        {
+            switch (value)
+            {
+                case "\r":
+                    return LineEnding.Cr;
+                case "\n":
+                    return LineEnding.Lf;
+                case "\r\n":
+                    return LineEnding.CrLf;
+                default:
+                    return LineEnding.None;
+            }
+        }
 
         public static readonly LineEnding None = new LineEnding("None", "None or End of File", "", 0);
 
@@ -136,7 +150,7 @@ namespace Veruthian.Library.Text.Lines
 
 
             builder.Clear();
-            
+
             int lineNumber = 0;
 
             bool empty = true;
@@ -228,8 +242,8 @@ namespace Veruthian.Library.Text.Lines
             IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
             where B : IEditableText<U>
         {
-            foreach (var line in GetLineData(values, ending, keepEnding, builder, getUtf32, getItem))            
-                yield return line.Value;            
+            foreach (var line in GetLineData(values, ending, keepEnding, builder, getUtf32, getItem))
+                yield return line.Value;
         }
     }
 }
