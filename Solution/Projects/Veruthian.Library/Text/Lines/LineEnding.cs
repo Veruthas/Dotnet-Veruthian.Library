@@ -134,10 +134,13 @@ namespace Veruthian.Library.Text.Lines
             bool allowCr = ending == Cr || ending == None;
 
 
+            builder.Clear();
+
+
             LineEnding found = None;
 
             bool empty = true;
-
+            
 
             foreach (var value in values)
             {

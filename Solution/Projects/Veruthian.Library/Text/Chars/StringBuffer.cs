@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Text.Chars.Extensions
+namespace Veruthian.Library.Text.Chars
 {
     public class StringBuffer : IEnumerable<char>, IEditableText<char>, IEditableText<char, IEnumerable<char>>, IEditableText<char, string>
     {
