@@ -136,12 +136,12 @@ namespace Veruthian.Library.Text.Lines
 
 
             builder.Clear();
-
+            
             int lineNumber = 0;
 
-            LineEnding found = None;
-
             bool empty = true;
+
+            LineEnding found = None;
 
 
             foreach (var value in values)
