@@ -121,7 +121,8 @@ namespace Veruthian.Library.Text.Lines
 
 
 
-        public static IEnumerable<S> GetLines<U, S, B>(IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+        public static IEnumerable<(int LineNumber, LineEnding Ending, S Value)> GetLineData<U, S, B>(
+            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
             where B : IEditableText<U>
         {
             if (ending == null)
@@ -136,11 +137,12 @@ namespace Veruthian.Library.Text.Lines
 
             builder.Clear();
 
+            int lineNumber = 0;
 
             LineEnding found = None;
 
             bool empty = true;
-            
+
 
             foreach (var value in values)
             {
@@ -154,7 +156,7 @@ namespace Veruthian.Library.Text.Lines
                         if (keepEnding)
                             builder.Append(value);
 
-                        yield return getItem(builder);
+                        yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
 
                         builder.Clear();
 
@@ -167,7 +169,7 @@ namespace Veruthian.Library.Text.Lines
                     // Cr                    
                     else if (allowCr)
                     {
-                        yield return getItem(builder);
+                        yield return (lineNumber++, LineEnding.Cr, getItem(builder));
 
                         builder.Clear();
 
@@ -179,7 +181,7 @@ namespace Veruthian.Library.Text.Lines
                 {
                     if (allowLf)
                     {
-                        yield return getItem(builder);
+                        yield return (lineNumber++, LineEnding.Lf, getItem(builder));
 
                         builder.Clear();
 
@@ -213,13 +215,21 @@ namespace Veruthian.Library.Text.Lines
 
             if (!empty)
             {
-                yield return getItem(builder);
+                yield return (lineNumber++, found, getItem(builder));
 
                 builder.Clear();
 
                 if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
-                    yield return getItem(builder);
+                    yield return (lineNumber, LineEnding.None, getItem(builder));
             }
+        }
+
+        public static IEnumerable<S> GetLines<U, S, B>(
+            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+            where B : IEditableText<U>
+        {
+            foreach (var line in GetLineData(values, ending, keepEnding, builder, getUtf32, getItem))            
+                yield return line.Value;            
         }
     }
 }

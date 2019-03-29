@@ -53,12 +53,15 @@ namespace Veruthian.Library.Text.Chars.Extensions
             }
         }
 
-        // Split
+        // Lines
+        public static IEnumerable<(int LineNumber, LineEnding Ending, string value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLineData(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
+        }
+
         public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
         {
-            StringBuffer buffer = new StringBuffer();
-            
-            return LineEnding.GetLines(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
+            return LineEnding.GetLines(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
         }
 
 

@@ -254,12 +254,15 @@ namespace Veruthian.Library.Text.Runes.Extensions
             }
         }
 
-        // Split
-        public static IEnumerable<string> GetLines(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        // Lines
+        public static IEnumerable<(int LineNumber, LineEnding Ending, RuneString value)> GetLineData(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
         {
-            RuneBuffer buffer = new RuneBuffer();
+            return LineEnding.GetLineData(values, ending, keepEnding, new RuneBuffer(), (c => (uint)c), (b => b.ToRuneString()));
+        }
 
-            return LineEnding.GetLines(values, ending, keepEnding, buffer, (c => (uint)c), (b => b.ToString()));
+        public static IEnumerable<RuneString> GetLines(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLines(values, ending, keepEnding, new RuneBuffer(), (c => (uint)c), (b => b.ToRuneString()));
         }
     }
 }
