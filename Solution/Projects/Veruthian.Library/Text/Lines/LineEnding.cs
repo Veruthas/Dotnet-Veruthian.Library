@@ -1,6 +1,8 @@
 using Veruthian.Library.Types;
 using Veruthian.Library.Text.Encodings;
 using static Veruthian.Library.Text.Encodings.Utf32;
+using System.Collections.Generic;
+using System;
 
 namespace Veruthian.Library.Text.Lines
 {
@@ -30,6 +32,15 @@ namespace Veruthian.Library.Text.Lines
         public int Size => size;
 
 
+        public bool IsNewLine() => this != None;
+
+
+        public static bool IsNewLine(uint value) => value == Utf32.Chars.Lf || value == Utf32.Chars.Cr;
+
+        public static bool IsCarriageReturn(uint value) => value == Utf32.Chars.Cr;
+
+        public static bool IsLineFeed(uint value) => value == Utf32.Chars.Lf;
+
         public static bool IsNewLine(uint value, uint next)
         {
             // \r
@@ -42,7 +53,21 @@ namespace Veruthian.Library.Text.Lines
                 return false;
         }
 
-        public static LineEnding FromValues(uint value, uint next)
+
+        public static LineEnding From(uint value)
+        {
+            switch (value)
+            {
+                case '\r':
+                    return LineEnding.Cr;
+                case '\n':
+                    return LineEnding.Lf;
+                default:
+                    return LineEnding.None;
+            }
+        }
+
+        public static LineEnding From(uint value, uint next)
         {
             if (value == Utf32.Chars.Cr)
                 return next == Utf32.Chars.Lf ? LineEnding.CrLf : LineEnding.Cr;
@@ -52,19 +77,177 @@ namespace Veruthian.Library.Text.Lines
                 return LineEnding.None;
         }
 
+        public static LineEnding From(LineEnding ending, uint next)
+        {
+            if (ending == LineEnding.Cr)
+            {
+                switch (next)
+                {
+                    case Utf32.Chars.Lf:
+                        return LineEnding.CrLf;
+                    default:
+                        return LineEnding.None;
+                }
+            }
+            else
+            {
+                switch (next)
+                {
+                    case Utf32.Chars.Lf:
+                        return LineEnding.Lf;
+                    case Utf32.Chars.Cr:
+                        return LineEnding.Cr;
+                    default:
+                        return LineEnding.None;
+                }
+            }
+        }
+
+
+        public static LineEnding From(string value)
+        {
+            switch (value)
+            {
+                case "\r":
+                    return LineEnding.Cr;
+                case "\n":
+                    return LineEnding.Lf;
+                case "\r\n":
+                    return LineEnding.CrLf;
+                default:
+                    return LineEnding.None;
+            }
+        }
 
         public static readonly LineEnding None = new LineEnding("None", "None or End of File", "", 0);
 
         public static readonly LineEnding Cr = new LineEnding("Cr", "Carriage Return", "\r", 1);
 
-        public static readonly LineEnding Lf= new LineEnding("Lf", "Line Feed", "\n", 1);
+        public static readonly LineEnding Lf = new LineEnding("Lf", "Line Feed", "\n", 1);
 
-        public static readonly LineEnding CrLf= new LineEnding("CrLf", "Carriage Return + Line Feed", "\r\n", 2);
+        public static readonly LineEnding CrLf = new LineEnding("CrLf", "Carriage Return + Line Feed", "\r\n", 2);
 
         public static readonly LineEnding CarriageReturn = Cr;
 
-        public static readonly LineEnding LineFeed = Lf ;
+        public static readonly LineEnding LineFeed = Lf;
 
-        public static readonly LineEnding CarriageReturnLineFeed= CrLf;
+        public static readonly LineEnding CarriageReturnLineFeed = CrLf;
+
+
+
+        public static IEnumerable<(int LineNumber, LineEnding Ending, S Value)> GetLineData<U, S, B>(
+            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+            where B : IEditableText<U>
+        {
+            if (ending == null)
+                ending = LineEnding.None;
+
+            bool allowCrLf = ending == CrLf || ending == None;
+
+            bool allowLf = ending == Lf || ending == None;
+
+            bool allowCr = ending == Cr || ending == None;
+
+
+            builder.Clear();
+
+            int lineNumber = 0;
+
+            bool empty = true;
+
+            LineEnding found = None;
+
+
+            foreach (var value in values)
+            {
+                uint utf32 = getUtf32(value);
+
+                if (found == LineEnding.Cr)
+                {
+                    // CrLf
+                    if (allowCrLf && utf32 == Utf32.Chars.Lf)
+                    {
+                        found = LineEnding.CrLf;
+
+                        if (keepEnding)
+                            builder.Append(value);
+
+                        continue;
+                    }
+                    // Cr                    
+                    else if (allowCr)
+                    {
+                        yield return (lineNumber++, LineEnding.Cr, getItem(builder));
+
+                        builder.Clear();
+
+                        empty = true;
+                    }
+                }
+                // Lf
+                else if (found == LineEnding.Lf)
+                {
+                    if (allowLf)
+                    {
+                        yield return (lineNumber++, LineEnding.Lf, getItem(builder));
+
+                        builder.Clear();
+
+                        empty = true;
+                    }
+                }
+                // CrLf
+                else if (found == LineEnding.CrLf)
+                {
+                    yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
+
+                    builder.Clear();
+
+                    empty = true;
+                }
+
+
+                if (utf32 == Utf32.Chars.Cr)
+                {
+                    found = LineEnding.Cr;
+
+                    if (keepEnding)
+                        builder.Append(value);
+                }
+                else if (utf32 == Utf32.Chars.Lf)
+                {
+                    found = LineEnding.Lf;
+
+                    if (keepEnding)
+                        builder.Append(value);
+                }
+                else
+                {
+                    builder.Append(value);
+
+                    found = LineEnding.None;
+
+                    empty = false;
+                }
+            }
+
+            if (!empty)
+            {
+                yield return (lineNumber++, found, getItem(builder));
+
+                builder.Clear();
+
+                if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
+                    yield return (lineNumber, LineEnding.None, getItem(builder));
+            }
+        }
+
+        public static IEnumerable<S> GetLines<U, S, B>(
+            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
+            where B : IEditableText<U>
+        {
+            foreach (var line in GetLineData(values, ending, keepEnding, builder, getUtf32, getItem))
+                yield return line.Value;
+        }
     }
 }

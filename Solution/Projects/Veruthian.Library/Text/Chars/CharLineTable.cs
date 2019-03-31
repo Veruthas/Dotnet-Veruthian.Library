@@ -1,13 +1,22 @@
+using System.Collections.Generic;
 using Veruthian.Library.Text.Lines;
 
 namespace Veruthian.Library.Text.Chars
 {
-    public class CharLineTable : BaseLineTable<char, string>
+    public class CharLineTable<S> : BaseLineTable<char, S>
+        where S : IEnumerable<char>
     {
+        public CharLineTable() : base() { }
+
+        public CharLineTable(LineEnding endingType) : base(endingType) { }
+
         protected sealed override uint ConvertToUtf32(char value) => value;
+    }
 
-        protected sealed override int GetLength(string value) => value.Length;
+    public class CharLineTable: CharLineTable<IEnumerable<char>>    
+    {
+        public CharLineTable() : base() { }
 
-        protected sealed override string Slice(string value, int start, int length) => value.Substring(start, length);
+        public CharLineTable(LineEnding endingType) : base(endingType) { }
     }
 }

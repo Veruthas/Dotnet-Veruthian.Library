@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Veruthian.Library\Veruthian.Library.csproj" />
+    <ProjectReference Include="..\Veruthian.Library.Tests\Veruthian.Library.Tests.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -8,7 +8,7 @@ using Veruthian.Library.Readers.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Veruthian.Library.Readers
+namespace Veruthian.Library.Readers.Test
 {
     public abstract class ReaderTest<T, TReader>
         where TReader : IReader<T>
