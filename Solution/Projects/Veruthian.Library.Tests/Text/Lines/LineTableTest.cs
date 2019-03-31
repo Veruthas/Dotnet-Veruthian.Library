@@ -34,6 +34,8 @@ namespace Veruthian.Library.Text.Lines
 
             this.builder = builder;
 
+            this.slicer = slicer;
+            
             this.getUtf32 = getUtf32;
 
             this.getItem = getItem;
@@ -55,6 +57,12 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
+        public void AppendMultiple(IEnumerable<U> values)
+        {
+            foreach (var value in values)
+                Append(value);
+        }
+
         public void Prepend(U value)
         {
             this.Value.Prepend(value);
@@ -67,6 +75,13 @@ namespace Veruthian.Library.Text.Lines
             this.Value.Prepend(value);
 
             this.Lines.Prepend(value);
+        }
+
+
+        public void PrependMultiple(IEnumerable<U> values)
+        {
+            foreach (var value in values.Reverse())
+                Prepend(value);
         }
 
 
@@ -84,12 +99,38 @@ namespace Veruthian.Library.Text.Lines
             this.Lines.Insert(position, value);
         }
 
+        public void InsertMultiple(int position, IEnumerable<U> values)
+        {
+            foreach (var value in values)
+            {
+                Insert(position++, value);
+            }
+        }
+
+        public void InsertMultipleReversed(int position, IEnumerable<U> values)
+        {
+            foreach (var value in values.Reverse())
+                Insert(position, value);
+        }
 
         public void Remove(int position, int amount)
         {
             this.Value.Remove(position, amount);
 
             this.Lines.Remove(position, amount);
+        }
+
+        public void RemoveMultiple(int position, int amount)
+        {
+            for (int i = 0; i < amount; i++)
+                Remove(position++, 1);
+        }
+
+        public void RemoveMultipleReversed(int position, int amount)
+        {
+
+            for (int i = position + amount - 1; i >= position; i--)
+                Remove(i, 1);
         }
 
         public void Clear()
@@ -138,9 +179,18 @@ namespace Veruthian.Library.Text.Lines
         static CharLineTester()
         {
             actions.Add("Append", b => b.Append("Hello, world!"));
+
+            actions.Add("AppendMultiple", b => b.AppendMultiple("Hello, world!"));
         }
 
         [InlineData("Append", "None", true)]
+        [InlineData("AppendMultiple", "None", true)]
+        [InlineData("Append", "Cr", true)]
+        [InlineData("AppendMultiple", "Cr", true)]
+        [InlineData("Append", "Lf", true)]
+        [InlineData("AppendMultiple", "Lf", true)]
+        [InlineData("Append", "LfCr", true)]
+        [InlineData("AppendMultiple", "LfCr", true)]
         [Theory]
         public static void TestLines(string action, string ending, bool keepEnd)
         {
