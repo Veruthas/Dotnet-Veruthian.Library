@@ -181,6 +181,10 @@ namespace Veruthian.Library.Text.Lines
             actions.Add("Append", b => b.Append("Hello, world!"));
 
             actions.Add("AppendMultiple", b => b.AppendMultiple("Hello, world!"));
+
+            actions.Add("Prepend", b => b.Prepend("Hello, world!"));
+
+            actions.Add("PrependMultiple", b => b.PrependMultiple("Hello, world!"));
         }
 
         [InlineData("Append", "None", true)]
@@ -191,6 +195,14 @@ namespace Veruthian.Library.Text.Lines
         [InlineData("AppendMultiple", "Lf", true)]
         [InlineData("Append", "LfCr", true)]
         [InlineData("AppendMultiple", "LfCr", true)]
+        [InlineData("Append", "None", true)]
+        [InlineData("AppendMultiple", "None", true)]
+        [InlineData("Prepend", "Cr", true)]
+        [InlineData("PrependMultiple", "Cr", true)]
+        [InlineData("Prepend", "Lf", true)]
+        [InlineData("PrependMultiple", "Lf", true)]
+        [InlineData("Prepend", "LfCr", true)]
+        [InlineData("PrependMultiple", "LfCr", true)]
         [Theory]
         public static void TestLines(string action, string ending, bool keepEnd)
         {
