@@ -87,7 +87,7 @@ namespace Veruthian.Library.Types
 
         public bool Precedes(E other) => other == null ? false : this.ordinal < other.ordinal;
 
-        public bool Follows(E other) => other == null ? true : this.ordinal > other.ordinal;
+        public bool Follows(E other) => other == null ? false : this.ordinal > other.ordinal;
 
         public int CompareTo(E other) => other == null ? -1 : this.ordinal.CompareTo(other.ordinal);
 
@@ -103,17 +103,17 @@ namespace Veruthian.Library.Types
                 return Equals(obj as E);
         }
 
-        public static bool operator ==(Enum<E> left, Enum<E> right) => left.ordinal == right.ordinal;
+        public static bool operator ==(Enum<E> left, Enum<E> right) => left?.ordinal == right?.ordinal;
 
-        public static bool operator !=(Enum<E> left, Enum<E> right) => left.ordinal != right.ordinal;
+        public static bool operator !=(Enum<E> left, Enum<E> right) => left?.ordinal != right?.ordinal;
 
-        public static bool operator <(Enum<E> left, Enum<E> right) => left.ordinal < right.ordinal;
+        public static bool operator <(Enum<E> left, Enum<E> right) => left?.ordinal < right?.ordinal;
 
-        public static bool operator >(Enum<E> left, Enum<E> right) => left.ordinal > right.ordinal;
+        public static bool operator >(Enum<E> left, Enum<E> right) => left?.ordinal > right?.ordinal;
 
-        public static bool operator <=(Enum<E> left, Enum<E> right) => left.ordinal <= right.ordinal;
+        public static bool operator <=(Enum<E> left, Enum<E> right) => left?.ordinal <= right?.ordinal;
 
-        public static bool operator >=(Enum<E> left, Enum<E> right) => left.ordinal >= right.ordinal;
+        public static bool operator >=(Enum<E> left, Enum<E> right) => left?.ordinal >= right?.ordinal;
 
         #endregion
 

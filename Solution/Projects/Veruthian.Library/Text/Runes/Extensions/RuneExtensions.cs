@@ -236,7 +236,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         public static bool IsNullOrEmpty(this RuneString value) => RuneString.IsNullOrEmpty(value);
 
 
-        // LineTracking
+        // LineTable
         public static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, out RuneLineTable lines)
         {
             lines = new RuneLineTable();
@@ -246,18 +246,23 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
         private static IEnumerable<Rune> ProcessLines(this IEnumerable<Rune> runes, RuneLineTable lines)
         {
-            Rune current = '\0';
-
             foreach (var rune in runes)
             {
-                lines.MoveToNext(current, rune);
+                lines.Append(rune);
 
                 yield return rune;
-
-                current = rune;
             }
+        }
 
-            lines.MoveToNext(current, '\0');
+        // Lines
+        public static IEnumerable<(int LineNumber, LineEnding Ending, RuneString Value)> GetLineData(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLineData(values, ending, keepEnding, new RuneBuffer(), (c => (uint)c), (b => b.ToRuneString()));
+        }
+
+        public static IEnumerable<RuneString> GetLines(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLines(values, ending, keepEnding, new RuneBuffer(), (c => (uint)c), (b => b.ToRuneString()));
         }
     }
 }

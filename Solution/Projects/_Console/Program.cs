@@ -9,7 +9,6 @@ namespace _Console
             Pause();
         }
 
-
         static void Pause()
         {
             Console.Write("Press any key to continue...");

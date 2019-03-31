@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Text;
+using Veruthian.Library.Text.Encodings;
+using Veruthian.Library.Text.Lines;
 
 namespace Veruthian.Library.Text.Chars.Extensions
 {
     public static class CharExtensions
     {
         // Printable Chars
-        public static string GetAsPrintable(this char value)
+        public static string ToPrintableString(this char value)
         {
             switch (value)
             {
@@ -23,38 +25,43 @@ namespace Veruthian.Library.Text.Chars.Extensions
             }
         }
 
-        public static string GetAsPrintable(this string value)
+        public static string ToPrintableString(this string value)
         {
             var builder = new StringBuilder();
 
             foreach (char c in value)
-                builder.Append(GetAsPrintable(c));
+                builder.Append(ToPrintableString(c));
 
             return builder.ToString();
         }
 
-        // LineTracking
-        public static IEnumerable<char> ProcessLines(this IEnumerable<char> runes, out CharLineTable lines)
+        // LineTable
+        public static IEnumerable<char> ProcessLines(this IEnumerable<char> values, out CharLineTable lines)
         {
             lines = new CharLineTable();
 
-            return ProcessLines(runes, lines);
+            return ProcessLines(values, lines);
         }
 
-        private static IEnumerable<char> ProcessLines(this IEnumerable<char> runes, CharLineTable lines)
+        private static IEnumerable<char> ProcessLines(this IEnumerable<char> values, CharLineTable lines)
         {
-            char current = '\0';
-
-            foreach (var rune in runes)
+            foreach (var rune in values)
             {
-                lines.MoveToNext(current, rune);
+                lines.Append(rune);
 
                 yield return rune;
-
-                current = rune;
             }
+        }
 
-            lines.MoveToNext(current, '\0');
+        // Lines
+        public static IEnumerable<(int LineNumber, LineEnding Ending, string Value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLineData(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
+        }
+
+        public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        {
+            return LineEnding.GetLines(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
         }
 
 

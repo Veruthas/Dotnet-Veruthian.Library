@@ -44,6 +44,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
+
         // Copy To
         public static void CopyTo<T>(this T[] source, T[] destination)
         {
@@ -312,6 +313,32 @@ namespace Veruthian.Library.Collections.Extensions
 
                 return newArray;
             }
+        }
+
+
+        // Remove
+        public static T[] Remove<T>(this T[] array, int index, int count = 1)
+        {
+            ExceptionHelper.VerifyInBounds(index, 0, array.Length, nameof(index));
+
+            ExceptionHelper.VerifyPositive(count, nameof(count));
+
+            ExceptionHelper.VerifyInBounds(index + count, 0, array.Length + 1, nameof(count));
+
+
+            var newsize = array.Length - count;
+
+            var newarray = new T[newsize];
+
+            var sourceIndex = index + count;
+
+            var amount = array.Length - sourceIndex;
+
+            newarray.CopyFrom(array, 0, 0, index);
+
+            newarray.CopyFrom(array, sourceIndex, index, amount);
+
+            return newarray;
         }
 
 

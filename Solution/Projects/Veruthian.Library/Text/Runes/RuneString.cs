@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Text.Runes.Extensions;
 using Veruthian.Library.Utility;
 using Veruthian.Library.Utility.Extensions;
@@ -344,6 +345,22 @@ namespace Veruthian.Library.Text.Runes
             return new RuneString(combined, false);
         }
 
+
+        public static RuneString Insert(RuneString into, int position, RuneString value)
+        {
+            return new RuneString(into.runes.InsertEnumerable(position, value), false);
+        }
+
+        public static RuneString Insert(RuneString into, int position, Rune value)
+        {
+            return new RuneString(into.runes.Insert(position, value), false);
+        }
+
+        public static RuneString Remove(RuneString from, int position, int amount)
+        {
+            return new RuneString(from.runes.Remove(position, amount), false);
+        }
+
         #endregion
 
         #region Replicate
@@ -469,12 +486,12 @@ namespace Veruthian.Library.Text.Runes
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach(var rune in runes)            
+            foreach (var rune in runes)
                 builder.Append(rune.ToPrintableString());
 
             return builder.ToString();
         }
-        
+
         #endregion
 
         #region Enumerator
