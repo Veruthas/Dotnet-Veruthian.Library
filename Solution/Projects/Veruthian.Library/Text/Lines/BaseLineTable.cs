@@ -501,12 +501,14 @@ namespace Veruthian.Library.Text.Lines
                     // Split a <..CrLf> into <..Cr> + <> + {Lf}
                     else if (segment.Ending == LineEnding.CrLf)
                     {
-                        // <..Cr>|{Lf}
+                        // <..Cr>|{Lf}                        
+                        segment.Ending = LineEnding.Cr;
+
+                        segment.Length--;
+
                         lastsegment = segment;
 
-                        lastsegment.Ending = LineEnding.Cr;
-
-                        lastsegment.Length--;
+                        segments[index++] = lastsegment;
 
 
                         // Add new empty segment
@@ -514,7 +516,7 @@ namespace Veruthian.Library.Text.Lines
 
                         segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + segment.Length, 0, LineEnding.None);
 
-                        segments.Insert(++index, segment);
+                        segments.Insert(index, segment);
 
                         column = columnOffset = 0;
 

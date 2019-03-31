@@ -255,7 +255,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
         // Lines
-        public static IEnumerable<(int LineNumber, LineEnding Ending, RuneString value)> GetLineData(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<(int LineNumber, LineEnding Ending, RuneString Value)> GetLineData(this IEnumerable<Rune> values, LineEnding ending, bool keepEnding = true)
         {
             return LineEnding.GetLineData(values, ending, keepEnding, new RuneBuffer(), (c => (uint)c), (b => b.ToRuneString()));
         }

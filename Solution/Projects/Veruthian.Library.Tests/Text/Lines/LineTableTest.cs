@@ -6,16 +6,16 @@ using Veruthian.Library.Text.Lines;
 using Veruthian.Library.Text.Runes;
 using Xunit;
 
-namespace Veruthian.Library.Text.Lines
+namespace Veruthian.Library.Text.Lines.Test
 {
     public class LineBuilder<U, S, L, B> : IEditableText<U, S>
         where S : IEnumerable<U>, IEditableText<U, S>
         where L : BaseLineTable<U, S>
         where B : IEditableText<U>
     {
-        S Value;
+        public S Value;
 
-        L Lines;
+        public L Lines;
 
         SliceText<S> slicer;
 
@@ -35,7 +35,7 @@ namespace Veruthian.Library.Text.Lines
             this.builder = builder;
 
             this.slicer = slicer;
-            
+
             this.getUtf32 = getUtf32;
 
             this.getItem = getItem;
@@ -140,6 +140,7 @@ namespace Veruthian.Library.Text.Lines
             Lines.Clear();
         }
 
+
         public void Compare(bool keepEndings)
         {
             var tableLines = Lines.Extract(Value, slicer, keepEndings).ToArray();
@@ -176,33 +177,58 @@ namespace Veruthian.Library.Text.Lines
     {
         static Dictionary<string, Action<CharLineBuilder>> actions = new Dictionary<string, Action<CharLineBuilder>>();
 
+        static string SimpleTestString = "Hello, world!\r\nHow are you?\nI am fine\rThat is good";
         static CharLineTester()
         {
-            actions.Add("Append", b => b.Append("Hello, world!"));
+            actions.Add("Append", b => b.Append(SimpleTestString));
 
-            actions.Add("AppendMultiple", b => b.AppendMultiple("Hello, world!"));
+            actions.Add("AppendMultiple", b => b.AppendMultiple(SimpleTestString));
 
-            actions.Add("Prepend", b => b.Prepend("Hello, world!"));
+            actions.Add("Prepend", b => b.Prepend(SimpleTestString));
 
-            actions.Add("PrependMultiple", b => b.PrependMultiple("Hello, world!"));
+            actions.Add("PrependMultiple", b => b.PrependMultiple(SimpleTestString));
+
+            actions.Add("Insert", b => b.Insert(0, SimpleTestString));
+
+            actions.Add("InsertMultiple", b => b.InsertMultiple(0, SimpleTestString));
+
+            actions.Add("InsertMultipleReversed", b => b.InsertMultipleReversed(0, SimpleTestString));
+
+            actions.Add("BreakNewLineTest", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
         }
 
         [InlineData("Append", "None", true)]
-        [InlineData("AppendMultiple", "None", true)]
         [InlineData("Append", "Cr", true)]
-        [InlineData("AppendMultiple", "Cr", true)]
         [InlineData("Append", "Lf", true)]
-        [InlineData("AppendMultiple", "Lf", true)]
         [InlineData("Append", "LfCr", true)]
-        [InlineData("AppendMultiple", "LfCr", true)]
-        [InlineData("Append", "None", true)]
         [InlineData("AppendMultiple", "None", true)]
+        [InlineData("AppendMultiple", "Cr", true)]
+        [InlineData("AppendMultiple", "Lf", true)]
+        [InlineData("AppendMultiple", "LfCr", true)]
+        [InlineData("Prepend", "None", true)]
         [InlineData("Prepend", "Cr", true)]
-        [InlineData("PrependMultiple", "Cr", true)]
         [InlineData("Prepend", "Lf", true)]
-        [InlineData("PrependMultiple", "Lf", true)]
         [InlineData("Prepend", "LfCr", true)]
+        [InlineData("PrependMultiple", "None", true)]
+        [InlineData("PrependMultiple", "Cr", true)]
+        [InlineData("PrependMultiple", "Lf", true)]
         [InlineData("PrependMultiple", "LfCr", true)]
+        [InlineData("Insert", "None", true)]
+        [InlineData("Insert", "Cr", true)]
+        [InlineData("Insert", "Lf", true)]
+        [InlineData("Insert", "LfCr", true)]
+        [InlineData("InsertMultiple", "None", true)]
+        [InlineData("InsertMultiple", "Cr", true)]
+        [InlineData("InsertMultiple", "Lf", true)]
+        [InlineData("InsertMultiple", "LfCr", true)]
+        [InlineData("InsertMultipleReversed", "None", true)]
+        [InlineData("InsertMultipleReversed", "Cr", true)]
+        [InlineData("InsertMultipleReversed", "Lf", true)]
+        [InlineData("InsertMultipleReversed", "LfCr", true)]
+        [InlineData("BreakNewLineTest", "None", true)]
+        [InlineData("BreakNewLineTest", "Cr", true)]
+        [InlineData("BreakNewLineTest", "Lf", true)]
+        [InlineData("BreakNewLineTest", "LfCr", true)]
         [Theory]
         public static void TestLines(string action, string ending, bool keepEnd)
         {

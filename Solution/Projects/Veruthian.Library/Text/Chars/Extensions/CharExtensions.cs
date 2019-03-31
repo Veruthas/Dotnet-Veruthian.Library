@@ -54,7 +54,7 @@ namespace Veruthian.Library.Text.Chars.Extensions
         }
 
         // Lines
-        public static IEnumerable<(int LineNumber, LineEnding Ending, string value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<(int LineNumber, LineEnding Ending, string Value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
         {
             return LineEnding.GetLineData(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
         }

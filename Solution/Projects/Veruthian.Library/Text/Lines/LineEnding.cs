@@ -167,16 +167,10 @@ namespace Veruthian.Library.Text.Lines
                     // CrLf
                     if (allowCrLf && utf32 == Utf32.Chars.Lf)
                     {
+                        found = LineEnding.CrLf;
+
                         if (keepEnding)
                             builder.Append(value);
-
-                        yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
-
-                        builder.Clear();
-
-                        empty = true;
-
-                        found = LineEnding.None;
 
                         continue;
                     }
@@ -202,6 +196,16 @@ namespace Veruthian.Library.Text.Lines
                         empty = true;
                     }
                 }
+                // CrLf
+                else if (found == LineEnding.CrLf)
+                {
+                    yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
+
+                    builder.Clear();
+
+                    empty = true;
+                }
+
 
                 if (utf32 == Utf32.Chars.Cr)
                 {
