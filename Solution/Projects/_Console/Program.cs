@@ -9,9 +9,10 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.None;
+            var ending = LineEnding.CrLf;
 
             CharLineBuilder builder = new CharLineBuilder(ending);
+
 
             builder.Append("Hello\rWorld\nMy\r\n");
 

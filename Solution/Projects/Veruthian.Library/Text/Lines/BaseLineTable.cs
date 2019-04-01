@@ -522,7 +522,7 @@ namespace Veruthian.Library.Text.Lines
 
 
                         // If Cr is not considered a line
-                        lineOffset -= (newlineOffset ^ 1);
+                        lineOffset += newlineOffset;
 
                         postponedLf = true;
                     }
