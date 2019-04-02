@@ -213,6 +213,8 @@ namespace Veruthian.Library.Text.Lines
 
                     if (keepEnding)
                         builder.Append(value);
+
+                    empty = false;
                 }
                 else if (utf32 == Utf32.Chars.Lf)
                 {
@@ -220,6 +222,8 @@ namespace Veruthian.Library.Text.Lines
 
                     if (keepEnding)
                         builder.Append(value);
+
+                    empty = false;
                 }
                 else
                 {

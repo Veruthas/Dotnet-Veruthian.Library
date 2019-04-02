@@ -9,12 +9,14 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.CrLf;
+            var ending = LineEnding.None;
 
             CharLineBuilder builder = new CharLineBuilder(ending);
 
 
-            builder.Append("Hello\rWorld\nMy\r\n");
+            builder.Append("Hello\rWorld\nMy\r\n\n");
+
+            Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
             foreach (var line in builder.Value.GetLineData(ending))
                 Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
@@ -27,7 +29,9 @@ namespace _Console
             Console.WriteLine();
 
 
-            builder.Insert(15, "name is Veruthas!");
+            builder.Insert(15, "name is Veruthas!\n");
+
+            Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
             foreach (var line in builder.Value.GetLineData(ending))
                 Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
@@ -42,6 +46,8 @@ namespace _Console
 
             builder.Insert(11, "!!\r");
 
+            Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
+
             foreach (var line in builder.Value.GetLineData(ending))
                 Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
 
@@ -54,6 +60,8 @@ namespace _Console
 
 
             builder.Insert(6, "\n, ");
+
+            Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
             foreach (var line in builder.Value.GetLineData(ending))
                 Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
