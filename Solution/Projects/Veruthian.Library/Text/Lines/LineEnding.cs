@@ -135,9 +135,7 @@ namespace Veruthian.Library.Text.Lines
 
 
 
-        public static IEnumerable<(int LineNumber, LineEnding Ending, S Value)> GetLineData<U, S, B>(
-            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
-            where B : IEditableText<U>
+        public static IEnumerable<(int Position, int Length, int LineNumber, LineEnding Ending)> GetLineSegments<U>(IEnumerable<U> values, Func<U, uint> getUtf32, LineEnding ending = null)
         {
             if (ending == null)
                 ending = LineEnding.None;
@@ -149,9 +147,11 @@ namespace Veruthian.Library.Text.Lines
             bool allowCr = ending == Cr || ending == None;
 
 
-            builder.Clear();
-
             int lineNumber = 0;
+
+            int position = 0;
+
+            int length = 0;
 
             LineEnding found = None;
 
@@ -167,17 +167,18 @@ namespace Veruthian.Library.Text.Lines
                     {
                         found = LineEnding.CrLf;
 
-                        if (keepEnding)
-                            builder.Append(value);
+                        length++;
 
                         continue;
                     }
                     // Cr                    
                     else if (allowCr)
                     {
-                        yield return (lineNumber++, LineEnding.Cr, getItem(builder));
+                        yield return (position, length, lineNumber++, found);
 
-                        builder.Clear();
+                        position += length;
+
+                        length = 0;
                     }
                 }
                 // Lf
@@ -185,56 +186,49 @@ namespace Veruthian.Library.Text.Lines
                 {
                     if (allowLf)
                     {
-                        yield return (lineNumber++, LineEnding.Lf, getItem(builder));
+                        yield return (position, length, lineNumber++, found);
 
-                        builder.Clear();
+                        position += length;
+
+                        length = 0;
                     }
                 }
                 // CrLf
                 else if (found == LineEnding.CrLf)
                 {
-                    yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
+                    yield return (position, length, lineNumber++, found);
 
-                    builder.Clear();
+                    position += length;
+
+                    length = 0;
                 }
 
+
+                length++;
 
                 if (utf32 == Utf32.Chars.Cr)
-                {
                     found = LineEnding.Cr;
-
-                    if (keepEnding)
-                        builder.Append(value);
-                }
                 else if (utf32 == Utf32.Chars.Lf)
-                {
                     found = LineEnding.Lf;
-
-                    if (keepEnding)
-                        builder.Append(value);
-                }
                 else
-                {
-                    builder.Append(value);
-
                     found = LineEnding.None;
-                }
+
             }
 
-            yield return (lineNumber++, found, getItem(builder));
-
-            builder.Clear();
+            yield return (position, length, lineNumber++, found);
 
             if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
-                yield return (lineNumber, LineEnding.None, getItem(builder));
+                yield return (position, length, lineNumber++, found);
         }
 
-        public static IEnumerable<S> GetLines<U, S, B>(
-            IEnumerable<U> values, LineEnding ending, bool keepEnding, B builder, Func<U, uint> getUtf32, Func<B, S> getItem)
-            where B : IEditableText<U>
+        // Also should have a way to cache an actual IEnumerable<U>
+        public static IEnumerable<S> GetLines<U, S>(S value, Func<U, uint> getUtf32, SliceText<S> slice, LineEnding ending = null, bool includeEnding = true)
+            where S : IEnumerable<U>
         {
-            foreach (var line in GetLineData(values, ending, keepEnding, builder, getUtf32, getItem))
-                yield return line.Value;
+            foreach (var line in GetLineSegments(value, getUtf32, ending))
+            {
+                yield return slice(value, line.Position, line.Length);
+            }
         }
     }
 }
