@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Veruthian.Library.Text.Chars;
 using Veruthian.Library.Text.Lines;
+using Veruthian.Library.Text.Lines.Extensions;
 using Veruthian.Library.Text.Runes;
 using Xunit;
 
@@ -17,30 +18,30 @@ namespace Veruthian.Library.Text.Lines.Test
 
         public L Lines;
 
-        ExtractText<S> extractor;
-
-        B builder;
-
         Func<U, uint> getUtf32;
 
-        Func<B, S> getItem;
+        ExtractText<S> extractor;
+
+        B buffer;
+
+        Func<B, S> getBufferItem;
 
 
         public LineEnding Ending => Lines.Ending;
 
-        public LineBuilder(S value, L lines, B builder, ExtractText<S> extractor, Func<U, uint> getUtf32, Func<B, S> getItem)
+        public LineBuilder(S value, L lines, B buffer, ExtractText<S> extractor, Func<U, uint> getUtf32, Func<B, S> getBufferItem)
         {
             this.Value = value;
 
             this.Lines = lines;
 
-            this.builder = builder;
+            this.buffer = buffer;
 
             this.extractor = extractor;
 
             this.getUtf32 = getUtf32;
 
-            this.getItem = getItem;
+            this.getBufferItem = getBufferItem;
         }
 
 
@@ -143,18 +144,20 @@ namespace Veruthian.Library.Text.Lines.Test
         }
 
 
-        public void Compare(bool keepEndings)
+        public void Compare()
         {
-            // var tableLines = Lines.Extract(Value, extractor, keepEndings).ToArray();
+            var tableLines = Lines.Lines.ExtractLineData(Value, extractor).ToArray();
 
-            // var splitLines = new object[tableLines.Length]; //LineEnding.GetLines(Value, Lines.EndingType, keepEndings, builder, getUtf32, getItem).ToArray();
+            var splitLines = TextSegment.GetLineData(Value, getUtf32, buffer, getBufferItem, Ending).ToArray();
 
+            Assert.Equal(tableLines.Length, splitLines.Length);
 
-            // Assert.Equal(tableLines.Length, splitLines.Length);
-
-            // for (int i = 0; i < tableLines.Length; i++)
-            //     ;//Assert.Equal(tableLines[i], splitLines[i]);
-        }
+            for (var i = 0; i < tableLines.Length; i++)
+                {
+                var tableLine = tableLines[i];
+                var splitLine = splitLines[i];
+            }
+    }
     }
 
 
@@ -199,40 +202,40 @@ namespace Veruthian.Library.Text.Lines.Test
             actions.Add("BreakNewLineTest", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
         }
 
-        [InlineData("Append", "None", true)]
-        [InlineData("Append", "Cr", true)]
-        [InlineData("Append", "Lf", true)]
-        [InlineData("Append", "LfCr", true)]
-        [InlineData("AppendMultiple", "None", true)]
-        [InlineData("AppendMultiple", "Cr", true)]
-        [InlineData("AppendMultiple", "Lf", true)]
-        [InlineData("AppendMultiple", "LfCr", true)]
-        [InlineData("Prepend", "None", true)]
-        [InlineData("Prepend", "Cr", true)]
-        [InlineData("Prepend", "Lf", true)]
-        [InlineData("Prepend", "LfCr", true)]
-        [InlineData("PrependMultiple", "None", true)]
-        [InlineData("PrependMultiple", "Cr", true)]
-        [InlineData("PrependMultiple", "Lf", true)]
-        [InlineData("PrependMultiple", "LfCr", true)]
-        [InlineData("Insert", "None", true)]
-        [InlineData("Insert", "Cr", true)]
-        [InlineData("Insert", "Lf", true)]
-        [InlineData("Insert", "LfCr", true)]
-        [InlineData("InsertMultiple", "None", true)]
-        [InlineData("InsertMultiple", "Cr", true)]
-        [InlineData("InsertMultiple", "Lf", true)]
-        [InlineData("InsertMultiple", "LfCr", true)]
-        [InlineData("InsertMultipleReversed", "None", true)]
-        [InlineData("InsertMultipleReversed", "Cr", true)]
-        [InlineData("InsertMultipleReversed", "Lf", true)]
-        [InlineData("InsertMultipleReversed", "LfCr", true)]
-        [InlineData("BreakNewLineTest", "None", true)]
-        [InlineData("BreakNewLineTest", "Cr", true)]
-        [InlineData("BreakNewLineTest", "Lf", true)]
-        [InlineData("BreakNewLineTest", "LfCr", true)]
+        [InlineData("Append", "None")]
+        [InlineData("Append", "Cr")]
+        [InlineData("Append", "Lf")]
+        [InlineData("Append", "LfCr")]
+        [InlineData("AppendMultiple", "None")]
+        [InlineData("AppendMultiple", "Cr")]
+        [InlineData("AppendMultiple", "Lf")]
+        [InlineData("AppendMultiple", "LfCr")]
+        [InlineData("Prepend", "None")]
+        [InlineData("Prepend", "Cr")]
+        [InlineData("Prepend", "Lf")]
+        [InlineData("Prepend", "LfCr")]
+        [InlineData("PrependMultiple", "None")]
+        [InlineData("PrependMultiple", "Cr")]
+        [InlineData("PrependMultiple", "Lf")]
+        [InlineData("PrependMultiple", "LfCr")]
+        [InlineData("Insert", "None")]
+        [InlineData("Insert", "Cr")]
+        [InlineData("Insert", "Lf")]
+        [InlineData("Insert", "LfCr")]
+        [InlineData("InsertMultiple", "None")]
+        [InlineData("InsertMultiple", "Cr")]
+        [InlineData("InsertMultiple", "Lf")]
+        [InlineData("InsertMultiple", "LfCr")]
+        [InlineData("InsertMultipleReversed", "None")]
+        [InlineData("InsertMultipleReversed", "Cr")]
+        [InlineData("InsertMultipleReversed", "Lf")]
+        [InlineData("InsertMultipleReversed", "LfCr")]
+        [InlineData("BreakNewLineTest", "None")]
+        [InlineData("BreakNewLineTest", "Cr")]
+        [InlineData("BreakNewLineTest", "Lf")]
+        [InlineData("BreakNewLineTest", "LfCr")]
         [Theory]
-        public static void TestLines(string action, string ending, bool keepEnd)
+        public static void TestLines(string action, string ending)
         {
             LineEnding.TryGetByName(ending, out var lineEnding);
 
@@ -242,7 +245,7 @@ namespace Veruthian.Library.Text.Lines.Test
 
             actionFunc(builder);
 
-            builder.Compare(keepEnd);
+            builder.Compare();
         }
     }
 }
