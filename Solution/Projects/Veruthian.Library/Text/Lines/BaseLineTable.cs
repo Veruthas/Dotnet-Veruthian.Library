@@ -9,51 +9,7 @@ namespace Veruthian.Library.Text.Lines
     public abstract class BaseLineTable<U, S> : IEditableText<U, S>
         where S : IEnumerable<U>
     {
-        private struct LineSegment
-        {
-            public int LineNumber;
-
-            public int Position;
-
-            public int Length;
-
-            public LineEnding Ending;
-
-
-            public LineSegment(int lineNumber, int position, int length, LineEnding ending)
-            {
-                this.LineNumber = lineNumber;
-                this.Position = position;
-                this.Length = length;
-                this.Ending = ending;
-            }
-
-            public (int LineNumber, int Position, int Length, LineEnding Ending) ToTuple()
-            {
-                return (LineNumber, Position, Length, Ending);
-            }
-
-
-
-            public static implicit operator (int LineNumber, int Position, int Length, LineEnding Ending) (LineSegment value)
-            {
-                return value.ToTuple();
-            }
-
-            public static implicit operator LineSegment((int LineNumber, int Position, int Length, LineEnding Ending) value)
-            {
-                return new LineSegment(value.LineNumber, value.Position, value.Length, value.Ending);
-            }
-
-
-            public override string ToString()
-            {
-                return $"{nameof(LineNumber)}: {LineNumber}; {nameof(Position)}: {Position}; {nameof(Length)}: {Length}; {nameof(Ending)}: {Ending};";
-            }
-        }
-
-
-        List<LineSegment> segments;
+        List<TextSegment> segments;
 
         int length;
 
@@ -64,7 +20,7 @@ namespace Veruthian.Library.Text.Lines
 
         public BaseLineTable(LineEnding endingType)
         {
-            this.segments = new List<LineSegment>();
+            this.segments = new List<TextSegment>();
 
             this.segments.Add((0, 0, 0, LineEnding.None));
 
@@ -74,46 +30,46 @@ namespace Veruthian.Library.Text.Lines
         }
 
 
-        public int Count => segments[segments.Count - 1].LineNumber + 1;
-    
+        public int Count => segments[segments.Count - 1].Line + 1;
+
         public LineEnding EndingType => endingType;
 
 
-        public (int LineNumber, int Position, int Length, LineEnding Ending) GetLine(int lineNumber)
+        public TextSegment GetSegment(int line)
         {
-            if (lineNumber < 0 || lineNumber >= Count)
-                throw new ArgumentOutOfRangeException(nameof(lineNumber));
+            if (line < 0 || line >= Count)
+                throw new ArgumentOutOfRangeException(nameof(line));
 
             if (endingType != LineEnding.CrLf)
             {
-                var line = this.segments[lineNumber];
+                var segment = this.segments[line];
 
-                return line;
+                return segment;
             }
             else
             {
-                var lineIndex = GetIndexFromNumber(lineNumber);
+                var lineIndex = GetIndexFromNumber(line);
 
-                var segments = GetLineSegments(lineIndex, lineNumber);
+                var segments = GetLineSegments(lineIndex, line);
 
                 return JoinSegments(segments);
             }
         }
 
-        public (int LineNumber, int Position, int Length, LineEnding Ending) GetLineFromPosition(int position)
+        public TextSegment GetSegmentFromPosition(int position)
         {
             if (position < 0 && position > length)
                 throw new ArgumentOutOfRangeException(nameof(position));
 
             if (endingType != LineEnding.CrLf)
             {
-                return segments[GetLineNumber(position)];
+                return segments[GetLineFromPosition(position)];
             }
             else
             {
                 var lineIndex = GetIndexFromPosition(position);
 
-                var lineNumber = this.segments[lineIndex].LineNumber;
+                var lineNumber = this.segments[lineIndex].Line;
 
                 var segments = GetLineSegments(lineIndex, lineNumber);
 
@@ -123,21 +79,21 @@ namespace Veruthian.Library.Text.Lines
 
         public TextLocation GetTextLocation(int position)
         {
-            var line = GetLineFromPosition(position);
+            var line = GetSegmentFromPosition(position);
 
-            return new TextLocation(position, line.LineNumber, position - line.Position);
+            return new TextLocation(position, line.Line, position - line.Position);
         }
 
-        public int GetLineNumber(int position)
+        public int GetLineFromPosition(int position)
         {
             var index = GetIndexFromPosition(position);
 
-            return index != -1 ? segments[index].LineNumber : -1;
+            return index != -1 ? segments[index].Line : -1;
         }
 
 
         // Helpers
-        private LineSegment JoinSegments((int first, int last) segments)
+        private TextSegment JoinSegments((int first, int last) segments)
         {
             var segment = this.segments[segments.first];
 
@@ -145,7 +101,7 @@ namespace Veruthian.Library.Text.Lines
             {
                 var nextSegment = this.segments[i];
 
-                segment = (segment.LineNumber, segment.Position, segment.Length + nextSegment.Length, nextSegment.Ending);
+                segment = (segment.Position, segment.Length + nextSegment.Length, segment.Line, nextSegment.Ending);
             }
 
             return segment;
@@ -159,14 +115,14 @@ namespace Veruthian.Library.Text.Lines
 
             for (int i = lineIndex; i >= 0; i--)
             {
-                if (segments[i].LineNumber == lineNumber)
+                if (segments[i].Line == lineNumber)
                     first = i;
                 else
                     break;
             }
             for (int i = lineIndex; i < segments.Count; i++)
             {
-                if (segments[i].LineNumber == lineNumber)
+                if (segments[i].Line == lineNumber)
                     last = i;
                 else
                     break;
@@ -187,9 +143,9 @@ namespace Veruthian.Library.Text.Lines
 
                 var line = segments[middle];
 
-                if (lineNumber < line.LineNumber)
+                if (lineNumber < line.Line)
                     high = middle - 1;
-                else if (lineNumber >= line.LineNumber)
+                else if (lineNumber >= line.Line)
                     low = middle + 1;
                 else
                     return middle;
@@ -229,7 +185,7 @@ namespace Veruthian.Library.Text.Lines
 
                 line.Position += positionOffset;
 
-                line.LineNumber += lineOffset;
+                line.Line += lineOffset;
 
                 segments[i] = line;
             }
@@ -257,9 +213,9 @@ namespace Veruthian.Library.Text.Lines
                 {
                     var newlineOffset = NewLineOffset(segment.Ending);
 
-                    var lineNumber = segment.LineNumber + newlineOffset;
+                    var lineNumber = segment.Line + newlineOffset;
 
-                    segment = new LineSegment(lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
+                    segment = (lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
 
                     segments.Add(segment);
                 }
@@ -395,7 +351,7 @@ namespace Veruthian.Library.Text.Lines
         {
             var segment = this.segments[index];
 
-            var lastsegment = index > 0 ? this.segments[index - 1] : new LineSegment();
+            var lastsegment = index > 0 ? this.segments[index - 1] : (0, 0, 0, LineEnding.None);
 
             var postponedLf = false;
 
@@ -411,9 +367,9 @@ namespace Veruthian.Library.Text.Lines
                 var newlineOffset = NewLineOffset(ending);
 
 
-                lastsegment = new LineSegment(segment.LineNumber, segment.Position, column + columnOffset, ending);
+                lastsegment = (segment.Position, column + columnOffset, segment.Line, ending);
 
-                segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + lastsegment.Length, segment.Length - lastsegment.Length, segment.Ending);
+                segment = (segment.Position + lastsegment.Length, segment.Length - lastsegment.Length, segment.Line + newlineOffset, segment.Ending);
 
 
                 segments[index++] = lastsegment;
@@ -459,7 +415,7 @@ namespace Veruthian.Library.Text.Lines
 
                         if (endingType == LineEnding.CrLf)
                         {
-                            segment.LineNumber++;
+                            segment.Line++;
 
                             lineOffset++;
                         }
@@ -514,7 +470,7 @@ namespace Veruthian.Library.Text.Lines
                         // Add new empty segment
                         var newlineOffset = NewLineOffset(LineEnding.Cr);
 
-                        segment = new LineSegment(segment.LineNumber + newlineOffset, segment.Position + segment.Length, 0, LineEnding.None);
+                        segment = (segment.Position + segment.Length, 0, segment.Line + newlineOffset, LineEnding.None);
 
                         segments.Insert(index, segment);
 
@@ -586,7 +542,7 @@ namespace Veruthian.Library.Text.Lines
                     {
                         segments[index++] = segment;
 
-                        segment = new LineSegment(segment.LineNumber, segment.Position + segment.Length, 1, LineEnding.Lf);
+                        segment = (segment.Position + segment.Length, 1, segment.Line, LineEnding.Lf);
 
                         segments.Insert(index++, segment);
                     }
@@ -644,7 +600,7 @@ namespace Veruthian.Library.Text.Lines
             var positionOffset = amount;
 
 
-            var lastLineNumber = segment.LineNumber;
+            var lastLineNumber = segment.Line;
 
 
             // If removing within a segment
@@ -701,11 +657,11 @@ namespace Veruthian.Library.Text.Lines
                             segmentCount++;
 
                             // Increment LineOffset for adjustment
-                            if (segment.LineNumber != lastLineNumber)
+                            if (segment.Line != lastLineNumber)
                             {
                                 lineOffset++;
 
-                                lastLineNumber = segment.LineNumber;
+                                lastLineNumber = segment.Line;
                             }
                         }
                         // If removing beginning of last segment 
@@ -752,7 +708,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
         // Enumerator
-        public IEnumerable<(int LineNumber, int Position, int Length, LineEnding Ending)> Lines
+        public IEnumerable<TextSegment> Lines
         {
             get
             {
@@ -771,7 +727,7 @@ namespace Veruthian.Library.Text.Lines
                     {
                         var nextSegment = segments[i];
 
-                        if (nextSegment.LineNumber == lineNumber)
+                        if (nextSegment.Line == lineNumber)
                         {
                             segment.Length += nextSegment.Length;
 
@@ -790,30 +746,10 @@ namespace Veruthian.Library.Text.Lines
                     yield return segment;
                 }
             }
-        }        
+        }
 
 
         // Abstract
         protected abstract uint ConvertToUtf32(U value);
-
-
-        // Extract
-        public E Extract<E>(E value, int lineNumber, SliceText<E> slice, bool keepEnding = true)
-            where E : IEnumerable<U>
-        {
-            if (lineNumber < 0 || lineNumber >= Count)
-                throw new ArgumentOutOfRangeException(nameof(lineNumber));
-
-            var line = GetLine(lineNumber);
-
-            return slice(value, line.Position, line.Length - (keepEnding ? 0 : line.Ending.Size));
-        }
-
-        public IEnumerable<E> Extract<E>(E value, SliceText<E> slice, bool keepEnding = true)
-            where E : IEnumerable<U>
-        {
-            foreach (var line in Lines)
-                yield return slice(value, line.Position, line.Length - (keepEnding ? 0 : line.Ending.Size));
-        }
     }
 }

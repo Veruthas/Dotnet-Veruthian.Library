@@ -1,8 +1,5 @@
 using Veruthian.Library.Types;
 using Veruthian.Library.Text.Encodings;
-using static Veruthian.Library.Text.Encodings.Utf32;
-using System.Collections.Generic;
-using System;
 
 namespace Veruthian.Library.Text.Lines
 {
@@ -132,103 +129,5 @@ namespace Veruthian.Library.Text.Lines
         public static readonly LineEnding LineFeed = Lf;
 
         public static readonly LineEnding CarriageReturnLineFeed = CrLf;
-
-
-
-        public static IEnumerable<(int Position, int Length, int LineNumber, LineEnding Ending)> GetLineSegments<U>(IEnumerable<U> values, Func<U, uint> getUtf32, LineEnding ending = null)
-        {
-            if (ending == null)
-                ending = LineEnding.None;
-
-            bool allowCrLf = ending == CrLf || ending == None;
-
-            bool allowLf = ending == Lf || ending == None;
-
-            bool allowCr = ending == Cr || ending == None;
-
-
-            int lineNumber = 0;
-
-            int position = 0;
-
-            int length = 0;
-
-            LineEnding found = None;
-
-
-            foreach (var value in values)
-            {
-                uint utf32 = getUtf32(value);
-
-                if (found == LineEnding.Cr)
-                {
-                    // CrLf
-                    if (allowCrLf && utf32 == Utf32.Chars.Lf)
-                    {
-                        found = LineEnding.CrLf;
-
-                        length++;
-
-                        continue;
-                    }
-                    // Cr                    
-                    else if (allowCr)
-                    {
-                        yield return (position, length, lineNumber++, found);
-
-                        position += length;
-
-                        length = 0;
-                    }
-                }
-                // Lf
-                else if (found == LineEnding.Lf)
-                {
-                    if (allowLf)
-                    {
-                        yield return (position, length, lineNumber++, found);
-
-                        position += length;
-
-                        length = 0;
-                    }
-                }
-                // CrLf
-                else if (found == LineEnding.CrLf)
-                {
-                    yield return (position, length, lineNumber++, found);
-
-                    position += length;
-
-                    length = 0;
-                }
-
-
-                length++;
-
-                if (utf32 == Utf32.Chars.Cr)
-                    found = LineEnding.Cr;
-                else if (utf32 == Utf32.Chars.Lf)
-                    found = LineEnding.Lf;
-                else
-                    found = LineEnding.None;
-
-            }
-
-            yield return (position, length, lineNumber++, found);
-
-            if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
-                yield return (position, length, lineNumber++, found);
-        }
-
-        // Also should have a way to cache an actual IEnumerable<U>
-        public static IEnumerable<S> GetLines<U, S>(S value, Func<U, uint> getUtf32, SliceText<S> slice, LineEnding ending = null, bool includeEnding = true)
-            where S : IEnumerable<U>
-        {
-            foreach (var line in GetLineSegments(value, getUtf32, ending))
-            {
-                yield return slice(value, line.Position, line.Length);
-            }
-        }
     }
 }

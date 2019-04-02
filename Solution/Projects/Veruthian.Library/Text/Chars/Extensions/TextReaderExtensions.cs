@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Veruthian.Library.Text.Extensions
+namespace Veruthian.Library.Text.Chars.Extensions
 {
     public static class TextReaderExtensions
     {
@@ -35,7 +35,7 @@ namespace Veruthian.Library.Text.Extensions
 
             return GetChars(reader);
         }
-
+        
 
         // TextReaders
         public static TextReader GetTextReader(this Stream stream, Encoding encoding = null)

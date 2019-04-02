@@ -35,7 +35,8 @@ namespace Veruthian.Library.Text.Chars.Extensions
             return builder.ToString();
         }
 
-        // LineTable
+
+        // Line Table
         public static IEnumerable<char> ProcessLines(this IEnumerable<char> values, out CharLineTable lines)
         {
             lines = new CharLineTable();
@@ -53,16 +54,15 @@ namespace Veruthian.Library.Text.Chars.Extensions
             }
         }
 
+
         // Lines
         public static IEnumerable<(int LineNumber, LineEnding Ending, string Value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
         {
-            //return LineEnding.GetLineData(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
             yield break;
         }
 
         public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
         {
-            //return LineEnding.GetLines(values, ending, keepEnding, new StringBuffer(), (c => (uint)c), (b => b.ToString()));
             yield break;
         }
 
