@@ -89,6 +89,7 @@ namespace Veruthian.Library.Text.Lines
 
         public override string ToString() => $"{nameof(Position)}: {Position}; {nameof(Length)}: {Length}; {nameof(Line)}: {Line}; {nameof(Ending)}: {Ending};";
 
+        public string ToTupleString() => $"({Position}, {Length}, {Line}, {Ending})";
 
 
         public static IEnumerable<TextSegment> GetLineSegments<U>(IEnumerable<U> values, Func<U, uint> getUtf32, LineEnding ending = null,
@@ -195,7 +196,7 @@ namespace Veruthian.Library.Text.Lines
             yield return (position, length - (withEnding ? 0 : found.Size), lineNumber++, found);
 
             if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
-                yield return (position, 0, lineNumber, LineEnding.None);
+                yield return (position + length, 0, lineNumber, LineEnding.None);
         }
 
 

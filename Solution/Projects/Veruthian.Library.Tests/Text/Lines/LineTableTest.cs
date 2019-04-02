@@ -26,6 +26,8 @@ namespace Veruthian.Library.Text.Lines.Test
         Func<B, S> getItem;
 
 
+        public LineEnding Ending => Lines.Ending;
+
         public LineBuilder(S value, L lines, B builder, ExtractText<S> extractor, Func<U, uint> getUtf32, Func<B, S> getItem)
         {
             this.Value = value;

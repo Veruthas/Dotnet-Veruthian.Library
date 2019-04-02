@@ -32,7 +32,7 @@ namespace Veruthian.Library.Text.Lines
 
         public int Count => segments[segments.Count - 1].Line + 1;
 
-        public LineEnding EndingType => endingType;
+        public LineEnding Ending => endingType;
 
 
         public TextSegment GetSegment(int line)
@@ -215,7 +215,7 @@ namespace Veruthian.Library.Text.Lines
 
                     var lineNumber = segment.Line + newlineOffset;
 
-                    segment = (lineNumber, segment.Position + segment.Length, 0, LineEnding.None);
+                    segment = (segment.Position + segment.Length, 0, lineNumber, LineEnding.None);
 
                     segments.Add(segment);
                 }
