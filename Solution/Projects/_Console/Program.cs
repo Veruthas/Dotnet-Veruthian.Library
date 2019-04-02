@@ -14,12 +14,17 @@ namespace _Console
             CharLineBuilder builder = new CharLineBuilder(ending);
 
 
-            builder.Append("Hello\rWorld\nMy\r\n\n");
+            builder.Append("Hello\rWorld\nMy\r\n");
 
             Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
+            var position = 0;
             foreach (var line in builder.Value.GetLineData(ending))
-                Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
+            {
+                var text = (line.LineNumber, position, line.Value.Length, line.Ending).ToString();
+                Console.WriteLine($"{text}{new string(' ', 22 - text.Length)}-> '{line.Value.ToPrintableString()}'");
+                position += line.Value.Length;
+            }
 
             Console.WriteLine("-");
 
@@ -33,8 +38,13 @@ namespace _Console
 
             Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
+            position = 0;
             foreach (var line in builder.Value.GetLineData(ending))
-                Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
+            {
+                var text = (line.LineNumber, position, line.Value.Length, line.Ending).ToString();
+                Console.WriteLine($"{text}{new string(' ', 22 - text.Length)}-> '{line.Value.ToPrintableString()}'");
+                position += line.Value.Length;
+            }
 
             Console.WriteLine("-");
 
@@ -48,8 +58,13 @@ namespace _Console
 
             Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
+            position = 0;
             foreach (var line in builder.Value.GetLineData(ending))
-                Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
+            {
+                var text = (line.LineNumber, position, line.Value.Length, line.Ending).ToString();
+                Console.WriteLine($"{text}{new string(' ', 22 - text.Length)}-> '{line.Value.ToPrintableString()}'");
+                position += line.Value.Length;
+            }
 
             Console.WriteLine("-");
 
@@ -63,8 +78,13 @@ namespace _Console
 
             Console.WriteLine(builder.Value.ToString().ToPrintableString() + "\n");
 
+            position = 0;
             foreach (var line in builder.Value.GetLineData(ending))
-                Console.WriteLine((line.LineNumber, line.Ending, $"'{line.Value.ToPrintableString()}'", line.Value.Length));
+            {
+                var text = (line.LineNumber, position, line.Value.Length, line.Ending).ToString();
+                Console.WriteLine($"{text}{new string(' ', 22 - text.Length)}-> '{line.Value.ToPrintableString()}'");
+                position += line.Value.Length;
+            }
 
             Console.WriteLine("-");
 

@@ -153,8 +153,6 @@ namespace Veruthian.Library.Text.Lines
 
             int lineNumber = 0;
 
-            bool empty = true;
-
             LineEnding found = None;
 
 
@@ -180,8 +178,6 @@ namespace Veruthian.Library.Text.Lines
                         yield return (lineNumber++, LineEnding.Cr, getItem(builder));
 
                         builder.Clear();
-
-                        empty = true;
                     }
                 }
                 // Lf
@@ -192,8 +188,6 @@ namespace Veruthian.Library.Text.Lines
                         yield return (lineNumber++, LineEnding.Lf, getItem(builder));
 
                         builder.Clear();
-
-                        empty = true;
                     }
                 }
                 // CrLf
@@ -202,8 +196,6 @@ namespace Veruthian.Library.Text.Lines
                     yield return (lineNumber++, LineEnding.CrLf, getItem(builder));
 
                     builder.Clear();
-
-                    empty = true;
                 }
 
 
@@ -213,8 +205,6 @@ namespace Veruthian.Library.Text.Lines
 
                     if (keepEnding)
                         builder.Append(value);
-
-                    empty = false;
                 }
                 else if (utf32 == Utf32.Chars.Lf)
                 {
@@ -222,28 +212,21 @@ namespace Veruthian.Library.Text.Lines
 
                     if (keepEnding)
                         builder.Append(value);
-
-                    empty = false;
                 }
                 else
                 {
                     builder.Append(value);
 
                     found = LineEnding.None;
-
-                    empty = false;
                 }
             }
 
-            if (!empty)
-            {
-                yield return (lineNumber++, found, getItem(builder));
+            yield return (lineNumber++, found, getItem(builder));
 
-                builder.Clear();
+            builder.Clear();
 
-                if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
-                    yield return (lineNumber, LineEnding.None, getItem(builder));
-            }
+            if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
+                yield return (lineNumber, LineEnding.None, getItem(builder));
         }
 
         public static IEnumerable<S> GetLines<U, S, B>(
