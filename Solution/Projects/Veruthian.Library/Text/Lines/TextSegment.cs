@@ -59,7 +59,7 @@ namespace Veruthian.Library.Text.Lines
 
 
         public S Extract<S>(S value, ExtractText<S> extractor) => extractor(value, position, length);
-        
+
 
         public (int Position, int Length, int Line, LineEnding Ending) ToTuple()
         {
@@ -96,6 +96,9 @@ namespace Veruthian.Library.Text.Lines
         {
             if (ending == null)
                 ending = LineEnding.None;
+
+            if (buffer != null)
+                buffer.Clear();
 
             bool allowCrLf = ending == LineEnding.CrLf || ending == LineEnding.None;
 
@@ -195,31 +198,8 @@ namespace Veruthian.Library.Text.Lines
                 yield return (position, 0, lineNumber, LineEnding.None);
         }
 
-        public static IEnumerable<S> GetExtractedLines<U, S>(S values, Func<U, uint> getUtf32, ExtractText<S> extractor, LineEnding ending = null, bool withEnding = true)
-            where S : IEnumerable<U>
-        {
-            foreach (var line in GetLineSegments(values, getUtf32, ending))
-            {
-                yield return extractor(values, line.position, line.length);
-            }
-        }
 
-
-        public static IEnumerable<S> GetBufferedLines<U, S, B>(IEnumerable<U> values, Func<U, uint> getUtf32,
-                                                               B buffer, Func<B, S> getBufferItem,
-                                                               LineEnding ending = null, bool withEnding = true)
-            where B : IEditableText<U>
-        {
-            foreach(var line in GetLineSegments(values, getUtf32, ending, withEnding, buffer))
-            {
-                yield return getBufferItem(buffer);
-
-                buffer.Clear();
-            }
-        }
-
-
-        public static IEnumerable<(TextSegment, S)> GetBufferedLineSegments<U, S, B>(IEnumerable<U> values, Func<U, uint> getUtf32,
+        public static IEnumerable<(TextSegment Segment, S Value)> GetLineData<U, S, B>(IEnumerable<U> values, Func<U, uint> getUtf32,
                                                                B buffer, Func<B, S> getBufferItem,
                                                                LineEnding ending = null, bool withEnding = true)
             where B : IEditableText<U>
@@ -232,5 +212,36 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
+        public static IEnumerable<S> GetLines<U, S, B>(IEnumerable<U> values, Func<U, uint> getUtf32,
+                                                               B buffer, Func<B, S> getBufferItem,
+                                                               LineEnding ending = null, bool withEnding = true)
+            where B : IEditableText<U>
+        {
+            foreach (var line in GetLineSegments(values, getUtf32, ending, withEnding, buffer))
+            {
+                yield return getBufferItem(buffer);
+
+                buffer.Clear();
+            }
+        }
+
+        public static IEnumerable<(TextSegment Segment, S Value)> GetLineData<U, S>(S values, Func<U, uint> getUtf32, ExtractText<S> extractor, 
+                                                                                     LineEnding ending = null, bool withEnding = true)
+            where S : IEnumerable<U>
+        {
+            foreach (var line in GetLineSegments(values, getUtf32, ending, withEnding))
+            {
+                yield return (line, extractor(values, line.position, line.length));
+            }
+        }
+
+        public static IEnumerable<S> GetLines<U, S>(S values, Func<U, uint> getUtf32, ExtractText<S> extractor, LineEnding ending = null, bool withEnding = true)
+            where S : IEnumerable<U>
+        {
+            foreach (var line in GetLineSegments(values, getUtf32, ending, withEnding))
+            {
+                yield return extractor(values, line.position, line.length);
+            }
+        }
     }
 }

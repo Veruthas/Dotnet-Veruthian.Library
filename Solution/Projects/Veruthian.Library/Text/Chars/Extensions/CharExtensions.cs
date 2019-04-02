@@ -56,14 +56,29 @@ namespace Veruthian.Library.Text.Chars.Extensions
 
 
         // Lines
-        public static IEnumerable<(int LineNumber, LineEnding Ending, string Value)> GetLineData(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<TextSegment> GetLineSegments(this IEnumerable<char> values, LineEnding ending = null, bool withEnding = true)
         {
-            yield break;
+            return TextSegment.GetLineSegments(values, (c => (uint)c), ending, withEnding);
         }
 
-        public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending, bool keepEnding = true)
+        public static IEnumerable<(TextSegment Segment, string Value)> GetLineData(this IEnumerable<char> values, LineEnding ending = null, bool withEnding = true)
         {
-            yield break;
+            return TextSegment.GetLineData(values, (c => (uint)c), new EditableString(), (b => b.ToString()), ending, withEnding);
+        }
+
+        public static IEnumerable<string> GetLines(this IEnumerable<char> values, LineEnding ending = null, bool withEnding = true)
+        {
+            return TextSegment.GetLines(values, (c => (uint)c), new StringBuffer(), (b => b.ToString()), ending, withEnding);
+        }
+
+        public static IEnumerable<(TextSegment Segment, string Value)> GetLineData(this string values, LineEnding ending = null, bool withEnding = true)
+        {
+            return TextSegment.GetLineData<char, string>(values, c => (uint)c, (s, p, l) => s.Substring(p, l), ending, withEnding);
+        }
+
+        public static IEnumerable<string> GetLines(this string values, LineEnding ending = null, bool withEnding = true)
+        {
+            return TextSegment.GetLines<char, string>(values, c => (uint)c, (s, p, l) => s.Substring(p, l), ending, withEnding);
         }
 
 
