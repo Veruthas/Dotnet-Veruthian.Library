@@ -503,7 +503,7 @@ namespace Veruthian.Library.Text.Lines
 
                             segments[index - 1] = lastsegment;
 
-                            // Increment line if Cr is not a newline
+                            // Decrement line if Cr is not a newline
                             lineOffset -= (NewLineOffset(LineEnding.Cr));
                         }
                         // <...?> + <{Lf}>
@@ -514,6 +514,9 @@ namespace Veruthian.Library.Text.Lines
                             segment.Ending = LineEnding.Lf;
 
                             segments[index++] = segment;
+
+                            // Decrement line if Lr is not a newline
+                            lineOffset -= (NewLineOffset(LineEnding.Lf) ^ 1);
                         }
                     }
                     // <...None> + {Lf}
@@ -534,7 +537,7 @@ namespace Veruthian.Library.Text.Lines
 
                         segments[index++] = segment;
 
-                        // Increment line if Cr is not a newline
+                        // Decrement line if Cr is not a newline
                         lineOffset -= (NewLineOffset(LineEnding.Cr));
                     }
                     // <...?> + <{Lf}>
