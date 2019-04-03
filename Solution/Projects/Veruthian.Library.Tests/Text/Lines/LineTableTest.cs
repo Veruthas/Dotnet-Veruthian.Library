@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Veruthian.Library.Text.Chars;
+using Veruthian.Library.Text.Chars.Extensions;
 using Veruthian.Library.Text.Lines;
 using Veruthian.Library.Text.Lines.Extensions;
 using Veruthian.Library.Text.Runes;
@@ -141,6 +142,31 @@ namespace Veruthian.Library.Text.Lines.Test
             Value.Clear();
 
             Lines.Clear();
+        }
+
+
+        public void WriteBuilder()
+        {
+            Console.WriteLine($"'{Value.ToString().ToPrintableString()}', {Value.ToString().Length}");
+
+            Console.WriteLine("Split");
+
+            foreach (var line in Value.ToString().GetLineData(Ending))
+            {
+                var segment = line.Segment.ToTupleString();
+
+                Console.WriteLine("{0}{1}-> '{2}'", segment, new string(' ', 20 - segment.Length), line.Value.ToPrintableString());
+            }
+
+            Console.WriteLine("-------");
+
+            Console.WriteLine("Table");
+            foreach (var line in Lines.Lines)
+            {
+                Console.WriteLine(line.ToTupleString());
+            }
+
+            Console.WriteLine();
         }
 
 

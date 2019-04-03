@@ -193,10 +193,16 @@ namespace Veruthian.Library.Text.Lines
                 }
             }
 
-            yield return (position, length - (withEnding ? 0 : found.Size), lineNumber++, found);
-
             if (found != LineEnding.None && (ending == LineEnding.None || ending == found))
+            {
+                yield return (position, length - (withEnding ? 0 : found.Size), lineNumber++, found);
+
                 yield return (position + length, 0, lineNumber, LineEnding.None);
+            }
+            else
+            {
+                yield return (position, length, lineNumber, LineEnding.None);
+            }
         }
 
 
@@ -226,7 +232,7 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
-        public static IEnumerable<(TextSegment Segment, S Value)> GetLineData<U, S>(S values, Func<U, uint> getUtf32, ExtractText<S> extractor, 
+        public static IEnumerable<(TextSegment Segment, S Value)> GetLineData<U, S>(S values, Func<U, uint> getUtf32, ExtractText<S> extractor,
                                                                                      LineEnding ending = null, bool withEnding = true)
             where S : IEnumerable<U>
         {

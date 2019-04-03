@@ -9,48 +9,24 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.None;
+            var ending = LineEnding.CrLf;
 
             var builder = new CharLineBuilder(ending);
 
             builder.Append("Hello\rWorld\nMy\r\n");
-            WriteBuilder(builder);
-
+            builder.WriteBuilder();
+        
             builder.Insert(15, "name is Veruthas!\n");
-            WriteBuilder(builder);
+            builder.WriteBuilder();
 
             builder.Insert(11, "!!\r");
-            WriteBuilder(builder);
+            builder.WriteBuilder();
 
             builder.Insert(6, "\n, ");
-            WriteBuilder(builder);
+            builder.WriteBuilder();
 
 
             Pause();
-        }
-
-        private static void WriteBuilder(CharLineBuilder builder)
-        {
-            Console.WriteLine($"'{builder.Value.ToString().ToPrintableString()}'");
-
-            Console.WriteLine("Split");
-
-            foreach (var line in builder.Value.ToString().GetLineData(builder.Ending))
-            {
-                var segment = line.Segment.ToTupleString();
-
-                Console.WriteLine("{0}{1}-> '{2}'", segment, new string(' ', 20 - segment.Length), line.Value.ToPrintableString());
-            }
-
-            Console.WriteLine("-------");
-
-            Console.WriteLine("Table");
-            foreach (var line in builder.Lines.Lines)
-            {
-                Console.WriteLine(line.ToTupleString());
-            }
-
-            Console.WriteLine();
         }
 
         static void Pause()
