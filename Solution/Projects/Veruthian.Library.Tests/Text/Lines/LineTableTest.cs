@@ -179,11 +179,11 @@ namespace Veruthian.Library.Text.Lines.Test
             Assert.Equal(tableLines.Length, splitLines.Length);
 
             for (var i = 0; i < tableLines.Length; i++)
-                {
+            {
                 var tableLine = tableLines[i];
                 var splitLine = splitLines[i];
             }
-    }
+        }
     }
 
 

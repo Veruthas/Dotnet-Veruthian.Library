@@ -191,7 +191,11 @@ namespace Veruthian.Library.Text.Lines
             }
         }
 
-        private int NewLineOffset(LineEnding ending) => (endingType != LineEnding.CrLf || ending == LineEnding.CrLf ? 1 : 0);
+        private int NewLineOffset(LineEnding ending)
+        {            
+            // Either it accepts them all or only its own type
+            return (endingType == LineEnding.None || ending == endingType) ? 1 : 0;
+        }
 
 
         // Append
@@ -505,6 +509,8 @@ namespace Veruthian.Library.Text.Lines
 
                             // Decrement line if Cr is not a newline
                             lineOffset -= (NewLineOffset(LineEnding.Cr));
+
+                            lineOffset += (NewLineOffset(LineEnding.CrLf));
                         }
                         // <...?> + <{Lf}>
                         else
