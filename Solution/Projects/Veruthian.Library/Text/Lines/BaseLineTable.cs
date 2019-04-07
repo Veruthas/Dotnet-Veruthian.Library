@@ -48,11 +48,11 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                var lineIndex = GetIndexFromNumber(line);
+                var segmentIndex = GetIndexFromNumber(line);
 
-                var segments = GetLineSegments(lineIndex, line);
+                segmentIndex = GetFirstSegment(segmentIndex, line);
 
-                return JoinSegments(segments);
+                return JoinSegments(segmentIndex, line);
             }
         }
 
@@ -67,13 +67,13 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                var lineIndex = GetIndexFromPosition(position);
+                var segmentIndex = GetIndexFromPosition(position);
 
-                var lineNumber = this.segments[lineIndex].Line;
+                var lineNumber = this.segments[segmentIndex].Line;
 
-                var segments = GetLineSegments(lineIndex, lineNumber);
+                segmentIndex = GetFirstSegment(segmentIndex, lineNumber);
 
-                return JoinSegments(segments);
+                return JoinSegments(segmentIndex, lineNumber);
             }
         }
 
@@ -93,42 +93,34 @@ namespace Veruthian.Library.Text.Lines
 
 
         // Helpers
-        private TextSegment JoinSegments((int first, int last) segments)
+        private TextSegment JoinSegments(int segmentIndex, int lineNumber)
         {
-            var segment = this.segments[segments.first];
+            var segment = this.segments[segmentIndex];
 
-            for (int i = segments.first + 1; i <= segments.last; i++)
+            for (int i = segmentIndex + 1; i < segments.Count; i++)
             {
                 var nextSegment = this.segments[i];
 
-                segment = (segment.Position, segment.Length + nextSegment.Length, segment.Line, nextSegment.Ending);
+                if (nextSegment.Line != lineNumber)
+                    break;
+
+                segment.Length += nextSegment.Length;
+
+                segment.Ending = nextSegment.Ending;
             }
 
             return segment;
         }
 
-        private (int first, int last) GetLineSegments(int lineIndex, int lineNumber)
+        private int GetFirstSegment(int segmentIndex, int lineNumber)
         {
-            int first = lineIndex;
-
-            int last = lineIndex;
-
-            for (int i = lineIndex; i >= 0; i--)
+            for (; segmentIndex >= 0; segmentIndex--)
             {
-                if (segments[i].Line == lineNumber)
-                    first = i;
-                else
-                    break;
-            }
-            for (int i = lineIndex; i < segments.Count; i++)
-            {
-                if (segments[i].Line == lineNumber)
-                    last = i;
-                else
+                if (segments[segmentIndex].Line != lineNumber)
                     break;
             }
 
-            return (first, last);
+            return segmentIndex;
         }
 
         private int GetIndexFromNumber(int lineNumber)
@@ -192,7 +184,7 @@ namespace Veruthian.Library.Text.Lines
         }
 
         private int NewLineOffset(LineEnding ending)
-        {            
+        {
             // Either it accepts them all or only its own type
             return (endingType == LineEnding.None || ending == endingType) ? 1 : 0;
         }
@@ -472,7 +464,7 @@ namespace Veruthian.Library.Text.Lines
 
 
                         // Add new empty segment
-                        var newlineOffset = NewLineOffset(LineEnding.Cr);
+                        var newlineOffset = endingType == LineEnding.None ? 1 : 0;
 
                         segment = (segment.Position + segment.Length, 0, segment.Line + newlineOffset, LineEnding.None);
 
