@@ -438,6 +438,40 @@ namespace Veruthian.Library.Text.Lines
 
             void ProcessInitial()
             {
+
+                //         NONE
+                // <(n)...{Lf
+                //     }>  <(n + 1)...>
+
+                // <(n)...>      <(n + 1)...>
+                //         {Lf
+                // }
+
+
+                // CrLf
+                // <(n)...{Lf}>   <(n)...>
+
+                // <(n)...>       <(n)...>
+                //           {Lf}
+
+
+
+                //         NONE
+                // <(n)...{CrLf}>  <(n + 1)...>
+                //          offset = 0               
+                // <(n)...{Cr}>  <(n+1)>  <(n + 1 + offset)...>
+                //             {Lf}
+
+
+                //         CrLf
+                // <(n)...{CrLf}>  <(n + 1)...>
+
+                //         offset = -1
+                // <(n)...{Cr}> <(n)> <(n + 1 + offset)...>
+                //             {Lf}
+
+
+
                 // Push off <...[?]Lf> processing until end
                 if (column == segment.Length - 1)
                 {
