@@ -209,6 +209,7 @@ namespace Veruthian.Library.Text.Lines.Test
         static Dictionary<string, Action<CharLineBuilder>> actions = new Dictionary<string, Action<CharLineBuilder>>();
 
         static string SimpleTestString = "Hello, world!\r\nHow are you?\nI am fine\rThat is good";
+
         static CharLineTester()
         {
             actions.Add("Append", b => b.Append(SimpleTestString));
@@ -225,43 +226,51 @@ namespace Veruthian.Library.Text.Lines.Test
 
             actions.Add("InsertMultipleReversed", b => b.InsertMultipleReversed(0, SimpleTestString));
 
-            actions.Add("BreakNewLineTest", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
+            actions.Add("BreakNewLineTest", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!\n"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
         }
 
         [InlineData("Append", "None")]
         [InlineData("Append", "Cr")]
         [InlineData("Append", "Lf")]
-        [InlineData("Append", "LfCr")]
+        [InlineData("Append", "CrLf")]
         [InlineData("AppendMultiple", "None")]
         [InlineData("AppendMultiple", "Cr")]
         [InlineData("AppendMultiple", "Lf")]
-        [InlineData("AppendMultiple", "LfCr")]
+        [InlineData("AppendMultiple", "CrLf")]
         [InlineData("Prepend", "None")]
         [InlineData("Prepend", "Cr")]
         [InlineData("Prepend", "Lf")]
-        [InlineData("Prepend", "LfCr")]
+        [InlineData("Prepend", "CrLf")]
         [InlineData("PrependMultiple", "None")]
         [InlineData("PrependMultiple", "Cr")]
         [InlineData("PrependMultiple", "Lf")]
-        [InlineData("PrependMultiple", "LfCr")]
+        [InlineData("PrependMultiple", "CrLf")]
         [InlineData("Insert", "None")]
         [InlineData("Insert", "Cr")]
         [InlineData("Insert", "Lf")]
-        [InlineData("Insert", "LfCr")]
+        [InlineData("Insert", "CrLf")]
         [InlineData("InsertMultiple", "None")]
         [InlineData("InsertMultiple", "Cr")]
         [InlineData("InsertMultiple", "Lf")]
-        [InlineData("InsertMultiple", "LfCr")]
+        [InlineData("InsertMultiple", "CrLf")]
         [InlineData("InsertMultipleReversed", "None")]
         [InlineData("InsertMultipleReversed", "Cr")]
         [InlineData("InsertMultipleReversed", "Lf")]
-        [InlineData("InsertMultipleReversed", "LfCr")]
+        [InlineData("InsertMultipleReversed", "CrLf")]
         [InlineData("BreakNewLineTest", "None")]
         [InlineData("BreakNewLineTest", "Cr")]
         [InlineData("BreakNewLineTest", "Lf")]
-        [InlineData("BreakNewLineTest", "LfCr")]
+        [InlineData("BreakNewLineTest", "CrLf")]
         [Theory]
         public static void TestLines(string action, string ending)
+        {
+            var builder = Build(action, ending);
+            
+            builder.Compare();
+        }
+
+
+        public static CharLineBuilder Build(string action, string ending)
         {
             LineEnding.TryGetByName(ending, out var lineEnding);
 
@@ -271,7 +280,7 @@ namespace Veruthian.Library.Text.Lines.Test
 
             actionFunc(builder);
 
-            builder.Compare();
+            return builder;
         }
     }
 }

@@ -9,13 +9,30 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.CrLf;
+            var builder = CharLineTester.Build("AppendMultiple", "None");
+            builder.WriteBuilder();
+
+            builder = CharLineTester.Build("AppendMultiple", "Lf");
+            builder.WriteBuilder();
+            
+            builder = CharLineTester.Build("AppendMultiple", "Cr");
+            builder.WriteBuilder();
+            
+            builder = CharLineTester.Build("AppendMultiple", "CrLf");
+            builder.WriteBuilder();
+
+            Pause();
+        }
+
+        private static void TestEnding()
+        {
+            var ending = LineEnding.None;
 
             var builder = new CharLineBuilder(ending);
 
             builder.Append("Hello\rWorld\nMy\r\n");
             builder.WriteBuilder();
-        
+
             builder.Insert(15, "name is Veruthas!\n");
             builder.WriteBuilder();
 
@@ -25,8 +42,6 @@ namespace _Console
             builder.Insert(6, "\n, ");
             builder.WriteBuilder();
 
-
-            Pause();
         }
 
         static void Pause()

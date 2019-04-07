@@ -48,7 +48,7 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                var segmentIndex = GetIndexFromNumber(line);
+                var segmentIndex = GetIndexFromLine(line);
 
                 segmentIndex = GetFirstSegment(segmentIndex, line);
 
@@ -123,7 +123,7 @@ namespace Veruthian.Library.Text.Lines
             return segmentIndex;
         }
 
-        private int GetIndexFromNumber(int lineNumber)
+        private int GetIndexFromLine(int lineNumber)
         {
             var low = 0;
 
@@ -237,14 +237,14 @@ namespace Veruthian.Library.Text.Lines
                     // If allows CrLf
                     if (endingType != LineEnding.Lf)
                     {
-                        // If <...Lf> + <Cr>
+                        // If <...Cr> + [Lf]
                         if (segment.Ending == LineEnding.Cr)
                         {
                             segment.Length++;
 
                             segment.Ending = LineEnding.CrLf;
                         }
-                        // On <...Lf> + <Cr> when first character of entire append is Cr
+                        // On <...Cr> + [Lf] when first character of entire append is Lf
                         else if (segment.Length == 0 && segments.Count > 1 && segments[segments.Count - 2].Ending == LineEnding.Cr)
                         {
                             var lastsegment = segments[segments.Count - 2];
@@ -256,6 +256,10 @@ namespace Veruthian.Library.Text.Lines
                             segments[segments.Count - 2] = lastsegment;
 
                             segment.Position++;
+
+                            // If Cr didn't count as a line ending, increment current segment line number
+                            if (endingType == LineEnding.CrLf)
+                                segment.Line++;
                         }
                         // Lf
                         else
@@ -438,7 +442,6 @@ namespace Veruthian.Library.Text.Lines
 
             void ProcessInitial()
             {
-
                 //         NONE
                 // <(n)...{Lf
                 //     }>  <(n + 1)...>
@@ -448,7 +451,7 @@ namespace Veruthian.Library.Text.Lines
                 // }
 
 
-                // CrLf
+                //          CrLf
                 // <(n)...{Lf}>   <(n)...>
 
                 // <(n)...>       <(n)...>
@@ -458,8 +461,8 @@ namespace Veruthian.Library.Text.Lines
 
                 //         NONE
                 // <(n)...{CrLf}>  <(n + 1)...>
-                //          offset = 0               
-                // <(n)...{Cr}>  <(n+1)>  <(n + 1 + offset)...>
+                //          offset = 0              
+                // <(n)...{Cr}>  <(n+1)>  <(n+1+offset=n+1)...>
                 //             {Lf}
 
 
@@ -467,50 +470,53 @@ namespace Veruthian.Library.Text.Lines
                 // <(n)...{CrLf}>  <(n + 1)...>
 
                 //         offset = -1
-                // <(n)...{Cr}> <(n)> <(n + 1 + offset)...>
+                // <(n)...{Cr}> <(n)> <(n+1+offset=n)...>
                 //             {Lf}
 
 
-
                 // Push off <...[?]Lf> processing until end
-                if (column == segment.Length - 1)
+                if (endingType == LineEnding.None || endingType == LineEnding.CrLf)
                 {
-                    // Split a <..Lf> into <..> + {Lf}
-                    if (segment.Ending == LineEnding.Lf && endingType != LineEnding.Lf)
+                    if (column == segment.Length - 1)
                     {
-                        segment.Ending = LineEnding.None;
+                        // Split a <..Lf> into <..> + {Lf}
+                        if (segment.Ending == LineEnding.Lf)
+                        {
+                            segment.Ending = LineEnding.None;
 
-                        segment.Length--;
+                            segment.Length--;
 
-                        postponedLf = true;
-                    }
-                    // Split a <..CrLf> into <..Cr> + <> + {Lf}
-                    else if (segment.Ending == LineEnding.CrLf)
-                    {
-                        // <..Cr>|{Lf}                        
-                        segment.Ending = LineEnding.Cr;
+                            postponedLf = true;
+                        }
+                        // Split a <..CrLf> into <..Cr> + <> + {Lf}
+                        else if (segment.Ending == LineEnding.CrLf)
+                        {
+                            // <..Cr>|{Lf}                        
+                            segment.Ending = LineEnding.Cr;
 
-                        segment.Length--;
+                            segment.Length--;
 
-                        lastsegment = segment;
+                            lastsegment = segment;
 
-                        segments[index++] = lastsegment;
-
-
-                        // Add new empty segment
-                        var newlineOffset = endingType == LineEnding.None ? 1 : 0;
-
-                        segment = (segment.Position + segment.Length, 0, segment.Line + newlineOffset, LineEnding.None);
-
-                        segments.Insert(index, segment);
-
-                        column = columnOffset = 0;
+                            segments[index++] = lastsegment;
 
 
-                        // If Cr is not considered a line
-                        lineOffset += newlineOffset;
+                            // Add new empty segment
+                            var newlineOffset = endingType == LineEnding.None ? 1 : 0;
 
-                        postponedLf = true;
+                            segment = (segment.Position + segment.Length, 0, segment.Line + newlineOffset, LineEnding.None);
+
+                            segments.Insert(index, segment);
+
+                            column = columnOffset = 0;
+
+
+                            // If Cr is not considered a line
+                            if (endingType == LineEnding.CrLf)
+                                lineOffset--;
+
+                            postponedLf = true;
+                        }
                     }
                 }
             }
@@ -522,8 +528,8 @@ namespace Veruthian.Library.Text.Lines
                     // <...?> + <> + {Lf}
                     if (segment.Length == 0)
                     {
-                        // <...Cr> + <> + {Lf} & endingType = CrLf | None
-                        if (lastsegment.Ending == LineEnding.Cr && (endingType == LineEnding.CrLf || endingType == LineEnding.None))
+                        // <...Cr> + <> + {Lf}
+                        if (lastsegment.Ending == LineEnding.Cr)
                         {
                             segments.RemoveAt(index);
 
@@ -533,10 +539,8 @@ namespace Veruthian.Library.Text.Lines
 
                             segments[index - 1] = lastsegment;
 
-                            // Decrement line if Cr is not a newline
-                            lineOffset -= (NewLineOffset(LineEnding.Cr));
-
-                            lineOffset += (NewLineOffset(LineEnding.CrLf));
+                            // Increment line if Cr was not a newline, otherwise cancel out previous addition of char
+                            lineOffset += (endingType == LineEnding.CrLf) ? 1 : -1;                            
                         }
                         // <...?> + <{Lf}>
                         else
@@ -547,8 +551,8 @@ namespace Veruthian.Library.Text.Lines
 
                             segments[index++] = segment;
 
-                            // Decrement line if Lr is not a newline
-                            lineOffset -= (NewLineOffset(LineEnding.Lf) ^ 1);
+                            if (endingType == LineEnding.None)
+                                lineOffset++;
                         }
                     }
                     // <...None> + {Lf}
@@ -560,8 +564,8 @@ namespace Veruthian.Library.Text.Lines
 
                         segments[index++] = segment;
                     }
-                    // <...Cr> + {Lf} & endingType = CrLf | None
-                    else if (segment.Ending == LineEnding.Cr && (endingType == LineEnding.CrLf || endingType == LineEnding.None))
+                    // <...Cr> + {Lf}
+                    else if (segment.Ending == LineEnding.Cr)
                     {
                         segment.Length++;
 
@@ -569,8 +573,9 @@ namespace Veruthian.Library.Text.Lines
 
                         segments[index++] = segment;
 
-                        // Decrement line if Cr is not a newline
-                        lineOffset -= (NewLineOffset(LineEnding.Cr));
+                        // Increment line if Cr was not a newline
+                        if (endingType == LineEnding.CrLf)
+                            lineOffset++;
                     }
                     // <...?> + <{Lf}>
                     else
