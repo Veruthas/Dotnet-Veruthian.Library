@@ -622,136 +622,65 @@ namespace Veruthian.Library.Text.Lines
             if (amount < 0 || position + amount > length)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            // If Clearing             
-            if (amount == length)
+            if (amount > 0)
             {
-                Clear();
-
                 return;
             }
-
-
-            var index = GetIndexFromPosition(position);
-
-            var segment = segments[index];
-
-            var column = position - segment.Position;
-
-
-            var segmentCount = 0;
-
-
-            var lineOffset = 0;
-
-            var positionOffset = amount;
-
-
-            var lastLineNumber = segment.Line;
-
-
-            // If dividing a CrLf
-            if (column + amount == segment.Length - 2 && segment.Ending == LineEnding.CrLf)
+            else if (amount == length)
             {
-                segment.Length -= amount;
-
-                segments[index] = segment;
-
-                Adjust(0, amount, index + 1);
+                Clear();
             }
-            // If removing within a segment
-            if (column + amount < segment.Length)
-            {
-                segment.Length -= amount;
-
-                segments[index] = segment;
-
-                Adjust(0, amount, index + 1);
-            }
-            // If removing one or more segments
             else
             {
+                var index = GetIndexFromPosition(position);
+
+                var segment = segments[index];
+
                 var dangling = segment;
 
-                // If removing end of first segment
-                if (column != 0)
+                var column = position - segment.Position;
+
+
+                var segmentCount = 0;
+
+                var positionOffset = -amount;
+
+                var lineOffset = 0;
+
+                var lastLineNumber = segment.Line;
+
+
+                // Handle first segment
+                if (column == segment.Length - 2 && (endingType == LineEnding.None || endingType == LineEnding.CrLf))
                 {
-                    dangling.Length -= column;
+                    // Peel off 'Lf'
+                    segment.Length--;
+                    segment.Ending = LineEnding.Cr;
+                    segments[index++] = segment;
 
-                    dangling.Ending = LineEnding.None;
+                    segment = segments[index];
 
-                    amount -= dangling.Length;
+                    column = 0;
 
-                    lineOffset++;
-
-                    index++;
+                    if (endingType == LineEnding.CrLf)
+                    {
+                        lineOffset--;
+                        segment.Line = lastLineNumber;
+                    }
+                    else
+                    {
+                        lastLineNumber = segment.Line;
+                    }
                 }
-
-                // If removing rest of segments
-                if (position + amount == length)
-                {
-                    segments.RemoveRange(index, segments.Count - index);
-
-                    if (column != 0)
-                        segments[index - 1] = dangling;
-                }
-                // Otherwise            
                 else
                 {
-
-                    while (amount > 0)
-                    {
-                        segment = segments[index + segmentCount];
-
-                        // If entire segment is being removed
-                        if (segment.Length >= amount)
-                        {
-                            amount -= segment.Length;
-
-                            segment.Length = 0;
-
-                            segmentCount++;
-
-                            // Increment LineOffset for adjustment
-                            if (segment.Line != lastLineNumber)
-                            {
-                                lineOffset++;
-
-                                lastLineNumber = segment.Line;
-                            }
-                        }
-                        // If removing beginning of last segment 
-                        else
-                        {
-                            segment.Position += amount;
-
-                            segment.Length -= amount;
-                        }
-                    }
-
-                    // Need to merge in dangling
-                    if (column != 0)
-                    {
-                        // If removed entire last segment, get next for dangling
-                        if (segment.Length == 0)
-                            segment = segments[index + segmentCount + 1];
-
-                        dangling.Length += segment.Length;
-
-                        dangling.Ending = segment.Ending;
-
-                        segments[index - 1] = dangling;
-                    }
-                    // If removed only beginning of last segment
-                    else if (segment.Length != 0)
-                    {
-                        segments[index + segmentCount] = segment;
-                    }
-
-                    // Remove and adjust
-                    segments.RemoveRange(index, segmentCount);
-
-                    Adjust(lineOffset, positionOffset, index);
+                    dangling.Length = column;
+                    
                 }
+
+                // Handle middle segments
+
+                // Handle last segment
             }
         }
 
