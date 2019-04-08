@@ -9,16 +9,16 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var builder = CharLineTester.Build("AppendMultiple", "None");
+            var builder = CharLineTester.Build("RemoveSimpleEnd", "None");
             builder.WriteBuilder();
 
-            builder = CharLineTester.Build("AppendMultiple", "Lf");
+            builder = CharLineTester.Build("RemoveSimpleEnd", "Lf");
             builder.WriteBuilder();
             
-            builder = CharLineTester.Build("AppendMultiple", "Cr");
+            builder = CharLineTester.Build("RemoveSimpleEnd", "Cr");
             builder.WriteBuilder();
             
-            builder = CharLineTester.Build("AppendMultiple", "CrLf");
+            builder = CharLineTester.Build("RemoveSimpleEnd", "CrLf");
             builder.WriteBuilder();
 
             Pause();

@@ -22,11 +22,9 @@ namespace Veruthian.Library.Text.Lines
         {
             this.segments = new List<TextSegment>();
 
-            this.segments.Add((0, 0, 0, LineEnding.None));
-
-            this.length = 0;
-
             this.endingType = endingType ?? LineEnding.None;
+
+            Clear();
         }
 
 
@@ -540,7 +538,7 @@ namespace Veruthian.Library.Text.Lines
                             segments[index - 1] = lastsegment;
 
                             // Increment line if Cr was not a newline, otherwise cancel out previous addition of char
-                            lineOffset += (endingType == LineEnding.CrLf) ? 1 : -1;                            
+                            lineOffset += (endingType == LineEnding.CrLf) ? 1 : -1;
                         }
                         // <...?> + <{Lf}>
                         else
@@ -624,6 +622,14 @@ namespace Veruthian.Library.Text.Lines
             if (amount < 0 || position + amount > length)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
+            // If Clearing             
+            if (amount == length)
+            {
+                Clear();
+
+                return;
+            }
+
 
             var index = GetIndexFromPosition(position);
 
@@ -643,6 +649,15 @@ namespace Veruthian.Library.Text.Lines
             var lastLineNumber = segment.Line;
 
 
+            // If dividing a CrLf
+            if (column + amount == segment.Length - 2 && segment.Ending == LineEnding.CrLf)
+            {
+                segment.Length -= amount;
+
+                segments[index] = segment;
+
+                Adjust(0, amount, index + 1);
+            }
             // If removing within a segment
             if (column + amount < segment.Length)
             {
@@ -743,8 +758,11 @@ namespace Veruthian.Library.Text.Lines
         // Clear
         public void Clear()
         {
-            segments.Clear();
-            length = 0;
+            this.segments.Clear();
+
+            this.segments.Add((0, 0, 0, LineEnding.None));
+
+            this.length = 0;
         }
 
         // Enumerator

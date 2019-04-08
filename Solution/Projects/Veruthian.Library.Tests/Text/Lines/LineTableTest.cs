@@ -226,7 +226,14 @@ namespace Veruthian.Library.Text.Lines.Test
 
             actions.Add("InsertMultipleReversed", b => b.InsertMultipleReversed(0, SimpleTestString));
 
-            actions.Add("BreakNewLineTest", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!\n"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
+            actions.Add("InsertNewLineBreak", b => { b.Append("Hello\rWorld\nMy\r\n"); b.Insert(15, "name is Veruthas!\n"); b.Insert(11, "!!\r"); b.Insert(6, "\n, "); });
+
+
+            actions.Add("RemoveSimple", b => { b.Append("Hello, world!"); b.Remove(1, b.Value.Length - 1); });
+
+            actions.Add("RemoveSimpleFront", b => { b.Append("Hello, world!"); b.RemoveMultiple(1, b.Value.Length - 1); });
+
+            actions.Add("RemoveSimpleEnd", b => { b.Append("Hello, world!"); b.RemoveMultipleReversed(1, b.Value.Length - 1); });
         }
 
         [InlineData("Append", "None")]
@@ -237,6 +244,7 @@ namespace Veruthian.Library.Text.Lines.Test
         [InlineData("AppendMultiple", "Cr")]
         [InlineData("AppendMultiple", "Lf")]
         [InlineData("AppendMultiple", "CrLf")]
+
         [InlineData("Prepend", "None")]
         [InlineData("Prepend", "Cr")]
         [InlineData("Prepend", "Lf")]
@@ -245,6 +253,7 @@ namespace Veruthian.Library.Text.Lines.Test
         [InlineData("PrependMultiple", "Cr")]
         [InlineData("PrependMultiple", "Lf")]
         [InlineData("PrependMultiple", "CrLf")]
+
         [InlineData("Insert", "None")]
         [InlineData("Insert", "Cr")]
         [InlineData("Insert", "Lf")]
@@ -257,15 +266,28 @@ namespace Veruthian.Library.Text.Lines.Test
         [InlineData("InsertMultipleReversed", "Cr")]
         [InlineData("InsertMultipleReversed", "Lf")]
         [InlineData("InsertMultipleReversed", "CrLf")]
-        [InlineData("BreakNewLineTest", "None")]
-        [InlineData("BreakNewLineTest", "Cr")]
-        [InlineData("BreakNewLineTest", "Lf")]
-        [InlineData("BreakNewLineTest", "CrLf")]
+        [InlineData("InsertNewLineBreak", "None")]
+        [InlineData("InsertNewLineBreak", "Cr")]
+        [InlineData("InsertNewLineBreak", "Lf")]
+        [InlineData("InsertNewLineBreak", "CrLf")]
+
+        [InlineData("RemoveSimple", "None")]
+        [InlineData("RemoveSimple", "Cr")]
+        [InlineData("RemoveSimple", "Lf")]
+        [InlineData("RemoveSimple", "CrLf")]
+        [InlineData("RemoveSimpleFront", "None")]
+        [InlineData("RemoveSimpleFront", "Cr")]
+        [InlineData("RemoveSimpleFront", "Lf")]
+        [InlineData("RemoveSimpleFront", "CrLf")]
+        [InlineData("RemoveSimpleEnd", "None")]
+        [InlineData("RemoveSimpleEnd", "Cr")]
+        [InlineData("RemoveSimpleEnd", "Lf")]
+        [InlineData("RemoveSimpleEnd", "CrLf")]
         [Theory]
         public static void TestLines(string action, string ending)
         {
             var builder = Build(action, ending);
-            
+
             builder.Compare();
         }
 
