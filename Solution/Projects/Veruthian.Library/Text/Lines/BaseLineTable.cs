@@ -652,7 +652,7 @@ namespace Veruthian.Library.Text.Lines
                 {
                     startSegment.Length -= amount;
 
-                    segments[index] = startSegment;
+                    segments[startIndex] = startSegment;
 
                     Adjust(lineOffset, positionOffset, index + 1);
                 }
@@ -664,7 +664,7 @@ namespace Veruthian.Library.Text.Lines
                     var lastLineNumber = startSegment.Line;
 
 
-                    // Handle first segment                
+                    // Handle first segment
                     if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 2)
                     {
                         startSegment.Ending = LineEnding.Cr;
@@ -672,11 +672,42 @@ namespace Veruthian.Library.Text.Lines
                         if (endingType == LineEnding.CrLf)
                             lineOffset--;
                     }
+                    else
+                    {
+                        startSegment.Ending = LineEnding.None;
+                    }
+
+                    amount -= startSegment.Length - startColumn;
+
+                    startSegment.Length = startColumn;
+
+                    index++;
 
 
                     // Handle middle segments
+                    while (index < segments.Count)
+                    {
+                        var segment = segments[index];
+
+                        if (segment.Length <= amount)
+                        {
+                            if (segment.Line != lastLineNumber)
+                                lineOffset++;
+
+                            lastLineNumber = segment.Line;
+
+                            amount -= segment.Length;
+
+                            segmentCount++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
 
                     // Handle last segment
+
                 }
             }
         }
