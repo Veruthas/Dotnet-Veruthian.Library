@@ -622,7 +622,7 @@ namespace Veruthian.Library.Text.Lines
             if (amount < 0 || position + amount > length)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > 0)
+            if (amount == 0)
             {
                 return;
             }
@@ -632,55 +632,52 @@ namespace Veruthian.Library.Text.Lines
             }
             else
             {
-                var index = GetIndexFromPosition(position);
-
-                var segment = segments[index];
-
-                var dangling = segment;
-
-                var column = position - segment.Position;
-
-
-                var segmentCount = 0;
-
                 var positionOffset = -amount;
 
                 var lineOffset = 0;
 
-                var lastLineNumber = segment.Line;
+
+                var index = GetIndexFromPosition(position);
 
 
-                // Handle first segment
-                if (column == segment.Length - 2 && (endingType == LineEnding.None || endingType == LineEnding.CrLf))
+                var startIndex = index;
+
+                var startSegment = segments[index];
+
+                var startColumn = position - startSegment.Position;
+
+
+                // Within one segment
+                if (startColumn + amount < startSegment.Length - (startSegment.Ending == LineEnding.CrLf ? 2 : 1))
                 {
-                    // Peel off 'Lf'
-                    segment.Length--;
-                    segment.Ending = LineEnding.Cr;
-                    segments[index++] = segment;
+                    startSegment.Length -= amount;
 
-                    segment = segments[index];
+                    segments[index] = startSegment;
 
-                    column = 0;
-
-                    if (endingType == LineEnding.CrLf)
-                    {
-                        lineOffset--;
-                        segment.Line = lastLineNumber;
-                    }
-                    else
-                    {
-                        lastLineNumber = segment.Line;
-                    }
+                    Adjust(lineOffset, positionOffset, index + 1);
                 }
+                // Over multiple segment
                 else
                 {
-                    dangling.Length = column;
-                    
+                    var segmentCount = 0;
+
+                    var lastLineNumber = startSegment.Line;
+
+
+                    // Handle first segment                
+                    if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 2)
+                    {
+                        startSegment.Ending = LineEnding.Cr;
+
+                        if (endingType == LineEnding.CrLf)
+                            lineOffset--;
+                    }
+
+
+                    // Handle middle segments
+
+                    // Handle last segment
                 }
-
-                // Handle middle segments
-
-                // Handle last segment
             }
         }
 
