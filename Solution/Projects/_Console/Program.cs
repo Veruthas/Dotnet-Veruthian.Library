@@ -9,16 +9,14 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var builder = CharLineTester.Build("RemoveSimpleEnd", "None");
+            var ending = LineEnding.None;
+
+            var builder = new CharLineBuilder(ending);
+
+            builder.Append("Hello,$! World!\r\n");
             builder.WriteBuilder();
 
-            builder = CharLineTester.Build("RemoveSimpleEnd", "Lf");
-            builder.WriteBuilder();
-            
-            builder = CharLineTester.Build("RemoveSimpleEnd", "Cr");
-            builder.WriteBuilder();
-            
-            builder = CharLineTester.Build("RemoveSimpleEnd", "CrLf");
+            builder.Remove(6, 2);
             builder.WriteBuilder();
 
             Pause();
@@ -42,6 +40,22 @@ namespace _Console
             builder.Insert(6, "\n, ");
             builder.WriteBuilder();
 
+        }
+
+
+        private static void Tests()
+        {
+            var builder = CharLineTester.Build("RemoveSimpleEnd", "None");
+            builder.WriteBuilder();
+
+            builder = CharLineTester.Build("RemoveSimpleEnd", "Lf");
+            builder.WriteBuilder();
+
+            builder = CharLineTester.Build("RemoveSimpleEnd", "Cr");
+            builder.WriteBuilder();
+
+            builder = CharLineTester.Build("RemoveSimpleEnd", "CrLf");
+            builder.WriteBuilder();
         }
 
         static void Pause()
