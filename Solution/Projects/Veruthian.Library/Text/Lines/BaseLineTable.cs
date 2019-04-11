@@ -699,6 +699,8 @@ namespace Veruthian.Library.Text.Lines
                             amount -= segment.Length;
 
                             segmentCount++;
+
+                            index++;
                         }
                         else
                         {
@@ -707,6 +709,26 @@ namespace Veruthian.Library.Text.Lines
                     }
 
                     // Handle last segment
+                    if (index < segments.Count)
+                    {
+                        var lastSegment = segments[index];
+
+                        var lastColumn = amount;
+
+                        lastSegment.Position += amount;
+
+                        lastSegment.Length -= amount;
+
+                        if (lastSegment.Length == 1 && lastSegment.Ending == LineEnding.CrLf)
+                        {
+                            lastSegment.Ending = LineEnding.Lf;
+
+                            if (endingType == LineEnding.CrLf)
+                                lineOffset--;
+                        }
+                    }
+
+                    // Try to combine first and last segments
 
                 }
             }
