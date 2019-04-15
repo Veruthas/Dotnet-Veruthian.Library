@@ -665,24 +665,37 @@ namespace Veruthian.Library.Text.Lines
 
 
                     // Handle first segment
-                    if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 2)
+                    if (startColumn == 0)
                     {
-                        startSegment.Ending = LineEnding.Cr;
+                        startIndex = index - 1;
 
-                        if (endingType == LineEnding.CrLf)
-                            lineOffset--;
+                        if (index != -1)
+                        {
+                            startSegment = segments[startIndex];
+
+                            startColumn = startSegment.Length;
+                        }
                     }
                     else
                     {
-                        startSegment.Ending = LineEnding.None;
+                        if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 2)
+                        {
+                            startSegment.Ending = LineEnding.Cr;
+
+                            if (endingType == LineEnding.CrLf)
+                                lineOffset--;
+                        }
+                        else
+                        {
+                            startSegment.Ending = LineEnding.None;
+                        }
+
+                        amount -= startSegment.Length - startColumn;
+
+                        startSegment.Length = startColumn;
+
+                        index++;
                     }
-
-                    amount -= startSegment.Length - startColumn;
-
-                    startSegment.Length = startColumn;
-
-                    index++;
-
 
                     // Handle middle segments
                     while (index < segments.Count)
