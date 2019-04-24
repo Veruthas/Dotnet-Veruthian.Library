@@ -739,10 +739,41 @@ namespace Veruthian.Library.Text.Lines
                             if (endingType == LineEnding.CrLf)
                                 lineOffset--;
                         }
+
+                        // Try to combine first and last segments
+                        if (startIndex != -1)
+                        {
+                            // CrLf
+                            if (startSegment.Ending == LineEnding.Cr)
+                            {
+                                if (lastSegment.Ending == LineEnding.Lf && lastSegment.Length == 1)
+                                {
+                                    startSegment.Length++;
+
+                                    startSegment.Ending = LineEnding.CrLf;
+
+                                    segments[startIndex] = startSegment;
+
+                                    segmentCount++;
+                                }
+                            }
+                            else
+                            {
+                                startSegment.Length += lastSegment.Length;
+
+                                startSegment.Ending = lastSegment.Ending;
+
+                                segments[startIndex] = startSegment;
+                                
+                                segmentCount++;
+                            }
+                        }
                     }
 
-                    // Try to combine first and last segments
 
+                    segments.RemoveRange(startIndex + 1, segmentCount);
+
+                    Adjust(lineOffset, positionOffset, startIndex + 1);
                 }
             }
         }
