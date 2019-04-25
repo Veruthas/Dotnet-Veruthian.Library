@@ -648,7 +648,7 @@ namespace Veruthian.Library.Text.Lines
 
 
                 // Within one segment
-                if (startColumn + amount < startSegment.Length - startSegment.Ending.Size)
+                if (startColumn + amount <= startSegment.Length - startSegment.Ending.Size)
                 {
                     startSegment.Length -= amount;
 

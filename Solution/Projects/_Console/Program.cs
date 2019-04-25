@@ -9,37 +9,9 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.Cr;
-
-            var builder = new CharLineBuilder(ending);
-
-            builder.Append("A\r\nB\n");
-            builder.WriteBuilder();
-
-            builder.Remove(2, 2);
-            builder.WriteBuilder();
+            Tests();
 
             Pause();
-        }
-
-        private static void TestEnding()
-        {
-            var ending = LineEnding.None;
-
-            var builder = new CharLineBuilder(ending);
-
-            builder.Append("Hello\rWorld\nMy\r\n");
-            builder.WriteBuilder();
-
-            builder.Insert(15, "name is Veruthas!\n");
-            builder.WriteBuilder();
-
-            builder.Insert(11, "!!\r");
-            builder.WriteBuilder();
-
-            builder.Insert(6, "\n, ");
-            builder.WriteBuilder();
-
         }
 
 
