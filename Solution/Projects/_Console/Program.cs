@@ -9,7 +9,7 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var ending = LineEnding.None;
+            var ending = LineEnding.Cr;
 
             var builder = new CharLineBuilder(ending);
 

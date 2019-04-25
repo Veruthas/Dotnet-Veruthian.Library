@@ -648,7 +648,7 @@ namespace Veruthian.Library.Text.Lines
 
 
                 // Within one segment
-                if (startColumn + amount < startSegment.Length - (startSegment.Ending == LineEnding.CrLf ? 2 : 1))
+                if (startColumn + amount < startSegment.Length - startSegment.Ending.Size)
                 {
                     startSegment.Length -= amount;
 
@@ -758,7 +758,8 @@ namespace Veruthian.Library.Text.Lines
 
                                     segmentCount++;
 
-                                    lineOffset--;
+                                    if (endingType == LineEnding.CrLf)
+                                        lineOffset++;
                                 }
                             }
                             else
