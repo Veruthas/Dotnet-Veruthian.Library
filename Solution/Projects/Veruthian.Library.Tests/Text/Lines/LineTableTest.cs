@@ -127,7 +127,7 @@ namespace Veruthian.Library.Text.Lines.Test
         public void RemoveMultiple(int position, int amount)
         {
             for (int i = 0; i < amount; i++)
-                Remove(position++, 1);
+                Remove(position, 1);
         }
 
         public void RemoveMultipleReversed(int position, int amount)

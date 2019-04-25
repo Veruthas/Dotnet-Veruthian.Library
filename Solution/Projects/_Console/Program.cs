@@ -1,7 +1,4 @@
 ﻿using System;
-using Veruthian.Library.Text.Chars.Extensions;
-using Veruthian.Library.Text.Lines;
-using Veruthian.Library.Text.Lines.Test;
 
 namespace _Console
 {
@@ -9,25 +6,7 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            Tests();
-
             Pause();
-        }
-
-
-        private static void Tests()
-        {
-            var builder = CharLineTester.Build("RemoveSimpleEnd", "None");
-            builder.WriteBuilder();
-
-            builder = CharLineTester.Build("RemoveSimpleEnd", "Lf");
-            builder.WriteBuilder();
-
-            builder = CharLineTester.Build("RemoveSimpleEnd", "Cr");
-            builder.WriteBuilder();
-
-            builder = CharLineTester.Build("RemoveSimpleEnd", "CrLf");
-            builder.WriteBuilder();
         }
 
         static void Pause()
