@@ -434,11 +434,11 @@ namespace Veruthian.Library.Text.Runes
 
         #endregion
 
-        #region Slice
+        #region Extract
 
-        public RuneString Slice(int start) => Slice(start, Length - start);
+        public RuneString Extract(int start) => Extract(start, Length - start);
 
-        public RuneString Slice(int start, int length)
+        public RuneString Extract(int start, int length)
         {
             if (start < 0 || start > Length)
                 throw new ArgumentOutOfRangeException("start");
