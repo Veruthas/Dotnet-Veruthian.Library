@@ -13,10 +13,10 @@ namespace _Console
 
             var builder = new CharLineBuilder(ending);
 
-            builder.Append("Hello,$! World!\r\n");
+            builder.Append("A\r\nB\n");
             builder.WriteBuilder();
 
-            builder.Remove(6, 2);
+            builder.Remove(2, 2);
             builder.WriteBuilder();
 
             Pause();

@@ -678,7 +678,7 @@ namespace Veruthian.Library.Text.Lines
                     }
                     else
                     {
-                        if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 2)
+                        if (startSegment.Ending == LineEnding.CrLf && startColumn == startSegment.Length - 1)
                         {
                             startSegment.Ending = LineEnding.Cr;
 
@@ -688,6 +688,8 @@ namespace Veruthian.Library.Text.Lines
                         else
                         {
                             startSegment.Ending = LineEnding.None;
+
+                            lineOffset--;
                         }
 
                         amount -= startSegment.Length - startColumn;
@@ -755,6 +757,8 @@ namespace Veruthian.Library.Text.Lines
                                     segments[startIndex] = startSegment;
 
                                     segmentCount++;
+
+                                    lineOffset--;
                                 }
                             }
                             else
@@ -764,7 +768,7 @@ namespace Veruthian.Library.Text.Lines
                                 startSegment.Ending = lastSegment.Ending;
 
                                 segments[startIndex] = startSegment;
-                                
+
                                 segmentCount++;
                             }
                         }
