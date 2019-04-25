@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Veruthian.Library.Operations
-{
+{   
+    // Produces a flattened list of Operations instead of Tree
     public class FlattenedOperation<TState>
-    {
-        public FlattenedOperation(IOperation<TState> operation, int suboperationCount)
+    {        
+        private FlattenedOperation(IOperation<TState> operation, int suboperationCount)
         {
             this.Operation = operation;
 

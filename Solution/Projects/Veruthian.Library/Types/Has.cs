@@ -9,5 +9,4 @@ namespace Veruthian.Library.Types
     {
         void Set(T value);
     }
-
 }
