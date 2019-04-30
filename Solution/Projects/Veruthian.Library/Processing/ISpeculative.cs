@@ -1,7 +1,10 @@
 namespace Veruthian.Library.Processing
 {
-    public interface ITransaction
+    public interface ISpeculative
     {
+        bool IsSpeculating { get; }
+
+
         void Mark();
 
 

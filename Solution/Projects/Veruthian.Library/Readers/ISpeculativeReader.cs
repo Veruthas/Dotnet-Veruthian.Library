@@ -4,13 +4,9 @@ using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Readers
 {
-    public interface ISpeculativeReader<out T> : ILookaheadReader<T>, ITransaction
+    public interface ISpeculativeReader<out T> : ILookaheadReader<T>, ISpeculative
     {
-        bool IsSpeculating { get; }
-
-
         int MarkPosition { get; }
-
 
         T PeekFromMark(int lookahead);
 
