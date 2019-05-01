@@ -4,12 +4,12 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Operations
 {
-    public abstract class BaseGroupedOperation<TState> : BaseOperation<TState>
+    public abstract class BaseListOperation<TState> : BaseOperation<TState>
     {
         private readonly DataIndex<IOperation<TState>> operations;
 
 
-        public BaseGroupedOperation(DataIndex<IOperation<TState>> operations) => this.operations = operations;
+        public BaseListOperation(DataIndex<IOperation<TState>> operations) => this.operations = operations;
 
 
         protected DataIndex<IOperation<TState>> Operations => operations;

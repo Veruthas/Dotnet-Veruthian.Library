@@ -49,11 +49,11 @@ namespace Veruthian.Library.Operations
 
         private void VerifyIndex(int index)
         {
-            if (HasIndex(index))
+            if (!HasIndex(index))
                 throw new IndexOutOfRangeException();
         }
 
-        private bool HasIndex(int index) => (uint)index >= Count;
+        private bool HasIndex(int index) => (uint)index < Count;
 
         bool ILookup<int, IOperation<TState>>.HasKey(int key) => HasIndex(key);
 
@@ -63,6 +63,7 @@ namespace Veruthian.Library.Operations
             get
             {
                 VerifyIndex(key);
+                
                 return GetSubOperation(key);
             }
         }
@@ -116,15 +117,5 @@ namespace Veruthian.Library.Operations
         }
 
         #endregion
-
-        #region Validation Helpers
-
-        protected void CheckForNullOperation(IOperation<TState> operation, string name = null)
-        {
-            if (operation == null)
-                throw new ArgumentNullException($"Operation {(string.IsNullOrWhiteSpace(name) ? "${name} " : "")}cannot be null!");
-        }
-
-        #endregion        
     }
 }

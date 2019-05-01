@@ -3,7 +3,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Operations
 {
-    public class SequentialOperation<TState> : BaseGroupedOperation<TState>
+    public class SequentialOperation<TState> : BaseListOperation<TState>
     {
         public SequentialOperation()
             : base(DataIndex<IOperation<TState>>.New(0)) { }
