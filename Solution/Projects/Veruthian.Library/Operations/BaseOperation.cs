@@ -24,7 +24,12 @@ namespace Veruthian.Library.Operations
         public bool Perform(TState state, ITracer<TState> tracer = null)
         {
             if (tracer != null)
-                tracer.OnStart(this, state);
+            {
+                tracer.OnStart(this, state, out var handled);
+
+                if (handled != null)
+                    return handled.Value;
+            }
 
             bool result = DoAction(state, tracer);
 
@@ -63,7 +68,7 @@ namespace Veruthian.Library.Operations
             get
             {
                 VerifyIndex(key);
-                
+
                 return GetSubOperation(key);
             }
         }
