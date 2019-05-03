@@ -6,13 +6,13 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Operations
 {
-    public class InSetOperation<TState, T> : BaseMatchOperation<TState, T>
+    public class MatchSetOperation<TState, T> : BaseMatchOperation<TState, T>
         where TState : Has<IReader<T>>
         where T : ISequential<T>, IBounded<T>
     {
         RangeSet<T> set;
 
-        public InSetOperation(RangeSet<T> set)
+        public MatchSetOperation(RangeSet<T> set)
         {
             ExceptionHelper.VerifyNotNull(set);
 
