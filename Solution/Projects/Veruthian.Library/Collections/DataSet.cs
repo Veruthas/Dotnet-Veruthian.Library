@@ -19,7 +19,7 @@ namespace Veruthian.Library.Collections
 
         public DataSet(IEqualityComparer<T> comparer, params T[] items) => this.items = new HashSet<T>(items, comparer);
 
-        public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);        
+        public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);
 
 
         public int Count => items.Count;
@@ -38,7 +38,27 @@ namespace Veruthian.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
+        private const string start = "{", end = "}", separator = ", ";
 
-        public override string ToString() => this.ToListString("{", "}", ", ") ;        
+        public override string ToString() => this.ToListString(start, end, separator);
+
+        public string ToString(bool alwaysEnclose) => ToString(start, end, separator, alwaysEnclose);
+
+        public string ToString(string start, string end, string separator, bool alwaysEnclose = true)
+        {
+            if (alwaysEnclose || Count > 1)
+            {
+                return this.ToListString(start, end, separator);
+            }
+            else
+            {
+                var result = "";
+
+                foreach (var item in items)
+                    result = item.ToString();
+
+                return result;
+            }
+        }
     }
 }

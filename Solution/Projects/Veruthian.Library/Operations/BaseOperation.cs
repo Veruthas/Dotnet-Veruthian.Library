@@ -21,6 +21,7 @@ namespace Veruthian.Library.Operations
         #endregion
 
         #region Implemented
+        
         public bool Perform(TState state, ITracer<TState> tracer = null)
         {
             if (tracer != null)
