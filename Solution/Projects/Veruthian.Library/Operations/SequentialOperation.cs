@@ -22,7 +22,7 @@ namespace Veruthian.Library.Operations
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {
-            foreach (var operation in Operations)
+            foreach (var operation in operations)
             {
                 if (!operation.Perform(state, tracer))
                     return false;

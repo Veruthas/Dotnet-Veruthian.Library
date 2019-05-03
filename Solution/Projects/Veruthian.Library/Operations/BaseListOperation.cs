@@ -6,13 +6,11 @@ namespace Veruthian.Library.Operations
 {
     public abstract class BaseListOperation<TState> : BaseOperation<TState>
     {
-        private readonly DataIndex<IOperation<TState>> operations;
+        protected DataIndex<IOperation<TState>> operations;
 
 
         public BaseListOperation(DataIndex<IOperation<TState>> operations) => this.operations = operations;
 
-
-        protected DataIndex<IOperation<TState>> Operations => operations;
 
         protected override int Count => operations.Count;
 
