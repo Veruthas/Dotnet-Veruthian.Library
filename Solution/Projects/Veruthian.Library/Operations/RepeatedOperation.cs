@@ -2,12 +2,12 @@ using System;
 
 namespace Veruthian.Library.Operations
 {
-    public class RepeatOperation<TState> : BaseNestedOperation<TState>
+    public class RepeatedOperation<TState> : BaseNestedOperation<TState>
     {
         int? times;
 
 
-        public RepeatOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
+        public RepeatedOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
 
         public override string Description => $"repeat {(times == null ? "?" : (times < 0 ? $"{-times}?" : times.ToString()))} {Operation}";
 
@@ -38,10 +38,10 @@ namespace Veruthian.Library.Operations
         }
 
 
-        public RepeatOperation<TState> Repeat(IOperation<TState> operation) => new RepeatOperation<TState>(operation);
+        public RepeatedOperation<TState> Repeat(IOperation<TState> operation) => new RepeatedOperation<TState>(operation);
 
-        public RepeatOperation<TState> Exactly(int times, IOperation<TState> operation) => new RepeatOperation<TState>(operation, Math.Abs(times));
+        public RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, Math.Abs(times));
 
-        public RepeatOperation<TState> AtMost(int times, IOperation<TState> operation) => new RepeatOperation<TState>(operation, -(Math.Abs(times)));
+        public RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, -(Math.Abs(times)));
     }
 }
