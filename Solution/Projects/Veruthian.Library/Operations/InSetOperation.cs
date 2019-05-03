@@ -6,7 +6,7 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Operations
 {
-    public class InSetOperation<TState, T> : BaseReadOperation<TState, T>
+    public class InSetOperation<TState, T> : BaseMatchOperation<TState, T>
         where TState : Has<IReader<T>>
         where T : ISequential<T>, IBounded<T>
     {
@@ -18,6 +18,8 @@ namespace Veruthian.Library.Operations
 
             this.set = set;
         }
+
+        public RangeSet<T> Set => set;
 
         public override string Description => $"in({set})";
 

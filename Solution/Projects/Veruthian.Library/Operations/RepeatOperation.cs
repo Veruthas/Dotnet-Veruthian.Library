@@ -1,3 +1,5 @@
+using System;
+
 namespace Veruthian.Library.Operations
 {
     public class RepeatOperation<TState> : BaseNestedOperation<TState>
@@ -5,18 +7,23 @@ namespace Veruthian.Library.Operations
         int? times;
 
 
-        public RepeatOperation(IOperation<TState> operation, int? times = null) : base(operation)
-        {
-            this.times = times;
-        }
+        public RepeatOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
 
-        public override string Description => $"repeat {(times == null ? "?" : times.ToString())} {Operation}";
+        public override string Description => $"repeat {(times == null ? "?" : (times < 0 ? $"{-times}?" : times.ToString()))} {Operation}";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {
             if (times == null)
             {
                 while (Operation.Perform(state, tracer)) ;
+
+                return true;
+            }
+            else if (times < 0)
+            {
+                for (int i = 0; i > times; i--)
+                    if (!Operation.Perform(state, tracer))
+                        break;
 
                 return true;
             }
@@ -29,5 +36,12 @@ namespace Veruthian.Library.Operations
                 return true;
             }
         }
+
+
+        public RepeatOperation<TState> Repeat(IOperation<TState> operation) => new RepeatOperation<TState>(operation);
+
+        public RepeatOperation<TState> Exactly(int times, IOperation<TState> operation) => new RepeatOperation<TState>(operation, Math.Abs(times));
+
+        public RepeatOperation<TState> AtMost(int times, IOperation<TState> operation) => new RepeatOperation<TState>(operation, -(Math.Abs(times)));
     }
 }
