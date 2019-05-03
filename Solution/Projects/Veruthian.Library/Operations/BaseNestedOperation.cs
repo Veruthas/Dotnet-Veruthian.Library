@@ -4,9 +4,12 @@ namespace Veruthian.Library.Operations
 {
     public abstract class BaseNestedOperation<TState> : BaseOperation<TState>
     {
-        readonly IOperation<TState> operation;
+        protected IOperation<TState> operation;
 
-        public BaseNestedOperation(IOperation<TState> operation) => this.operation = operation;
+
+        protected BaseNestedOperation() { }
+
+        protected BaseNestedOperation(IOperation<TState> operation) => this.operation = operation;
 
 
         protected IOperation<TState> Operation => operation;

@@ -2,10 +2,8 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Operations
 {
-    public class ClassedOperation<TState> : BaseOperation<TState>
+    public class ClassedOperation<TState> : BaseNestedOperation<TState>
     {
-        IOperation<TState> operation;
-
         DataSet<string> classes;
 
 
@@ -23,7 +21,7 @@ namespace Veruthian.Library.Operations
         }
 
 
-        public IOperation<TState> Operation
+        public new IOperation<TState> Operation
         {
             get => operation;
             set => operation = value;
@@ -38,9 +36,5 @@ namespace Veruthian.Library.Operations
         public override string Description => $"({operation?.ToString() ?? ""}):{(classes == null ? "{}" : classes.ToString(false))}";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null) => Operation.Perform(state, tracer);
-
-        protected override int Count => 1;
-
-        protected override IOperation<TState> GetSubOperation(int verifiedIndex) => operation;
     }
 }
