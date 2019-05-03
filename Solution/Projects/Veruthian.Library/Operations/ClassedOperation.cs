@@ -4,16 +4,16 @@ namespace Veruthian.Library.Operations
 {
     public class ClassedOperation<TState> : BaseNestedOperation<TState>
     {
-        DataSet<string> classes;
+        IExpandableContainer<string> classes;
 
 
         public ClassedOperation() { }
 
         public ClassedOperation(IOperation<TState> operation) => this.operation = operation;
 
-        public ClassedOperation(DataSet<string> classes) => this.classes = classes;
+        public ClassedOperation(IExpandableContainer<string> classes) => this.classes = classes;
 
-        public ClassedOperation(IOperation<TState> operation, DataSet<string> classes)
+        public ClassedOperation(IOperation<TState> operation, IExpandableContainer<string> classes)
         {
             this.operation = operation;
 
@@ -27,13 +27,13 @@ namespace Veruthian.Library.Operations
             set => operation = value;
         }
 
-        public DataSet<string> Classes
+        public IExpandableContainer<string> Classes
         {
             get => classes;
             set => classes = value;
         }
 
-        public override string Description => $"({operation?.ToString() ?? ""}):{(classes == null ? "{}" : classes.ToString(false))}";
+        public override string Description => $"({operation?.ToString() ?? ""}):{(classes == null ? "{}" : classes.ToString())}";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null) => Operation.Perform(state, tracer);
     }

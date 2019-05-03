@@ -40,25 +40,7 @@ namespace Veruthian.Library.Collections
 
         private const string start = "{", end = "}", separator = ", ";
 
+
         public override string ToString() => this.ToListString(start, end, separator);
-
-        public string ToString(bool alwaysEnclose) => ToString(start, end, separator, alwaysEnclose);
-
-        public string ToString(string start, string end, string separator, bool alwaysEnclose = true)
-        {
-            if (alwaysEnclose || Count > 1)
-            {
-                return this.ToListString(start, end, separator);
-            }
-            else
-            {
-                var result = "";
-
-                foreach (var item in items)
-                    result = item.ToString();
-
-                return result;
-            }
-        }
     }
 }
