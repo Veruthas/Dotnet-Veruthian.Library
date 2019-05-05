@@ -2,18 +2,18 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Operations
 {
-    public class ClassedOperation<TState> : BaseNestedOperation<TState>
+    public class ClassifiedOperation<TState> : BaseNestedOperation<TState>
     {
         IExpandableContainer<string> classes;
 
 
-        public ClassedOperation() { }
+        public ClassifiedOperation() { }
 
-        public ClassedOperation(IOperation<TState> operation) => this.operation = operation;
+        public ClassifiedOperation(IOperation<TState> operation) => this.operation = operation;
 
-        public ClassedOperation(IExpandableContainer<string> classes) => this.classes = classes;
+        public ClassifiedOperation(IExpandableContainer<string> classes) => this.classes = classes;
 
-        public ClassedOperation(IOperation<TState> operation, IExpandableContainer<string> classes)
+        public ClassifiedOperation(IOperation<TState> operation, IExpandableContainer<string> classes)
         {
             this.operation = operation;
 

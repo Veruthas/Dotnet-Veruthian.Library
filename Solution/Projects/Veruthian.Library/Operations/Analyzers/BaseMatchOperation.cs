@@ -1,10 +1,11 @@
 using Veruthian.Library.Readers;
 using Veruthian.Library.Types;
 
-namespace Veruthian.Library.Operations
+namespace Veruthian.Library.Operations.Analyzers
 {
-    public abstract class BaseMatchOperation<TState, T> : BaseReaderOperation<TState, T>
-        where TState : Has<IReader<T>>
+    public abstract class BaseMatchOperation<TState, TReader, T> : BaseReaderOperation<TState, TReader, T>
+        where TState : Has<TReader>
+        where TReader : IReader<T>
     {
         protected override bool Process(IReader<T> reader)
         {

@@ -1,12 +1,12 @@
 using Veruthian.Library.Processing;
 using Veruthian.Library.Types;
 
-namespace Veruthian.Library.Operations
+namespace Veruthian.Library.Operations.Analyzers
 {
-    public class SpeculateOperation<TState> : BaseNestedOperation<TState>
+    public class SpeculativeOperation<TState> : BaseNestedOperation<TState>
         where TState : Has<ISpeculative>
     {
-        public SpeculateOperation(IOperation<TState> operation) : base(operation) { }
+        public SpeculativeOperation(IOperation<TState> operation) : base(operation) { }
 
 
         public override string Description => $"speculate({Operation})";

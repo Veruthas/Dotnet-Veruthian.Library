@@ -7,7 +7,7 @@ namespace Veruthian.Library.Operations
         int? times;
 
 
-        public RepeatedOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
+        private RepeatedOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
 
         public override string Description => $"repeat {(times == null ? "?" : (times < 0 ? $"{-times}?" : times.ToString()))} {Operation}";
 
@@ -38,10 +38,10 @@ namespace Veruthian.Library.Operations
         }
 
 
-        public RepeatedOperation<TState> Repeat(IOperation<TState> operation) => new RepeatedOperation<TState>(operation);
+        public static RepeatedOperation<TState> Repeat(IOperation<TState> operation) => new RepeatedOperation<TState>(operation);
 
-        public RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, Math.Abs(times));
+        public static RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, Math.Abs(times));
 
-        public RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, -(Math.Abs(times)));
+        public static RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation) => new RepeatedOperation<TState>(operation, -(Math.Abs(times)));
     }
 }

@@ -4,11 +4,12 @@ using Veruthian.Library.Readers;
 using Veruthian.Library.Types;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Operations
+namespace Veruthian.Library.Operations.Analyzers
 {
-    public class MatchSequenceOperation<TState, T, S> : BaseReaderOperation<TState, T>
-        where TState : Has<IReader<T>>
-        where T : IEquatable<T>
+    public class MatchSequenceOperation<TState, TReader, T, S> : BaseReaderOperation<TState, TReader, T>
+        where TState : Has<TReader>
+        where TReader : IReader<T>
+        where T : IEquatable<T>        
         where S : IEnumerable<T>
     {
         S sequence;
