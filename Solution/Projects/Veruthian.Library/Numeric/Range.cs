@@ -66,28 +66,34 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        const string StringStart = "(";
+        const string StringStart = "";
 
         const string StringMiddle = " to ";
 
-        const string StringEnd = ")";
+        const string StringEnd = "";
 
 
         public override string ToString() => ToString(StringStart, StringMiddle, StringEnd);
 
-        public string ToString(string start, string middle, string end)
+        public string ToString(string start, string middle, string end, bool wrapOnSingle = false)
         {
             if (IsSingle)
-                return low.ToString();
+                if (wrapOnSingle)
+                    return start + low.ToString() + end;
+                else
+                    return low.ToString();
             else
                 return start + low.ToString() + middle + high.ToString() + end;
         }
 
 
-        public string ToString(Func<T, string> toString, string start = StringStart, string middle = StringMiddle, string end = StringEnd)
+        public string ToString(Func<T, string> toString, string start = StringStart, string middle = StringMiddle, string end = StringEnd, bool wrapOnSingle = false)
         {
             if (IsSingle)
-                return toString(low);
+                if (wrapOnSingle)
+                    return start + toString(low) + end;
+                else
+                    return toString(low);
             else
                 return start + toString(low) + middle + toString(high) + end;
         }
