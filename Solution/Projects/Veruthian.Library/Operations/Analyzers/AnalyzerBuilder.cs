@@ -12,10 +12,13 @@ namespace Veruthian.Library.Operations.Analyzers
         where TReader : ISpeculativeReader<T>
         where T : IEquatable<T>
     {
-        public MatchOperation<TState, TReader, T> Match(T value) => new MatchOperation<TState, TReader, T>(value);
+        public MatchOperation<TState, TReader, T> Match(T value) 
+            => new MatchOperation<TState, TReader, T>(value);
 
-        public MatchSetOperation<TState, TReader, T> MatchSet(IContainer<T> set) => new MatchSetOperation<TState, TReader, T>(set);
+        public MatchSetOperation<TState, TReader, T> MatchSet(IContainer<T> set) 
+            => new MatchSetOperation<TState, TReader, T>(set);
 
-        public MatchSequenceOperation<TState, TReader, T, S> MatchSequence<S>(S sequence) where S : IEnumerable<T> => new MatchSequenceOperation<TState, TReader, T, S>(sequence);
+        public MatchSequenceOperation<TState, TReader, T, S> MatchSequence<S>(S sequence) where S : IEnumerable<T> 
+            => new MatchSequenceOperation<TState, TReader, T, S>(sequence);
     }
 }
