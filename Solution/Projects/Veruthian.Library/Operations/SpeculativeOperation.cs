@@ -9,7 +9,7 @@ namespace Veruthian.Library.Operations
         public SpeculativeOperation(IOperation<TState> operation) : base(operation) { }
 
 
-        public override string Description => $"speculate({Operation})";
+        public override string Description => $"speculate";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {

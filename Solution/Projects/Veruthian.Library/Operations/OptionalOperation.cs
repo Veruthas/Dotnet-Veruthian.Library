@@ -4,7 +4,7 @@ namespace Veruthian.Library.Operations
     {
         public OptionalOperation(IOperation<TState> operation) : base(operation) { }
 
-        public override string Description => $"optional({Operation})";
+        public override string Description => "optional";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {

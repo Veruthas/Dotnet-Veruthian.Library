@@ -19,7 +19,7 @@ namespace Veruthian.Library.Operations
         }
 
 
-        public override string Description => description ?? "<Action>";
+        public override string Description => description ?? "<action>";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null) => action(state, tracer);
     }

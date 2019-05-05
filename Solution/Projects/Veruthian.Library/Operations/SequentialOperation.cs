@@ -18,7 +18,7 @@ namespace Veruthian.Library.Operations
             : base(operations.ToDataIndex()) { }
 
 
-        public override string Description => this.ToListString("(", ")", " ");
+        public override string Description => "sequence";
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {

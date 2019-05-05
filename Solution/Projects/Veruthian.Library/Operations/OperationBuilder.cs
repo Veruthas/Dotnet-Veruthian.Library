@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Processing;
@@ -21,9 +22,6 @@ namespace Veruthian.Library.Operations
 
 
         // Sequence
-        public virtual SequentialOperation<TState> Sequence(DataIndex<IOperation<TState>> operations)
-            => new SequentialOperation<TState>(operations);
-
         public virtual SequentialOperation<TState> Sequence(params IOperation<TState>[] operations)
             => new SequentialOperation<TState>(operations);
 
@@ -85,6 +83,30 @@ namespace Veruthian.Library.Operations
         // Until
         public virtual RepeatedOperation<TState> Until(IOperation<TState> condition, IOperation<TState> operation)
             => Repeat(UnlessThen(condition, operation));
+
+
+        // Choice
+        public virtual IOperation<TState> Choice(params IOperation<TState>[] operations)
+        {
+            if (operations.Length == 0)
+            {
+                return True;
+            }
+            else
+            {
+                IOperation<TState> current = operations[operations.Length - 1];
+
+                for (int i = operations.Length - 2; i >= 0; i--)
+                {
+                    current = ChoiceComponent(operations[i], current);
+                }
+
+                return current;
+            }
+        }
+
+        protected virtual IOperation<TState> ChoiceComponent(IOperation<TState> previous, IOperation<TState> next)
+            => IfElse(previous, next);
 
 
         // Classify
