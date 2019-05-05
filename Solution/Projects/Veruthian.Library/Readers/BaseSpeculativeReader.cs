@@ -5,13 +5,13 @@ namespace Veruthian.Library.Readers
 {
     public abstract class BaseSpeculativeReader<T> : BaseVariableLookaheadReader<T>, ISpeculativeReader<T>
     {
-        protected struct MarkItem
+        protected struct Marker
         {
             public int Position { get; }
 
             public int Index { get; }
 
-            public MarkItem(int position, int index)
+            public Marker(int position, int index)
             {
                 this.Position = position;
                 this.Index = index;
@@ -23,7 +23,7 @@ namespace Veruthian.Library.Readers
             }
         }
 
-        Stack<MarkItem> marks = new Stack<MarkItem>();
+        Stack<Marker> marks = new Stack<Marker>();
 
 
         public BaseSpeculativeReader() { }
@@ -67,7 +67,7 @@ namespace Veruthian.Library.Readers
 
             for (int i = index; i < index + amount; i++)
             {
-                if (i < Size || includeEnd)
+                if (i < CacheSize || includeEnd)
                     yield return RawPeekByIndex(i);
                 else
                     yield break;
@@ -77,7 +77,7 @@ namespace Veruthian.Library.Readers
 
 
         // Mark information
-        protected Stack<MarkItem> Marks => marks;
+        protected Stack<Marker> Marks => marks;
 
         protected override bool CanReset => !IsSpeculating;
 
@@ -90,9 +90,9 @@ namespace Veruthian.Library.Readers
 
 
         // Mark
-        public void Mark() => CreateMark(Position, Index);
+        public void Mark() => CreateMark(Position, CacheIndex);
 
-        protected void CreateMark(int position, int index) => marks.Push(new MarkItem(position, index));
+        protected void CreateMark(int position, int index) => marks.Push(new Marker(position, index));
 
 
         // Commit
@@ -113,7 +113,7 @@ namespace Veruthian.Library.Readers
 
             var mark = marks.Pop();
 
-            this.Index = mark.Index;
+            this.CacheIndex = mark.Index;
 
             this.Position = mark.Position;
         }

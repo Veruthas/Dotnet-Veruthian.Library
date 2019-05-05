@@ -5,7 +5,7 @@ namespace Veruthian.Library.Readers
 {
     public class FixedLookaheadReader<T> : BaseLookaheadReader<T>
     {
-        T[] buffer;
+        T[] cache;
 
         int index;
 
@@ -15,13 +15,14 @@ namespace Veruthian.Library.Readers
             if (lookahead < 1)
                 throw new ArgumentOutOfRangeException("lookahead", "Lookahead must be greater than 1.");
 
-            buffer = new T[lookahead];
+            cache = new T[lookahead];
 
             SetData(enumerator, generateEndItem);
         }
 
-
-        protected int Size { get => buffer.Length; }
+        protected T[] Cache => cache;
+        
+        protected int CacheSize => cache.Length; 
 
 
         protected override void Initialize()
@@ -37,7 +38,7 @@ namespace Veruthian.Library.Readers
 
             bool atEnd = IsEnd;
 
-            for (int i = 0; i < Size; i++)
+            for (int i = 0; i < CacheSize; i++)
             {
                 T next;
 
@@ -59,21 +60,21 @@ namespace Veruthian.Library.Readers
                     LastItem = next;
                 }
 
-                buffer[i] = next;
+                cache[i] = next;
             }
         }
 
         protected override void EnsureLookahead(int lookahead = 0)
         {
-            if (lookahead < 0 || lookahead > Size)
-                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead must be in the range [0, {1}]", Size - 1));
+            if (lookahead < 0 || lookahead > CacheSize)
+                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead must be in the range [0, {1}]", CacheSize - 1));
         }
 
         protected override T RawPeek(int lookahead = 0)
         {
-            var actualIndex = (index + lookahead) % Size;
+            var actualIndex = (index + lookahead) % CacheSize;
 
-            var item = buffer[actualIndex];
+            var item = cache[actualIndex];
 
             return item;
         }
@@ -86,11 +87,11 @@ namespace Veruthian.Library.Readers
                 Position++;
 
             if (!success && !EndFound)
-                EndPosition = Position + Size - 1;
+                EndPosition = Position + CacheSize - 1;
 
-            buffer[index] = next;
+            cache[index] = next;
 
-            index = (index + 1) % Size;
+            index = (index + 1) % CacheSize;
         }
 
         protected override void TryPreload(int amount) { }
