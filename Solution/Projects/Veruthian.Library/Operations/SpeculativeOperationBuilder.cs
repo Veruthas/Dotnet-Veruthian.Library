@@ -39,7 +39,6 @@ namespace Veruthian.Library.Operations
             => ConditionOperation<TState>.UnlessThenElse(Speculate(condition), thenOperation, elseOperation);
 
 
-
         // Optional
         public override OptionalOperation<TState> Optional(IOperation<TState> operation)
             => base.Optional(IfThen(operation, operation));
@@ -51,5 +50,11 @@ namespace Veruthian.Library.Operations
 
         public override RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation)
             => RepeatedOperation<TState>.AtMost(times, IfThen(operation, operation));
+
+
+        // Choice
+        protected override IOperation<TState> ChoiceComponent(IOperation<TState> previous, IOperation<TState> next)
+            => IfThenElse(previous, previous, next);
+
     }
 }
