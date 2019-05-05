@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Veruthian.Library.Operations
+namespace Veruthian.Library.Operations.Extensions
 {   
     // Produces a flattened list of Operations instead of Tree
     public class FlattenedOperation<TState>
