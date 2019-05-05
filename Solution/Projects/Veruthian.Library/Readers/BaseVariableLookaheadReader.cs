@@ -13,13 +13,13 @@ namespace Veruthian.Library.Readers
         public BaseVariableLookaheadReader() { }
 
 
-        protected List<T> Cache { get => cache; }
+        protected List<T> Cache => cache; 
 
         protected int CacheIndex { get => index; set => index = value; }
 
-        protected int CacheSize { get => cache.Count; }
+        protected int CacheSize => cache.Count; 
 
-        protected virtual bool CanReset { get => true; }
+        protected virtual bool CanReset => true; 
 
 
         protected override void Initialize()
@@ -55,14 +55,9 @@ namespace Veruthian.Library.Readers
                     bool success = GetNext(out T next);
 
                     if (success)
-                    {
-                        cache.Add(next);
-                    }
+                        cache.Add(next);                    
                     else
-                    {
                         EndPosition = lastPosition + i;
-
-                    }
                 }
             }
         }
@@ -103,14 +98,11 @@ namespace Veruthian.Library.Readers
             {
                 int delta = CacheSize - index;
 
-                if (CanReset)
-                {
-                    Reset();
-                }
-                else
-                {
+                if (CanReset)                
+                    Reset();                
+                else                
                     index = CacheSize;
-                }
+                
 
                 Position += delta;
 

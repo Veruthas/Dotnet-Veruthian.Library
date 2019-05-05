@@ -14,13 +14,18 @@ namespace Veruthian.Library.Readers
             public Marker(int position, int index)
             {
                 this.Position = position;
+
                 this.Index = index;
             }
 
-            public override string ToString()
-            {
-                return string.Format("Position: {0}; Index: {1}", Position, Index);
-            }
+
+            public override string ToString() => $"{nameof(Position)}: {Position}; {nameof(Index)}: {Index}";
+
+
+            public static implicit operator (int Position, int Index)(Marker value) => (value.Position, value.Index);
+
+            public static implicit operator Marker((int Position, int Index) value) => new Marker(value.Position, value.Index);
+
         }
 
         Stack<Marker> marks = new Stack<Marker>();
