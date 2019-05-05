@@ -158,5 +158,28 @@ namespace _Console
 
             return template;
         }
+    
+    
+        // TypeSetCreate
+        public static string GenerateTypeSetCreate(int size)
+        {
+            string template =
+@"public static TypeSet<*GENERICS*> Create<*GENERICS*>() => new TypeSet<*GENERICS*>();
+";
+
+            
+            string genericsString = "";
+
+            for (int i = 0; i < size; i++)
+            {
+                if (i != 0) genericsString += ", ";
+
+                genericsString += $"T{i}";
+            }
+
+            template = template.Replace("*GENERICS*", genericsString);
+
+            return template;
+        }
     }
 }
