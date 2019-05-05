@@ -32,7 +32,7 @@ namespace Veruthian.Library.Readers
         SortedList<int, Dictionary<K, Memory>> memories = new SortedList<int, Dictionary<K, Memory>>();
 
 
-        public void StoreProgress(K key, bool success, D data = default)
+        public void StoreProgress(K key, bool success, D data = default(D))
         {
             if (!memories.TryGetValue(MarkPosition, out var progresses))
             {
