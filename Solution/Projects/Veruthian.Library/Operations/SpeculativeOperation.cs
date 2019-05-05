@@ -1,7 +1,7 @@
 using Veruthian.Library.Processing;
 using Veruthian.Library.Types;
 
-namespace Veruthian.Library.Operations.Analyzers
+namespace Veruthian.Library.Operations
 {
     public class SpeculativeOperation<TState> : BaseNestedOperation<TState>
         where TState : Has<ISpeculative>

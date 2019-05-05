@@ -2,7 +2,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public class RuleBuilder<TState> : OperationBuilder<TState>
+    public class RuleTable<TState>
     {
         public const string RuleClass = "rule";
 
@@ -12,14 +12,8 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public IOperation<TState> this[string rule]
         {
-            get
-            {
-                return GetRule(rule);
-            }
-            set
-            {
-                GetRule(rule).Operation = value;
-            }
+            get => GetRule(rule);
+            set => GetRule(rule).Operation = value;
         }
 
         private ClassifiedOperation<TState> GetRule(string name)
@@ -33,5 +27,9 @@ namespace Veruthian.Library.Operations.Analyzers
 
             return rule;
         }
+
+
+        private ClassifiedOperation<TState> Classify(params string[] classes)
+            => new ClassifiedOperation<TState>(new DataSet<string>(classes));
     }
 }

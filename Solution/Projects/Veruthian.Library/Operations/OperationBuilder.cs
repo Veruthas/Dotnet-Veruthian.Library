@@ -15,10 +15,7 @@ namespace Veruthian.Library.Operations
             => BooleanOperation<TState>.False;
 
 
-        // Optional
-        public virtual OptionalOperation<TState> Optional(IOperation<TState> operation)
-            => new OptionalOperation<TState>(operation);
-
+        // Action
         public virtual ActionOperation<TState> Action(OperationAction<TState> action)
             => new ActionOperation<TState>(action);
 
@@ -31,21 +28,9 @@ namespace Veruthian.Library.Operations
             => new SequentialOperation<TState>(operations);
 
 
-        // Repeat
-        public virtual RepeatedOperation<TState> Repeat(IOperation<TState> operation)
-            => RepeatedOperation<TState>.Repeat(operation);
-
-        public virtual RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation)
-            => RepeatedOperation<TState>.AtMost(times, operation);
-
-        public virtual RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation)
-            => RepeatedOperation<TState>.Exactly(times, operation);
-
-        public virtual SequentialOperation<TState> AtLeast(int times, IOperation<TState> operation)
-            => Sequence(Exactly(times, operation), Repeat(operation));
-
-        public virtual SequentialOperation<TState> InRange(int min, int max, IOperation<TState> operation)
-            => Sequence(Exactly(min, operation), AtMost(max - min, operation));
+        // Optional
+        public virtual OptionalOperation<TState> Optional(IOperation<TState> operation)
+            => new OptionalOperation<TState>(operation);
 
 
         // If
@@ -76,6 +61,23 @@ namespace Veruthian.Library.Operations
             => ConditionOperation<TState>.UnlessThenElse(condition, thenOperation, elseOperation);
 
 
+        // Repeat
+        public virtual RepeatedOperation<TState> Repeat(IOperation<TState> operation)
+            => RepeatedOperation<TState>.Repeat(operation);
+
+        public virtual RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation)
+            => RepeatedOperation<TState>.AtMost(times, operation);
+
+        public virtual RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation)
+            => RepeatedOperation<TState>.Exactly(times, operation);
+
+        public virtual SequentialOperation<TState> AtLeast(int times, IOperation<TState> operation)
+            => Sequence(Exactly(times, operation), Repeat(operation));
+
+        public virtual SequentialOperation<TState> InRange(int min, int max, IOperation<TState> operation)
+            => Sequence(Exactly(min, operation), AtMost(max - min, operation));
+
+
         // While
         public virtual RepeatedOperation<TState> While(IOperation<TState> condition, IOperation<TState> operation)
             => Repeat(IfThen(condition, operation));
@@ -92,7 +94,7 @@ namespace Veruthian.Library.Operations
         public virtual ClassifiedOperation<TState> Classify(IOperation<TState> operation)
             => new ClassifiedOperation<TState>(operation);
 
-        public virtual ClassifiedOperation<TState> Classify( params string[] classes)
+        public virtual ClassifiedOperation<TState> Classify(params string[] classes)
             => new ClassifiedOperation<TState>(new DataSet<string>(classes));
 
         public virtual ClassifiedOperation<TState> Classify(IOperation<TState> operation, params string[] classes)

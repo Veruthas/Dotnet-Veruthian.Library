@@ -6,7 +6,7 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public class SpeculativeReaderRuleBuilder<TState, TReader, T> : SpeculativeRuleBuilder<TState>
+    public class AnalyzerRuleBuilder<TState, TReader, T> : SpeculativeOperationBuilder<TState>
         where TState : Has<TReader>, Has<ISpeculative>
         where TReader : ISpeculativeReader<T>
         where T : IEquatable<T>, ISequential<T>, IBounded<T>
@@ -15,6 +15,6 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public MatchSetOperation<TState, TReader, T> MatchSet(RangeSet<T> set) => new MatchSetOperation<TState, TReader, T>(set);
 
-        public MatchSetOperation<TState, TReader, T> MatchSequence(RangeSet<T> set) => new MatchSetOperation<TState, TReader, T>(set);
+        public MatchSetOperation<TState, TReader, T> MatchSequence(RangeSet<T> set) => new MatchSetOperation<TState, TReader, T>(set);    
     }
 }
