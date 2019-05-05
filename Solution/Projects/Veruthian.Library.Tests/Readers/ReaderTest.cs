@@ -150,9 +150,9 @@ namespace Veruthian.Library.Readers.Test
 
 
 
-    public class ReaderTest : ReaderTest<Rune, Reader<Rune>>
+    public class ReaderTest : ReaderTest<Rune, IReader<Rune>>
     {
-        private Reader<Rune> GetReader(Rune[] data)
+        private IReader<Rune> GetReader(Rune[] data)
         {
             return data.GetReader();
         }
@@ -182,9 +182,9 @@ namespace Veruthian.Library.Readers.Test
 
     }
 
-    public class FixedLookaheadReaderTest : LookaheadReaderTest<Rune, FixedLookaheadReader<Rune>>
+    public class FixedLookaheadReaderTest : LookaheadReaderTest<Rune, ILookaheadReader<Rune>>
     {
-        private FixedLookaheadReader<Rune> GetReader(Rune[] data, int lookahead)
+        private ILookaheadReader<Rune> GetReader(Rune[] data, int lookahead)
         {
             return data.GetFixedLookaheadReader(lookahead);
         }
@@ -252,9 +252,9 @@ namespace Veruthian.Library.Readers.Test
         }
     }
 
-    public class VariableLookaheadReaderTest : LookaheadReaderTest<Rune, BaseVariableLookaheadReader<Rune>>
+    public class VariableLookaheadReaderTest : LookaheadReaderTest<Rune, ILookaheadReader<Rune>>
     {
-        private BaseVariableLookaheadReader<Rune> GetReader(Rune[] data)
+        private ILookaheadReader<Rune> GetReader(Rune[] data)
         {
             return data.GetVariableLookaheadReader();
         }
@@ -310,9 +310,9 @@ namespace Veruthian.Library.Readers.Test
         }
     }
 
-    public class SpeculativeReaderTest : SpeculativeReaderTest<Rune, SpeculativeReader<Rune>>
+    public class SpeculativeReaderTest : SpeculativeReaderTest<Rune, ISpeculativeReader<Rune>>
     {
-        private SpeculativeReader<Rune> GetReader(Rune[] data)
+        private ISpeculativeReader<Rune> GetReader(Rune[] data)
         {
             return data.GetSpeculativeReader();
         }
