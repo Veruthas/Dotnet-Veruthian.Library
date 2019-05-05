@@ -3,16 +3,6 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Readers
 {
-    public class ReaderAdapater<T> : ReaderAdapterBase<T>
-    {
-        protected ReaderAdapater(IReader<T> reader)
-        {
-            this.Reader = reader;
-        }
-
-        protected override IReader<T> Reader { get; }
-    }
-
     public abstract class ReaderAdapterBase<T> : IReader<T>
     {
         protected abstract IReader<T> Reader { get; }
@@ -48,5 +38,15 @@ namespace Veruthian.Library.Readers
         }
 
         protected virtual void OnSkip(int requestedAmount, int actualAmount) { }
+    }
+
+    public class ReaderAdapater<T> : ReaderAdapterBase<T>
+    {
+        protected ReaderAdapater(IReader<T> reader)
+        {
+            this.Reader = reader;
+        }
+
+        protected override IReader<T> Reader { get; }
     }
 }

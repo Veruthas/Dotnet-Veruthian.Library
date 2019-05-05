@@ -3,16 +3,6 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Readers
 {
-    public class SpeculativeReaderAdapater<T> : SpeculativeReaderAdapaterBase<T>
-    {
-        protected SpeculativeReaderAdapater(ISpeculativeReader<T> reader)
-        {
-            this.SpeculativeReader = reader;
-        }
-
-        protected override ISpeculativeReader<T> SpeculativeReader { get; }
-    }
-
     public abstract class SpeculativeReaderAdapaterBase<T> : LookaheadReaderAdapterBase<T>, ISpeculativeReader<T>
     {
         protected abstract ISpeculativeReader<T> SpeculativeReader { get; }
@@ -72,5 +62,15 @@ namespace Veruthian.Library.Readers
 
 
         protected virtual void OnRollback(int markedPosition, int speculatedPosition) { }
+    }
+
+    public class SpeculativeReaderAdapater<T> : SpeculativeReaderAdapaterBase<T>
+    {
+        protected SpeculativeReaderAdapater(ISpeculativeReader<T> reader)
+        {
+            this.SpeculativeReader = reader;
+        }
+
+        protected override ISpeculativeReader<T> SpeculativeReader { get; }
     }
 }
