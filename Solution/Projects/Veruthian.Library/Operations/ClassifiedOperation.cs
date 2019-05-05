@@ -1,4 +1,5 @@
 using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Operations
 {
@@ -33,8 +34,8 @@ namespace Veruthian.Library.Operations
             set => classes = value;
         }
 
-        public override string Description => $"({operation?.ToString() ?? ""}):{(classes == null ? "{}" : classes.ToString())}";
+        public override string Description => classes == null ? "class<>" : classes.ToListString("<", ">", ", ");
 
-        protected override bool DoAction(TState state, ITracer<TState> tracer = null) => Operation.Perform(state, tracer);
+        protected override bool DoAction(TState state, ITracer<TState> tracer = null) => Operation == null ? true : Operation.Perform(state, tracer);
     }
 }
