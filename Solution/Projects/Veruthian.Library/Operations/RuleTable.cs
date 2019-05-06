@@ -8,9 +8,8 @@ namespace Veruthian.Library.Operations
     {
         public const string RuleClass = "rule";
 
-        public const string SubMarker = ":";
+        DataLookup<string, ClassifiedOperation<TState>> rules = new DataLookup<string, ClassifiedOperation<TState>>();
 
-        public DataLookup<string, ClassifiedOperation<TState>> Rules = new DataLookup<string, ClassifiedOperation<TState>>();
 
         public IOperation<TState> this[string name]
         {
@@ -18,13 +17,15 @@ namespace Veruthian.Library.Operations
             set => GetRule(name).Operation = value;
         }
 
+        public ILookup<string, ClassifiedOperation<TState>> Rules => rules;
+
         private ClassifiedOperation<TState> GetRule(string name)
         {
-            if (!Rules.TryGet(name, out var rule))
+            if (!rules.TryGet(name, out var rule))
             {
-                rule = Classify(RuleClass, RuleClass + SubMarker + name);
+                rule = Classify(RuleClass, name);
 
-                Rules.Insert(name, rule);
+                rules.Insert(name, rule);
             }
 
             return rule;
@@ -45,7 +46,7 @@ namespace Veruthian.Library.Operations
 
             builder.Append($"rule:{name} :=");
 
-            if (!Rules.TryGet(name, out var rule) || rule.Operation == null)
+            if (!rules.TryGet(name, out var rule) || rule.Operation == null)
             {
                 builder.Append(" ()");
             }
