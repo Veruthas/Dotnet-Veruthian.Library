@@ -24,9 +24,16 @@ namespace Veruthian.Library.Operations.Analyzers
             set => GetRule(name).Operation = value;
         }
 
+        public IOperation<TState> this[string name, params string[] additional]
+        {
+            get => GetRule(name, additional);
+            set => GetRule(name, additional).Operation = value;
+        }
+
         public ILookup<string, ClassifiedOperation<TState>> Rules => rules;
 
-        private ClassifiedOperation<TState> GetRule(string name)
+
+        private ClassifiedOperation<TState> GetRule(string name, string[] additional = null)
         {
             if (!rules.TryGet(name, out var rule))
             {
@@ -41,6 +48,12 @@ namespace Veruthian.Library.Operations.Analyzers
                 rules.Insert(name, rule);
             }
 
+            if (additional != null)
+            {
+                foreach(var item in additional)
+                    rule.Classes.Add(item);
+            }
+
             return rule;
         }
 
@@ -49,7 +62,7 @@ namespace Veruthian.Library.Operations.Analyzers
         {
             var rule = GetRule(name);
 
-            AddClass(rule, name, additional, false);
+            rule.Classes.Add(additional);
         }
 
         public void Classify(string name, params string[] additional)
@@ -57,42 +70,7 @@ namespace Veruthian.Library.Operations.Analyzers
             var rule = GetRule(name);
 
             foreach (var item in additional)
-                AddClass(rule, name, item, false);
-        }
-
-        public void ClassifyQualified(string name, string additional)
-        {
-            var rule = GetRule(name);
-
-            AddClass(rule, name, additional, true);
-        }
-
-        public void ClassifyQualified(string name, params string[] additional)
-        {
-            var rule = GetRule(name);
-
-            foreach (var item in additional)
-                AddClass(rule, name, item, true);
-        }
-
-        private void AddClass(ClassifiedOperation<TState> rule, string name, string additional, bool qualify)
-        {
-            var newClass = GetClassName(name, additional, qualify);
-
-            rule.Classes.Add(newClass);
-        }
-
-        private string GetClassName(string name, string additional, bool qualify)
-        {
-            var result = additional;
-
-            if (qualify)
-                result = name + classSeparator + result;
-
-            if (qualifyName)
-                result = AnalyzerClasses.Rule + classSeparator + result;
-
-            return result;
+                rule.Classes.Add(item);
         }
 
 
