@@ -9,7 +9,7 @@ namespace Veruthian.Library.Operations
 
         private RepeatedOperation(IOperation<TState> operation, int? times = null) : base(operation) => this.times = times;
 
-        public override string Description => "repeat" + (times == null ? "?" : times < 0 ? $"?<{times}>" : $"<{times}>");
+        public override string Description => "repeat-" + (times != null ? times.ToString() : "") + (times >= 0 ? "" : "?");
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null)
         {

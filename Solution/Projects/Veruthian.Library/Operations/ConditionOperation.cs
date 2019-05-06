@@ -32,7 +32,7 @@ namespace Veruthian.Library.Operations
         public IOperation<TState> OnFalse => onFalse;
 
 
-        public override string Description => $"{(when ? "if" : "unless")}{(onTrue != null ? "then" : "")}{(onFalse != null ? "else" : "")}";
+        public override string Description => $"{(when ? "if" : "unless")}{(onTrue != null ? "-then" : "")}{(onFalse != null ? "-else" : "")}";
 
 
         protected override int Count => 1 + (onTrue != null ? 1 : 0) + (onFalse != null ? 1 : 0);
@@ -42,9 +42,9 @@ namespace Veruthian.Library.Operations
             var result = condition.Perform(state, tracer);
 
             if (result == when)
-                if (onTrue != null) result = onTrue.Perform(state, tracer);
-                else
-                if (onFalse != null) result = onFalse.Perform(state, tracer);
+                result = onTrue != null ? onTrue.Perform(state, tracer) : true;
+            else
+                result = onFalse != null ? onFalse.Perform(state, tracer) : false;
 
             return result;
         }

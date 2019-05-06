@@ -2,37 +2,55 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Veruthian.Library.Operations.Extensions
-{   
+{
     // Produces a flattened list of Operations instead of Tree
     public class FlattenedOperation<TState>
-    {        
-        private FlattenedOperation(IOperation<TState> operation, int suboperationCount)
+    {
+        private FlattenedOperation(int index, IOperation<TState> operation, int suboperationCount)
         {
+            this.Index = index;
+
             this.Operation = operation;
 
             this.SubOperationIndices = new int[suboperationCount];
         }
 
+        public int Index { get; }
+
         public IOperation<TState> Operation { get; }
 
         public int[] SubOperationIndices { get; }
 
+
         public override string ToString() => FlattenedString();
 
-        public string FlattenedString(string separator = " ", string before = "<", string after = ">")
+
+        public const string BeforeIndex = "<", AfterIndex = ">";
+        
+        public const string BeforeSubIndices = "(", AfterSubIndices = ")";
+
+        public const string SubIndexSeparator = " ";
+
+
+        public string FlattenedString(string separator = SubIndexSeparator, string beforeIndex = BeforeIndex, string afterIndex = AfterIndex,
+                                      string beforeSubIndices = BeforeSubIndices, string afterSubIndices = AfterSubIndices)
         {
             var result = new StringBuilder();
+
+            result.Append(beforeIndex).Append(Index).Append(afterIndex).Append(" ");
             result.Append(Operation.ToString());
-            result.Append('(');
 
-            IndicesToString(result, separator, before, after); ;
-
-            result.Append(')');
+            if (SubOperationIndices.Length > 0)
+            {
+                result.Append(beforeSubIndices);
+                IndicesToString(result, separator, beforeIndex, afterIndex); ;
+                result.Append(afterSubIndices);
+            }
 
             return result.ToString();
         }
 
-        public string IndicesToString(string separator = " ", string before = "<", string after = ">")
+        public string IndicesToString(string separator = SubIndexSeparator, string before = BeforeIndex, string after = AfterIndex)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -41,7 +59,7 @@ namespace Veruthian.Library.Operations.Extensions
             return builder.ToString();
         }
 
-        public void IndicesToString(StringBuilder builder, string separator = " ", string before = "<", string after = ">")
+        public void IndicesToString(StringBuilder builder, string separator = SubIndexSeparator, string before = BeforeIndex, string after = AfterIndex)
         {
             bool started = false;
 
@@ -80,7 +98,7 @@ namespace Veruthian.Library.Operations.Extensions
             {
                 int index = operations.Count;
 
-                var flattened = new FlattenedOperation<TState>(operation, operation.SubOperations.Count);
+                var flattened = new FlattenedOperation<TState>(index, operation, operation.SubOperations.Count);
 
                 operations.Add(flattened);
 
@@ -98,5 +116,4 @@ namespace Veruthian.Library.Operations.Extensions
             }
         }
     }
-
 }

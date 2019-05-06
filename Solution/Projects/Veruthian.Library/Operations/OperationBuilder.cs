@@ -94,7 +94,7 @@ namespace Veruthian.Library.Operations
             }
             else
             {
-                IOperation<TState> current = operations[operations.Length - 1];
+                IOperation<TState> current = ChoiceFinal(operations[operations.Length - 1]);
 
                 for (int i = operations.Length - 2; i >= 0; i--)
                 {
@@ -104,6 +104,9 @@ namespace Veruthian.Library.Operations
                 return current;
             }
         }
+
+        protected virtual IOperation<TState> ChoiceFinal(IOperation<TState> final)
+            => final;
 
         protected virtual IOperation<TState> ChoiceComponent(IOperation<TState> previous, IOperation<TState> next)
             => IfElse(previous, next);

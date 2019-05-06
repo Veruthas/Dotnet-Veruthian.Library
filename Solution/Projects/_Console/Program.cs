@@ -1,6 +1,7 @@
 ﻿using System;
 using Veruthian.Library.Numeric;
 using Veruthian.Library.Operations;
+using Veruthian.Library.Operations.Extensions;
 using Veruthian.Library.Operations.Analyzers;
 using Veruthian.Library.Processing;
 using Veruthian.Library.Readers;
@@ -34,11 +35,20 @@ namespace _Console
             var data = GetBuilder(TypeSet.Create<ISpeculativeReader<Rune>, ISpeculative>());
 
             var b = data.Builder;
+
             var rule = data.Rules;
 
+            var tracer = data.tracer;
 
-            // rule File = Whitespace {Number or Word} unless Any;
-            rule["File"] = b.Sequence(rule["Whitespace"], b.Repeat(b.Choice(rule["Number"], rule["Word"])), b.Unless(b.MatchSet(RuneSet.Complete)));
+
+            // rule File = Whitespace Items unless Any;
+            rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+            // Items = {Item};
+            rule["Items"] = b.Repeat(rule["Item"]);
+
+            // Item = Number or Word;
+            rule["Item"] = b.Choice(rule["Number"], rule["Word"]);
 
             // rule Number = (at least 1 <'0' to '9'>) Whitespace;
             rule["Number"] = b.Sequence(b.AtLeast(1, b.MatchSet(RuneSet.Digit)), rule["Whitespace"]);
@@ -47,10 +57,30 @@ namespace _Console
             rule["Word"] = b.Sequence(b.AtLeast(1, b.MatchSet(RuneSet.Letter)), rule["Whitespace"]);
 
             // rule Whitespace = {<' ' + '\t'>};
-            rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.SpaceOrTab));
+            rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.TabOrSpace));
 
 
-            //Console.WriteLine(rule["File"]);
+            // var items = rule["File"].Flatten();
+
+            // foreach(var item in items)
+            //     Console.WriteLine(item);
+
+            Console.WriteLine(rule.FormatRule("File"));
+
+            Console.WriteLine(rule.FormatRule("Items"));
+
+            Console.WriteLine(rule.FormatRule("Item"));
+
+            Console.WriteLine(rule.FormatRule("Number"));
+
+            Console.WriteLine(rule.FormatRule("Word"));
+
+            Console.WriteLine(rule.FormatRule("Whitespace").Replace("\t", "\\t"));
+
+
+            Pause();
+
+            Console.WriteLine();
 
             while (true)
             {
@@ -59,20 +89,43 @@ namespace _Console
 
                 var r = s.GetSpeculativeReader();
 
-                bool result = rule["File"].Perform(r.GroupWith((ISpeculative)r));
+                bool result = rule.Perform("File", r.GroupWith((ISpeculative)r), tracer);
 
                 Console.WriteLine($"Result: {(result ? "Success" : "Failed")}");
 
+                Console.WriteLine(r.Position);
+                
                 Console.WriteLine();
             }
 
         }
 
 
-        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules) GetBuilder<TState>(TState mockup)
+        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
             where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
         {
-            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>());
+            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Tracer<TState>());
+        }
+
+        public class Tracer<TState> : ITracer<TState>
+        {
+            int increment = 0;
+
+            public void OnStart(IOperation<TState> operation, TState state, out bool? handled)
+            {
+                Console.WriteLine($"{new string('|', increment)}Starting {{{operation}}}");
+
+                handled = null;
+
+                increment++;
+            }
+
+            public void OnFinish(IOperation<TState> operation, TState state, bool success)
+            {
+                increment--;
+
+                Console.WriteLine($"{new string('|', increment)}Finished w/{(success ? "Success" : "Failure")} {{{operation}}}");
+            }
         }
     }
 }

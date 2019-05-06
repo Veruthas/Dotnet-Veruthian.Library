@@ -34,7 +34,7 @@ namespace Veruthian.Library.Operations
             set => classes = value;
         }
 
-        public override string Description => classes == null ? "class<>" : classes.ToListString("<", ">", ", ");
+        public override string Description => classes == null ? "class<>" : "class" + classes.ToListString("<", ">", ", ");
 
         protected override bool DoAction(TState state, ITracer<TState> tracer = null) => Operation == null ? true : Operation.Perform(state, tracer);
     }

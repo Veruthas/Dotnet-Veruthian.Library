@@ -53,8 +53,10 @@ namespace Veruthian.Library.Operations
 
 
         // Choice
+        protected override IOperation<TState> ChoiceFinal(IOperation<TState> final)
+            => IfThen(final, final);
+
         protected override IOperation<TState> ChoiceComponent(IOperation<TState> previous, IOperation<TState> next)
             => IfThenElse(previous, previous, next);
-
     }
 }
