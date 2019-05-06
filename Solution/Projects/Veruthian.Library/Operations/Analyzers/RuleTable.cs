@@ -96,7 +96,11 @@ namespace Veruthian.Library.Operations.Analyzers
             StringBuilder builder = new StringBuilder();
 
             foreach (var name in rules.Keys)
+            {
                 FormatRule(builder, name, indentSize, indentChar);
+
+                builder.AppendLine();
+            }
 
             return builder.ToString();
         }
