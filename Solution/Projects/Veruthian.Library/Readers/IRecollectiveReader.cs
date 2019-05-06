@@ -1,9 +1,9 @@
 namespace Veruthian.Library.Readers
 {
-    public interface IRecollectiveReader<out T, K, D> : ISpeculativeReader<T>
+    public interface IRecollectiveReader<out T> : ISpeculativeReader<T>
     {
-        void StoreProgress(K key, bool success, D data = default(D));
+        void StoreProgress(object key, bool success, object data = null);
 
-        (bool? success, int Length, D Data) RecallProgress(K key);
+        (bool? success, int Length, object Data) RecallProgress(object key);
     }
 }

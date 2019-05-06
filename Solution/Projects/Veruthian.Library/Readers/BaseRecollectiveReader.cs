@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Readers
 {
-    public class BaseRecollectiveReader<T, K, D> : BaseSpeculativeReader<T>, IRecollectiveReader<T, K, D>
+    public class BaseRecollectiveReader<T> : BaseSpeculativeReader<T>, IRecollectiveReader<T>
     {
         protected struct Memory
         {
@@ -13,10 +13,10 @@ namespace Veruthian.Library.Readers
 
             public int Length => Math.Abs(StoredLength);
 
-            public D Data { get; }
+            public object Data { get; }
 
 
-            public Memory(bool success, int length, D data)
+            public Memory(bool success, int length, object data)
             {
                 this.StoredLength = success ? Math.Abs(length) : -Math.Abs(length);
 
@@ -24,25 +24,25 @@ namespace Veruthian.Library.Readers
             }
 
 
-            public static implicit operator (bool success, int Length, D Data)(Memory value) => (value.Success, value.Length, value.Data);
+            public static implicit operator (bool success, int Length, object Data)(Memory value) => (value.Success, value.Length, value.Data);
 
-            public static implicit operator Memory((bool Success, int Length, D Data) value) => new Memory(value.Success, value.Length, value.Data);
+            public static implicit operator Memory((bool Success, int Length, object Data) value) => new Memory(value.Success, value.Length, value.Data);
         }
 
-        SortedList<int, Dictionary<K, Memory>> memories = new SortedList<int, Dictionary<K, Memory>>();
+        SortedList<int, Dictionary<object, Memory>> memories = new SortedList<int, Dictionary<object, Memory>>();
 
 
-        public void StoreProgress(K key, bool success, D data = default(D))
+        public void StoreProgress(object key, bool success, object data = null)
         {
             if (!memories.TryGetValue(MarkPosition, out var progresses))
             {
-                memories.Add(MarkPosition, progresses = new Dictionary<K, Memory>());
+                memories.Add(MarkPosition, progresses = new Dictionary<object, Memory>());
             }
 
             progresses.Add(key, (success, Position - MarkPosition, data));
         }
 
-        public (bool? success, int Length, D Data) RecallProgress(K key)
+        public (bool? success, int Length, object Data) RecallProgress(object key)
         {
             if (memories.TryGetValue(Position, out var progresses))
             {
@@ -52,7 +52,7 @@ namespace Veruthian.Library.Readers
                 }
             }
 
-            return (null, 0, default(D));
+            return (null, 0, null);
         }
 
 
