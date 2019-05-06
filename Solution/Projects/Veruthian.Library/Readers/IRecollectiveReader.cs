@@ -4,6 +4,6 @@ namespace Veruthian.Library.Readers
     {
         void StoreProgress(object key, bool success, object data = null);
 
-        (bool? success, int Length, object Data) RecallProgress(object key);
+        (bool? Success, int Length, object Data) RecallProgress(object key);
     }
 }

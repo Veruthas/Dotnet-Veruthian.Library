@@ -34,6 +34,9 @@ namespace Veruthian.Library.Readers
 
         public void StoreProgress(object key, bool success, object data = null)
         {
+            if (!IsSpeculating)
+                throw new InvalidOperationException("Cannot store progress when not speculating.");
+
             if (!memories.TryGetValue(MarkPosition, out var progresses))
             {
                 memories.Add(MarkPosition, progresses = new Dictionary<object, Memory>());
@@ -42,7 +45,7 @@ namespace Veruthian.Library.Readers
             progresses.Add(key, (success, Position - MarkPosition, data));
         }
 
-        public (bool? success, int Length, object Data) RecallProgress(object key)
+        public (bool? Success, int Length, object Data) RecallProgress(object key)
         {
             if (memories.TryGetValue(Position, out var progresses))
             {
