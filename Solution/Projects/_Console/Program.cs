@@ -9,6 +9,7 @@ using Veruthian.Library.Readers.Extensions;
 using Veruthian.Library.Text.Runes;
 using Veruthian.Library.Types;
 using Veruthian.Library.Types.Extensions;
+using System.Collections.Generic;
 
 namespace _Console
 {
@@ -51,10 +52,10 @@ namespace _Console
             rule["Item"] = b.Choice(rule["Number"], rule["Word"]);
 
             // rule Number = (at least 1 <'0' to '9'>) Whitespace;
-            rule["Number"] = b.Sequence(b.AtLeast(1, b.MatchSet(RuneSet.Digit)), rule["Whitespace"]);
+            rule["Number"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Digit)), "value"), rule["Whitespace"]);
 
             // rule Word = (at least 1 <'A' to 'Z' + 'a' to 'z'>) Whitespace;
-            rule["Word"] = b.Sequence(b.AtLeast(1, b.MatchSet(RuneSet.Letter)), rule["Whitespace"]);
+            rule["Word"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Letter)), "value"), rule["Whitespace"]);
 
             // rule Whitespace = {<' ' + '\t'>};
             rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.TabOrSpace));
@@ -85,6 +86,9 @@ namespace _Console
             while (true)
             {
                 Console.Write("Parse String> ");
+
+                tracer.Captures.Clear();
+
                 var s = (RuneString)Console.ReadLine();
 
                 var r = s.GetSpeculativeReader();
@@ -94,17 +98,22 @@ namespace _Console
                 Console.WriteLine($"Result: {(result ? "Success" : "Failed")}");
 
                 Console.WriteLine(r.Position);
-                
+
+                for (int i = 0; i < tracer.Captures.Count; i++)
+                {
+                    Console.WriteLine($"[{i}] '{tracer.Captures[i]}'");
+                }
+
                 Console.WriteLine();
             }
 
         }
 
 
-        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
+        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Capturer<TState> tracer) GetBuilder<TState>(TState mockup)
             where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
         {
-            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Tracer<TState>());
+            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Capturer<TState>());
         }
 
         public class Tracer<TState> : ITracer<TState>
@@ -125,6 +134,48 @@ namespace _Console
                 increment--;
 
                 Console.WriteLine($"{new string('|', increment)}Finished w/{(success ? "Success" : "Failure")} {{{operation}}}");
+            }
+        }
+
+        public class Capturer<TState> : ITracer<TState>
+            where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
+        {
+            public List<RuneString> Captures = new List<RuneString>();
+
+            public void OnStart(IOperation<TState> operation, TState state, out bool? handled)
+            {
+                var classified = operation as ClassifiedOperation<TState>;
+
+                if (classified != null)
+                {
+                    if (classified.Classes.Contains("value"))
+                    {
+                        state.Get(out ISpeculative speculative);
+
+                        speculative.Mark();
+                    }
+                }
+
+                handled = null;
+            }
+
+            public void OnFinish(IOperation<TState> operation, TState state, bool success)
+            {
+                if (success)
+                {
+                    var classified = operation as ClassifiedOperation<TState>;
+
+                    if (classified != null && classified.Classes.Contains("value"))
+                    {
+                        state.Get(out ISpeculativeReader<Rune> reader);
+
+                        var runes = new RuneString(reader.PeekFromMark(0, null));
+
+                        Captures.Add(runes);
+
+                        reader.Commit();
+                    }
+                }
             }
         }
     }

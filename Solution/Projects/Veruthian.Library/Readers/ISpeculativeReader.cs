@@ -10,6 +10,6 @@ namespace Veruthian.Library.Readers
 
         T PeekFromMark(int lookahead);
 
-        IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false);
+        IEnumerable<T> PeekFromMark(int lookahead, int? amount, bool includeEnd = false);        
     }
 }
