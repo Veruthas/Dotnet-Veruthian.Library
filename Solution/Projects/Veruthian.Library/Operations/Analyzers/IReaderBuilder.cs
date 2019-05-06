@@ -13,9 +13,9 @@ namespace Veruthian.Library.Operations.Analyzers
     {
         MatchOperation<TState, TReader, T> Match(T value);
         
-        MatchSetOperation<TState, TReader, T> Match(IContainer<T> set);
+        MatchSetOperation<TState, TReader, T> MatchSet(IContainer<T> set);
 
-        MatchSequenceOperation<TState, TReader, T, S> Match<S>(S sequence) where S : IEnumerable<T>;
+        MatchSequenceOperation<TState, TReader, T, S> MatchSequence<S>(S sequence) where S : IEnumerable<T>;
 
 
         ClassifiedOperation<TState> Literal(IOperation<TState> operation);

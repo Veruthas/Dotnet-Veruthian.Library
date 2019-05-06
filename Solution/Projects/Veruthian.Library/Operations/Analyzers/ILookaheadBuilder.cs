@@ -13,8 +13,8 @@ namespace Veruthian.Library.Operations.Analyzers
     {
         MatchAheadOperation<TState, TReader, T> Match(int lookahead, T value);
 
-        MatchAheadSetOperation<TState, TReader, T> Match(int lookahead, IContainer<T> set);
+        MatchAheadSetOperation<TState, TReader, T> MatchSet(int lookahead, IContainer<T> set);
 
-        MatchAheadSequenceOperation<TState, TReader, T, S> Match<S>(int lookahead, S sequence) where S : IEnumerable<T>;
+        MatchAheadSequenceOperation<TState, TReader, T, S> MatchSequence<S>(int lookahead, S sequence) where S : IEnumerable<T>;
     }
 }
