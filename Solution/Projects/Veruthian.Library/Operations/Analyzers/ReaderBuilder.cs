@@ -7,7 +7,7 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public class ReaderBuilder<TState, TReader, T> : BuilderAdapter<TState>
+    public class ReaderBuilder<TState, TReader, T> : BuilderAdapter<TState>, IReaderBuilder<TState, TReader, T>
         where TState : Has<TReader>
         where TReader : IReader<T>
         where T : IEquatable<T>
@@ -23,5 +23,9 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public MatchSequenceOperation<TState, TReader, T, S> Match<S>(S sequence) where S : IEnumerable<T>
             => new MatchSequenceOperation<TState, TReader, T, S>(sequence);
+
+
+        public ClassifiedOperation<TState> Literal(IOperation<TState> operation)
+            => Classify(operation, AnalyzerClasses.Literal);
     }
 }
