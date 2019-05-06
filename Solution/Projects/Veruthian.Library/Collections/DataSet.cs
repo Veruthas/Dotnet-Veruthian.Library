@@ -9,7 +9,7 @@ namespace Veruthian.Library.Collections
         HashSet<T> items;
 
 
-        public DataSet() { }
+        public DataSet() => this.items = new HashSet<T>();
 
         public DataSet(IEqualityComparer<T> comparer) => this.items = new HashSet<T>(comparer);
 
