@@ -29,7 +29,7 @@ namespace _Console
             var Symbols = RuneSet.List("`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?");
 
             // rule File = Whitespace Items unless Any;
-            rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+            rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.Match(RuneSet.Complete)));
 
             // Items = {Item};
             rule["Items"] = b.Repeat(rule["Item"]);
@@ -38,16 +38,16 @@ namespace _Console
             rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
 
             // rule Symbol = (at least 1 Symbol) Whitespace;
-            rule["Symbol"] = b.Sequence(b.AtLeast(1, b.MatchSet(Symbols)), rule["Whitespace"]);
+            rule["Symbol"] = b.Sequence(b.AtLeast(1, b.Match(Symbols)), rule["Whitespace"]);
 
             // rule Number = (at least 1 Digit) Whitespace;
-            rule["Number"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Digit)), "value"), rule["Whitespace"]);
+            rule["Number"] = b.Sequence(b.Classify(b.AtLeast(1, b.Match(RuneSet.Digit)), "value"), rule["Whitespace"]);
 
             // rule Word = (at least 1 Letter) Whitespace;
-            rule["Word"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Letter)), "value"), rule["Whitespace"]);
+            rule["Word"] = b.Sequence(b.Classify(b.AtLeast(1, b.Match(RuneSet.Letter)), "value"), rule["Whitespace"]);
 
             // rule Whitespace = {Whitespace};
-            rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.Whitespace));
+            rule["Whitespace"] = b.Repeat(b.Match(RuneSet.Whitespace));
 
 
 
@@ -113,29 +113,29 @@ namespace _Console
                     if (i == 0)
                     {
                         // rule File = Whitespace Items unless Any;
-                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.Match(RuneSet.Complete)));
 
                         // Items = {Item};
                         rule["Items"] = b.Repeat(rule["Item"]);
 
                         // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
-                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                        rule["Item"] = b.IfThenElse(b.Match(RuneSet.Digit), rule["Number"], b.IfThenElse(b.Match(RuneSet.Letter), rule["Word"], b.IfThen(b.Match(Symbols), rule["Symbol"])));
                     }
                     else if (i == 1)
                     {
                         // rule File = Whitespace Items unless Any;
-                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.Match(RuneSet.Complete)));
 
                         // Items = while (Digit or Letter or Symbols) then Item;
-                        rule["Items"] = b.While(b.MatchSet(RuneSet.Union(RuneSet.Digit, RuneSet.Letter, Symbols)), rule["Item"]);
+                        rule["Items"] = b.While(b.Match(RuneSet.Union(RuneSet.Digit, RuneSet.Letter, Symbols)), rule["Item"]);
 
                         // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
-                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                        rule["Item"] = b.IfThenElse(b.Match(RuneSet.Digit), rule["Number"], b.IfThenElse(b.Match(RuneSet.Letter), rule["Word"], b.IfThen(b.Match(Symbols), rule["Symbol"])));
                     }
                     else
                     {
                         // rule File = Whitespace Items unless Any;
-                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.Match(RuneSet.Complete)));
 
                         // Items = {Item};
                         rule["Items"] = b.Repeat(rule["Item"]);

@@ -6,22 +6,22 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public class MatchSequenceOperation<TState, TReader, T, S> : BaseReadOperation<TState, TReader, T>
+    public class MatchAheadSequenceOperation<TState, TReader, T, S> : BaseLookaheadOperation<TState, TReader, T>
         where TState : Has<TReader>
-        where TReader : IReader<T>
-        where T : IEquatable<T>        
+        where TReader : ILookaheadReader<T>
+        where T : IEquatable<T>
         where S : IEnumerable<T>
     {
         S sequence;
 
-        public MatchSequenceOperation(S sequence)
+        public MatchAheadSequenceOperation(int lookahead, S sequence) : base(lookahead)
         {
             ExceptionHelper.VerifyNotNull(sequence);
 
             this.sequence = sequence;
         }
 
-        public override string Description => $"match({sequence})";
+        public override string Description => $"match(+{lookahead}, {sequence})";
 
         public S Sequence => sequence;
 
