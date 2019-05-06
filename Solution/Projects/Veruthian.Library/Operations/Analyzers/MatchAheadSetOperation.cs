@@ -21,7 +21,7 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public IContainer<T> Set => set;
 
-        public override string Description => $"in(+{lookahead}, {set})";
+        public override string Description => $"match-set(+{lookahead}, {set})";
 
         protected override bool Match(T value) => set.Contains(value);
     }

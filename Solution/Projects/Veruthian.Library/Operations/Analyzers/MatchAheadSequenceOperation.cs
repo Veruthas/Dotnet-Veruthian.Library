@@ -21,7 +21,7 @@ namespace Veruthian.Library.Operations.Analyzers
             this.sequence = sequence;
         }
 
-        public override string Description => $"match(+{lookahead}, {sequence})";
+        public override string Description => $"match-sequence(+{lookahead}, {sequence})";
 
         public S Sequence => sequence;
 
