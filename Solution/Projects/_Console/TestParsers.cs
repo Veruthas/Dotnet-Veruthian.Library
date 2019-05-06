@@ -149,10 +149,12 @@ namespace _Console
         }
 
 
-        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
+        static (ReaderBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
             where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
         {
-            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Tracer<TState>());
+            return (new ReaderBuilder<TState, ISpeculativeReader<Rune>, Rune>(new SpeculativeBuilder<TState>()), 
+                    new RuleTable<TState>(), 
+                    new Tracer<TState>());
         }
 
         public class Tracer<TState> : ITracer<TState>

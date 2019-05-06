@@ -3,7 +3,7 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations
 {
-    public class SpeculativeOperationBuilder<TState> : Builder<TState>, ISpeculativeBuilder<TState>
+    public class SpeculativeBuilder<TState> : Builder<TState>
             where TState :  Has<ISpeculative>        
     {
         // Speculative
