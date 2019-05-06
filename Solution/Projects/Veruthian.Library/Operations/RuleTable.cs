@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Operations.Analyzers
+namespace Veruthian.Library.Operations
 {
     public class RuleTable<TState>
     {

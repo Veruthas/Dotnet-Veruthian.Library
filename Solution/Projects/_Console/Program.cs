@@ -10,6 +10,7 @@ using Veruthian.Library.Text.Runes;
 using Veruthian.Library.Types;
 using Veruthian.Library.Types.Extensions;
 using System.Collections.Generic;
+using System.IO;
 
 namespace _Console
 {
@@ -41,6 +42,7 @@ namespace _Console
 
             var tracer = data.tracer;
 
+            var Symbols = RuneSet.List("`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?");
 
             // rule File = Whitespace Items unless Any;
             rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
@@ -48,17 +50,21 @@ namespace _Console
             // Items = {Item};
             rule["Items"] = b.Repeat(rule["Item"]);
 
-            // Item = Number or Word;
-            rule["Item"] = b.Choice(rule["Number"], rule["Word"]);
+            // Item = Number or Word or Symbol;
+            rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
 
-            // rule Number = (at least 1 <'0' to '9'>) Whitespace;
+            // rule Symbol = (at least 1 Symbol) Whitespace;
+            rule["Symbol"] = b.Sequence(b.AtLeast(1, b.MatchSet(Symbols)), rule["Whitespace"]);
+
+            // rule Number = (at least 1 Digit) Whitespace;
             rule["Number"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Digit)), "value"), rule["Whitespace"]);
 
-            // rule Word = (at least 1 <'A' to 'Z' + 'a' to 'z'>) Whitespace;
+            // rule Word = (at least 1 Letter) Whitespace;
             rule["Word"] = b.Sequence(b.Classify(b.AtLeast(1, b.MatchSet(RuneSet.Letter)), "value"), rule["Whitespace"]);
 
-            // rule Whitespace = {<' ' + '\t'>};
-            rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.TabOrSpace));
+            // rule Whitespace = {Whitespace};
+            rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.Whitespace));
+
 
 
             // var items = rule["File"].Flatten();
@@ -71,6 +77,8 @@ namespace _Console
             Console.WriteLine(rule.FormatRule("Items"));
 
             Console.WriteLine(rule.FormatRule("Item"));
+
+            Console.WriteLine(rule.FormatRule("Symbol"));
 
             Console.WriteLine(rule.FormatRule("Number"));
 
@@ -87,37 +95,86 @@ namespace _Console
             {
                 Console.Write("Parse String> ");
 
-                tracer.Captures.Clear();
+                // if (tracer is Capturer)
+                //     tracer.Captures.Clear();
 
                 var s = (RuneString)Console.ReadLine();
 
-                var r = s.GetSpeculativeReader();
-
-                bool result = rule.Perform("File", r.GroupWith((ISpeculative)r), tracer);
-
-                Console.WriteLine($"Result: {(result ? "Success" : "Failed")}");
-
-                Console.WriteLine(r.Position);
-
-                for (int i = 0; i < tracer.Captures.Count; i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    Console.WriteLine($"[{i}] '{tracer.Captures[i]}'");
-                }
+                    tracer.Count = 0;
 
-                Console.WriteLine();
+                    var r = s.GetSpeculativeReader();
+
+                    bool result = rule.Perform("File", r.GroupWith((ISpeculative)r), tracer);
+
+                    Console.WriteLine($"Result: {(result ? "Success" : "Failed")}");
+
+                    Console.WriteLine(r.Position);
+
+                    Console.WriteLine(r.IsEnd);
+
+                    Console.WriteLine(tracer.Count);
+
+                    // for (int i = 0; i < tracer.Captures.Count; i++)
+                    // {
+                    //     (int position, RuneString value) = tracer.Captures.Values[i];
+                    //     Console.WriteLine($"[{i}] Position: {position}; Value: '{value}'");
+                    // }
+
+                    Pause();
+
+                    Console.WriteLine();
+                    
+                    if (i == 0)
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = {Item};
+                        rule["Items"] = b.Repeat(rule["Item"]);
+
+                        // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
+                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                    }
+                    else if (i == 1)
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = while (Digit or Letter or Symbols) then Item;
+                        rule["Items"] = b.While(b.MatchSet(RuneSet.Union(RuneSet.Digit, RuneSet.Letter, Symbols)), rule["Item"]);
+
+                        // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
+                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                    }
+                    else
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = {Item};
+                        rule["Items"] = b.Repeat(rule["Item"]);
+
+                        // Item = Number or Word or Symbol;
+                        rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
+                    }
+                }
             }
 
         }
 
 
-        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Capturer<TState> tracer) GetBuilder<TState>(TState mockup)
+        static (AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
             where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
         {
-            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Capturer<TState>());
+            return (new AnalyzerBuilder<TState, ISpeculativeReader<Rune>, Rune>(), new RuleTable<TState>(), new Tracer<TState>());
         }
 
         public class Tracer<TState> : ITracer<TState>
         {
+            public int Count;
+
             int increment = 0;
 
             public void OnStart(IOperation<TState> operation, TState state, out bool? handled)
@@ -127,6 +184,8 @@ namespace _Console
                 handled = null;
 
                 increment++;
+
+                Count++;
             }
 
             public void OnFinish(IOperation<TState> operation, TState state, bool success)
@@ -140,7 +199,7 @@ namespace _Console
         public class Capturer<TState> : ITracer<TState>
             where TState : Has<ISpeculative>, Has<ISpeculativeReader<Rune>>
         {
-            public List<RuneString> Captures = new List<RuneString>();
+            public SortedList<int, (int, RuneString)> Captures = new SortedList<int, (int, RuneString)>();
 
             public void OnStart(IOperation<TState> operation, TState state, out bool? handled)
             {
@@ -171,7 +230,7 @@ namespace _Console
 
                         var runes = new RuneString(reader.PeekFromMark(0, null));
 
-                        Captures.Add(runes);
+                        Captures.TryAdd(reader.MarkPosition, (reader.MarkPosition, runes));
 
                         reader.Commit();
                     }

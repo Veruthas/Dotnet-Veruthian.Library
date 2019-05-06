@@ -9,7 +9,7 @@ namespace Veruthian.Library.Operations.Analyzers
 {
     public class AnalyzerBuilder<TState, TReader, T> : SpeculativeOperationBuilder<TState>
         where TState : Has<TReader>, Has<ISpeculative>
-        where TReader : ISpeculativeReader<T>
+        where TReader : IReader<T>
         where T : IEquatable<T>
     {
         public MatchOperation<TState, TReader, T> Match(T value) 

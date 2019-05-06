@@ -6,7 +6,7 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations
 {
-    public class OperationBuilder<TState>
+    public class Builder<TState> : IBuilder<TState>
     {
         // Boolean
         public virtual BooleanOperation<TState> True
