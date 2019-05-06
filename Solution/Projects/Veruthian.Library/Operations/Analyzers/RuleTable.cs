@@ -10,33 +10,23 @@ namespace Veruthian.Library.Operations.Analyzers
 
         bool qualifyName;
 
-        bool qualifyClasses;
-
         string classSeparator;
 
 
-        public RuleTable(bool qualifyName = false, bool qualifyClasses = false, string classSeparator = ":")
+        public RuleTable(bool qualifyName = false, string classSeparator = ":")
         {
-            this.qualifyClasses = qualifyClasses;
-
             this.classSeparator = classSeparator;
         }
 
         public IOperation<TState> this[string name]
         {
-            get => GetRule(name, null);
-            set => GetRule(name, null).Operation = value;
-        }
-
-        public IOperation<TState> this[string name, params string[] classes]
-        {
-            get => GetRule(name, classes);
-            set => GetRule(name, classes).Operation = value;
+            get => GetRule(name);
+            set => GetRule(name).Operation = value;
         }
 
         public ILookup<string, ClassifiedOperation<TState>> Rules => rules;
 
-        private ClassifiedOperation<TState> GetRule(string name, string[] classes)
+        private ClassifiedOperation<TState> GetRule(string name)
         {
             if (!rules.TryGet(name, out var rule))
             {
@@ -44,12 +34,9 @@ namespace Veruthian.Library.Operations.Analyzers
 
                 classSet.Add(AnalyzerClasses.Rule);
 
-                classSet.Add(GetClass(name));
+                classSet.Add(qualifyName ? AnalyzerClasses.Rule + classSeparator + name : name);
 
-                foreach (var item in classes)
-                    classSet.Add(GetClass(name, item));
-
-                rule = new ClassifiedOperation<TState>();
+                rule = new ClassifiedOperation<TState>(classSet);
 
                 rules.Insert(name, rule);
             }
@@ -57,16 +44,60 @@ namespace Veruthian.Library.Operations.Analyzers
             return rule;
         }
 
-        private string GetClass(string name, string item = null)
+
+        public void Classify(string name, string additional)
         {
-            if (item == null)
-                return qualifyName ? AnalyzerClasses.Rule + classSeparator + name : name;
-            else
-                return qualifyClasses ? AnalyzerClasses.Rule + classSeparator + name + classSeparator + item : item;
+            var rule = GetRule(name);
+
+            AddClass(rule, name, additional, false);
         }
 
+        public void Classify(string name, params string[] additional)
+        {
+            var rule = GetRule(name);
+
+            foreach (var item in additional)
+                AddClass(rule, name, item, false);
+        }
+
+        public void ClassifyQualified(string name, string additional)
+        {
+            var rule = GetRule(name);
+
+            AddClass(rule, name, additional, true);
+        }
+
+        public void ClassifyQualified(string name, params string[] additional)
+        {
+            var rule = GetRule(name);
+
+            foreach (var item in additional)
+                AddClass(rule, name, item, true);
+        }
+
+        private void AddClass(ClassifiedOperation<TState> rule, string name, string additional, bool qualify)
+        {
+            var newClass = GetClassName(name, additional, qualify);
+
+            rule.Classes.Add(newClass);
+        }
+
+        private string GetClassName(string name, string additional, bool qualify)
+        {
+            var result = additional;
+
+            if (qualify)
+                result = name + classSeparator + result;
+
+            if (qualifyName)
+                result = AnalyzerClasses.Rule + classSeparator + result;
+
+            return result;
+        }
+
+
         public bool Perform(string name, TState state, ITracer<TState> tracer = null)
-            => GetRule(name, null).Perform(state, tracer);
+            => GetRule(name).Perform(state, tracer);
 
 
         public string FormatRule(string name, int indentSize = 3, char indentChar = ' ')
