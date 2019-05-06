@@ -1,4 +1,5 @@
 ﻿using System;
+using Veruthian.Library.Readers.Extensions;
 
 namespace _Console
 {
@@ -6,6 +7,8 @@ namespace _Console
     {
         static void Main(string[] args)
         {
+            TestParsers.TestParser();
+
             Pause();
         }
 
