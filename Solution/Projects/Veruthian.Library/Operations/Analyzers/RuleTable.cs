@@ -15,9 +15,13 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public RuleTable(bool qualifyName = false, string classSeparator = ":")
         {
+            this.qualifyName = qualifyName;
+
             this.classSeparator = classSeparator;
         }
 
+
+        // Access
         public IOperation<TState> this[string name]
         {
             get => GetRule(name);
@@ -50,7 +54,7 @@ namespace Veruthian.Library.Operations.Analyzers
 
             if (additional != null)
             {
-                foreach(var item in additional)
+                foreach (var item in additional)
                     rule.Classes.Add(item);
             }
 
@@ -58,6 +62,7 @@ namespace Veruthian.Library.Operations.Analyzers
         }
 
 
+        // Classify
         public void Classify(string name, string additional)
         {
             var rule = GetRule(name);
@@ -74,14 +79,39 @@ namespace Veruthian.Library.Operations.Analyzers
         }
 
 
+        // Perform
         public bool Perform(string name, TState state, ITracer<TState> tracer = null)
             => GetRule(name).Perform(state, tracer);
 
 
-        public string FormatRule(string name, int indentSize = 3, char indentChar = ' ')
+        // Formatting
+        private const int IndentSize = 3;
+        private const char IndentChar = ' ';
+
+
+        public override string ToString() => ToString(IndentSize, IndentChar);
+
+        public string ToString(int indentSize, char indentChar)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var name in rules.Keys)
+                FormatRule(builder, name, indentSize, indentChar);
+
+            return builder.ToString();
+        }
+
+        public string FormatRule(string name, int indentSize = IndentSize, char indentChar = IndentChar)
         {
             var builder = new StringBuilder();
 
+            FormatRule(builder, name, indentSize, indentChar);
+
+            return builder.ToString();
+        }
+
+        private void FormatRule(StringBuilder builder, string name, int indentSize = IndentSize, char indentChar = IndentChar)
+        {
             builder.Append($"rule:{name} :=");
 
             if (!rules.TryGet(name, out var rule) || rule.Operation == null)
@@ -94,8 +124,6 @@ namespace Veruthian.Library.Operations.Analyzers
 
                 FormatOperation(builder, 1, indentSize, indentChar, rule.Operation);
             }
-
-            return builder.ToString();
         }
 
         private void FormatOperation(StringBuilder builder, int indent, int indentSize, char indentChar, IOperation<TState> operation)
