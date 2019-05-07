@@ -12,6 +12,7 @@ using Veruthian.Library.Types;
 using Veruthian.Library.Types.Extensions;
 using System.Collections.Generic;
 using System.IO;
+using Veruthian.Library.Operations.Analyzers.Extensions;
 
 namespace _Console
 {
@@ -171,7 +172,7 @@ namespace _Console
             bool token = false;
 
 
-            public void OnStart(IOperation<TState> operation, TState state, out bool? handled)
+            public bool? OperationStart(IOperation<TState> operation, TState state)
             {
                 Count++;
 
@@ -183,7 +184,7 @@ namespace _Console
 
                 if (classified != null)
                 {
-                    if (classified.Contains(AnalyzerClasses.Rule))
+                    if (classified.IsRule())
                     {
                         if (StashDiscoveries)
                         {
@@ -191,29 +192,27 @@ namespace _Console
 
                             if (result.Success == true)
                             {
-                                handled = result.Success;
-
                                 reader.Skip(result.Length);
 
                                 PrintFinish(operation, true, true, reader.Position, reader.Peek());
 
-                                return;
+                                return true;
                             }
                             else if (result.Success == false)
                             {
                                 PrintFinish(operation, false, true, reader.Position, reader.Peek());
 
-                                handled = false;
+                                return false;
                             }
                         }
                     }
 
-                    if (classified.Contains("Token"))
+                    if (classified.IsToken())
                     {
                         token = true;
                     }
 
-                    if (token && classified.Contains(AnalyzerClasses.Literal))
+                    if (token && classified.IsLiteral())
                     {
                         state.Get(out ISpeculative speculative);
 
@@ -223,10 +222,10 @@ namespace _Console
 
                 increment++;
 
-                handled = null;
+                return null;
             }
 
-            public void OnFinish(IOperation<TState> operation, TState state, bool success)
+            public void OperationFinish(IOperation<TState> operation, TState state, bool success)
             {
                 increment--;
 
@@ -238,7 +237,7 @@ namespace _Console
 
                 if (classified != null)
                 {
-                    if (classified.Contains(AnalyzerClasses.Rule))
+                    if (classified.IsRule())
                     {
                         if (StashDiscoveries)
                         {
@@ -255,7 +254,7 @@ namespace _Console
                         token = false;
                     }
 
-                    if (token && classified.Contains(AnalyzerClasses.Literal))
+                    if (token && classified.IsLiteral())
                     {
                         if (success)
                         {
@@ -279,6 +278,18 @@ namespace _Console
             {
                 if (OutputTrace)
                     Console.WriteLine($"{new string('|', increment)}Finished @({position},'{value.ToPrintableString()}') w/{(skipped ? "Skip-" : "")}{(success ? "Success" : "Failure")} {{{operation.ToString().ToPrintableString()}}}");
+            }
+
+
+            public void Reset()
+            {
+                Captures.Clear();
+
+                Count = 0;
+
+                increment = 0;
+
+                token = false;
             }
         }
     }
