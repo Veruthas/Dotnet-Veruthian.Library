@@ -35,8 +35,8 @@ namespace Veruthian.Library.Operations
         }
 
 
-        public bool Contains (string className) => classes != null && classes.Contains(className);
-        
+        public bool Is(string className) => classes != null && classes.Contains(className);
+
 
         public override string Description => classes == null ? "class<>" : "class" + classes.ToListString("<", ">", ", ");
 

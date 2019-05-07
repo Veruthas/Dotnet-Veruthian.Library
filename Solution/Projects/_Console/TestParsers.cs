@@ -249,7 +249,7 @@ namespace _Console
                         }
                     }
 
-                    if (classified.Contains("Token"))
+                    if (classified.Is("Token"))
                     {
                         token = false;
                     }

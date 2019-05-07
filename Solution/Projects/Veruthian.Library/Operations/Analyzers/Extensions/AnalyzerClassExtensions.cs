@@ -6,11 +6,12 @@ namespace Veruthian.Library.Operations.Analyzers.Extensions
             => builder.Classify(AnalyzerClass.Literal);
 
         public static bool IsRule<TState>(this ClassifiedOperation<TState> operation)
-            => operation.Contains(AnalyzerClass.Rule.Name);
+            => operation.Is(AnalyzerClass.Rule.Name);
 
         public static bool IsToken<TState>(this ClassifiedOperation<TState> operation)
-            => operation.Contains(AnalyzerClass.Token.Name);
+            => operation.Is(AnalyzerClass.Token.Name);
+            
         public static bool IsLiteral<TState>(this ClassifiedOperation<TState> operation)
-            => operation.Contains(AnalyzerClass.Literal.Name);
+            => operation.Is(AnalyzerClass.Literal.Name);
     }
 }

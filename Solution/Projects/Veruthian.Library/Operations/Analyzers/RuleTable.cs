@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Operations.Analyzers.Extensions;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
@@ -142,7 +143,7 @@ namespace Veruthian.Library.Operations.Analyzers
             {
                 var possible = operation as ClassifiedOperation<TState>;
 
-                if (possible == null || !possible.Classes.Contains(AnalyzerClass.Rule))
+                if (possible == null || !possible.IsRule();
                 {
                     foreach (var subOperation in operation.SubOperations)
                     {
