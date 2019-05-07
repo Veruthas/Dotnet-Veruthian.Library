@@ -317,7 +317,7 @@ namespace Veruthian.Library.Text.Runes
             return new RuneString(combined, false);
         }
 
-        public static RuneString Combine(params RuneString[] values) => Combine(values);
+        public static RuneString Combine(params RuneString[] values) => Combine((IEnumerable<RuneString>)values);
 
         public static RuneString Combine(IEnumerable<RuneString> values)
         {
@@ -581,7 +581,7 @@ namespace Veruthian.Library.Text.Runes
 
         public static implicit operator RuneString(string value) => value.IsNull() ? null : new RuneString(value);
 
-        public static implicit operator Rune[] (RuneString value) => value.IsNull() ? new Rune[0] : value.ToRuneArray();
+        public static implicit operator Rune[](RuneString value) => value.IsNull() ? new Rune[0] : value.ToRuneArray();
 
         public static implicit operator RuneString(Rune[] value) => value.IsNull() || value.Length == 0 ? RuneString.Empty : new RuneString(value);
 
