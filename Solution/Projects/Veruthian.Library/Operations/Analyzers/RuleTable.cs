@@ -143,7 +143,7 @@ namespace Veruthian.Library.Operations.Analyzers
             {
                 var possible = operation as ClassifiedOperation<TState>;
 
-                if (possible == null || !possible.IsRule();
+                if (possible == null || !possible.IsRule())
                 {
                     foreach (var subOperation in operation.SubOperations)
                     {

@@ -31,17 +31,14 @@ namespace _Console
             var Symbols = RuneSet.List("`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?");
 
 
-
-
-
             // rule Symbol = (at least 1 Symbol) Whitespace;
-            rule["Symbol", "Token"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(Symbols))), rule["Whitespace"]);
+            rule["Symbol", AnalyzerClass.Token] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(Symbols))), rule["Whitespace"]);
 
             // rule Number = (at least 1 Digit) Whitespace;
-            rule["Number", "Token"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(RuneSet.Digit))), rule["Whitespace"]);
+            rule["Number", AnalyzerClass.Token] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(RuneSet.Digit))), rule["Whitespace"]);
 
             // rule Word = (at least 1 Letter) Whitespace;
-            rule["Word", "Token"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(RuneSet.Letter))), rule["Whitespace"]);
+            rule["Word", AnalyzerClass.Token] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(RuneSet.Letter))), rule["Whitespace"]);
 
             // rule Whitespace = {Whitespace};
             rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.Whitespace));

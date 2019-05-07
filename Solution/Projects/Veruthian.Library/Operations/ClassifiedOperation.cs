@@ -1,5 +1,6 @@
 using Veruthian.Library.Collections;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Operations
 {
@@ -8,24 +9,24 @@ namespace Veruthian.Library.Operations
         IExpandableContainer<string> classes;
 
 
-        public ClassifiedOperation() { }
+        public ClassifiedOperation() : this(null, null) { }
 
-        public ClassifiedOperation(IOperation<TState> operation) => this.operation = operation;
+        public ClassifiedOperation(IOperation<TState> operation) : this(operation, null) { }
 
-        public ClassifiedOperation(IExpandableContainer<string> classes) => this.classes = classes;
+        public ClassifiedOperation(IExpandableContainer<string> classes) : this(null, classes) { }
 
         public ClassifiedOperation(IOperation<TState> operation, IExpandableContainer<string> classes)
         {
-            this.operation = operation;
+            Operation = operation;
 
-            this.classes = classes;
+            Classes = classes;
         }
 
 
         public new IOperation<TState> Operation
         {
             get => operation;
-            set => operation = value;
+            set => operation = value ?? BooleanOperation<TState>.True;
         }
 
         public IExpandableContainer<string> Classes
