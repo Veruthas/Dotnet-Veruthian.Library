@@ -2,8 +2,11 @@ namespace Veruthian.Library.Operations
 {
     public interface ITracer<TState>
     {
-        void OnStart(IOperation<TState> operation, TState state, out bool? handled);
+        bool? OperationStart(IOperation<TState> operation, TState state);
 
-        void OnFinish(IOperation<TState> operation, TState state, bool success);
+        void OperationFinish(IOperation<TState> operation, TState state, bool success);
+
+
+        void Reset();
     }
 }

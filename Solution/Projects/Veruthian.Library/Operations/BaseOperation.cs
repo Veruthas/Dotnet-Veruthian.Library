@@ -26,16 +26,20 @@ namespace Veruthian.Library.Operations
         {
             if (tracer != null)
             {
-                tracer.OnStart(this, state, out var handled);
+                var handled = tracer.OperationStart(this, state);
 
                 if (handled != null)
+                {
+                    tracer.OperationFinish(this, state, handled.Value);
+
                     return handled.Value;
+                }
             }
 
             bool result = DoAction(state, tracer);
 
             if (tracer != null)
-                tracer.OnFinish(this, state, result);
+                tracer.OperationFinish(this, state, result);
 
             return result;
         }
