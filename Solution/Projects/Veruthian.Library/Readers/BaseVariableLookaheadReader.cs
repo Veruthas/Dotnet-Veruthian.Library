@@ -13,13 +13,13 @@ namespace Veruthian.Library.Readers
         public BaseVariableLookaheadReader() { }
 
 
-        protected List<T> Cache => cache; 
+        protected List<T> Cache => cache;
 
         protected int CacheIndex { get => index; set => index = value; }
 
-        protected int CacheSize => cache.Count; 
+        protected int CacheSize => cache.Count;
 
-        protected virtual bool CanReset => true; 
+        protected virtual bool CanReset => true;
 
 
         protected override void Initialize()
@@ -55,7 +55,7 @@ namespace Veruthian.Library.Readers
                     bool success = GetNext(out T next);
 
                     if (success)
-                        cache.Add(next);                    
+                        cache.Add(next);
                     else
                         EndPosition = lastPosition + i;
                 }
@@ -93,28 +93,32 @@ namespace Veruthian.Library.Readers
 
         protected override void SkipAhead(int amount)
         {
-            // If there are still items in "cache"
-            if (index < CacheSize)
+            if (index + amount >= CacheSize)
             {
-                int delta = CacheSize - index;
-
-                if (CanReset)                
-                    Reset();                
-                else                
-                    index = CacheSize;
-                
+                var delta = (CacheSize - index);
 
                 Position += delta;
 
                 amount -= delta;
+
+                index = CacheSize;
+
+                if (CanReset)
+                    Reset();
+
+                for (int i = 0; i < amount; i++)
+                {
+                    MoveNext();
+
+                    if (IsEnd)
+                        break;
+                }
             }
-
-            for (int i = 0; i < amount; i++)
+            else
             {
-                MoveNext();
+                index += amount;
 
-                if (IsEnd)
-                    break;
+                Position += amount;
             }
         }
 
