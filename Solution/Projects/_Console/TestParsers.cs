@@ -29,17 +29,12 @@ namespace _Console
 
             var Symbols = RuneSet.List("`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?");
 
-            // rule File = Whitespace Items unless Any;
-            rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
 
-            // Items = {Item};
-            rule["Items"] = b.Repeat(rule["Item"]);
 
-            // Item = Number or Word or Symbol;
-            rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
+
 
             // rule Symbol = (at least 1 Symbol) Whitespace;
-            rule["Symbol"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(Symbols))), rule["Whitespace"]);
+            rule["Symbol", "Token"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(Symbols))), rule["Whitespace"]);
 
             // rule Number = (at least 1 Digit) Whitespace;
             rule["Number", "Token"] = b.Sequence(b.Literal(b.AtLeast(1, b.MatchSet(RuneSet.Digit))), rule["Whitespace"]);
@@ -50,45 +45,68 @@ namespace _Console
             // rule Whitespace = {Whitespace};
             rule["Whitespace"] = b.Repeat(b.MatchSet(RuneSet.Whitespace));
 
-
-
-            // var items = rule["File"].Flatten();
-
-            // foreach(var item in items)
-            //     Console.WriteLine(item);
-
-            // Console.WriteLine(rule.FormatRule("File"));
-
-            // Console.WriteLine(rule.FormatRule("Items"));
-
-            // Console.WriteLine(rule.FormatRule("Item"));
-
-            // Console.WriteLine(rule.FormatRule("Symbol"));
-
-            // Console.WriteLine(rule.FormatRule("Number"));
-
-            // Console.WriteLine(rule.FormatRule("Word"));
-
-            // Console.WriteLine(rule.FormatRule("Whitespace").Replace("\t", "\\t"));
-
             Console.WriteLine(rule);
-
-
-            Program.Pause();
 
             Console.WriteLine();
 
             while (true)
             {
+                Program.Pause();
+
+                Console.WriteLine();
+
                 Console.Write("Parse String> ");
 
                 // if (tracer is Capturer)
                 //     tracer.Captures.Clear();
 
-                var s = (RuneString)Console.ReadLine();
+                var s = ((RuneString)Console.ReadLine() * 100);
 
-                for (int i = 0; i < 2; i++)
+
+                for (int i = 0; i < 6; i++)
                 {
+                    var optimizeLevel = i / 2;
+
+                    if (optimizeLevel == 0)
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = {Item};
+                        rule["Items"] = b.Repeat(rule["Item"]);
+
+                        // Item = Number or Word or Symbol;
+                        rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
+                    }
+                    else if (optimizeLevel == 1)
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = {Item};
+                        rule["Items"] = b.Repeat(rule["Item"]);
+
+                        // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
+                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                    }
+                    else
+                    {
+                        // rule File = Whitespace Items unless Any;
+                        rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
+
+                        // Items = while (Digit or Letter or Symbols) then Item;
+                        rule["Items"] = b.While(b.MatchSet(RuneSet.Union(RuneSet.Digit, RuneSet.Letter, Symbols)), rule["Item"]);
+
+                        // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
+                        rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
+                    }
+
+                    var watch = new System.Diagnostics.Stopwatch();
+
+                    watch.Start();
+
+                    Console.WriteLine();
+
                     tracer.Count = 0;
 
                     tracer.Captures.Clear();
@@ -96,6 +114,10 @@ namespace _Console
                     var r = s.GetRecollectiveReader<Rune>();
 
                     bool result = rule.Perform("File", r.GroupWith((ISpeculative)r), tracer);
+
+                    watch.Stop();
+
+                    Console.WriteLine((tracer.StashDiscoveries ? "Stashed" : "UnStashed") + "; Level: " + optimizeLevel);
 
                     Console.WriteLine($"Result: {(result ? "Success" : "Failed")}");
 
@@ -105,54 +127,22 @@ namespace _Console
 
                     Console.WriteLine("Tracer Count: " + tracer.Count);
 
-                    for (int j = 0; j < tracer.Captures.Count; j++)
-                    {
-                        (int position, RuneString value) = tracer.Captures.Values[j];
-                        Console.WriteLine($"[{j}] Position: {position}; Value: '{value}'");
-                    }
+                    Console.WriteLine("Token Count: " + tracer.Captures.Count);
 
-                    Program.Pause();
+                    Console.WriteLine($"Elapsed millisceconds: {watch.ElapsedMilliseconds}");
 
-                    Console.WriteLine();
 
                     tracer.StashDiscoveries ^= true;
 
-                    // if (i == 0)
+                    //tracer.OutputTrace ^= true;
+
+                    // for (int j = 0; j < tracer.Captures.Count; j++)
                     // {
-                    //     // rule File = Whitespace Items unless Any;
-                    //     rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
-
-                    //     // Items = {Item};
-                    //     rule["Items"] = b.Repeat(rule["Item"]);
-
-                    //     // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
-                    //     rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
-                    // }
-                    // else if (i == 1)
-                    // {
-                    //     // rule File = Whitespace Items unless Any;
-                    //     rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
-
-                    //     // Items = while (Digit or Letter or Symbols) then Item;
-                    //     rule["Items"] = b.While(b.MatchSet(RuneSet.Union(RuneSet.Digit, RuneSet.Letter, Symbols)), rule["Item"]);
-
-                    //     // Item = if Digit then Number else if Letter then Word else if Symbols then Symbol;
-                    //     rule["Item"] = b.IfThenElse(b.MatchSet(RuneSet.Digit), rule["Number"], b.IfThenElse(b.MatchSet(RuneSet.Letter), rule["Word"], b.IfThen(b.MatchSet(Symbols), rule["Symbol"])));
-                    // }
-                    // else
-                    // {
-                    //     // rule File = Whitespace Items unless Any;
-                    //     rule["File"] = b.Sequence(rule["Whitespace"], rule["Items"], b.Unless(b.MatchSet(RuneSet.Complete)));
-
-                    //     // Items = {Item};
-                    //     rule["Items"] = b.Repeat(rule["Item"]);
-
-                    //     // Item = Number or Word or Symbol;
-                    //     rule["Item"] = b.Choice(rule["Number"], rule["Word"], rule["Symbol"]);
+                    //     (int position, RuneString value) = tracer.Captures.Values[j];
+                    //     Console.WriteLine($"[{j}] Position: {position}; Value: '{value.ToPrintableString()}'");
                     // }
                 }
             }
-
         }
 
 
@@ -185,8 +175,9 @@ namespace _Console
             {
                 Count++;
 
-                if (OutputTrace)
-                    Console.WriteLine($"{new string('|', increment)}Starting {{{operation.ToString().ToPrintableString()}}}");
+                state.Get(out IRecollectiveReader<Rune> reader);
+
+                PrintStart(operation, reader.Position, reader.Peek());
 
                 var classified = operation as ClassifiedOperation<TState>;
 
@@ -196,8 +187,6 @@ namespace _Console
                     {
                         if (StashDiscoveries)
                         {
-                            state.Get(out IRecollectiveReader<Rune> reader);
-
                             var result = reader.RecallProgress(operation);
 
                             if (result.Success == true)
@@ -206,10 +195,14 @@ namespace _Console
 
                                 reader.Skip(result.Length);
 
+                                PrintFinish(operation, true, true, reader.Position, reader.Peek());
+
                                 return;
                             }
                             else if (result.Success == false)
                             {
+                                PrintFinish(operation, false, true, reader.Position, reader.Peek());
+
                                 handled = false;
                             }
                         }
@@ -237,8 +230,9 @@ namespace _Console
             {
                 increment--;
 
-                if (OutputTrace)
-                    Console.WriteLine($"{new string('|', increment)}Finished w/{(success ? "Success" : "Failure")} {{{operation.ToString().ToPrintableString()}}}");
+                state.Get(out IRecollectiveReader<Rune> reader);
+
+                PrintFinish(operation, success, false, reader.Position, reader.Peek());
 
                 var classified = operation as ClassifiedOperation<TState>;
 
@@ -248,7 +242,6 @@ namespace _Console
                     {
                         if (StashDiscoveries)
                         {
-                            state.Get(out IRecollectiveReader<Rune> reader);
 
                             if (reader.IsSpeculating)
                             {
@@ -264,8 +257,6 @@ namespace _Console
 
                     if (token && classified.Contains(AnalyzerClasses.Literal))
                     {
-                        state.Get(out IRecollectiveReader<Rune> reader);
-
                         if (success)
                         {
                             var runes = new RuneString(reader.PeekFromMark(0, null));
@@ -276,6 +267,18 @@ namespace _Console
                         reader.Commit();
                     }
                 }
+            }
+
+            private void PrintStart(IOperation<TState> operation, int position, Rune value)
+            {
+                if (OutputTrace)
+                    Console.WriteLine($"{new string('|', increment)}Starting @({position},'{value.ToPrintableString()}') {{{operation.ToString().ToPrintableString()}}}");
+            }
+
+            private void PrintFinish(IOperation<TState> operation, bool success, bool skipped, int position, Rune value)
+            {
+                if (OutputTrace)
+                    Console.WriteLine($"{new string('|', increment)}Finished @({position},'{value.ToPrintableString()}') w/{(skipped ? "Skip-" : "")}{(success ? "Success" : "Failure")} {{{operation.ToString().ToPrintableString()}}}");
             }
         }
     }
