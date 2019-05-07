@@ -23,9 +23,5 @@ namespace Veruthian.Library.Operations.Analyzers
 
         public MatchSequenceOperation<TState, TReader, T, S> MatchSequence<S>(S sequence) where S : IEnumerable<T>
             => new MatchSequenceOperation<TState, TReader, T, S>(sequence);
-
-
-        public ClassifiedOperation<TState> Literal(IOperation<TState> operation)
-            => Classify(operation, AnalyzerClasses.Literal);
     }
 }

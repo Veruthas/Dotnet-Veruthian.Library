@@ -43,9 +43,9 @@ namespace Veruthian.Library.Operations.Analyzers
             {
                 DataSet<string> classSet = new DataSet<string>();
 
-                classSet.Add(AnalyzerClasses.Rule);
+                classSet.Add(AnalyzerClass.Rule);
 
-                classSet.Add(qualifyName ? AnalyzerClasses.Rule + classSeparator + name : name);
+                classSet.Add(qualifyName ? AnalyzerClass.Rule + classSeparator + name : name);
 
                 rule = new ClassifiedOperation<TState>(classSet);
 
@@ -142,7 +142,7 @@ namespace Veruthian.Library.Operations.Analyzers
             {
                 var possible = operation as ClassifiedOperation<TState>;
 
-                if (possible == null || !possible.Classes.Contains(AnalyzerClasses.Rule))
+                if (possible == null || !possible.Classes.Contains(AnalyzerClass.Rule))
                 {
                     foreach (var subOperation in operation.SubOperations)
                     {
