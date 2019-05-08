@@ -6,28 +6,60 @@ namespace Veruthian.Library.Steps
 {
     public delegate IExpandableContainer<string> LabelContainerGenerator(string name, string[] additionalLabels = null);
 
+    public delegate IExpandableContainer<string> LabelContainerModifier(string name, IExpandableContainer<string> container);
+
+
     public class StepTable
     {
-        DataLookup<string, LabeledStep> items = new DataLookup<string, LabeledStep>();
+        IExpandableLookup<string, LabeledStep> items;
 
         LabelContainerGenerator generator;
 
 
         // Constructors
         public StepTable()
-            : this(DefaultGenerator) { }
+            : this(null, DefaultGenerator) { }
 
         public StepTable(params string[] defaultLabels)
-            => this.generator = GetGenerator(null, defaultLabels);
+            : this(null, GetGenerator(null, defaultLabels)) { }
 
         public StepTable(Func<string, string> nameProcessor)
-            => this.generator = GetGenerator(nameProcessor, null);
+            : this(null, GetGenerator(nameProcessor, null)) { }
 
         public StepTable(Func<string, string> nameProcessor, params string[] defaultLabels)
-            => this.generator = GetGenerator(nameProcessor, defaultLabels);
+            : this(null, GetGenerator(nameProcessor, defaultLabels)) { }
 
         public StepTable(LabelContainerGenerator generator)
-            => this.generator = generator ?? DefaultGenerator;
+            : this(null, generator) { }
+
+        public StepTable(IExpandableLookup<string, LabeledStep> items, params string[] defaultLabels)
+            : this(items, GetGenerator(null, defaultLabels)) { }
+
+        public StepTable(IExpandableLookup<string, LabeledStep> items, Func<string, string> nameProcessor)
+            : this(items, GetGenerator(nameProcessor, null)) { }
+
+        public StepTable(IExpandableLookup<string, LabeledStep> items, Func<string, string> nameProcessor, params string[] defaultLabels)
+            : this(items, GetGenerator(nameProcessor, defaultLabels)) { }
+
+        public StepTable(IExpandableLookup<string, LabeledStep> items, LabelContainerGenerator generator)
+        {
+            this.items = items ?? new DataLookup<string, LabeledStep>();
+
+            this.generator = generator ?? DefaultGenerator;
+        }
+
+
+        // SubTable
+        public StepTable CreateSubTable(params string[] additionalDefault) => CreateSubTable((name, container) =>
+        {   
+            if (additionalDefault != null)
+                foreach(var label in additionalDefault)
+                    container.Add(label);
+
+            return container;
+        });
+
+        public StepTable CreateSubTable(LabelContainerModifier modifier) => new StepTable(items, GetModifiedGenerator(generator, modifier));
 
 
         // Generators
@@ -52,6 +84,9 @@ namespace Veruthian.Library.Steps
                 return labels;
             });
         }
+
+        static LabelContainerGenerator GetModifiedGenerator(LabelContainerGenerator generator, LabelContainerModifier modifier)
+            => (name, additional) => modifier(name, generator(name, additional));
 
 
         // Access
@@ -89,7 +124,7 @@ namespace Veruthian.Library.Steps
 
 
         public ILookup<string, LabeledStep> Items => items;
-    
+
 
         // Label
         public void Label(string name, string additional)

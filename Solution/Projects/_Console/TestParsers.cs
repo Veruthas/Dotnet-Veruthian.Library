@@ -308,19 +308,20 @@ namespace _Console
 
             var rules = new StepTable("rule");
 
+            var tokens = rules.CreateSubTable("token");
 
             // rules
             rules["Files"] = g.Sequence(rules["Whitespace"], rules["Items"], g.Unless(g.MatchSet(RuneSet.Complete)));
 
             rules["Items"] = g.Repeat(rules["Item"]);
 
-            rules["Item"] = g.Choice(rules["Symbol"], rules["Number"], rules["Word"]);
+            rules["Item"] = g.Choice(rules["Symbol"], tokens["Number"], tokens["Word"]);
 
             rules["Symbol"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Whitespace"]);
 
-            rules["Number"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Digit)), rules["Whitespace"]);
+            tokens["Number"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Digit)), rules["Whitespace"]);
 
-            rules["Word"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Letter)), rules["Whitespace"]);
+            tokens["Word"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Letter)), rules["Whitespace"]);
 
             rules["Whitespace"] = g.Repeat(g.MatchSet(RuneSet.Whitespace));
 
