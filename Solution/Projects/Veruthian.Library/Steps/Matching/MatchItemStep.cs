@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library.Steps.Analyzers
+namespace Veruthian.Library.Steps.Matching
 {
     public class MatchItemStep<T> : MatchStep<T>
         where T : IEquatable<T>
@@ -13,6 +13,6 @@ namespace Veruthian.Library.Steps.Analyzers
 
         public T Expecting => expecting;
 
-        public override bool Match(T value) => (expecting == null && value == null) || expecting.Equals(value);
+        public override bool Match(T value) => (expecting == null) ? value == null : expecting.Equals(value);
     }
 }

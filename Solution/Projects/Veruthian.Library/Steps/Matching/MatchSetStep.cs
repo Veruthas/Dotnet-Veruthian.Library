@@ -1,7 +1,7 @@
 using Veruthian.Library.Collections;
 using Veruthian.Library.Collections.Extensions;
 
-namespace Veruthian.Library.Steps.Analyzers
+namespace Veruthian.Library.Steps.Matching
 {
     public class MatchSetStep<T> : MatchStep<T>
     {

@@ -1,13 +1,12 @@
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Steps.Analyzers
+namespace Veruthian.Library.Steps.Matching
 {
-    public abstract class MatchAheadStep<T> : MatchStep<T>
+    public abstract class MatchAheadMultipleStep<T> : MatchMultipleStep<T>
     {
         int lookahead;
 
-
-        public MatchAheadStep(int lookahead) 
+        public MatchAheadMultipleStep(int lookahead)
         {
             ExceptionHelper.VerifyNotNull(lookahead);
 
