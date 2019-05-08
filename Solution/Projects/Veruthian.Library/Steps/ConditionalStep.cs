@@ -13,7 +13,7 @@ namespace Veruthian.Library.Steps
 
         public ConditionalStep(IStep condition, bool expecting = true, IStep thenStep = null, IStep elseStep = null)
         {
-            this.condition = this.condition ?? (BooleanStep)!expecting;
+            this.condition = condition ?? (BooleanStep)!expecting;
 
             this.expecting = expecting;
 
@@ -32,9 +32,19 @@ namespace Veruthian.Library.Steps
         public IStep Else => elseStep;
 
 
-        public override string Description => (expecting ? "if" : "unless") + (thenStep == null ? "" : "-then") + (elseStep == null ? "" : "-else");
 
-        protected override int SubStepCount => 1 + (thenStep == null ? 0 : 1) + (elseStep == null ? 0 : 1);
+        private bool HasThen => Then != null;
+
+        private bool HasElse => Else != null;
+
+
+        public override string Description => (expecting ? "if" : "unless") +
+                                              (HasThen ? "-then" : "") +
+                                              (HasElse ? "-else" : "");
+
+        protected override int SubStepCount => 1 +
+                                              (HasThen ? 1 : 0) +
+                                              (HasElse ? 1 : 0);
 
         protected override IStep GetSubStep(int verifiedIndex)
         {
@@ -43,7 +53,7 @@ namespace Veruthian.Library.Steps
                 case 0:
                     return condition;
                 case 1:
-                    return thenStep == null ? elseStep : thenStep;
+                    return HasThen ? thenStep : elseStep;
                 default:
                     return elseStep;
             }

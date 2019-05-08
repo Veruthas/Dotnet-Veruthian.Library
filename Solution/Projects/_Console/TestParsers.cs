@@ -291,3 +291,41 @@
 //         }
 //     }
 // }
+
+using System;
+using Veruthian.Library.Numeric;
+using Veruthian.Library.Steps;
+using Veruthian.Library.Steps.Matching;
+using Veruthian.Library.Text.Runes;
+
+namespace _Console
+{
+    public static class TestParsers
+    {
+        public static void Test()
+        {
+            var g = new MatchStepGenerator(new SpeculativeStepGenerator());
+
+            var rules = new StepTable("rule");
+
+
+            // rules
+            rules["Files"] = g.Sequence(rules["Whitespace"], rules["Items"], g.Unless(g.MatchSet(RuneSet.Complete)));
+
+            rules["Items"] = g.Repeat(rules["Item"]);
+
+            rules["Item"] = g.Choice(rules["Symbol"], rules["Number"], rules["Word"]);
+
+            rules["Symbol"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Whitespace"]);
+
+            rules["Number"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Digit)), rules["Whitespace"]);
+
+            rules["Word"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Letter)), rules["Whitespace"]);
+
+            rules["Whitespace"] = g.Repeat(g.MatchSet(RuneSet.Whitespace));
+
+
+            Console.WriteLine(rules);
+        }
+    }
+}

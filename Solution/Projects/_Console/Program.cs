@@ -6,6 +6,7 @@ namespace _Console
     {
         static void Main(string[] args)
         {
+            TestParsers.Test();
             Pause();
         }
 
