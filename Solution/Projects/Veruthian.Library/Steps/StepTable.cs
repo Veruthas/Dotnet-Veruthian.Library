@@ -1,66 +1,86 @@
+using System;
 using System.Text;
 using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps
 {
+    public delegate IExpandableContainer<string> LabelContainerGenerator(string name, string[] additionalLabels = null);
+
     public class StepTable
     {
         DataLookup<string, LabeledStep> items = new DataLookup<string, LabeledStep>();
 
-        string autoLabel;
-
-        bool qualifyName;
-
-        string qualifierSeparator;
+        LabelContainerGenerator generator;
 
 
-        public StepTable() { }
+        // Constructors
+        public StepTable()
+            : this(DefaultGenerator) { }
 
-        public StepTable(string autoLabel, bool qualifyName = false, string qualifierSeparator = ":")
+        public StepTable(params string[] defaultLabels)
+            => this.generator = GetGenerator(null, defaultLabels);
+
+        public StepTable(Func<string, string> nameProcessor)
+            => this.generator = GetGenerator(nameProcessor, null);
+
+        public StepTable(Func<string, string> nameProcessor, params string[] defaultLabels)
+            => this.generator = GetGenerator(nameProcessor, defaultLabels);
+
+        public StepTable(LabelContainerGenerator generator)
+            => this.generator = generator ?? DefaultGenerator;
+
+
+        // Generators
+        static LabelContainerGenerator DefaultGenerator { get; } = GetGenerator(null, null);
+
+        static LabelContainerGenerator GetGenerator(Func<string, string> nameProcessor, string[] defaultLabels)
         {
-            this.autoLabel = autoLabel;
+            return ((name, additional) =>
+            {
+                var labels = new DataSet<string>();
 
-            this.qualifyName = qualifyName;
+                labels.Add(nameProcessor != null ? nameProcessor(name) : name);
 
-            this.qualifierSeparator = qualifierSeparator;
+                if (defaultLabels != null)
+                    foreach (var label in defaultLabels)
+                        labels.Add(label);
+
+                if (additional != null)
+                    foreach (var label in additional)
+                        labels.Add(label);
+
+                return labels;
+            });
         }
 
 
         // Access
         public IStep this[string name]
         {
-            get => Get(name);
-            set => Get(name).Step = value;
+            get => GetItem(name);
+            set => GetItem(name).Step = value;
         }
 
-        public IStep this[string name, params string[] additional]
+        public IStep this[string name, params string[] additionalLabels]
         {
-            get => Get(name, additional);
-            set => Get(name, additional).Step = value;
+            get => GetItem(name, additionalLabels);
+            set => GetItem(name, additionalLabels).Step = value;
         }
 
-        public ILookup<string, LabeledStep> Items => items;
-
-
-        private LabeledStep Get(string name, string[] additional = null)
+        private LabeledStep GetItem(string name, string[] additionalLabels = null)
         {
             if (!items.TryGet(name, out var rule))
             {
-                DataSet<string> labels = new DataSet<string>();
-
-                if (autoLabel != null)
-                    labels.Add(autoLabel);
-
-                labels.Add(qualifyName ? $"{autoLabel}{qualifierSeparator}{name}" : name);
+                var labels = generator(name, additionalLabels);
 
                 rule = new LabeledStep(labels);
 
                 items.Insert(name, rule);
             }
 
-            if (additional != null)
+            if (additionalLabels != null)
             {
-                foreach (var item in additional)
+                foreach (var item in additionalLabels)
                     rule.Labels.Add(item);
             }
 
@@ -68,17 +88,20 @@ namespace Veruthian.Library.Steps
         }
 
 
+        public ILookup<string, LabeledStep> Items => items;
+    
+
         // Label
         public void Label(string name, string additional)
         {
-            var rule = Get(name);
+            var rule = GetItem(name);
 
             rule.Labels.Add(additional);
         }
 
         public void Label(string name, params string[] additional)
         {
-            var rule = Get(name);
+            var rule = GetItem(name);
 
             foreach (var item in additional)
                 rule.Labels.Add(item);
@@ -93,6 +116,7 @@ namespace Veruthian.Library.Steps
 
 
         public override string ToString() => ToString(IndentSize, IndentChar);
+
 
         public string ToString(int indentSize, char indentChar)
         {
@@ -119,7 +143,7 @@ namespace Veruthian.Library.Steps
 
         private void FormatItem(StringBuilder builder, string name, int indentSize = IndentSize, char indentChar = IndentChar)
         {
-            builder.Append($"{(autoLabel != null && qualifyName ? $"{autoLabel}{qualifierSeparator}" : "")}{name} :=");
+            builder.Append($"{name} :=");
 
             if (!items.TryGet(name, out var rule) || rule.Step == null)
             {
