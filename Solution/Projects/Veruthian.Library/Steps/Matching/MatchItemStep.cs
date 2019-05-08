@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Library.Steps.Matching
 {
-    public class MatchItemStep<T> : MatchStep<T>
+    public class MatchItemStep<T> : MatchSimpleStep<T>
         where T : IEquatable<T>
     {
         T expecting;
@@ -13,6 +13,6 @@ namespace Veruthian.Library.Steps.Matching
 
         public T Expecting => expecting;
 
-        public override bool Match(T value) => (expecting == null) ? value == null : expecting.Equals(value);
+        protected override bool Match(T value) => (expecting == null) ? value == null : expecting.Equals(value);
     }
 }

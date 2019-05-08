@@ -3,7 +3,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps
 {
-    public class SequentialStep : BaseStep
+    public class SequentialStep : Step
     {
         IIndex<IStep> sequence;
 

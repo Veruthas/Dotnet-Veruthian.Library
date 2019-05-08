@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Library.Steps
 {
-    public class ActionStep : BaseSimpleStep
+    public class ActionStep : SimpleStep
     {
         Func<bool> action;
 

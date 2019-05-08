@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public abstract class BaseSimpleStep : BaseStep
+    public abstract class SimpleStep : Step
     {
         protected override int SubStepCount => 0;
 

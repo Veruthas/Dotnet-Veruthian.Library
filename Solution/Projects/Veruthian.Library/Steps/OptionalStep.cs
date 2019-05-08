@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class OptionalStep : BaseNestedStep
+    public class OptionalStep : NestedStep
     {
         public OptionalStep(IStep step) : base(step) { }
 

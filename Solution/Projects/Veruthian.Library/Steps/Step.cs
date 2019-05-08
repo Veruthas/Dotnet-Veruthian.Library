@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps
 {
-    public abstract class BaseStep : IStep, IIndex<IStep>
+    public abstract class Step : IStep, IIndex<IStep>
     {
         #region Abstracts
 

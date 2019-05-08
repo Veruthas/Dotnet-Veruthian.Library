@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class ConditionalStep : BaseStep
+    public class ConditionalStep : Step
     {
         IStep condition;
 

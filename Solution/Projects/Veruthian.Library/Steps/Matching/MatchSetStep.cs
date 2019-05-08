@@ -3,7 +3,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Steps.Matching
 {
-    public class MatchSetStep<T> : MatchStep<T>
+    public class MatchSetStep<T> : MatchSimpleStep<T>
     {
         IContainer<T> set;
 
@@ -11,6 +11,6 @@ namespace Veruthian.Library.Steps.Matching
 
         public override string Description => "match-set" + set.ToListString("<", ">", " + ");
 
-        public override bool Match(T value) => set.Contains(value);
+        protected  override bool Match(T value) => set.Contains(value);
     }
 }

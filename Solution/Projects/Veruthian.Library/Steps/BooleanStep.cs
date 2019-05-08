@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class BooleanStep : BaseSimpleStep
+    public class BooleanStep : SimpleStep
     {
         bool value;
 

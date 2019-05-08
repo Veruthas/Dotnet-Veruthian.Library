@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Steps.Matching
 {
-    public class MatchSequenceStep<T, S> : MatchMultipleStep<T>
+    public class MatchSequenceStep<T, S> : MatchStep<T>
         where T : IEquatable<T>
         where S : IEnumerable<T>
     {
         S sequence;
+
+        public override string Description => $"match-sequence({sequence})";
 
         public override (bool Success, object State) Match(T value, object state = null)
         {

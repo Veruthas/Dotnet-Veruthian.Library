@@ -1,12 +1,12 @@
 namespace Veruthian.Library.Steps
 {
-    public abstract class BaseNestedStep : BaseStep
+    public abstract class NestedStep : Step
     {
         IStep step;
 
-        public BaseNestedStep() : this(null) { }
+        public NestedStep() : this(null) { }
 
-        public BaseNestedStep(IStep step) => Step = step;
+        public NestedStep(IStep step) => Step = step;
 
         public IStep Step
         {

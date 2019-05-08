@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class RepeatedStep : BaseNestedStep
+    public class RepeatedStep : NestedStep
     {
         int count;
 

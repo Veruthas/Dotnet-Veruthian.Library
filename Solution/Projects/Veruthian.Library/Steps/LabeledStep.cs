@@ -3,7 +3,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Steps
 {
-    public class LabeledStep : BaseNestedStep
+    public class LabeledStep : NestedStep
     {
         IExpandableContainer<string> labels;
 
