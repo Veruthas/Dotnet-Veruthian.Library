@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Operations
 {
-    public interface IBuilder<TState>
+    public interface IOperationGenerator<TState>
     {
         // Boolean
         BooleanOperation<TState> True { get; }

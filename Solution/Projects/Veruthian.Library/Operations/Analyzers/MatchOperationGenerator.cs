@@ -7,12 +7,12 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public class ReaderBuilder<TState, TReader, T> : BuilderAdapter<TState>, IReaderBuilder<TState, TReader, T>
+    public class MatchOperationGenerator<TState, TReader, T> : OperationGeneratorAdapter<TState>, IMatchOperationGenerator<TState, TReader, T>
         where TState : Has<TReader>
         where TReader : IReader<T>
         where T : IEquatable<T>
     {
-        public ReaderBuilder(IBuilder<TState> builder) : base(builder) { }
+        public MatchOperationGenerator(IOperationGenerator<TState> generator) : base(generator) { }
 
         // Match
         public MatchOperation<TState, TReader, T> Match(T value)

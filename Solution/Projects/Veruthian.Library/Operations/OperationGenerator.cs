@@ -1,105 +1,128 @@
+using System;
+using System.Collections.Generic;
+using Veruthian.Library.Collections;
+using Veruthian.Library.Processing;
+using Veruthian.Library.Types;
+
 namespace Veruthian.Library.Operations
 {
-    public class BuilderAdapter<TState> : IBuilder<TState>
+    public class OperationGenerator<TState> : IOperationGenerator<TState>
     {
-        protected readonly IBuilder<TState> builder;
-
-        public BuilderAdapter(IBuilder<TState> builder) => this.builder = builder;
-
-
         // Boolean
         public virtual BooleanOperation<TState> True
-            => builder.True;
+            => BooleanOperation<TState>.True;
 
         public virtual BooleanOperation<TState> False
-            => builder.False;
+            => BooleanOperation<TState>.False;
 
 
         // Action
         public virtual ActionOperation<TState> Action(OperationAction<TState> action)
-            => builder.Action(action);
+            => new ActionOperation<TState>(action);
 
 
         // Sequence
         public virtual SequentialOperation<TState> Sequence(params IOperation<TState>[] operations)
-            => builder.Sequence(operations);
+            => new SequentialOperation<TState>(operations);
 
 
         // Optional
         public virtual OptionalOperation<TState> Optional(IOperation<TState> operation)
-            => builder.Optional(operation);
+            => new OptionalOperation<TState>(operation);
 
 
         // If
         public virtual ConditionOperation<TState> If(IOperation<TState> condition)
-            => builder.If(condition);
+            => ConditionOperation<TState>.If(condition);
 
         public virtual ConditionOperation<TState> IfThen(IOperation<TState> condition, IOperation<TState> thenOperation)
-            => builder.IfThen(condition, thenOperation);
+            => ConditionOperation<TState>.IfThen(condition, thenOperation);
 
         public virtual ConditionOperation<TState> IfElse(IOperation<TState> condition, IOperation<TState> elseOperation)
-            => builder.IfElse(condition, elseOperation);
+            => ConditionOperation<TState>.IfElse(condition, elseOperation);
 
         public virtual ConditionOperation<TState> IfThenElse(IOperation<TState> condition, IOperation<TState> thenOperation, IOperation<TState> elseOperation)
-            => builder.IfThenElse(condition, thenOperation, elseOperation);
+            => ConditionOperation<TState>.IfThenElse(condition, thenOperation, elseOperation);
 
 
         // Unless
         public virtual ConditionOperation<TState> Unless(IOperation<TState> condition)
-            => builder.Unless(condition);
+            => ConditionOperation<TState>.Unless(condition);
 
         public virtual ConditionOperation<TState> UnlessThen(IOperation<TState> condition, IOperation<TState> thenOperation)
-            => builder.UnlessThen(condition, thenOperation);
+            => ConditionOperation<TState>.UnlessThen(condition, thenOperation);
 
         public virtual ConditionOperation<TState> UnlessElse(IOperation<TState> condition, IOperation<TState> elseOperation)
-            => builder.UnlessElse(condition, elseOperation);
+            => ConditionOperation<TState>.UnlessElse(condition, elseOperation);
 
         public virtual ConditionOperation<TState> UnlessThenElse(IOperation<TState> condition, IOperation<TState> thenOperation, IOperation<TState> elseOperation)
-            => builder.UnlessThenElse(condition, thenOperation, elseOperation);
+            => ConditionOperation<TState>.UnlessThenElse(condition, thenOperation, elseOperation);
 
 
         // Repeat
         public virtual RepeatedOperation<TState> Repeat(IOperation<TState> operation)
-            => builder.Repeat(operation);
+            => RepeatedOperation<TState>.Repeat(operation);
 
         public virtual RepeatedOperation<TState> AtMost(int times, IOperation<TState> operation)
-            => builder.AtMost(times, operation);
+            => RepeatedOperation<TState>.AtMost(times, operation);
 
         public virtual RepeatedOperation<TState> Exactly(int times, IOperation<TState> operation)
-            => builder.Exactly(times, operation);
+            => RepeatedOperation<TState>.Exactly(times, operation);
 
         public virtual SequentialOperation<TState> AtLeast(int times, IOperation<TState> operation)
-            => builder.AtLeast(times, operation);
+            => Sequence(Exactly(times, operation), Repeat(operation));
 
         public virtual SequentialOperation<TState> InRange(int min, int max, IOperation<TState> operation)
-            => builder.InRange(min, max, operation);
+            => Sequence(Exactly(min, operation), AtMost(max - min, operation));
 
 
         // While
         public virtual RepeatedOperation<TState> While(IOperation<TState> condition, IOperation<TState> operation)
-            => builder.While(condition, operation);
+            => Repeat(IfThen(condition, operation));
 
         // Until
         public virtual RepeatedOperation<TState> Until(IOperation<TState> condition, IOperation<TState> operation)
-            => builder.Until(condition, operation);
+            => Repeat(UnlessThen(condition, operation));
 
 
         // Choice
         public virtual IOperation<TState> Choice(params IOperation<TState>[] operations)
-            => builder.Choice(operations);
+        {
+            if (operations.Length == 0)
+            {
+                return True;
+            }
+            else
+            {
+                IOperation<TState> current = ChoiceFinal(operations[operations.Length - 1]);
+
+                for (int i = operations.Length - 2; i >= 0; i--)
+                {
+                    current = ChoiceComponent(operations[i], current);
+                }
+
+                return current;
+            }
+        }
+
+        protected virtual IOperation<TState> ChoiceFinal(IOperation<TState> final)
+            => final;
+
+        protected virtual IOperation<TState> ChoiceComponent(IOperation<TState> previous, IOperation<TState> next)
+            => IfElse(previous, next);
 
 
         // Classify
         public virtual ClassifiedOperation<TState> Classify()
-            => builder.Classify();
+            => new ClassifiedOperation<TState>();
 
         public virtual ClassifiedOperation<TState> Classify(IOperation<TState> operation)
-            => builder.Classify(operation);
+            => new ClassifiedOperation<TState>(operation);
 
         public virtual ClassifiedOperation<TState> Classify(params string[] classes)
-            => builder.Classify(classes);
+            => new ClassifiedOperation<TState>(new DataSet<string>(classes));
 
         public virtual ClassifiedOperation<TState> Classify(IOperation<TState> operation, params string[] classes)
-            => builder.Classify(operation, classes);
+            => new ClassifiedOperation<TState>(operation, new DataSet<string>(classes));
     }
 }

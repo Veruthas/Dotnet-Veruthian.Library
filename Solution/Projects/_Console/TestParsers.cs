@@ -144,10 +144,10 @@ namespace _Console
         }
 
 
-        static (ReaderBuilder<TState, IRecollectiveReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
+        static (MatchOperationGenerator<TState, IRecollectiveReader<Rune>, Rune> Builder, RuleTable<TState> Rules, Tracer<TState> tracer) GetBuilder<TState>(TState mockup)
             where TState : Has<ISpeculative>, Has<IRecollectiveReader<Rune>>
         {
-            return (new ReaderBuilder<TState, IRecollectiveReader<Rune>, Rune>(new SpeculativeBuilder<TState>()),
+            return (new MatchOperationGenerator<TState, IRecollectiveReader<Rune>, Rune>(new SpeculativeOperationGenerator<TState>()),
                     new RuleTable<TState>(),
                     new Tracer<TState>());
         }

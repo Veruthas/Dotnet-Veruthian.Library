@@ -6,7 +6,7 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Operations.Analyzers
 {
-    public interface ILookaheadBuilder<TState, TReader, T> : IReaderBuilder<TState, TReader, T>
+    public interface ILookaheadOperationGenerator<TState, TReader, T> : IMatchOperationGenerator<TState, TReader, T>
         where TState : Has<TReader>
         where TReader : ILookaheadReader<T>
         where T : IEquatable<T>
