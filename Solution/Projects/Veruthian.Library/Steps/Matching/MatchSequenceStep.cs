@@ -9,6 +9,8 @@ namespace Veruthian.Library.Steps.Matching
     {
         S sequence;
 
+        public MatchSequenceStep(S sequence) => this.sequence = sequence;
+
         public override string Description => $"match-sequence({sequence})";
 
         public override (bool Success, object State) Match(T value, object state = null)
