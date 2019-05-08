@@ -8,6 +8,6 @@ namespace Veruthian.Library.Steps
 
         public int Count => count;
 
-        public override string Description => "repeat-" + count;
+        public override string Description => "repeat<" + count + ">";
     }
 }
