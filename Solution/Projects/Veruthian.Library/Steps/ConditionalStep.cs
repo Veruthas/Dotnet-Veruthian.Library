@@ -51,22 +51,22 @@ namespace Veruthian.Library.Steps
 
 
 
-        public ConditionalStep If(IStep condition) => new ConditionalStep(condition, true);
+        public static ConditionalStep If(IStep condition) => new ConditionalStep(condition, true);
 
-        public ConditionalStep IfThen(IStep condition, IStep thenStep) => new ConditionalStep(condition, true, thenStep);
+        public static ConditionalStep IfThen(IStep condition, IStep thenStep) => new ConditionalStep(condition, true, thenStep);
 
-        public ConditionalStep IfElse(IStep condition, IStep elseStep) => new ConditionalStep(condition, true, null, elseStep);
+        public static ConditionalStep IfElse(IStep condition, IStep elseStep) => new ConditionalStep(condition, true, null, elseStep);
 
-        public ConditionalStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep) => new ConditionalStep(condition, true, thenStep, elseStep);
+        public static ConditionalStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep) => new ConditionalStep(condition, true, thenStep, elseStep);
 
 
 
-        public ConditionalStep Unless(IStep condition) => new ConditionalStep(condition, false);
+        public static ConditionalStep Unless(IStep condition) => new ConditionalStep(condition, false);
 
-        public ConditionalStep UnlessThen(IStep condition, IStep thenStep) => new ConditionalStep(condition, false, thenStep);
+        public static ConditionalStep UnlessThen(IStep condition, IStep thenStep) => new ConditionalStep(condition, false, thenStep);
 
-        public ConditionalStep UnlessElse(IStep condition, IStep elseStep) => new ConditionalStep(condition, false, null, elseStep);
+        public static ConditionalStep UnlessElse(IStep condition, IStep elseStep) => new ConditionalStep(condition, false, null, elseStep);
 
-        public ConditionalStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep) => new ConditionalStep(condition, false, thenStep, elseStep);
+        public static ConditionalStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep) => new ConditionalStep(condition, false, thenStep, elseStep);
     }
 }

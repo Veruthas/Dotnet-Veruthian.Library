@@ -4,7 +4,7 @@ namespace Veruthian.Library.Steps
     {
         int? count;
 
-        public RepeatedTryStep(IStep step, int? count) : base(step) => this.count = count;
+        public RepeatedTryStep(IStep step, int? count = null) : base(step) => this.count = count;
 
         public override string Description => "repeat" + (count == null ? "" : "<" + count.ToString() + ">") + "?";
     }
