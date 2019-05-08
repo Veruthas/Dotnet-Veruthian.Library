@@ -18,8 +18,6 @@ namespace Veruthian.Library.Steps
 
 
         // Sequence
-        SequentialStep Sequence(IIndex<IStep> steps);
-
         SequentialStep Sequence(params IStep[] steps);
 
 

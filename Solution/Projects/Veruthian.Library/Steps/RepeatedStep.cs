@@ -4,7 +4,7 @@ namespace Veruthian.Library.Steps
     {
         int count;
 
-        public RepeatedStep(IStep step, int count) : base(step) { }
+        public RepeatedStep(IStep step, int count) : base(step) => this.count = count;
 
         public int Count => count;
 

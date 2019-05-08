@@ -25,9 +25,6 @@ namespace Veruthian.Library.Steps
 
 
         // Sequence
-        public virtual SequentialStep Sequence(IIndex<IStep> steps)
-            => generator.Sequence(steps);
-
         public virtual SequentialStep Sequence(params IStep[] steps)
             => generator.Sequence(steps);
 

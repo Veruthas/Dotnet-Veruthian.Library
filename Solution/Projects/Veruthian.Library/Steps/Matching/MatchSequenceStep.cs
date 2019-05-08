@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Steps.Matching
 {
@@ -11,7 +12,9 @@ namespace Veruthian.Library.Steps.Matching
 
         public MatchSequenceStep(S sequence) => this.sequence = sequence;
 
-        public override string Description => $"match-sequence({sequence})";
+        public S Sequence => sequence;
+
+        public override string Description => $"match-sequence<{sequence.ToListString("", "", ",")}>";
 
         public override (bool Success, object State) Match(T value, object state = null)
         {

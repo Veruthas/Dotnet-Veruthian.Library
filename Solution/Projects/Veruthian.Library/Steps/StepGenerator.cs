@@ -19,9 +19,6 @@ namespace Veruthian.Library.Steps
 
 
         // Sequence
-        public virtual SequentialStep Sequence(IIndex<IStep> steps)
-            => new SequentialStep(steps);
-
         public virtual SequentialStep Sequence(params IStep[] steps)
             => new SequentialStep(steps);
 
