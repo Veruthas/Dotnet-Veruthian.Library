@@ -112,7 +112,7 @@ namespace Veruthian.Library.Steps
             return Walk(speculative);
         }
 
-        protected override IStep HandleNullStep(IStep step)
+        protected override IStep HandleNullStep()
             => throw new NullReferenceException("Step cannot be null");
     }
 }

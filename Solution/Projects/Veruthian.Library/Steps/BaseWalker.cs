@@ -7,7 +7,7 @@ namespace Veruthian.Library.Steps
         public virtual bool Walk(IStep step)
         {
             if (step == null)
-                step = HandleNullStep(step);
+                step = HandleNullStep();
 
             OnStepStarted(step);
 
@@ -21,7 +21,7 @@ namespace Veruthian.Library.Steps
 
         protected abstract bool Handle(IStep step);
 
-        protected abstract IStep HandleNullStep(IStep step);
+        protected abstract IStep HandleNullStep();
 
 
         protected virtual void OnStepStarted(IStep step)
