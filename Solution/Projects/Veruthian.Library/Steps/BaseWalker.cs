@@ -2,23 +2,20 @@ using System;
 
 namespace Veruthian.Library.Steps
 {
-    public abstract class BaseTracer : ITracer
+    public abstract class BaseWalker : IWalker
     {
-        public virtual bool Trace(IStep step) => Perform(step);
-
-
-        protected virtual bool Perform(IStep step)
+        public virtual bool Walk(IStep step)
         {
             OnStepStarted(step);
 
-            var result = Handle(step);
+            var result = Perform(step);
 
             OnStepCompleted(step, result);
 
             return result;
         }
 
-        protected abstract bool Handle(IStep step);
+        protected abstract bool Perform(IStep step);
 
 
         protected virtual void OnStepStarted(IStep step)
@@ -34,8 +31,8 @@ namespace Veruthian.Library.Steps
         }
 
 
-        public event Action<ITracer, IStep> StepStarted;
+        public event Action<IWalker, IStep> StepStarted;
 
-        public event Action<ITracer, IStep, bool> StepCompleted;
+        public event Action<IWalker, IStep, bool> StepCompleted;
     }
 }
