@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public interface IWalker
+    public interface IStepWalker
     {
         bool Walk(IStep step);
     }
