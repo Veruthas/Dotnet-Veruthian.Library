@@ -33,18 +33,18 @@ namespace Veruthian.Library.Steps
 
 
 
-        private bool HasThen => Then != null;
+        public bool HasThenStep => Then != null;
 
-        private bool HasElse => Else != null;
+        public bool HasElseStep => Else != null;
 
 
         public override string Description => (expecting ? "if" : "unless") +
-                                              (HasThen ? "-then" : "") +
-                                              (HasElse ? "-else" : "");
+                                              (HasThenStep ? "-then" : "") +
+                                              (HasElseStep ? "-else" : "");
 
         protected override int SubStepCount => 1 +
-                                              (HasThen ? 1 : 0) +
-                                              (HasElse ? 1 : 0);
+                                              (HasThenStep ? 1 : 0) +
+                                              (HasElseStep ? 1 : 0);
 
         protected override IStep GetSubStep(int verifiedIndex)
         {
@@ -53,7 +53,7 @@ namespace Veruthian.Library.Steps
                 case 0:
                     return condition;
                 case 1:
-                    return HasThen ? thenStep : elseStep;
+                    return HasThenStep ? thenStep : elseStep;
                 default:
                     return elseStep;
             }
