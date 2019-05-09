@@ -315,9 +315,9 @@ namespace _Console
 
             rules["Items"] = g.Repeat(rules["Item"]);
 
-            rules["Item"] = g.Choice(rules["Symbol"], tokens["Number"], tokens["Word"]);
+            rules["Item"] = g.Choice(rules["Symbol"], rules["Number"], rules["Word"]);
 
-            rules["Symbol"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Whitespace"]);
+            tokens["Symbol"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Whitespace"]);
 
             tokens["Number"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Digit)), rules["Whitespace"]);
 

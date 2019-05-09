@@ -9,7 +9,7 @@ namespace Veruthian.Library.Steps.Matching
 
         public MatchSetStep(IContainer<T> set) => this.set = set;
 
-        public override string Description => "match-set" + set.ToListString("<", ">", ", ");
+        public override string Description => $"match-set<{set}>";
 
         protected  override bool Match(T value) => set.Contains(value);
     }

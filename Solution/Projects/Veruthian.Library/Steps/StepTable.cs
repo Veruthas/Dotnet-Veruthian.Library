@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Steps
 {
@@ -13,7 +14,11 @@ namespace Veruthian.Library.Steps
     {
         IExpandableLookup<string, LabeledStep> items;
 
+        IExpandableLookup<string, LabeledStep> subItems;
+
         LabelContainerGenerator generator;
+
+        LabelContainerModifier modifier;
 
 
         // Constructors
@@ -50,16 +55,41 @@ namespace Veruthian.Library.Steps
 
 
         // SubTable
-        public StepTable CreateSubTable(params string[] additionalDefault) => CreateSubTable((name, container) =>
-        {   
-            if (additionalDefault != null)
-                foreach(var label in additionalDefault)
-                    container.Add(label);
+        public StepTable CreateSubTable(params string[] additionalDefault) 
+            => CreateSubTable((name, container) =>
+                             {
+                                 if (additionalDefault != null)
+                                     foreach (var label in additionalDefault)
+                                         container.Add(label);
+ 
+                                 return container;
+                             });
 
-            return container;
-        });
+        public StepTable CreateSubTable(LabelContainerModifier modifier)
+        {
+            var subTable = new StepTable(items, generator);
 
-        public StepTable CreateSubTable(LabelContainerModifier modifier) => new StepTable(items, GetModifiedGenerator(generator, modifier));
+            subTable.subItems = new DataLookup<string, LabeledStep>();
+
+            // If this is a new subtable
+            if (this.modifier == null)
+            {
+                if (modifier == null)
+                    subTable.modifier = (name, container) => container;
+                else
+                    subTable.modifier = modifier;
+            }
+            // If this is a nested subtable        
+            else
+            {
+                if (modifier == null)
+                    subTable.modifier = this.modifier;
+                else
+                    subTable.modifier = (name, container) => { modifier(name, container); this.modifier(name, container); return container; };
+            }
+
+            return subTable;
+        }
 
 
         // Generators
@@ -71,7 +101,10 @@ namespace Veruthian.Library.Steps
             {
                 var labels = new DataSet<string>();
 
-                labels.Add(nameProcessor != null ? nameProcessor(name) : name);
+                name = nameProcessor != null ? nameProcessor(name) : name;
+
+                if (name != null)
+                    labels.Add(name);
 
                 if (defaultLabels != null)
                     foreach (var label in defaultLabels)
@@ -84,10 +117,6 @@ namespace Veruthian.Library.Steps
                 return labels;
             });
         }
-
-        static LabelContainerGenerator GetModifiedGenerator(LabelContainerGenerator generator, LabelContainerModifier modifier)
-            => (name, additional) => modifier(name, generator(name, additional));
-
 
         // Access
         public IStep this[string name]
@@ -104,22 +133,29 @@ namespace Veruthian.Library.Steps
 
         private LabeledStep GetItem(string name, string[] additionalLabels = null)
         {
-            if (!items.TryGet(name, out var rule))
+            if (!items.TryGet(name, out var item))
             {
                 var labels = generator(name, additionalLabels);
 
-                rule = new LabeledStep(labels);
+                item = new LabeledStep(labels);
 
-                items.Insert(name, rule);
+                items.Insert(name, item);
+            }
+
+            if (subItems != null && !subItems.HasKey(name))
+            {
+                subItems.Insert(name, item);
+
+                modifier(name, item.Labels);
             }
 
             if (additionalLabels != null)
             {
-                foreach (var item in additionalLabels)
-                    rule.Labels.Add(item);
+                foreach (var label in additionalLabels)
+                    item.Labels.Add(label);
             }
 
-            return rule;
+            return item;
         }
 
 
@@ -178,17 +214,25 @@ namespace Veruthian.Library.Steps
 
         private void FormatItem(StringBuilder builder, string name, int indentSize = IndentSize, char indentChar = IndentChar)
         {
-            builder.Append($"{name} :=");
+            builder.Append($"{name}");
 
-            if (!items.TryGet(name, out var rule) || rule.Step == null)
+            if (!items.TryGet(name, out var item))
             {
-                builder.Append(" ()");
+                builder.AppendLine(";");
             }
             else
             {
-                builder.AppendLine();
+                if (item.Labels != null)
+                {
+                    builder.Append(item.Labels.ToListString("<", ">", ", "));
+                }
 
-                FormatStep(builder, 1, indentSize, indentChar, rule.Step);
+                builder.AppendLine(" => ");
+
+                if (item.Step != null)
+                {
+                    FormatStep(builder, 1, indentSize, indentChar, item.Step);
+                }
             }
         }
 
