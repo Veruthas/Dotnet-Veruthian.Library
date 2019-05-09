@@ -9,16 +9,15 @@ namespace Veruthian.Library.Steps.Matching
         public MatchStepGenerator(IStepGenerator generator) : base(generator) { }
 
 
-        public MatchStep<T> MatchItem<T>(T value) 
+        public MatchStep<T> MatchItem<T>(T value, Func<T, string> toString = null) 
             where T : IEquatable<T> 
-            => new MatchItemStep<T>(value);
+            => new MatchItemStep<T>(value, toString);
 
-        public MatchStep<T> MatchSet<T>(IContainer<T> set) 
-            => new MatchSetStep<T>(set);
+        public MatchStep<T> MatchSet<T>(IContainer<T> set, Func<IContainer<T>, string> toString = null) 
+            => new MatchSetStep<T>(set, toString);
 
-        public MatchStep<T> MatchSequence<T, S>(S sequence) 
+        public MatchStep<T> MatchSequence<T>(IEnumerable<T> sequence, Func<IEnumerable<T>, string> toString = null) 
             where T : IEquatable<T> 
-            where S : IEnumerable<T> 
-            => new MatchSequenceStep<T, S>(sequence);
+            => new MatchSequenceStep<T>(sequence, toString);
     }
 }

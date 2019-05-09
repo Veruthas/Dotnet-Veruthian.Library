@@ -1,3 +1,4 @@
+using System;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Collections.Extensions;
 
@@ -7,10 +8,17 @@ namespace Veruthian.Library.Steps.Matching
     {
         IContainer<T> set;
 
-        public MatchSetStep(IContainer<T> set) => this.set = set;
+        Func<IContainer<T>, string> toString;
 
-        public override string Description => $"match-set<{set}>";
+        public MatchSetStep(IContainer<T> set, Func<IContainer<T>, string> toString = null)
+        {
+            Utility.ExceptionHelper.VerifyNotNull(set, nameof(set));
 
-        protected  override bool Match(T value) => set.Contains(value);
+            this.toString = toString ?? ((s) => s.ToString());
+        }
+
+        public override string Description => $"match-set<{toString(set)}>";
+
+        protected override bool Match(T value) => set.Contains(value);
     }
 }

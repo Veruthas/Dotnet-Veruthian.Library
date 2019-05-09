@@ -1,20 +1,30 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Steps.Matching
 {
-    public class MatchSequenceStep<T, S> : MatchStep<T>
+    public class MatchSequenceStep<T> : MatchStep<T>
         where T : IEquatable<T>
-        where S : IEnumerable<T>
     {
-        S sequence;
+        IEnumerable<T> sequence;
 
-        public MatchSequenceStep(S sequence) => this.sequence = sequence;
+        Func<IEnumerable<T>, string> toString;
 
-        public S Sequence => sequence;
 
-        public override string Description => $"match-sequence<{sequence.ToListString("", "", ",")}>";
+        public MatchSequenceStep(IEnumerable<T> sequence, Func<IEnumerable<T>, string> toString = null)
+        {
+            ExceptionHelper.VerifyNotNull(sequence, nameof(sequence));
+
+            this.sequence = sequence;
+
+            this.toString = toString ?? ((s) => s.ToString());
+        }
+
+        public IEnumerable<T> Sequence => sequence;
+
+        public override string Description => $"match-sequence<{toString(sequence)}>";
 
         public override (bool Success, object State) Match(T value, object state = null)
         {

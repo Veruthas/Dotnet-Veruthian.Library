@@ -5,14 +5,22 @@ namespace Veruthian.Library.Steps.Matching
     public class MatchItemStep<T> : MatchSimpleStep<T>
         where T : IEquatable<T>
     {
-        T expecting;
+        T expected;
 
-        public MatchItemStep(T expecting) => this.expecting = expecting;
+        Func<T, string> toString;
 
-        public override string Description => $"match<{Expecting}>";
 
-        public T Expecting => expecting;
+        public MatchItemStep(T expected, Func<T, string> toString = null)
+        {
+            this.expected = expected;
 
-        protected override bool Match(T value) => (expecting == null) ? value == null : expecting.Equals(value);
+            this.toString = toString ?? ((t) => t.ToString() ?? string.Empty);
+        }
+
+        public override string Description => $"match<{toString(expected)}>";
+
+        public T Expected => expected;
+
+        protected override bool Match(T value) => (expected == null) ? value == null : expected.Equals(value);
     }
 }
