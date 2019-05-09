@@ -6,6 +6,9 @@ namespace Veruthian.Library.Steps
 
         public RepeatedTryStep(IStep step, int? count = null) : base(step) => this.count = count;
 
+
+        public int? Count => count;
+
         public override string Description => "repeat" + (count == null ? "" : "<" + count.ToString() + ">") + "?";
     }
 }

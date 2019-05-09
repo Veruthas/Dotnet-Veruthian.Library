@@ -17,15 +17,15 @@ namespace Veruthian.Library.Steps
 
         #endregion
 
-        #region Implemented
-
-        public IIndex<IStep> SubSteps => this;
+        #region Implemented        
 
         public override string ToString() => Description;
 
         #endregion
 
         #region SubSteps
+
+        IIndex<IStep> IStep.SubSteps => this;
 
         int IIndex<int, IStep>.Start => 0;
 

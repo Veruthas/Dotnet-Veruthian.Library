@@ -19,7 +19,7 @@ namespace Veruthian.Library.Steps
 
         public IIndex<IStep> Sequence
         {
-            get => sequence;
+            get => this.sequence;
             set => this.sequence = value ?? new DataIndex<IStep>();
         }
 

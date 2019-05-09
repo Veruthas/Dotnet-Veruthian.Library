@@ -13,7 +13,7 @@ namespace Veruthian.Library.Steps
 
         public ConditionalStep(IStep condition, bool expecting = true, IStep thenStep = null, IStep elseStep = null)
         {
-            this.condition = condition ?? (BooleanStep)!expecting;
+            this.condition = condition;
 
             this.expecting = expecting;
 

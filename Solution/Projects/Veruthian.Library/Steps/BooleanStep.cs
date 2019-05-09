@@ -7,6 +7,9 @@ namespace Veruthian.Library.Steps
         private BooleanStep(bool value) => this.value = value;
 
 
+        public bool Value => value;
+        
+
         public override string Description => value.ToString();
 
 

@@ -6,12 +6,12 @@ namespace Veruthian.Library.Steps
 
         public NestedStep() : this(null) { }
 
-        public NestedStep(IStep step) => Step = step;
+        public NestedStep(IStep step) => this.step = step;
 
         public IStep Step
         {
             get => step;
-            set => step = value ?? BooleanStep.True;
+            set => step = value;
         }
 
         protected override int SubStepCount => 1;
