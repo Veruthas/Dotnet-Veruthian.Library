@@ -6,16 +6,22 @@ namespace Veruthian.Library.Steps
     {
         public virtual bool Walk(IStep step)
         {
+            if (step == null)
+                step = HandleNullStep(step);
+
             OnStepStarted(step);
 
-            var result = Perform(step);
+            var result = Handle(step);
 
             OnStepCompleted(step, result);
 
             return result;
         }
 
-        protected abstract bool Perform(IStep step);
+
+        protected abstract bool Handle(IStep step);
+
+        protected abstract IStep HandleNullStep(IStep step);
 
 
         protected virtual void OnStepStarted(IStep step)
