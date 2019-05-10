@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class StepHandlers<TState> : TypedStepHandler<TState, IStep>
+    public class StepHandlers<TState> : StepHandler<TState, IStep>
     {
         IEnumerable<IStepHandler<TState>> handlers;
 
@@ -57,7 +57,7 @@ namespace Veruthian.Library.Steps.Handlers
     }
 
 
-    public class BooleanStepHandler<TState> : TypedStepHandler<TState, BooleanStep>
+    public class BooleanStepHandler<TState> : StepHandler<TState, BooleanStep>
     {
         protected override bool? HandleStep(BooleanStep step, TState state, IStepHandler<TState> root)
         {
@@ -65,7 +65,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
     }
 
-    public class SequentialStepHandler<TState> : TypedStepHandler<TState, SequentialStep>
+    public class SequentialStepHandler<TState> : StepHandler<TState, SequentialStep>
     {
         protected override bool? HandleStep(SequentialStep step, TState state, IStepHandler<TState> root)
         {
@@ -81,7 +81,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
     }
 
-    public class OptionalStepHandler<TState> : TypedStepHandler<TState, OptionalStep>
+    public class OptionalStepHandler<TState> : StepHandler<TState, OptionalStep>
     {
         protected override bool? HandleStep(OptionalStep step, TState state, IStepHandler<TState> root)
         {
@@ -91,7 +91,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
     }
 
-    public class RepeatedStepHandler<TState> : TypedStepHandler<TState, RepeatedStep>
+    public class RepeatedStepHandler<TState> : StepHandler<TState, RepeatedStep>
     {
         protected override bool? HandleStep(RepeatedStep step, TState state, IStepHandler<TState> root)
         {
@@ -107,7 +107,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
     }
 
-    public class RepeatedTryStepHandler<TState> : TypedStepHandler<TState, RepeatedTryStep>
+    public class RepeatedTryStepHandler<TState> : StepHandler<TState, RepeatedTryStep>
     {
         protected override bool? HandleStep(RepeatedTryStep step, TState state, IStepHandler<TState> root)
         {
@@ -127,7 +127,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
     }
 
-    public class ConditionalStepHandler<TState> : TypedStepHandler<TState, ConditionalStep>
+    public class ConditionalStepHandler<TState> : StepHandler<TState, ConditionalStep>
     {
         protected override bool? HandleStep(ConditionalStep step, TState state, IStepHandler<TState> root)
         {

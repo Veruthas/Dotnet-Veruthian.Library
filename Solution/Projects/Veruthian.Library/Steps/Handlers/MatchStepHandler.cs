@@ -2,7 +2,7 @@ using System;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public abstract class MatchStepHandler<TState, T> : TypedStepHandler<TState, MatchStep<T>>
+    public abstract class MatchStepHandler<TState, T> : StepHandler<TState, MatchStep<T>>
     {
         protected override bool? HandleStep(MatchStep<T> step, TState state, IStepHandler<TState> root)
         {

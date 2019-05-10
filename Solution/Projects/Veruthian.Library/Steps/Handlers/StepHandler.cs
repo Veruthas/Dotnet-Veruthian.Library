@@ -1,6 +1,8 @@
+using System;
+
 namespace Veruthian.Library.Steps.Handlers
 {
-    public abstract class TypedStepHandler<TState, TStep> : IStepHandler<TState>
+    public abstract class StepHandler<TState, TStep> : IStepHandler<TState>
         where TStep : IStep
     {
         public virtual bool? Handle(IStep step, TState state, IStepHandler<TState> root = null)
@@ -27,8 +29,21 @@ namespace Veruthian.Library.Steps.Handlers
         protected abstract bool? HandleStep(TStep step, TState state, IStepHandler<TState> root);
 
 
-        protected virtual void OnStepStarted(TStep step, TState state) { }
+        protected virtual void OnStepStarted(TStep step, TState state)
+        {
+            if (StepStarted != null)
+                StepStarted(step, state);
+        }
 
-        protected virtual void OnStepCompleted(TStep step, TState state, bool? result) { }
+        protected virtual void OnStepCompleted(TStep step, TState state, bool? result)
+        {
+            if (StepCompleted != null)
+                StepCompleted(step, state, result);
+        }
+
+
+        public event Action<TStep, TState> StepStarted;
+
+        public event Action<TStep, TState, bool?> StepCompleted;
     }
 }
