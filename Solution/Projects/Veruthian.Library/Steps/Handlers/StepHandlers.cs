@@ -16,6 +16,9 @@ namespace Veruthian.Library.Steps.Handlers
 
         public override bool? Handle(IStep step, TState state, IStepHandler<TState> root)
         {
+            if (root == null)
+                root = this;
+
             bool? result = null;
 
             OnStepStarted(step, state);
