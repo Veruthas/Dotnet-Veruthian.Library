@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Veruthian.Library.Steps.Extensions
+namespace Veruthian.Library.Steps.Formatting
 {
     public class FlattenedStep
     {

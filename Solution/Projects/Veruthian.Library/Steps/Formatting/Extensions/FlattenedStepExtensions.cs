@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps.Extensions
+namespace Veruthian.Library.Steps.Formatting.Extensions
 {
     public static class FlattenedStepExtensions
     {
