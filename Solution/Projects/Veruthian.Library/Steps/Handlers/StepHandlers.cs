@@ -35,6 +35,22 @@ namespace Veruthian.Library.Steps.Handlers
 
 
         protected override bool? HandleStep(IStep step, TState state, IStepHandler<TState> root) => null;
+
+
+        public static StepHandlers<TState> GetBasic(BooleanStepHandler<TState> boolean = null,
+                                                    SequentialStepHandler<TState> sequential = null,
+                                                    OptionalStepHandler<TState> optional = null,
+                                                    RepeatedStepHandler<TState> repeated = null,
+                                                    RepeatedTryStepHandler<TState> repeatedTry = null,
+                                                    ConditionalStepHandler<TState> conditional = null)
+        {
+            return new StepHandlers<TState>(boolean ?? new BooleanStepHandler<TState>(),
+                                            sequential ?? new SequentialStepHandler<TState>(),
+                                            optional ?? new OptionalStepHandler<TState>(),
+                                            repeated ?? new RepeatedStepHandler<TState>(),
+                                            repeatedTry ?? new RepeatedTryStepHandler<TState>(),
+                                            conditional ?? new ConditionalStepHandler<TState>());
+        }
     }
 
 
