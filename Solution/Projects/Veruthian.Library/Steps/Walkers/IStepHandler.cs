@@ -1,7 +1,7 @@
 namespace Veruthian.Library.Steps.Walkers
 {
-    public interface IStepHandler
+    public interface IStepHandler<TState>
     {
-        bool? Handle(IStepWalker walker, IStep step);
+        bool? Handle(IStep step, IStepWalker<TState> walker, TState state);
     }
 }

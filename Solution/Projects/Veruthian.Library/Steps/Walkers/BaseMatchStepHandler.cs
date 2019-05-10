@@ -2,28 +2,28 @@ using System;
 
 namespace Veruthian.Library.Steps.Walkers
 {
-    public abstract class BaseMatchStepHandler<T> : IStepHandler
+    public abstract class BaseMatchStepHandler<TState, T> : IStepHandler<TState>
     {
-        public bool? Handle(IStepWalker walker, IStep step)
+        public bool? Handle(IStep step, IStepWalker<TState> walker, TState state)
         {
             switch (step)
             {
                 case MatchStep<T> matcher:
-                    return HandleMatchStep(walker, matcher);
+                    return HandleMatchStep(matcher, walker, state);
                 default:
                     return null;
             }
         }
 
-        protected virtual bool HandleMatchStep(IStepWalker walker, MatchStep<T> matcher)
+        protected virtual bool HandleMatchStep(MatchStep<T> matcher, IStepWalker<TState> walker, TState state)
         {
-            var item = PeekItem(walker);
+            var item = PeekItem(state);
 
             var result = matcher.Match(item);
 
-            while (result.Success && result.State != null && MoveNextItem(walker))
+            while (result.Success && result.State != null && MoveNextItem(state))
             {
-                item = PeekItem(walker);
+                item = PeekItem(state);
 
                 result = matcher.Match(item);
             }
@@ -31,8 +31,8 @@ namespace Veruthian.Library.Steps.Walkers
             return result.Success;
         }
 
-        protected abstract T PeekItem(IStepWalker walker);
+        protected abstract T PeekItem(TState state);
 
-        protected abstract bool MoveNextItem(IStepWalker walker);
+        protected abstract bool MoveNextItem( TState state);
     }
 }

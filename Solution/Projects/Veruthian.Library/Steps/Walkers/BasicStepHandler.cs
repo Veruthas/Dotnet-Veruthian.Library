@@ -2,71 +2,71 @@ using System;
 
 namespace Veruthian.Library.Steps.Walkers
 {
-    public class BasicStepHandler : IStepHandler
+    public class BasicStepHandler<TState> : IStepHandler<TState>
     {
-        public virtual bool? Handle(IStepWalker walker, IStep step)
+        public virtual bool? Handle(IStep step, IStepWalker<TState> walker, TState state)
         {
             switch (step)
             {
                 case BooleanStep boolean:
-                    return HandleBooleanStep(walker, boolean);
+                    return HandleBooleanStep(boolean, walker, state);
 
                 case SequentialStep sequence:
-                    return HandleSequentialStep(walker, sequence);
+                    return HandleSequentialStep(sequence, walker, state);
 
                 case OptionalStep optional:
-                    return HandleOptionalStep(walker, optional);
+                    return HandleOptionalStep(optional, walker, state);
 
                 case RepeatedStep repeated:
-                    return HandleRepeatedStep(walker, repeated);
+                    return HandleRepeatedStep(repeated, walker, state);
 
                 case RepeatedTryStep repeated:
-                    return HandleRepeatedTryStep(walker, repeated);
+                    return HandleRepeatedTryStep(repeated, walker, state);
 
                 case LabeledStep labeled:
-                    return HandleLabeledStep(walker, labeled);
+                    return HandleLabeledStep(labeled, walker, state);
 
                 case ConditionalStep conditional:
-                    return HandleConditionalStep(walker,conditional);
+                    return HandleConditionalStep(conditional, walker, state);
 
                 default:
                     return null;
             }
-        }        
+        }
 
-        protected virtual bool HandleBooleanStep(IStepWalker walker, BooleanStep boolean)
+        protected virtual bool HandleBooleanStep(BooleanStep boolean, IStepWalker<TState> walker, TState state)
             => boolean.Value;
 
-        protected virtual bool HandleSequentialStep(IStepWalker walker, SequentialStep step)
+        protected virtual bool HandleSequentialStep(SequentialStep step, IStepWalker<TState> walker, TState state)
         {
             foreach (var substep in step.Sequence)
-                if (!walker.Walk(substep))
+                if (!walker.Walk(substep, state))
                     return false;
 
             return true;
         }
 
-        protected virtual bool HandleOptionalStep(IStepWalker walker, OptionalStep optional)
+        protected virtual bool HandleOptionalStep(OptionalStep optional, IStepWalker<TState> walker, TState state)
         {
-            walker.Walk(optional.Step);
+            walker.Walk(optional.Step, state);
 
             return true;
         }
 
-        protected virtual bool HandleRepeatedStep(IStepWalker walker, RepeatedStep repeated)
+        protected virtual bool HandleRepeatedStep(RepeatedStep repeated, IStepWalker<TState> walker, TState state)
         {
             for (int i = 0; i < repeated.Count; i++)
-                if (!walker.Walk(repeated.Step))
+                if (!walker.Walk(repeated.Step, state))
                     return false;
 
             return true;
         }
 
-        protected virtual bool HandleRepeatedTryStep(IStepWalker walker, RepeatedTryStep repeated)
+        protected virtual bool HandleRepeatedTryStep(RepeatedTryStep repeated, IStepWalker<TState> walker, TState state)
         {
             if (repeated.Count == null)
             {
-                while (walker.Walk(repeated.Step))
+                while (walker.Walk(repeated.Step, state))
                     ;
 
                 return true;
@@ -74,53 +74,53 @@ namespace Veruthian.Library.Steps.Walkers
             else
             {
                 for (int i = 0; i < repeated.Count; i++)
-                    if (!walker.Walk(repeated.Step))
+                    if (!walker.Walk(repeated.Step, state))
                         break;
 
                 return true;
             }
         }
 
-        protected virtual bool HandleLabeledStep(IStepWalker walker, LabeledStep labeled)
+        protected virtual bool HandleLabeledStep(LabeledStep labeled, IStepWalker<TState> walker, TState state)
         {
-            return walker.Walk(labeled.Step);
+            return walker.Walk(labeled.Step,state);
         }
 
-        protected virtual bool HandleConditionalStep(IStepWalker walker, ConditionalStep conditional)
+        protected virtual bool HandleConditionalStep(ConditionalStep conditional, IStepWalker<TState> walker, TState state)
         {
-            var result = HandleSpeculation(walker, conditional.Condition);
+            var result = HandleSpeculation(conditional.Condition, walker, state);
 
             if (result == conditional.Expecting)
             {
                 if (conditional.HasThenStep)
-                    return walker.Walk(conditional.Then);
+                    return walker.Walk(conditional.Then, state);
                 else
                     return true;
             }
             else
             {
                 if (conditional.HasElseStep)
-                    return walker.Walk(conditional.Else);
+                    return walker.Walk(conditional.Else, state);
                 else
                     return false;
             }
 
         }
 
-        protected virtual bool HandleSpeculation(IStepWalker walker, IStep speculation)
+        protected virtual bool HandleSpeculation(IStep speculation, IStepWalker<TState> walker, TState state)
         {
-            OnSpeculationStarted(walker, speculation);
+            OnSpeculationStarted(speculation, walker, state);
 
-            var result = walker.Walk(speculation);
+            var result = walker.Walk(speculation, state);
 
-            OnSpeculationCompleted(walker, speculation, result);
+            OnSpeculationCompleted(speculation, walker, state, result);
 
             return result;
         }
 
 
-        protected virtual void OnSpeculationStarted(IStepWalker walker, IStep speculation) { }
+        protected virtual void OnSpeculationStarted(IStep speculation, IStepWalker<TState> walker, TState state) { }
 
-        protected virtual void OnSpeculationCompleted(IStepWalker walker, IStep speculation, bool result) { }
+        protected virtual void OnSpeculationCompleted(IStep speculation, IStepWalker<TState> walker, TState state, bool result) { }
     }
 }

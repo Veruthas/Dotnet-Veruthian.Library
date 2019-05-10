@@ -4,41 +4,41 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps.Walkers
 {
-    public class Walker : IStepWalker
+    public class Walker<TState> : IStepWalker<TState>
     {
-        IEnumerable<IStepHandler> handlers;
+        IEnumerable<IStepHandler<TState>> handlers;
 
         Func<IStep> nullStepHandler;
 
 
-        public Walker(params IStepHandler[] handlers)
-            : this(null, (IEnumerable<IStepHandler>)handlers) { }
+        public Walker(params IStepHandler<TState>[] handlers)
+            : this(null, (IEnumerable<IStepHandler<TState>>)handlers) { }
 
-        public Walker(Func<IStep> nullStepHandler, params IStepHandler[] handlers)
-            : this(null, (IEnumerable<IStepHandler>)handlers) { }
+        public Walker(Func<IStep> nullStepHandler, params IStepHandler<TState>[] handlers)
+            : this(null, (IEnumerable<IStepHandler<TState>>)handlers) { }
 
 
-        public Walker(Func<IStep> nullStepHandler, IEnumerable<IStepHandler> handlers)
+        public Walker(Func<IStep> nullStepHandler, IEnumerable<IStepHandler<TState>> handlers)
         {
             this.nullStepHandler = nullStepHandler ?? (() => throw new NullReferenceException("Step cannot be null"));
 
-            this.handlers = handlers ?? new IStepHandler[0];
+            this.handlers = handlers ?? new IStepHandler<TState>[0];
         }
 
 
-        public virtual bool Walk(IStep step)
+        public virtual bool Walk(IStep step, TState state = default(TState))
         {
             if (step == null)
                 step = nullStepHandler();
 
-            OnStepStarted(step);
+            OnStepStarted(step, state);
 
 
             bool? result = null;
 
             foreach (var handler in handlers)
             {
-                result = handler.Handle(this, step);
+                result = handler.Handle(step, this, state);
 
                 if (result != null)
                     break;
@@ -48,27 +48,27 @@ namespace Veruthian.Library.Steps.Walkers
                 result = false;
 
 
-            OnStepCompleted(step, result.Value);
+            OnStepCompleted(step, state, result.Value);
 
             return result.Value;
         }
 
 
-        protected virtual void OnStepStarted(IStep step)
+        protected virtual void OnStepStarted(IStep step, TState state)
         {
             if (StepStarted != null)
-                StepStarted(this, step);
+                StepStarted(step, this, state);
         }
 
-        protected virtual void OnStepCompleted(IStep step, bool result)
+        protected virtual void OnStepCompleted(IStep step, TState state, bool result)
         {
             if (StepCompleted != null)
-                StepCompleted(this, step, result);
+                StepCompleted(step, this, state, result);
         }
 
 
-        public event Action<IStepWalker, IStep> StepStarted;
+        public event Action<IStep, IStepWalker<TState>, TState> StepStarted;
 
-        public event Action<IStepWalker, IStep, bool> StepCompleted;
+        public event Action<IStep, IStepWalker<TState>, TState, bool> StepCompleted;
     }
 }
