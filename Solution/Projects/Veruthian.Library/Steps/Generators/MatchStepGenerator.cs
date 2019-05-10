@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps.Matching
+namespace Veruthian.Library.Steps.Generators
 {
     public class MatchStepGenerator : StepGeneratorAdapter
     {

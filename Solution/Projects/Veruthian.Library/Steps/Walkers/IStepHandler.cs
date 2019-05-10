@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Walkers
 {
     public interface IStepHandler
     {

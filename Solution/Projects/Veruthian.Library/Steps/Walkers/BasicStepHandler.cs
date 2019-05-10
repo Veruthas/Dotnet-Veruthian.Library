@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Walkers
 {
     public class BasicStepHandler : IStepHandler
     {

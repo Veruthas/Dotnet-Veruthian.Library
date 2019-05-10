@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Walkers
 {
     public class Walker : IStepWalker
     {

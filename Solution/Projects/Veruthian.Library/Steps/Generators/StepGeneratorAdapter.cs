@@ -1,7 +1,7 @@
 using System;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Generators
 {
     public abstract class StepGeneratorAdapter : IStepGenerator
     {

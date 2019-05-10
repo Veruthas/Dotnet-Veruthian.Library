@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Generators
 {
     public class SpeculativeStepGenerator : StepGenerator
     {

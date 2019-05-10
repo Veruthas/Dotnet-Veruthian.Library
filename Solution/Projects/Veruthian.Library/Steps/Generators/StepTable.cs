@@ -3,7 +3,7 @@ using System.Text;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Collections.Extensions;
 
-namespace Veruthian.Library.Steps
+namespace Veruthian.Library.Steps.Generators
 {
     public delegate IExpandableContainer<string> LabelContainerGenerator(string name, string[] additionalLabels = null);
 

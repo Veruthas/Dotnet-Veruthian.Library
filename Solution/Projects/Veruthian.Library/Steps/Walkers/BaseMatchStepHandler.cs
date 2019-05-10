@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library.Steps.Matching
+namespace Veruthian.Library.Steps.Walkers
 {
     public abstract class BaseMatchStepHandler<T> : IStepHandler
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Steps.Matching
+namespace Veruthian.Library.Steps
 {
     public class MatchSequenceStep<T> : MatchStep<T>
         where T : IEquatable<T>

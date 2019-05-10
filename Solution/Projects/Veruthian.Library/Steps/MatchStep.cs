@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps.Matching
+namespace Veruthian.Library.Steps
 {
     public abstract class MatchStep<T> : SimpleStep
     {

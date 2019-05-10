@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library.Steps.Matching
+namespace Veruthian.Library.Steps
 {
     public class MatchItemStep<T> : MatchSimpleStep<T>
         where T : IEquatable<T>
