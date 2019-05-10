@@ -4,21 +4,21 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps.Walkers
 {
-    public class Walker<TState> : IStepWalker<TState>
+    public class StepWalker<TState> : IStepWalker<TState>
     {
         IEnumerable<IStepHandler<TState>> handlers;
 
         Func<IStep> nullStepHandler;
 
 
-        public Walker(params IStepHandler<TState>[] handlers)
+        public StepWalker(params IStepHandler<TState>[] handlers)
             : this(null, (IEnumerable<IStepHandler<TState>>)handlers) { }
 
-        public Walker(Func<IStep> nullStepHandler, params IStepHandler<TState>[] handlers)
+        public StepWalker(Func<IStep> nullStepHandler, params IStepHandler<TState>[] handlers)
             : this(null, (IEnumerable<IStepHandler<TState>>)handlers) { }
 
 
-        public Walker(Func<IStep> nullStepHandler, IEnumerable<IStepHandler<TState>> handlers)
+        public StepWalker(Func<IStep> nullStepHandler, IEnumerable<IStepHandler<TState>> handlers)
         {
             this.nullStepHandler = nullStepHandler ?? (() => throw new NullReferenceException("Step cannot be null"));
 
