@@ -4,15 +4,15 @@ namespace Veruthian.Library.Steps.Generators
     {
         // Optional
         public override OptionalStep Optional(IStep step)
-            => base.Optional(IfThen(step, step));
+            => base.Optional(step is ConditionalStep ? step : IfThen(step, step));
 
 
         // Repeat
         public override RepeatedTryStep Repeat(IStep step)
-            => new RepeatedTryStep(IfThen(step, step));
+            => base.Repeat(step is ConditionalStep ? step : IfThen(step, step));
 
         public override RepeatedTryStep AtMost(int times, IStep step)
-            => new RepeatedTryStep(IfThen(step, step), times);
+            => base.AtMost(times, step is ConditionalStep ? step : IfThen(step, step));
 
 
         // Choice
