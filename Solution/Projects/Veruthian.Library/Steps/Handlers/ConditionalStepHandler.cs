@@ -1,3 +1,5 @@
+using System;
+
 namespace Veruthian.Library.Steps.Handlers
 {
     public class ConditionalStepHandler<TState> : StepHandler<TState, ConditionalStep>
@@ -38,8 +40,21 @@ namespace Veruthian.Library.Steps.Handlers
         }
 
 
-        protected virtual void OnSpeculationStarted(IStep speculation, TState state) { }
+        protected virtual void OnSpeculationStarted(IStep speculation, TState state)
+        {
+            if (SpeculationStarted != null)
+                SpeculationStarted(speculation, state);
+        }
 
-        protected virtual void OnSpeculationCompleted(IStep speculation, TState state, bool? result) { }
+        protected virtual void OnSpeculationCompleted(IStep speculation, TState state, bool? result)
+        {
+            if (SpeculationCompleted != null)
+                SpeculationCompleted(speculation, state, result);
+        }
+
+
+        public event Action<IStep, TState> SpeculationStarted;
+
+        public event Action<IStep, TState, bool?> SpeculationCompleted;
     }
 }
