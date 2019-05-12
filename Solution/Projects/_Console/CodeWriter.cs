@@ -158,8 +158,8 @@ namespace _Console
 
             return template;
         }
-    
-    
+
+
         // TypeSetCreate
         public static string GenerateTypeSetCreate(int size)
         {
@@ -167,7 +167,7 @@ namespace _Console
 @"public static TypeSet<*GENERICS*> Create<*GENERICS*>() => new TypeSet<*GENERICS*>();
 ";
 
-            
+
             string genericsString = "";
 
             for (int i = 0; i < size; i++)
@@ -178,6 +178,43 @@ namespace _Console
             }
 
             template = template.Replace("*GENERICS*", genericsString);
+
+            return template;
+        }
+
+
+        // TypeSetCreateWithValues
+        public static string GenerateTypeSetCreateWithValues(int size)
+        {
+            string template =
+@"public static TypeSet<*GENERICS*> Create<*GENERICS*>(*ITEMS*) => new TypeSet<*GENERICS*>(*IDENTIFIERS*);
+";
+            const string separator = ", ";
+
+
+            string genericsString = "";
+
+            string itemsString = "";
+
+            string identifiersString = "";
+
+            for (int i = 0; i < size; i++)
+            {
+                if (i != 0)
+                {
+                    genericsString += separator;
+                    itemsString += separator;
+                    identifiersString += separator;
+                }
+
+                genericsString += $"T{i}";
+                itemsString += $"T{i} t{i}";
+                identifiersString += $"t{i}";
+            }
+
+            template = template.Replace("*GENERICS*", genericsString);
+            template = template.Replace("*ITEMS*", itemsString);
+            template = template.Replace("*IDENTIFIERS*", identifiersString);
 
             return template;
         }
