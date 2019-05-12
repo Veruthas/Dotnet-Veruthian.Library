@@ -24,6 +24,11 @@ namespace Veruthian.Library.Collections
         }
 
 
+        public static DataList<T> New()
+        {
+            return new DataList<T>();
+        }
+
         public static DataList<T> New(int size)
         {
             var list = new DataList<T>(size);

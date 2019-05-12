@@ -1,17 +1,29 @@
 using System.Collections.Generic;
+using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps.Handlers
 {
     public class StepHandlers<TState> : StepHandler<TState, IStep>
     {
-        IEnumerable<IStepHandler<TState>> handlers;
+        IExpandableIndex<IStepHandler<TState>> handlers;
+
+
+        public StepHandlers()
+            : this(DataList<IStepHandler<TState>>.New()) { }
 
 
         public StepHandlers(params IStepHandler<TState>[] handlers)
-            : this((IEnumerable<IStepHandler<TState>>)handlers) { }
+            : this(DataList<IStepHandler<TState>>.From(handlers)) { }
 
         public StepHandlers(IEnumerable<IStepHandler<TState>> handlers)
-            => this.handlers = handlers ?? new IStepHandler<TState>[0];
+            : this(DataList<IStepHandler<TState>>.Extract(handlers)) { }
+
+
+        public StepHandlers(IExpandableIndex<IStepHandler<TState>> handlers)
+            => this.handlers = handlers ?? DataList<IStepHandler<TState>>.New();
+
+
+        public IExpandableIndex<IStepHandler<TState>> Handlers => handlers;
 
 
         public override bool? Handle(IStep step, TState state, IStepHandler<TState> root)
@@ -169,5 +181,4 @@ namespace Veruthian.Library.Steps.Handlers
 
         protected virtual void OnSpeculationCompleted(IStep speculation, TState state, bool? result) { }
     }
-
 }
