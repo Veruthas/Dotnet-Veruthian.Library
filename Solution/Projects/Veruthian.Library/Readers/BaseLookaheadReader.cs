@@ -7,19 +7,19 @@ namespace Veruthian.Library.Readers
     {
         public BaseLookaheadReader() { }
 
-        public T Peek(int lookahead) => base.CheckedPeek(lookahead);
+        public T Lookahead(int amount) => base.CheckedLookahead(amount);
 
-        public virtual IEnumerable<T> Peek(int lookahead, int amount, bool includeEnd = false)
+        public virtual IEnumerable<T> Lookahead(int amount, int length, bool includeEnd = false)
         {
-            EnsureLookahead(lookahead + amount);
+            EnsureLookahead(amount + length);
 
-            for (int i = lookahead; i < lookahead + amount; i++)
+            for (int i = amount; i < amount + length; i++)
             {
-                if (!PeekIsEnd(i) || includeEnd)
-                    yield return RawPeek(i);
+                if (!IsEndAhead(i) || includeEnd)
+                    yield return RawLookahead(i);
             }
         }
 
-        public bool PeekIsEnd(int lookahead) => base.CheckedIsAtEnd(lookahead);
+        public bool IsEndAhead(int lookahead) => base.CheckedIsAtEnd(lookahead);
     }
 }

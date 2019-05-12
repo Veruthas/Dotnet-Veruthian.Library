@@ -17,9 +17,9 @@ namespace Veruthian.Library.Readers
 
         public virtual int MarkPosition => SpeculativeReader.MarkPosition;
 
-        public virtual T PeekFromMark(int lookahead) => SpeculativeReader.PeekFromMark(lookahead);
+        public virtual T LookFromMark(int amount) => SpeculativeReader.LookFromMark(amount);
 
-        public virtual IEnumerable<T> PeekFromMark(int lookahead, int? amount, bool includeEnd = false) => SpeculativeReader.PeekFromMark(lookahead, amount, includeEnd);
+        public virtual IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false) => SpeculativeReader.LookFromMark(amount, length, includeEnd);
 
         public virtual void Mark()
         {

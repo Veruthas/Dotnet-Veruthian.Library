@@ -60,15 +60,15 @@ namespace Veruthian.Library.Readers
 
         protected void CreateMark(int position, int index) => marks.Push(new Marker(position, index));
 
-        // PeekFromMark
-        public T PeekFromMark(int lookahead)
+        // LookFromMark
+        public T LookFromMark(int amount)
         {
-            if (lookahead < 0)
-                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("lookahead", amount, "Lookahead cannot be less than 0");
 
             var mark = marks.Peek();
 
-            int index = mark.Index + lookahead;
+            int index = mark.Index + amount;
 
             EnsureIndex(index);
 
@@ -77,19 +77,19 @@ namespace Veruthian.Library.Readers
             return item;
         }
 
-        public IEnumerable<T> PeekFromMark(int lookahead, int? amount, bool includeEnd = false)
+        public IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false)
         {
-            if (lookahead < 0)
-                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
-
             if (amount < 0)
-                throw new ArgumentOutOfRangeException("amount", amount, "Amount cannot be less than 0");
+                throw new ArgumentOutOfRangeException("lookahead", amount, "Lookahead cannot be less than 0");
 
-            var realAmount = amount != null ? amount.Value : (Position - MarkPosition) + lookahead;
+            if (length < 0)
+                throw new ArgumentOutOfRangeException("amount", length, "Amount cannot be less than 0");
+
+            var realAmount = length != null ? length.Value : (Position - MarkPosition) + amount;
 
             var mark = marks.Peek();
 
-            int index = mark.Index + lookahead;
+            int index = mark.Index + amount;
 
             EnsureIndex(index + realAmount);
 

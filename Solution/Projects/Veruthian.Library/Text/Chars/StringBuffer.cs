@@ -332,7 +332,7 @@ namespace Veruthian.Library.Text.Chars
 
         public StringBuffer Replace(char oldValue, char newValue, int position, int amount)
         {
-            ExceptionHelper.VerifyInRange(position, amount, 0, builder.Length, nameof(position), nameof(amount));
+            ExceptionHelper.VerifyInBounds(position, amount, 0, builder.Length, nameof(position), nameof(amount));
 
             for (int i = position; i < position + amount; i++)
             {
@@ -364,7 +364,7 @@ namespace Veruthian.Library.Text.Chars
 
         public char[] ToChars(int position, int amount)
         {
-            ExceptionHelper.VerifyInRange(position, amount, 0, builder.Length, nameof(position), nameof(amount));
+            ExceptionHelper.VerifyInBounds(position, amount, 0, builder.Length, nameof(position), nameof(amount));
 
             char[] result = new char[amount];
 

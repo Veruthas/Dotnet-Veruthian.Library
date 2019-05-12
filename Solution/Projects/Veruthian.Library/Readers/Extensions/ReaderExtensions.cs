@@ -52,7 +52,7 @@ namespace Veruthian.Library.Readers.Extensions
         }
 
         // Speculative Reader
-        public static ISpeculativeReader<T> GetSpeculativeReader<T>(this IEnumerator<T> enumerator, 
+        public static ISpeculativeReader<T> GetSpeculativeReader<T>(this IEnumerator<T> enumerator,
                                                                     GenerateEndItem<T> generateEndItem = null)
         {
             var reader = new SpeculativeReader<T>(enumerator, generateEndItem);
@@ -60,7 +60,7 @@ namespace Veruthian.Library.Readers.Extensions
             return reader;
         }
 
-        public static ISpeculativeReader<T> GetSpeculativeReader<T>(this IEnumerable<T> enumerable, 
+        public static ISpeculativeReader<T> GetSpeculativeReader<T>(this IEnumerable<T> enumerable,
                                                                     GenerateEndItem<T> generateEndItem = null)
         {
             return GetSpeculativeReader(enumerable.GetEnumerator(), generateEndItem);
@@ -68,7 +68,7 @@ namespace Veruthian.Library.Readers.Extensions
 
 
         // Recollective Reader
-        public static IRecollectiveReader<T> GetRecollectiveReader<T>(this IEnumerator<T> enumerator, 
+        public static IRecollectiveReader<T> GetRecollectiveReader<T>(this IEnumerator<T> enumerator,
                                                                       GenerateEndItem<T> generateEndItem = null)
         {
             return new RecollectiveReader<T>(enumerator, generateEndItem);
@@ -78,6 +78,24 @@ namespace Veruthian.Library.Readers.Extensions
                                                                       GenerateEndItem<T> generateEndItem = null)
         {
             return GetRecollectiveReader<T>(enumerable.GetEnumerator(), generateEndItem);
+        }
+
+
+        // Methods
+        public static T Read<T>(this IReader<T> reader)
+        {
+            var current = reader.Current;
+
+            reader.Advance();
+
+            return current;
+        }
+
+        public static bool TryAdvance<T>(this IReader<T> reader)
+        {
+            reader.Advance();
+
+            return reader.IsEnd;
         }
     }
 }

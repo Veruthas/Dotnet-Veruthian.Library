@@ -5,14 +5,14 @@ namespace Veruthian.Library.Readers
 {
     public interface IReader<out T> : IDisposable
     {
-        bool IsEnd { get; }
+        T Current { get; }
 
         int Position { get; }
 
-        T Peek();
+        bool IsEnd { get; }
 
-        T Read();
+        void Advance();
 
-        void Skip(int amount);
+        void Advance(int amount);
     }
 }

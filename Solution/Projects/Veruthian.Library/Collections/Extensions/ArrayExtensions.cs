@@ -319,11 +319,11 @@ namespace Veruthian.Library.Collections.Extensions
         // Remove
         public static T[] Remove<T>(this T[] array, int index, int count = 1)
         {
-            ExceptionHelper.VerifyInBounds(index, 0, array.Length, nameof(index));
+            ExceptionHelper.VerifyBetween(index, 0, array.Length - 1, nameof(index));
 
             ExceptionHelper.VerifyPositive(count, nameof(count));
 
-            ExceptionHelper.VerifyInBounds(index + count, 0, array.Length + 1, nameof(count));
+            ExceptionHelper.VerifyBetween(index + count, 0, array.Length, nameof(count));
 
 
             var newsize = array.Length - count;

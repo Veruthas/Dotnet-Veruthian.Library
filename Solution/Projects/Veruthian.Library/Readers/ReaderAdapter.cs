@@ -13,31 +13,31 @@ namespace Veruthian.Library.Readers
 
         public virtual void Dispose() => Reader.Dispose();
 
-        public virtual T Peek() => Reader.Peek();
+        public virtual T Current => Reader.Current;
 
-        public virtual T Read()
+
+        public virtual void Advance()
         {
-            var item = Reader.Read();
+            var item = Reader.Current;
 
-            OnItemRead(item);
-
-            return item;
+            OnAdvance(item);            
         }
 
-        protected virtual void OnItemRead(T item) { }
+        protected virtual void OnAdvance(T item) { }
 
-        public virtual void Skip(int amount)
+
+        public virtual void Advance(int amount)
         {
             int position = Reader.Position;
 
-            Skip(amount);
+            Advance(amount);
 
             int actualAmount = Reader.Position - position;
 
-            OnSkip(amount, actualAmount);
+            OnAdvance(amount, actualAmount);
         }
 
-        protected virtual void OnSkip(int requestedAmount, int actualAmount) { }
+        protected virtual void OnAdvance(int requestedAmount, int actualAmount) { }
     }
 
     public class ReaderAdapater<T> : ReaderAdapterBase<T>

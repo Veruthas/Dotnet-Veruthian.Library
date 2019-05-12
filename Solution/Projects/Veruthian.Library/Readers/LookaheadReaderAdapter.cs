@@ -9,11 +9,11 @@ namespace Veruthian.Library.Readers
         protected override IReader<T> Reader => LookaheadReader;
         
 
-        public virtual T Peek(int lookahead) => LookaheadReader.Peek(lookahead);
+        public virtual T Lookahead(int amount) => LookaheadReader.Lookahead(amount);
 
-        public virtual IEnumerable<T> Peek(int lookahead, int amount, bool includeEnd = false) => LookaheadReader.Peek(lookahead, amount, includeEnd);
+        public virtual IEnumerable<T> Lookahead(int amount, int length, bool includeEnd = false) => LookaheadReader.Lookahead(amount, length, includeEnd);
 
-        public virtual bool PeekIsEnd(int lookahead) => LookaheadReader.PeekIsEnd(lookahead);
+        public virtual bool IsEndAhead(int amount) => LookaheadReader.IsEndAhead(amount);
     }
 
     public class LookaheadReaderAdapter<T> : LookaheadReaderAdapterBase<T>

@@ -8,8 +8,8 @@ namespace Veruthian.Library.Readers
     {
         int MarkPosition { get; }
 
-        T PeekFromMark(int lookahead);
+        T LookFromMark(int amount);
 
-        IEnumerable<T> PeekFromMark(int lookahead, int? amount, bool includeEnd = false);        
+        IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false);        
     }
 }

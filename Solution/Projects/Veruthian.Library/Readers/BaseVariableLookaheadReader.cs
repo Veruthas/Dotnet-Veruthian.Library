@@ -71,7 +71,7 @@ namespace Veruthian.Library.Readers
                 return cache[index];
         }
 
-        protected override T RawPeek(int lookahead = 0) => RawPeekByIndex(index + lookahead);
+        protected override T RawLookahead(int lookahead = 0) => RawPeekByIndex(index + lookahead);
 
 
         protected override void MoveNext()

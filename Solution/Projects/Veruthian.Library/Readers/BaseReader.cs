@@ -89,30 +89,23 @@ namespace Veruthian.Library.Readers
         protected T LastItem { get => lastItem; set => lastItem = value; }
 
 
-        // Peek
-        public T Peek() => CheckedPeek();
+        // Current
+        public T Current => CheckedLookahead();
 
-        protected T CheckedPeek(int lookahead = 0)
+        protected T CheckedLookahead(int amount = 0)
         {
-            EnsureLookahead(lookahead);
+            EnsureLookahead(amount);
 
-            var current = RawPeek(lookahead);
+            var current = RawLookahead(amount);
 
             return current;
         }
 
-        // Read
-        public T Read()
-        {
-            var current = RawPeek();
-
-            MoveNext();
-
-            return current;
-        }
+        // Advance
+        public void Advance() => MoveNext();
 
         // Skip
-        public void Skip(int amount) => SkipAhead(amount);
+        public void Advance(int amount) => SkipAhead(amount);
 
 
 
@@ -125,8 +118,8 @@ namespace Veruthian.Library.Readers
         
         protected abstract void SkipAhead(int amount);
 
-        protected abstract T RawPeek(int lookahead = 0);
+        protected abstract T RawLookahead(int amount = 0);
 
-        protected abstract void EnsureLookahead(int lookahead = 0);
+        protected abstract void EnsureLookahead(int amount = 0);
     }
 }

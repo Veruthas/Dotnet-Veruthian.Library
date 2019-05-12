@@ -15,7 +15,7 @@ namespace Veruthian.Library.Readers
 
         protected override void Initialize() => MoveNext();
 
-        protected override T RawPeek(int lookahead = 0) => item;
+        protected override T RawLookahead(int lookahead = 0) => item;
 
         protected override void EnsureLookahead(int lookahead = 0) { }
 

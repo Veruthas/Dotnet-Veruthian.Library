@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Readers
 {
@@ -12,8 +13,7 @@ namespace Veruthian.Library.Readers
 
         public FixedLookaheadReader(IEnumerator<T> enumerator, int lookahead, GenerateEndItem<T> generateEndItem = null)
         {
-            if (lookahead < 1)
-                throw new ArgumentOutOfRangeException("lookahead", "Lookahead must be greater than 1.");
+            ExceptionHelper.VerifyAtLeast(lookahead, 1, nameof(lookahead));
 
             cache = new T[lookahead];
 
@@ -21,8 +21,8 @@ namespace Veruthian.Library.Readers
         }
 
         protected T[] Cache => cache;
-        
-        protected int CacheSize => cache.Length; 
+
+        protected int CacheSize => cache.Length;
 
 
         protected override void Initialize()
@@ -64,15 +64,13 @@ namespace Veruthian.Library.Readers
             }
         }
 
-        protected override void EnsureLookahead(int lookahead = 0)
-        {
-            if (lookahead < 0 || lookahead > CacheSize)
-                throw new ArgumentOutOfRangeException("lookahead", string.Format("Lookahead must be in the range [0, {1}]", CacheSize - 1));
-        }
+        protected override void EnsureLookahead(int amount = 0)
+            => ExceptionHelper.VerifyBetween(amount, 0, CacheSize - 1, "Lookahead amount");
 
-        protected override T RawPeek(int lookahead = 0)
+
+        protected override T RawLookahead(int amount = 0)
         {
-            var actualIndex = (index + lookahead) % CacheSize;
+            var actualIndex = (index + amount) % CacheSize;
 
             var item = cache[actualIndex];
 
@@ -96,7 +94,7 @@ namespace Veruthian.Library.Readers
 
         protected override void TryPreload(int amount) { }
 
-        // TODO: Optimize
+
         protected override void SkipAhead(int amount)
         {
             for (int i = 0; i < amount; i++)

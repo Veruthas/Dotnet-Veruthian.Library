@@ -24,7 +24,7 @@ namespace Veruthian.Library.Readers.Test
                 Assert.Equal(i, reader.Position);
 
                 // Every item should equal on peek                
-                Assert.Equal(c, reader.Peek());
+                Assert.Equal(c, reader.Current);
 
                 // Every item should equal on read
                 Assert.Equal(c, reader.Read());
@@ -44,7 +44,7 @@ namespace Veruthian.Library.Readers.Test
 
             do
             {
-                reader.Skip(skipInterval);
+                reader.Advance(skipInterval);
 
                 current += skipInterval;
 
@@ -54,7 +54,7 @@ namespace Veruthian.Library.Readers.Test
                     Assert.Equal(current, reader.Position);
 
                     // We should be at same item in array and reader
-                    Assert.Equal(data[current], reader.Peek());
+                    Assert.Equal(data[current], reader.Current);
                 }
 
             } while (!reader.IsEnd);
@@ -67,7 +67,7 @@ namespace Veruthian.Library.Readers.Test
         {
             Assert.Equal(data.Length, reader.Position);
 
-            Assert.Equal(default(T), reader.Peek());
+            Assert.Equal(default(T), reader.Current);
 
             Assert.Equal(default(T), reader.Read());
 
@@ -88,7 +88,7 @@ namespace Veruthian.Library.Readers.Test
                 {
                     var dataItem = i + j >= data.Length ? default(T) : data[i + j];
 
-                    var readerItem = reader.Peek(j);
+                    var readerItem = reader.Lookahead(j);
 
                     Assert.Equal(dataItem, readerItem);
                 }
@@ -104,7 +104,7 @@ namespace Veruthian.Library.Readers.Test
 
             while (!reader.IsEnd)
             {
-                foreach (var item in reader.Peek(0, lookahead))
+                foreach (var item in reader.Lookahead(0, lookahead))
                 {
                     if (index >= data.Length)
                         break;
@@ -112,7 +112,7 @@ namespace Veruthian.Library.Readers.Test
                     Assert.Equal(data[index++], item);
                 }
 
-                reader.Skip(lookahead);
+                reader.Advance(lookahead);
             }
 
             TestIsAtEnd(reader, data);
@@ -126,20 +126,20 @@ namespace Veruthian.Library.Readers.Test
         {
             reader.Mark();
 
-            reader.Skip(data.Length);
+            reader.Advance(data.Length);
 
             for (int i = 0; i < data.Length; i++)
             {
                 var dataItem = data[i];
 
-                var readerItem = reader.PeekFromMark(i);
+                var readerItem = reader.LookFromMark(i);
 
                 Assert.Equal(dataItem, readerItem);
             }
 
             int index = 0;
 
-            foreach (var readerItem in reader.PeekFromMark(0, data.Length))
+            foreach (var readerItem in reader.LookFromMark(0, data.Length))
             {
                 var dataItem = data[index++];
 
