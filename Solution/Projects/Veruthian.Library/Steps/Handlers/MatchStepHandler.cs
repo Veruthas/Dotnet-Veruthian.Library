@@ -1,18 +1,16 @@
-using System;
-
 namespace Veruthian.Library.Steps.Handlers
 {
     public abstract class MatchStepHandler<TState, T> : StepHandler<TState, MatchStep<T>>
     {
         protected override bool? HandleStep(MatchStep<T> step, TState state, IStepHandler<TState> root)
         {
-            var item = PeekItem(state);
+            var item = GetCurrent(state);
 
             var result = step.Match(item);
 
-            while (result.Success && result.State != null && MoveNextItem(state))
+            while (result.Success && result.State != null && TryAdvance(state))
             {
-                item = PeekItem(state);
+                item = GetCurrent(state);
 
                 result = step.Match(item);
             }
@@ -20,8 +18,9 @@ namespace Veruthian.Library.Steps.Handlers
             return result.Success;
         }
 
-        protected abstract T PeekItem(TState state);
+        protected abstract T GetCurrent(TState state);
 
-        protected abstract bool MoveNextItem( TState state);
+        protected abstract bool TryAdvance(TState state);
     }
+
 }
