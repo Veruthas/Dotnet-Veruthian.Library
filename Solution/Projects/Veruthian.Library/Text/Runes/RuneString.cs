@@ -11,7 +11,7 @@ using Veruthian.Library.Utility.Extensions;
 
 namespace Veruthian.Library.Text.Runes
 {
-    public class RuneString : IIndex<Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
+    public class RuneString : IVector<Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
     {
         public static readonly RuneString Empty = new RuneString(new Rune[] { }, false);
 
@@ -51,10 +51,10 @@ namespace Veruthian.Library.Text.Runes
         public RuneString(IList<Rune> runes, int index, int length)
             : this(GetFromList(runes, index, length), false) { }
 
-        public RuneString(IIndex<int, Rune> runes, int index)
+        public RuneString(IVector<int, Rune> runes, int index)
             : this(GetFromIndex(runes, index, runes.Count - index), false) { }
 
-        public RuneString(IIndex<int, Rune> runes, int index, int length)
+        public RuneString(IVector<int, Rune> runes, int index, int length)
             : this(GetFromIndex(runes, index, length), false) { }
 
         private static Rune[] GetFromCollection(ICollection<Rune> ruins)
@@ -94,7 +94,7 @@ namespace Veruthian.Library.Text.Runes
             return values;
         }
 
-        private static Rune[] GetFromIndex(IIndex<int, Rune> runes, int index, int length)
+        private static Rune[] GetFromIndex(IVector<int, Rune> runes, int index, int length)
         {
             if (runes == null)
                 throw new ArgumentNullException("runes");
@@ -510,7 +510,7 @@ namespace Veruthian.Library.Text.Runes
 
         #region Index
 
-        int IIndex<int, Rune>.Start => 0;
+        int IVector<int, Rune>.Start => 0;
 
 
         public int Length => runes.Length;

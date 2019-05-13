@@ -11,10 +11,10 @@ namespace Veruthian.Library.Collections
         IMutableLookup<A, V> : ILookup<A, V>
         IExpandableLookup<A, V> : ILookup<A, V> => DataLookup
 
-        IIndex<A, V>: ILookup<K, V>
-        IMutableIndex<A, V>: IIndex<A, V>, IMutableLookup<A, V> => DataArray
-        IOrderedIndex<A, V>: IIndex<A, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
-        IExpandableIndex<A, V> : IIndex<A, V>, IExpandableLookup<A, V>, IExpandableContainer<V> => DataList
+        IVector<A, V>: ILookup<K, V>
+        IMutableVector<A, V>: IVector<A, V>, IMutableLookup<A, V> => DataArray
+        IOrderedVector<A, V>: IVector<A, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
+        IExpandableVector<A, V> : IVector<A, V>, IExpandableLookup<A, V>, IExpandableContainer<V> => DataList
 
         Future:
             IStack<T> : IContainer<T>

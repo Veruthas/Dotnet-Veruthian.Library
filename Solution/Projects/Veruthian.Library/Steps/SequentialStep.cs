@@ -5,22 +5,22 @@ namespace Veruthian.Library.Steps
 {
     public class SequentialStep : Step
     {
-        IIndex<IStep> sequence;
+        IVector<IStep> sequence;
 
 
-        public SequentialStep() : this((IIndex<IStep>)null) { }
+        public SequentialStep() : this((IVector<IStep>)null) { }
 
-        public SequentialStep(IIndex<IStep> sequence) => Sequence = sequence;
+        public SequentialStep(IVector<IStep> sequence) => Sequence = sequence;
 
-        public SequentialStep(IEnumerable<IStep> sequence) => Sequence = DataIndex<IStep>.Extract(sequence);
+        public SequentialStep(IEnumerable<IStep> sequence) => Sequence = DataVector<IStep>.Extract(sequence);
 
-        public SequentialStep(params IStep[] sequence) => Sequence = DataIndex<IStep>.From(sequence);
+        public SequentialStep(params IStep[] sequence) => Sequence = DataVector<IStep>.From(sequence);
 
 
-        public IIndex<IStep> Sequence
+        public IVector<IStep> Sequence
         {
             get => this.sequence;
-            set => this.sequence = value ?? new DataIndex<IStep>();
+            set => this.sequence = value ?? new DataVector<IStep>();
         }
 
         public override string Description => "seqeunce";

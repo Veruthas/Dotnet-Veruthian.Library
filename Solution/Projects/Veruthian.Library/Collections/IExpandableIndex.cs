@@ -11,7 +11,7 @@ namespace Veruthian.Library.Collections
         void RemoveRange(A address, int count);
     }
 
-    public interface IExpandableIndex<V> : IExpandableIndex<int, V>, IIndex<V>
+    public interface IExpandableIndex<V> : IExpandableIndex<int, V>, IVector<V>
     {
 
     }

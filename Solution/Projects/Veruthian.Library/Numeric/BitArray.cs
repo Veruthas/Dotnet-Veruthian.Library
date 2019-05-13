@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Numeric
 {
-    public sealed class BitArray : IMutableIndex<bool>
+    public sealed class BitArray : IMutableVector<bool>
     {
         const int lengthOfUlong = 64;
 
@@ -122,7 +122,7 @@ namespace Veruthian.Library.Numeric
 
         public int Count => count;
 
-        int IIndex<int, bool>.Start => 0;
+        int IVector<int, bool>.Start => 0;
 
         IEnumerable<int> ILookup<int, bool>.Addresses => Enumerables.GetRange(0, Count - 1);
 

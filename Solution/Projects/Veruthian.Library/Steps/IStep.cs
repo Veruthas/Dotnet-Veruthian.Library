@@ -6,6 +6,6 @@ namespace Veruthian.Library.Steps
     {
         string Description { get; }
 
-        IIndex<IStep> SubSteps { get; }
+        IVector<IStep> SubSteps { get; }
     }
 }

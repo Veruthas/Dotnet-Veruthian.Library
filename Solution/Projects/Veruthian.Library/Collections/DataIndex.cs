@@ -5,28 +5,28 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataIndex<T> : BaseIndex<T>
+    public class DataVector<T> : BaseVector<T>
     {
         T[] items;
 
-        public DataIndex() => items = new T[0];
+        public DataVector() => items = new T[0];
 
-        private DataIndex(T[] items) => this.items = items;
+        private DataVector(T[] items) => this.items = items;
 
-        public static DataIndex<T> New(int size)
+        public static DataVector<T> New(int size)
         {
             ExceptionHelper.VerifyPositive(size, nameof(size));
 
-            return new DataIndex<T>(new T[size]);
+            return new DataVector<T>(new T[size]);
         }
 
-        public static DataIndex<T> Of(T item) => new DataIndex<T>(new T[] { item });
+        public static DataVector<T> Of(T item) => new DataVector<T>(new T[] { item });
 
-        public static DataIndex<T> From(params T[] items) => new DataIndex<T>(items.Copy());
+        public static DataVector<T> From(params T[] items) => new DataVector<T>(items.Copy());
 
-        public static DataIndex<T> Extract(IEnumerable<T> items) => new DataIndex<T>(items.ToArray());
+        public static DataVector<T> Extract(IEnumerable<T> items) => new DataVector<T>(items.ToArray());
 
-        public static DataIndex<T> Extract(IEnumerable<T> items, int amount) => new DataIndex<T>(items.ToArray(amount));
+        public static DataVector<T> Extract(IEnumerable<T> items, int amount) => new DataVector<T>(items.ToArray(amount));
 
 
         public override int Count => items.Length;
@@ -56,31 +56,31 @@ namespace Veruthian.Library.Collections
         protected override T RawGet(int verifiedAddress) => items[verifiedAddress];
 
 
-        public static implicit operator DataIndex<T>(T item) => new DataIndex<T>(new T[] { item });
+        public static implicit operator DataVector<T>(T item) => new DataVector<T>(new T[] { item });
 
-        public static DataIndex<T> operator +(DataIndex<T> items, T item) => new DataIndex<T>(items.items.Append(item));
+        public static DataVector<T> operator +(DataVector<T> items, T item) => new DataVector<T>(items.items.Append(item));
 
-        public static DataIndex<T> operator +(T item, DataIndex<T> items) => new DataIndex<T>(items.items.Prepend(item));
-
-
-        public static DataIndex<T> operator +(DataIndex<T> left, T[] right) => new DataIndex<T>(left.items.AppendArray(right));
-
-        public static DataIndex<T> operator +(T[] left, DataIndex<T> right) => new DataIndex<T>(right.items.PrependArray(left));
+        public static DataVector<T> operator +(T item, DataVector<T> items) => new DataVector<T>(items.items.Prepend(item));
 
 
-        public static DataIndex<T> operator +(DataIndex<T> left, IEnumerable<T> right) => new DataIndex<T>(left.items.AppendEnumerable(right));
+        public static DataVector<T> operator +(DataVector<T> left, T[] right) => new DataVector<T>(left.items.AppendArray(right));
 
-        public static DataIndex<T> operator +(IEnumerable<T> left, DataIndex<T> right) => new DataIndex<T>(right.items.PrependEnumerable(left));
-
-
-        public static DataIndex<T> operator +(DataIndex<T> left, IContainer<T> right) => new DataIndex<T>(left.items.AppendContainer(right));
-
-        public static DataIndex<T> operator +(IContainer<T> left, DataIndex<T> right) => new DataIndex<T>(right.items.PrependContainer(left));
+        public static DataVector<T> operator +(T[] left, DataVector<T> right) => new DataVector<T>(right.items.PrependArray(left));
 
 
-        public static DataIndex<T> operator +(DataIndex<T> left, DataIndex<T> right) => new DataIndex<T>(left.items.AppendContainer(right));
+        public static DataVector<T> operator +(DataVector<T> left, IEnumerable<T> right) => new DataVector<T>(left.items.AppendEnumerable(right));
+
+        public static DataVector<T> operator +(IEnumerable<T> left, DataVector<T> right) => new DataVector<T>(right.items.PrependEnumerable(left));
 
 
-        public static DataIndex<T> operator *(DataIndex<T> items, int times) => new DataIndex<T>(items.items.Multiply(times));
+        public static DataVector<T> operator +(DataVector<T> left, IContainer<T> right) => new DataVector<T>(left.items.AppendContainer(right));
+
+        public static DataVector<T> operator +(IContainer<T> left, DataVector<T> right) => new DataVector<T>(right.items.PrependContainer(left));
+
+
+        public static DataVector<T> operator +(DataVector<T> left, DataVector<T> right) => new DataVector<T>(left.items.AppendContainer(right));
+
+
+        public static DataVector<T> operator *(DataVector<T> items, int times) => new DataVector<T>(items.items.Multiply(times));
     }
 }

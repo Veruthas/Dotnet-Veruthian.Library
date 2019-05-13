@@ -6,9 +6,9 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public struct IndexSegment<T> : IIndex<T>, IEnumerable<T>
+    public struct IndexSegment<T> : IVector<T>, IEnumerable<T>
     {
-        IIndex<T> index;
+        IVector<T> index;
 
         int offset;
 
@@ -18,7 +18,7 @@ namespace Veruthian.Library.Collections
 
 
 
-        public IndexSegment(IIndex<T> index)
+        public IndexSegment(IVector<T> index)
         {
             this.index = index;
 
@@ -29,7 +29,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public IndexSegment(IIndex<T> index, int offset)
+        public IndexSegment(IVector<T> index, int offset)
         {
             this.index = index;
 
@@ -40,7 +40,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public IndexSegment(IIndex<T> index, int offset, int count)
+        public IndexSegment(IVector<T> index, int offset, int count)
         {
             this.index = index;
 
@@ -51,7 +51,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public IndexSegment(IIndex<T> index, int offset, int count, int start)
+        public IndexSegment(IVector<T> index, int offset, int count, int start)
         {
             this.index = index;
 
@@ -65,7 +65,7 @@ namespace Veruthian.Library.Collections
 
         public int Count => count;
 
-        int IIndex<int, T>.Start => start;
+        int IVector<int, T>.Start => start;
 
         private int StartIndex => start;
 

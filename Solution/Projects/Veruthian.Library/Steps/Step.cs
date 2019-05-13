@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps
 {
-    public abstract class Step : IStep, IIndex<IStep>
+    public abstract class Step : IStep, IVector<IStep>
     {
         #region Abstracts
 
@@ -25,9 +25,9 @@ namespace Veruthian.Library.Steps
 
         #region SubSteps
 
-        IIndex<IStep> IStep.SubSteps => this;
+        IVector<IStep> IStep.SubSteps => this;
 
-        int IIndex<int, IStep>.Start => 0;
+        int IVector<int, IStep>.Start => 0;
 
         int IContainer<IStep>.Count => SubStepCount;
 

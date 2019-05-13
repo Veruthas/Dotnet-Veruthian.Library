@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseMutableIndex<T> : BaseIndex<T>, IMutableIndex<T>
+    public abstract class BaseMutableIndex<T> : BaseVector<T>, IMutableVector<T>
     {
         public new T this[int address]
         {

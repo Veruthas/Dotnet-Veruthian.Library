@@ -6,7 +6,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseIndex<T> : IIndex<T>, IEnumerable<T>
+    public abstract class BaseVector<T> : IVector<T>, IEnumerable<T>
     {
 
         public int Start => 0;

@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Numeric
 {
-    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<bool>, IFormattable
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IVector<bool>, IFormattable
     {
         private readonly byte value;
 
@@ -173,7 +173,7 @@ namespace Veruthian.Library.Numeric
 
         const int bits = 4;
 
-        int IIndex<int, bool>.Start => 0;
+        int IVector<int, bool>.Start => 0;
 
         bool ILookup<int, bool>.this[int address] => TryGet(address, out var result) ? result : throw new ArgumentOutOfRangeException(nameof(address));
 
