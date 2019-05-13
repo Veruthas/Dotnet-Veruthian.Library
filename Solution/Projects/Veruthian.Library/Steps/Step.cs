@@ -13,7 +13,7 @@ namespace Veruthian.Library.Steps
 
         protected abstract int SubStepCount { get; }
 
-        protected abstract IStep GetSubStep(int verifiedIndex);
+        protected abstract IStep GetSubStep(int verifiedAddress);
 
         #endregion
 
@@ -32,32 +32,32 @@ namespace Veruthian.Library.Steps
         int IContainer<IStep>.Count => SubStepCount;
 
 
-        private void VerifyIndex(int index)
+        private void VerifyAddress(int address)
         {
-            if (!HasIndex(index))
-                throw new IndexOutOfRangeException();
+            if (!HasAddress(address))
+                throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        private bool HasIndex(int index) => (uint)index < SubStepCount;
+        private bool HasAddress(int address) => (uint)address < SubStepCount;
 
-        bool ILookup<int, IStep>.HasAddress(int key) => HasIndex(key);
+        bool ILookup<int, IStep>.HasAddress(int address) => HasAddress(address);
 
 
-        IStep ILookup<int, IStep>.this[int key]
+        IStep ILookup<int, IStep>.this[int address]
         {
             get
             {
-                VerifyIndex(key);
+                VerifyAddress(address);
 
-                return GetSubStep(key);
+                return GetSubStep(address);
             }
         }
 
-        bool ILookup<int, IStep>.TryGet(int key, out IStep value)
+        bool ILookup<int, IStep>.TryGet(int address, out IStep value)
         {
-            if (HasIndex(key))
+            if (HasAddress(address))
             {
-                value = GetSubStep(key);
+                value = GetSubStep(address);
 
                 return true;
             }
@@ -92,7 +92,7 @@ namespace Veruthian.Library.Steps
 
         IEnumerable<int> ILookup<int, IStep>.Addresses => Enumerables.GetRange(0, SubStepCount);
 
-        IEnumerable<(int, IStep)> ILookup<int, IStep>.Pairs
+        IEnumerable<(int Address, IStep Value)> ILookup<int, IStep>.Pairs
         {
             get
             {

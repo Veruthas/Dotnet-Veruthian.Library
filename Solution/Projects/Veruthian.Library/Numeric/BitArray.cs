@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Numeric
 {
-    public sealed class BitArray : IMutableIndex<int, bool>
+    public sealed class BitArray : IMutableIndex<bool>
     {
         const int lengthOfUlong = 64;
 
@@ -38,27 +38,27 @@ namespace Veruthian.Library.Numeric
             this.count = size;
         }
 
-        public bool this[int index]
+        public bool this[int address]
         {
             get
             {
-                if (TryGet(index, out var value))
+                if (TryGet(address, out var value))
                     return value;
                 else
                     throw new IndexOutOfRangeException();
             }
             set
             {
-                if (!TrySet(index, value))
+                if (!TrySet(address, value))
                     throw new IndexOutOfRangeException();
             }
         }
 
-        bool ILookup<int, bool>.this[int index] => this[index];
+        bool ILookup<int, bool>.this[int address] => this[address];
 
-        public bool TryGet(int index, out bool value)
+        public bool TryGet(int address, out bool value)
         {
-            if (HasIndex(index))
+            if (HasAddress(address))
             {
                 ulong longValue;
 
@@ -68,15 +68,15 @@ namespace Veruthian.Library.Numeric
                 }
                 else
                 {
-                    int segmentIndex = index / lengthOfUlong;
+                    int segmentIndex = address / lengthOfUlong;
 
-                    index = index % lengthOfUlong;
+                    address = address % lengthOfUlong;
 
                     longValue = this.values[segmentIndex];
                 }
 
 
-                value = ((this.value >> index) & 0x1) == 0x1;
+                value = ((this.value >> address) & 0x1) == 0x1;
 
                 return true;
             }
@@ -88,19 +88,19 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        public bool TrySet(int index, bool value)
+        public bool TrySet(int address, bool value)
         {
-            if (HasIndex(index))
+            if (HasAddress(address))
             {
                 if (this.values == null)
                 {
-                    SetBit(ref this.value, index, value);
+                    SetBit(ref this.value, address, value);
                 }
                 else
                 {
-                    int valueIndex = index / lengthOfUlong;
+                    int valueIndex = address / lengthOfUlong;
 
-                    SetBit(ref this.values[valueIndex], index % lengthOfUlong, value);
+                    SetBit(ref this.values[valueIndex], address % lengthOfUlong, value);
                 }
 
                 return true;
@@ -109,11 +109,11 @@ namespace Veruthian.Library.Numeric
             return false;
         }
 
-        private static void SetBit(ref ulong value, int index, bool bit)
+        private static void SetBit(ref ulong value, int address, bool bit)
         {
             ulong longBit = 0x01;
 
-            longBit <<= index;
+            longBit <<= address;
 
             value &= ~longBit;
 
@@ -126,7 +126,7 @@ namespace Veruthian.Library.Numeric
 
         IEnumerable<int> ILookup<int, bool>.Addresses => Enumerables.GetRange(0, Count - 1);
 
-        public IEnumerator<bool> GetEnumerator()=> Values.GetEnumerator();
+        public IEnumerator<bool> GetEnumerator() => Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => Values.GetEnumerator();
 
@@ -168,7 +168,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        IEnumerable<(int, bool)> ILookup<int, bool>.Pairs
+        IEnumerable<(int Address, bool Value)> ILookup<int, bool>.Pairs
         {
             get
             {
@@ -204,10 +204,11 @@ namespace Veruthian.Library.Numeric
                     }
                 }
             }
-        }        
-        bool ILookup<int, bool>.HasAddress(int index) => HasIndex(index);
+        }
 
-        bool HasIndex(int index) => (uint)index < Count;
+        bool ILookup<int, bool>.HasAddress(int address) => HasAddress(address);
+
+        bool HasAddress(int address) => (uint)address < Count;
 
         bool IContainer<bool>.Contains(bool value)
         {

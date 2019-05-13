@@ -4,6 +4,6 @@ namespace Veruthian.Library.Steps
     {
         protected override int SubStepCount => 0;
 
-        protected override IStep GetSubStep(int verifiedIndex) => null;
+        protected override IStep GetSubStep(int verifiedAddress) => null;
     }
 }

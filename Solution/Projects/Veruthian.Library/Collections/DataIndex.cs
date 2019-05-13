@@ -53,7 +53,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        protected override T RawGet(int verifiedIndex) => items[verifiedIndex];
+        protected override T RawGet(int verifiedAddress) => items[verifiedAddress];
 
 
         public static implicit operator DataIndex<T>(T item) => new DataIndex<T>(new T[] { item });

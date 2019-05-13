@@ -27,6 +27,6 @@ namespace Veruthian.Library.Steps
 
         protected override int SubStepCount => sequence == null ? 0 : sequence.Count;
 
-        protected override IStep GetSubStep(int verifiedIndex) => sequence[verifiedIndex];
+        protected override IStep GetSubStep(int verifiedAddress) => sequence[verifiedAddress];
     }
 }

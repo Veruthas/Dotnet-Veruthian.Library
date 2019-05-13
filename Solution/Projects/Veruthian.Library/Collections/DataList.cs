@@ -58,9 +58,9 @@ namespace Veruthian.Library.Collections
         public sealed override int Count => items.Count;
 
 
-        protected sealed override T RawGet(int verifiedIndex) => items[verifiedIndex];
+        protected sealed override T RawGet(int verifiedAddress) => items[verifiedAddress];
 
-        protected sealed override void RawSet(int verifiedIndex, T value) => items[verifiedIndex] = value;
+        protected sealed override void RawSet(int verifiedAddress, T value) => items[verifiedAddress] = value;
 
         public sealed override bool Contains(T value) => items.Contains(value);
 
@@ -69,15 +69,15 @@ namespace Veruthian.Library.Collections
 
         public void AddRange(IEnumerable<T> values) => items.AddRange(values);
 
-        public void Insert(int index, T value) => items.Insert(index, value);
+        public void Insert(int address, T value) => items.Insert(address, value);
 
-        public void InsertRange(int index, IEnumerable<T> values) => items.InsertRange(index, values);
+        public void InsertRange(int address, IEnumerable<T> values) => items.InsertRange(address, values);
 
         public bool Remove(T value) => items.Remove(value);
 
-        public void RemoveBy(int index) => items.RemoveAt(index);
+        public void RemoveBy(int address) => items.RemoveAt(address);
 
-        public void RemoveRange(int index, int count) => items.RemoveRange(index, count);
+        public void RemoveRange(int address, int count) => items.RemoveRange(address, count);
 
         public void Clear() => items.Clear();
     }

@@ -11,7 +11,7 @@ using Veruthian.Library.Utility.Extensions;
 
 namespace Veruthian.Library.Text.Runes
 {
-    public class RuneString : IIndex<int, Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
+    public class RuneString : IIndex<Rune>, IEnumerable<Rune>, IEquatable<RuneString>, IComparable<RuneString>
     {
         public static readonly RuneString Empty = new RuneString(new Rune[] { }, false);
 
@@ -519,7 +519,7 @@ namespace Veruthian.Library.Text.Runes
 
         IEnumerable<int> ILookup<int, Rune>.Addresses => Enumerables.GetRange(0, Length);
 
-        IEnumerable<(int, Rune)> ILookup<int, Rune>.Pairs
+        IEnumerable<(int Address, Rune Value)> ILookup<int, Rune>.Pairs
         {
             get
             {
@@ -528,22 +528,22 @@ namespace Veruthian.Library.Text.Runes
             }
         }
 
-        public Rune this[int index]
+        public Rune this[int address]
         {
             get
             {
-                if (HasIndex(index))
-                    return runes[index];
+                if (HasAddress(address))
+                    return runes[address];
                 else
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(address));
             }
         }
 
-        bool ILookup<int, Rune>.TryGet(int index, out Rune value)
+        bool ILookup<int, Rune>.TryGet(int address, out Rune value)
         {
-            if (HasIndex(index))
+            if (HasAddress(address))
             {
-                value = runes[index];
+                value = runes[address];
 
                 return true;
             }
@@ -555,9 +555,9 @@ namespace Veruthian.Library.Text.Runes
             }
         }
 
-        private bool HasIndex(int index) => (uint)index < Length;
+        private bool HasAddress(int address) => (uint)address < Length;
 
-        bool ILookup<int, Rune>.HasAddress(int index) => HasIndex(index);
+        bool ILookup<int, Rune>.HasAddress(int index) => HasAddress(index);
 
 
         bool IContainer<Rune>.Contains(Rune value)

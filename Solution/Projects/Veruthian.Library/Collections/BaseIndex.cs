@@ -25,7 +25,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        protected abstract T RawGet(int verifiedIndex);
+        protected abstract T RawGet(int verifiedAddress);
 
         public bool TryGet(int address, out T value)
         {

@@ -35,9 +35,9 @@ namespace Veruthian.Library.Collections
 
         public sealed override int Count => items.Length;
 
-        protected sealed override T RawGet(int verifiedIndex) => items[verifiedIndex];
+        protected sealed override T RawGet(int verifiedAddress) => items[verifiedAddress];
 
-        protected sealed override void RawSet(int verifiedIndex, T value) => items[verifiedIndex] = value;
+        protected sealed override void RawSet(int verifiedAddress, T value) => items[verifiedAddress] = value;
 
         public sealed override bool Contains(T value)
         {

@@ -5,7 +5,7 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Numeric
 {
-    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<int, bool>, IFormattable
+    public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IIndex<bool>, IFormattable
     {
         private readonly byte value;
 
@@ -175,18 +175,18 @@ namespace Veruthian.Library.Numeric
 
         int IIndex<int, bool>.Start => 0;
 
-        bool ILookup<int, bool>.this[int key] => TryGet(key, out var result) ? result : throw new IndexOutOfRangeException();
+        bool ILookup<int, bool>.this[int address] => TryGet(address, out var result) ? result : throw new ArgumentOutOfRangeException(nameof(address));
 
 
         bool IContainer<bool>.Contains(bool value) => (value && this.value != 0) || (!value && this.value != 0xF);
 
-        bool ILookup<int, bool>.HasAddress(int key) => (uint)key <= bits;
+        bool ILookup<int, bool>.HasAddress(int address) => (uint)address <= bits;
 
-        private bool TryGet(int key, out bool value)
+        private bool TryGet(int address, out bool value)
         {
-            if ((uint)key <= bits)
+            if ((uint)address <= bits)
             {
-                value = ((this.value >> key) & 0x1) == 1;
+                value = ((this.value >> address) & 0x1) == 1;
 
                 return true;
             }
@@ -198,7 +198,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        bool ILookup<int, bool>.TryGet(int key, out bool value) => TryGet(key, out value);
+        bool ILookup<int, bool>.TryGet(int address, out bool value) => TryGet(address, out value);
 
 
         int IContainer<bool>.Count => bits;
@@ -221,7 +221,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        IEnumerable<(int, bool)> ILookup<int, bool>.Pairs
+        IEnumerable<(int Address, bool Value)> ILookup<int, bool>.Pairs
         {
             get
             {

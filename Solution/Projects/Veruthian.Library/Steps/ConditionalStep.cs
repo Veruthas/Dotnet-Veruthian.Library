@@ -46,9 +46,9 @@ namespace Veruthian.Library.Steps
                                               (HasThenStep ? 1 : 0) +
                                               (HasElseStep ? 1 : 0);
 
-        protected override IStep GetSubStep(int verifiedIndex)
+        protected override IStep GetSubStep(int verifiedAddress)
         {
-            switch (verifiedIndex)
+            switch (verifiedAddress)
             {
                 case 0:
                     return condition;
