@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Numeric.Binary
 {
     public struct Nibble : INumeric<Nibble>, IBounded<Nibble>, ILogical<Nibble>, IVector<bool>, IFormattable
     {
@@ -140,13 +140,6 @@ namespace Veruthian.Library.Numeric
         Nibble INumeric<Nibble>.Multiply(Nibble other) => this * other;
 
         Nibble INumeric<Nibble>.Divide(Nibble other) => this / other;
-
-        Nibble INumeric<Nibble>.Divide(Nibble other, out Nibble remainder)
-        {
-            remainder = this % other;
-
-            return this / other;
-        }
 
         Nibble INumeric<Nibble>.Modulus(Nibble other) => this % other;
 

@@ -12,7 +12,7 @@ namespace Veruthian.Library.Collections.Extensions
         {
             ExceptionHelper.VerifyPositive(size, nameof(size));
 
-            if (array == null || array.Length == 0)
+            if (array == null || array.Length == 0 || size == 0)
             {
                 return new T[size];
             }

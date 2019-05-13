@@ -23,7 +23,7 @@ namespace _Console
 
             var handler = GetHandler();
 
-            var state = GetState("Hello, world! My name is Levi Minkoff. What is your name?");
+            var state = GetState("Hello, world!");
 
             Console.WriteLine(rules);
 

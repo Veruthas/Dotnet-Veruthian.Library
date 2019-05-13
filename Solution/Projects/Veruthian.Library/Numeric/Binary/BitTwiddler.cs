@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Numeric.Binary
 {
     public struct BitTwiddler
     {

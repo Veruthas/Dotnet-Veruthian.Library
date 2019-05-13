@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Numeric.Binary
 {
     public sealed class BitArray : IMutableVector<bool>
     {

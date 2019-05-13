@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Globalization;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Text.Encodings;
 
 namespace Veruthian.Library.Text.Runes

@@ -1,5 +1,6 @@
 using System;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Text.Encodings

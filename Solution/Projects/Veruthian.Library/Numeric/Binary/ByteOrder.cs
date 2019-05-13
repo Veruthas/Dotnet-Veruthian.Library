@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Numeric
+namespace Veruthian.Library.Numeric.Binary
 {
     public enum ByteOrder
     {

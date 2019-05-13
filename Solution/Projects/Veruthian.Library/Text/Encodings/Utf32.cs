@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Text.Encodings
