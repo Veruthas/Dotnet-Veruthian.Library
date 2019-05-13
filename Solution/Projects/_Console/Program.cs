@@ -5,10 +5,13 @@ namespace _Console
     class Program
     {
         static void Main(string[] args)
-        {
+        {            
             TestParsers.Test();
+
             Pause();
         }
+
+        static event Func<int> Get;
 
         public static void Pause()
         {

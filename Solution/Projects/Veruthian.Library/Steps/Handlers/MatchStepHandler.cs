@@ -6,25 +6,39 @@ namespace Veruthian.Library.Steps.Handlers
     {
         protected override bool? HandleStep(MatchStep<T> step, TState state, IStepHandler<TState> root)
         {
+            if (IsEnd(state))
+                return false;
+
             var item = GetCurrent(state);
 
             var result = step.Match(item);
 
-            while (result.Success && result.State != null && TryAdvance(state))
+            while (result.Success)
             {
                 OnMatched(item);
 
-                item = GetCurrent(state);
+                Advance(state);                
 
-                result = step.Match(item);
+                if (result.State != null && !IsEnd(state))
+                {
+                    item = GetCurrent(state);
+
+                    result = step.Match(item);
+                }
+                else
+                {
+                    break;
+                }
             }
 
             return result.Success;
         }
 
+        protected abstract bool IsEnd(TState state);
+
         protected abstract T GetCurrent(TState state);
 
-        protected abstract bool TryAdvance(TState state);
+        protected abstract void Advance(TState state);
 
         protected virtual void OnMatched(T item)
         {

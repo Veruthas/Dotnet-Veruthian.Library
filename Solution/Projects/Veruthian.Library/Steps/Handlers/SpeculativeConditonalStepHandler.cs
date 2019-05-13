@@ -1,16 +1,23 @@
+using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Processing;
 using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Steps.Handlers
 {
     public class SpeculativeConditonalStepHandler<TState> : ConditionalStepHandler<TState>
-        where TState : Has<ISpeculative>
+        where TState : ILookup<string, object>
     {
+        public SpeculativeConditonalStepHandler(string speculativeAddress) => this.SpeculativeAddress = speculativeAddress;
+
+        public string SpeculativeAddress { get; }
+
+
         protected override void OnSpeculationStarted(IStep speculation, TState state)
         {
             base.OnSpeculationStarted(speculation, state);
 
-            state.Get(out var speculative);
+            state.Get(SpeculativeAddress, out ISpeculative speculative);
 
             speculative.Mark();
         }
@@ -19,12 +26,9 @@ namespace Veruthian.Library.Steps.Handlers
         {
             base.OnSpeculationCompleted(speculation, state, result);
 
-            state.Get(out var speculative);
+            state.Get(SpeculativeAddress, out ISpeculative speculative);
 
-            if (result == true)
-                speculative.Commit();
-            else
-                speculative.Rollback();
+            speculative.Rollback();
         }
     }
 }

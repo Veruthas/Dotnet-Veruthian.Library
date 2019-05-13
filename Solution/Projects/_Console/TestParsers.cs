@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Collections;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Numeric;
 using Veruthian.Library.Processing;
 using Veruthian.Library.Readers;
@@ -19,12 +21,18 @@ namespace _Console
         {
             var rules = GetRules();
 
+            var handler = GetHandler();
 
-            //var handler = GetHandler(TypeSets.Create<IReader<Rune>, ISpeculative>());
-
+            var state = GetState("Hello, world! My name is Levi Minkoff. What is your name?");
 
             Console.WriteLine(rules);
+
+            var result = handler.Handle(rules["File"], state);
+
+            Console.WriteLine($"\nResult: {result.ToPrintable()}; Steps: {state.GetCounter()}");
         }
+
+
 
         private static StepTable GetRules()
         {
@@ -36,7 +44,7 @@ namespace _Console
 
 
 
-            rules["Files"] = g.Sequence(rules["Whitespace"], rules["Items"], g.Unless(g.MatchSet(RuneSet.Complete)));
+            rules["File"] = g.Sequence(rules["Whitespace"], rules["Items"], g.Unless(g.MatchSet(RuneSet.Complete)));
 
             rules["Items"] = g.Repeat(rules["Item"]);
 
@@ -54,18 +62,101 @@ namespace _Console
             return rules;
         }
 
-        public static IStepHandler<TState> GetHandler<T, TState>(TState state)
-            where TState : Has<IReader<T>>, Has<ISpeculative>
+        static string ReaderAddress = "reader";
+
+        static string SpeculativeAddress = "reader";
+
+        static string CounterAddress = "counter";
+
+        static string IndentAddress = "indent";
+
+        public static IStepHandler<ILookup<string, object>> GetHandler()
         {
-            return new StepHandlerList<TState>(
-                new BooleanStepHandler<TState>(),
-                new SequentialStepHandler<TState>(),
-                new OptionalStepHandler<TState>(),
-                new RepeatedStepHandler<TState>(),
-                new RepeatedTryStepHandler<TState>(),
-                new SpeculativeConditonalStepHandler<TState>(),
-                new ReaderStepHandler<TState, T>()
-            );
+            var labeled = new LabeledStepHandler<ILookup<string, object>>();
+
+            var handlers =
+                new StepHandlerList<ILookup<string, object>>(
+                    new LabeledStepHandler<ILookup<string, object>>(),
+                    new BooleanStepHandler<ILookup<string, object>>(),
+                    new SequentialStepHandler<ILookup<string, object>>(),
+                    new OptionalStepHandler<ILookup<string, object>>(),
+                    new RepeatedStepHandler<ILookup<string, object>>(),
+                    new RepeatedTryStepHandler<ILookup<string, object>>(),
+                    new SpeculativeConditonalStepHandler<ILookup<string, object>>(ReaderAddress),
+                    new ReaderStepHandler<ILookup<string, object>, Rune>(SpeculativeAddress),
+                    labeled
+                );
+
+            handlers.StepStarted += (step, state) =>
+                {
+                    var counter = state.GetCounter();
+
+                    var indent = state.GetIndent();
+
+                    var reader = state.GetReader();
+
+                    counter.Value++;
+
+                    indent.Value++;
+
+
+                    Console.WriteLine($"{new string('|', indent)}Started @({reader.Position}:'{reader.Current.ToPrintableString()}') #{counter} {step}");
+                    
+                    return null;
+                };
+
+            handlers.StepCompleted += (step, state, result) =>
+                    {
+                        var indent = state.GetIndent();
+
+                        var reader = state.GetReader();
+
+                        Console.WriteLine($"{new string('|', indent)}Completed @({reader.Position}:'{reader.Current.ToPrintableString()}') <{result.ToPrintable()}> {step}");
+
+                        indent.Value--;
+                    };
+
+            return handlers;
+        }
+
+        public static ILookup<string, object> GetState(RuneString value)
+        {
+            var lookup = new DataLookup<string, object>();
+
+            var reader = value.GetSpeculativeReader();
+
+            lookup.Insert(ReaderAddress, reader);
+
+            lookup.Insert(CounterAddress, new Ref<int>());
+
+            lookup.Insert(IndentAddress, new Ref<int>());
+
+            return lookup;
+        }
+
+
+        static string ToPrintable(this bool? value) => value == null ? "Unhandled" : value.ToString();
+
+
+        static Ref<int> GetCounter(this ILookup<string, object> state)
+        {
+            state.Get(CounterAddress, out Ref<int> counter);
+
+            return counter;
+        }
+
+        static Ref<int> GetIndent(this ILookup<string, object> state)
+        {
+            state.Get(IndentAddress, out Ref<int> indent);
+
+            return indent;
+        }
+
+        static ISpeculativeReader<Rune> GetReader(this ILookup<string, object> state)
+        {
+            state.Get(ReaderAddress, out ISpeculativeReader<Rune> reader);
+
+            return reader;
         }
     }
 }

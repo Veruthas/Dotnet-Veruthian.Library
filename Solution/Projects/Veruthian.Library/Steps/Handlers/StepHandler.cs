@@ -11,9 +11,10 @@ namespace Veruthian.Library.Steps.Handlers
             {
                 case TStep tstep:
                     {
-                        OnStepStarted(tstep, state);
+                        var result = OnStepStarted(tstep, state);
 
-                        var result = HandleStep(tstep, state, root);
+                        if (result == null)
+                            result = HandleStep(tstep, state, root);
 
                         OnStepCompleted(tstep, state, result);
 
@@ -29,10 +30,12 @@ namespace Veruthian.Library.Steps.Handlers
         protected abstract bool? HandleStep(TStep step, TState state, IStepHandler<TState> root);
 
 
-        protected virtual void OnStepStarted(TStep step, TState state)
+        protected virtual bool? OnStepStarted(TStep step, TState state)
         {
             if (StepStarted != null)
-                StepStarted(step, state);
+                return StepStarted(step, state);
+
+            return null;
         }
 
         protected virtual void OnStepCompleted(TStep step, TState state, bool? result)
@@ -42,7 +45,7 @@ namespace Veruthian.Library.Steps.Handlers
         }
 
 
-        public event Action<TStep, TState> StepStarted;
+        public event Func<TStep, TState, bool?> StepStarted;
 
         public event Action<TStep, TState, bool?> StepCompleted;
     }

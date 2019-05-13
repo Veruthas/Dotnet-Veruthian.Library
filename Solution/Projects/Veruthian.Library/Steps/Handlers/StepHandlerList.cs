@@ -45,7 +45,7 @@ namespace Veruthian.Library.Steps.Handlers
 
             OnStepCompleted(step, state, result);
 
-            return null;
+            return result;
         }
 
 
