@@ -1,17 +1,31 @@
 ﻿using System;
+using Veruthian.Library.Numeric;
 
 namespace _Console
 {
     class Program
     {
         static void Main(string[] args)
-        {            
-            TestParsers.Test();
+        {
+            Number a = Number.Parse("80-00-00-00", Number.HexUpper);
+            Number b = uint.MaxValue;
+
+            var c = a + b;
+            var d = b - a;
+            var e = a - b;
+
+            var f = a * b;
+
+            var fs = f.ToString();
+            
+            var f2 = f.Previous;
+
+            var g = f / b;
+
+            var h = a % b;
 
             Pause();
         }
-
-        static event Func<int> Get;
 
         public static void Pause()
         {
@@ -20,6 +34,6 @@ namespace _Console
             while (Console.ReadKey(true).Key != ConsoleKey.Enter) ;
 
             Console.WriteLine();
-        }       
+        }
     }
 }
