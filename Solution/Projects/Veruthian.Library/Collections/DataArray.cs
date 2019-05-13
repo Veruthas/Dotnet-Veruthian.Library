@@ -8,7 +8,7 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataArray<T> : BaseMutableIndex<T>
+    public class DataArray<T> : BaseMutableVector<T>
     {
         T[] items;
 

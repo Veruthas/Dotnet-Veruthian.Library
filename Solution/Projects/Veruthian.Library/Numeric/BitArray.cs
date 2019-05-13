@@ -45,12 +45,12 @@ namespace Veruthian.Library.Numeric
                 if (TryGet(address, out var value))
                     return value;
                 else
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(address));
             }
             set
             {
                 if (!TrySet(address, value))
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(address));
             }
         }
 

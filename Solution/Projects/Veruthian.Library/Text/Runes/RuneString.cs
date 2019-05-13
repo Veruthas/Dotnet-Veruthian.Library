@@ -52,10 +52,10 @@ namespace Veruthian.Library.Text.Runes
             : this(GetFromList(runes, index, length), false) { }
 
         public RuneString(IVector<int, Rune> runes, int index)
-            : this(GetFromIndex(runes, index, runes.Count - index), false) { }
+            : this(GetFromVector(runes, index, runes.Count - index), false) { }
 
         public RuneString(IVector<int, Rune> runes, int index, int length)
-            : this(GetFromIndex(runes, index, length), false) { }
+            : this(GetFromVector(runes, index, length), false) { }
 
         private static Rune[] GetFromCollection(ICollection<Rune> ruins)
         {
@@ -94,7 +94,7 @@ namespace Veruthian.Library.Text.Runes
             return values;
         }
 
-        private static Rune[] GetFromIndex(IVector<int, Rune> runes, int index, int length)
+        private static Rune[] GetFromVector(IVector<int, Rune> runes, int index, int length)
         {
             if (runes == null)
                 throw new ArgumentNullException("runes");
@@ -508,7 +508,7 @@ namespace Veruthian.Library.Text.Runes
 
         #endregion
 
-        #region Index
+        #region Vector
 
         int IVector<int, Rune>.Start => 0;
 
