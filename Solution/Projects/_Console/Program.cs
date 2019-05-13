@@ -14,6 +14,8 @@ namespace _Console
             var d = b - a;
             var e = a - b;
 
+            var e2 = d + a;
+
             var f = a * b;
 
             var fs = f.ToString();

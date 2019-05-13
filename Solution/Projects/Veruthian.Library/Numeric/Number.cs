@@ -19,40 +19,50 @@ namespace Veruthian.Library.Numeric
 
         readonly uint value;
 
-        readonly uint[] values;
+        readonly uint[] units;
 
 
         private Number(uint value)
         {
             this.value = value;
-            this.values = null;
+
+            this.units = null;
         }
 
-        private Number(params uint[] values)
+        private Number(params uint[] units)
+            : this(0, units) { }
+
+        private Number(uint value, uint[] units)
         {
-            if (values.Length == 0)
+            if (units == null || units.Length == 0)
             {
-                this = new Number();
+                this.value = value;
+
+                this.units = null;
             }
-            else if (values.Length == 1)
+            else if (units.Length == 1)
             {
-                this = new Number(values[0]);
+                this.value = units[0];
+
+                this.units = null;
             }
             else
             {
-                this.value = default(uint);
-                this.values = values;
+                this.value = 0;
+
+                this.units = units;
             }
         }
+
 
 
         public bool IsZero => IsSimple && value == 0;
 
-        private bool IsSimple => values == null;
+        private bool IsSimple => units == null;
 
-        private uint this[int index] => values == null ? value : values.Length < index ? values[index] : 0;
+        private uint this[int index] => units == null ? value : units.Length < index ? units[index] : 0;
 
-        private int UnitCount => values != null ? values.Length : 1;
+        private int UnitCount => units != null ? units.Length : 1;
 
 
 
@@ -70,7 +80,7 @@ namespace Veruthian.Library.Numeric
                 if (this.UnitCount == other.UnitCount)
                 {
                     for (int i = this.UnitCount - 1; i >= 0; i--)
-                        if (this.values[i] >= other.values[i])
+                        if (this.units[i] >= other.units[i])
                             return false;
 
                     return true;
@@ -94,7 +104,7 @@ namespace Veruthian.Library.Numeric
                 if (this.UnitCount == other.UnitCount)
                 {
                     for (int i = this.UnitCount - 1; i >= 0; i--)
-                        if (this.values[i] <= other.values[i])
+                        if (this.units[i] <= other.units[i])
                             return false;
 
                     return true;
@@ -125,7 +135,7 @@ namespace Veruthian.Library.Numeric
                 {
                     for (int i = this.UnitCount - 1; i >= 0; i--)
                     {
-                        var compare = CompareValues(this.values[i], other.values[i]);
+                        var compare = CompareValues(this.units[i], other.units[i]);
 
                         if (compare != 0)
                             return compare;
@@ -165,7 +175,7 @@ namespace Veruthian.Library.Numeric
                 if (this.UnitCount == other.UnitCount)
                 {
                     for (int i = 0; i < this.UnitCount; i++)
-                        if (this.values[i] != other.values[i])
+                        if (this.units[i] != other.units[i])
                             return false;
 
                     return true;
@@ -188,7 +198,7 @@ namespace Veruthian.Library.Numeric
 
         public override int GetHashCode()
         {
-            return IsSimple ? value.GetHashCode() : Utility.HashCodes.Default.Combine(values);
+            return IsSimple ? value.GetHashCode() : Utility.HashCodes.Default.Combine(units);
         }
 
 
@@ -209,23 +219,25 @@ namespace Veruthian.Library.Numeric
         #region Arithmetic
 
         // Addition
-        public Number Add(Number other)
+        public Number Add(Number other) => Add(this, other);
+
+        private static Number Add(Number left, Number right)
         {
-            if (this.IsSimple && other.IsSimple)
+            if (left.IsSimple && right.IsSimple)
             {
-                ulong result = (ulong)this.value + (ulong)other.value;
+                ulong result = (ulong)left.value + (ulong)right.value;
 
                 return result;
             }
             else
             {
-                var units = new uint[Math.Max(this.UnitCount, other.UnitCount)];
+                var units = new uint[Math.Max(left.UnitCount, right.UnitCount)];
 
                 var carry = ulong.MinValue;
 
                 for (int i = 0; i < units.Length; i++)
                 {
-                    ulong result = (ulong)this[i] + (ulong)other[i] + carry;
+                    ulong result = (ulong)left[i] + (ulong)right[i] + carry;
 
                     units[i] = (uint)result;
 
@@ -247,31 +259,45 @@ namespace Veruthian.Library.Numeric
         {
             var result = Subtract(this, other);
 
-            return result.Regular ? result.Value : new Number();
+            return result.Positive ? new Number(result.Value, result.Units) : Zero;
         }
 
         public Number CheckedSubtract(Number other)
         {
             var result = Subtract(this, other);
 
-            if (!result.Regular)
+            if (!result.Positive)
                 throw new InvalidOperationException("Cannot subtract larger number from smaller one");
 
-            return result.Value;
+            if (result.Units != null)
+                TrimUnits(ref result.Units);
+
+            return new Number(result.Value, result.Units);
         }
 
         public Number Delta(Number other)
         {
             var result = Subtract(this, other);
 
-            return result.Value;
+            if (result.Units != null)
+            {
+                if (!result.Positive)
+                    AdjustNegative(result.Units);
+
+                TrimUnits(ref result.Units);
+            }
+
+            return new Number(result.Value, result.Units);
         }
 
-        private static (bool Regular, Number Value) Subtract(Number a, Number b)
+        private static (bool Positive, uint Value, uint[] Units) Subtract(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
-                return a.value >= b.value ? (true, new Number(a.value - b.value)) : (false, new Number(b.value - a.value));
+                if (a.value >= b.value)
+                    return (true, a.value - b.value, null);
+                else
+                    return (false, b.value - a.value, null);
             }
             else
             {
@@ -293,25 +319,24 @@ namespace Veruthian.Library.Numeric
                     }
                 }
 
-                // b > a
-                if (carry == 0)                
-                    AdjustNegative(units);                
-
-                var adjusted = count;
-
-                for (int i = count; i >= 0; i--)
-                {
-                    if (units[i] == 0)
-                        adjusted--;
-                    else
-                        break;
-                }
-
-                if (adjusted != count)
-                    units = units.Resize(adjusted);
-
-                return (carry == 1, new Number(units));
+                return (carry == 1, 0, units);
             }
+        }
+
+        private static void TrimUnits(ref uint[] units)
+        {
+            var adjusted = units.Length;
+
+            for (int i = units.Length - 1; i >= 0; i--)
+            {
+                if (units[i] == 0)
+                    adjusted--;
+                else
+                    break;
+            }
+
+            if (adjusted != units.Length)
+                units = units.Resize(adjusted);
         }
 
         private static void AdjustNegative(uint[] units)
@@ -404,7 +429,7 @@ namespace Veruthian.Library.Numeric
                 if (left.IsSimple)
                     return (new Number(left.value / right.value), new Number(left.value % right.value));
                 else
-                    return DivideWithRemainder(left.values, right.value);
+                    return DivideWithRemainder(left.units, right.value);
             }
             else
             {
@@ -534,33 +559,33 @@ namespace Veruthian.Library.Numeric
                     if (groupLength > 0 && actualLength != 0 && actualLength % groupLength == 0)
                         builder.Append(separator ?? "");
 
+                    current--;
+                    
                     builder.Append(symbols[0]);
 
                     actualLength++;
-
-                    current--;
                 }
             }
             else if (this.IsZero)
             {
                 builder.Append(symbols[0]);
             }
-            else
+            else if (this.units == null)
             {
                 var current = this;
+                
+                var rem = this;
 
                 while (!current.IsZero)
                 {
-                    var rem = current % numberBase;
-
                     if (groupLength > 0 && actualLength != 0 && actualLength % groupLength == 0)
                         builder.Append(separator ?? "");
+
+                    (current, rem) = DivideWithRemainder(this, numberBase, false);
 
                     builder.Append(symbols[(int)rem.value]);
 
                     actualLength++;
-
-                    current = current / numberBase;
                 }
             }
 
@@ -576,9 +601,7 @@ namespace Veruthian.Library.Numeric
             }
 
             for (int i = 0, j = builder.Length - 1; i < builder.Length / 2; i++, j--)
-            {
                 (builder[i], builder[j]) = (builder[j], builder[i]);
-            }
 
             return builder.ToString();
         }
