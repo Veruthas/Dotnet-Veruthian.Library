@@ -142,7 +142,7 @@ namespace Veruthian.Library.Steps.Generators
                 items.Insert(name, item);
             }
 
-            if (subItems != null && !subItems.HasKey(name))
+            if (subItems != null && !subItems.HasAddress(name))
             {
                 subItems.Insert(name, item);
 
@@ -193,7 +193,7 @@ namespace Veruthian.Library.Steps.Generators
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (var name in items.Keys)
+            foreach (var name in items.Addresses)
             {
                 FormatItem(builder, name, indentSize, indentChar);
 

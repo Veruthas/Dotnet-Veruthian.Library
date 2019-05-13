@@ -5,16 +5,16 @@ namespace Veruthian.Library.Collections
     /* 
         IContainer<T>
         IExpandableContainer<T> : IContainer<T> => DataSet        
-        IPool<K, A> : IContainer<(K, A)>
+        IPool<A, V> : IContainer<(A, V)>
 
-        ILookup<K, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
-        IMutableLookup<K, V> : ILookup<K, V>
-        IExpandableLookup<K, V> : ILookup<K, V> => DataLookup
+        ILookup<A, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
+        IMutableLookup<A, V> : ILookup<A, V>
+        IExpandableLookup<A, V> : ILookup<A, V> => DataLookup
 
-        IIndex<K, V>: ILookup<K, V>
-        IMutableIndex<K, V>: IIndex<K, V>, IMutableLookup<K, V> => DataArray
-        IOrderedIndex<K, V>: IIndex<K, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
-        IExpandableIndex<K, V> : IIndex<K, V>, IExpandableLookup<K, V>, IExpandableContainer<V> => DataList
+        IIndex<A, V>: ILookup<K, V>
+        IMutableIndex<A, V>: IIndex<A, V>, IMutableLookup<A, V> => DataArray
+        IOrderedIndex<A, V>: IIndex<A, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
+        IExpandableIndex<A, V> : IIndex<A, V>, IExpandableLookup<A, V>, IExpandableContainer<V> => DataList
 
         Future:
             IStack<T> : IContainer<T>

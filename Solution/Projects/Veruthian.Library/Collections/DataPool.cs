@@ -4,28 +4,28 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataPool<K, A> : IPool<K, A>
+    public class DataPool<A, V> : IPool<A, V>
     {
-        Dictionary<K, (K, A)> items = new Dictionary<K, (K, A)>();
+        Dictionary<A, (A, V)> items = new Dictionary<A, (A, V)>();
 
 
         public int Count => items.Count;
 
-        bool IContainer<(K, A)>.Contains((K, A) value) => items.ContainsValue(value);
+        bool IContainer<(A, V)>.Contains((A, V) value) => items.ContainsValue(value);
 
-        public IEnumerator<(K, A)> GetEnumerator() => items.Values.GetEnumerator();
+        public IEnumerator<(A, V)> GetEnumerator() => items.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => items.Values.GetEnumerator();
 
-        public bool HasKey(K key) => items.ContainsKey(key);
+        public bool HasAddress(A address) => items.ContainsKey(address);
 
-        public (K, A) Resolve(K key, A attribute = default(A))
+        public (A, V) Resolve(A address, V attribute = default(V))
         {
-            if (!items.TryGetValue(key, out var pair))
+            if (!items.TryGetValue(address, out var pair))
             {
-                pair = (key, attribute);
+                pair = (address, attribute);
 
-                items.Add(key, pair);
+                items.Add(address, pair);
             }
 
             return pair;
@@ -34,5 +34,5 @@ namespace Veruthian.Library.Collections
         public override string ToString() => this.ToTableString();
     }
 
-    public class DataPool<K> : DataPool<K, object> { }
+    public class DataPool<A> : DataPool<A, object> { }
 }

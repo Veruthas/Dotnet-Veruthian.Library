@@ -1,10 +1,10 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IExpandableLookup<K, V> : ILookup<K, V>
+    public interface IExpandableLookup<A, V> : ILookup<A, V>
     {
-        void Insert(K key, V value);        
+        void Insert(A address, V value);        
 
-        void RemoveBy(K key);
+        void RemoveBy(A key);
 
         void Clear();
     }

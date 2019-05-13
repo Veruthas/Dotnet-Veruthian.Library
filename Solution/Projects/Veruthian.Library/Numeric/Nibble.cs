@@ -180,7 +180,7 @@ namespace Veruthian.Library.Numeric
 
         bool IContainer<bool>.Contains(bool value) => (value && this.value != 0) || (!value && this.value != 0xF);
 
-        bool ILookup<int, bool>.HasKey(int key) => (uint)key <= bits;
+        bool ILookup<int, bool>.HasAddress(int key) => (uint)key <= bits;
 
         private bool TryGet(int key, out bool value)
         {
@@ -212,7 +212,7 @@ namespace Veruthian.Library.Numeric
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         
-        IEnumerable<int> ILookup<int, bool>.Keys
+        IEnumerable<int> ILookup<int, bool>.Addresses
         {
             get
             {

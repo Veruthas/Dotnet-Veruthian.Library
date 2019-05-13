@@ -1,7 +1,7 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IPool<K, A> : IContainer<(K, A)>
+    public interface IPool<A, V> : IContainer<(A, V)>
     {
-        (K, A) Resolve(K key, A attribute = default(A));
+        (A, V) Resolve(A address, V attribute = default(V));
     }
 }

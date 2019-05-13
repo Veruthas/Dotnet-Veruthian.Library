@@ -72,29 +72,29 @@ namespace Veruthian.Library.Collections
         private int EndIndex => start + count - 1;
 
 
-        public T this[int index]
+        public T this[int address]
         {
             get
             {
-                VerifyIndex(index);
+                VerifyAddress(address);
 
-                return RawGet(index);
+                return RawGet(address);
             }
         }
 
-        private void VerifyIndex(int index)
+        private void VerifyAddress(int address)
         {
-            if (!IsValidIndex(index))
-                throw new IndexOutOfRangeException();
+            if (!IsValidAddress(address))
+                throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        private T RawGet(int verifiedIndex) => this.index[offset + (verifiedIndex - start)];
+        private T RawGet(int verifiedAddress) => this.index[offset + (verifiedAddress - start)];
 
-        public bool TryGet(int index, out T value)
+        public bool TryGet(int address, out T value)
         {
-            if (IsValidIndex(index))
+            if (IsValidAddress(address))
             {
-                value = RawGet(index);
+                value = RawGet(address);
 
                 return true;
             }
@@ -106,11 +106,11 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public bool IsValidIndex(int index) => index >= StartIndex && index <= EndIndex;
+        public bool IsValidAddress(int address) => address >= StartIndex && address <= EndIndex;
 
 
 
-        IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(StartIndex, EndIndex);
+        IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(StartIndex, EndIndex);
 
 
         public IEnumerable<(int, T)> Pairs
@@ -153,7 +153,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        bool ILookup<int, T>.HasKey(int key) => IsValidIndex(key);
+        bool ILookup<int, T>.HasAddress(int address) => IsValidAddress(address);
 
         public override string ToString() => this.ToListString();
     }

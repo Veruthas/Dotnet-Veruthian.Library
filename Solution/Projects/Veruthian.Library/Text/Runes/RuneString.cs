@@ -517,7 +517,7 @@ namespace Veruthian.Library.Text.Runes
 
         int IContainer<Rune>.Count => Length;
 
-        IEnumerable<int> ILookup<int, Rune>.Keys => Enumerables.GetRange(0, Length);
+        IEnumerable<int> ILookup<int, Rune>.Addresses => Enumerables.GetRange(0, Length);
 
         IEnumerable<(int, Rune)> ILookup<int, Rune>.Pairs
         {
@@ -557,7 +557,7 @@ namespace Veruthian.Library.Text.Runes
 
         private bool HasIndex(int index) => (uint)index < Length;
 
-        bool ILookup<int, Rune>.HasKey(int index) => HasIndex(index);
+        bool ILookup<int, Rune>.HasAddress(int index) => HasIndex(index);
 
 
         bool IContainer<Rune>.Contains(Rune value)

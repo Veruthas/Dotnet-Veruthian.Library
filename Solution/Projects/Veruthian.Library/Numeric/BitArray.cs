@@ -124,7 +124,7 @@ namespace Veruthian.Library.Numeric
 
         int IIndex<int, bool>.Start => 0;
 
-        IEnumerable<int> ILookup<int, bool>.Keys => Enumerables.GetRange(0, Count - 1);
+        IEnumerable<int> ILookup<int, bool>.Addresses => Enumerables.GetRange(0, Count - 1);
 
         public IEnumerator<bool> GetEnumerator()=> Values.GetEnumerator();
 
@@ -205,7 +205,7 @@ namespace Veruthian.Library.Numeric
                 }
             }
         }        
-        bool ILookup<int, bool>.HasKey(int index) => HasIndex(index);
+        bool ILookup<int, bool>.HasAddress(int index) => HasIndex(index);
 
         bool HasIndex(int index) => (uint)index < Count;
 

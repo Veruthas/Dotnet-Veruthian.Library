@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IIndex<K, V> : ILookup<K, V>
+    public interface IIndex<A, V> : ILookup<A, V>
     {
-        K Start { get; }
+        A Start { get; }
     }
 
     public interface IIndex<V> : IIndex<int, V>

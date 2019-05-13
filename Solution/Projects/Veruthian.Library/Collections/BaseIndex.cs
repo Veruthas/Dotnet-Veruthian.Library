@@ -15,23 +15,23 @@ namespace Veruthian.Library.Collections
 
 
 
-        public T this[int index]
+        public T this[int address]
         {
             get
             {
-                VerifyIndex(index);
+                VerifyIndex(address);
 
-                return RawGet(index);
+                return RawGet(address);
             }
         }
 
         protected abstract T RawGet(int verifiedIndex);
 
-        public bool TryGet(int index, out T value)
+        public bool TryGet(int address, out T value)
         {
-            if (IsValidIndex(index))
+            if (IsValidAddress(address))
             {
-                value = RawGet(index);
+                value = RawGet(address);
                 return true;
             }
             else
@@ -44,18 +44,18 @@ namespace Veruthian.Library.Collections
         public abstract bool Contains(T value);
 
 
-        protected void VerifyIndex(int index)
+        protected void VerifyIndex(int address)
         {
-            if (!IsValidIndex(index))
-                throw new IndexOutOfRangeException();
+            if (!IsValidAddress(address))
+                throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        protected bool IsValidIndex(int index) => (uint)index < Count;
+        protected bool IsValidAddress(int address) => (uint)address < Count;
 
-        bool ILookup<int, T>.HasKey(int index) => IsValidIndex(index);
+        bool ILookup<int, T>.HasAddress(int address) => IsValidAddress(address);
 
 
-        IEnumerable<int> ILookup<int, T>.Keys => Enumerables.GetRange(0, Count - 1);
+        IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(0, Count - 1);
 
         public IEnumerable<(int, T)> Pairs
         {

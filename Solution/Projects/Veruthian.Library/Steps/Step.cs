@@ -40,7 +40,7 @@ namespace Veruthian.Library.Steps
 
         private bool HasIndex(int index) => (uint)index < SubStepCount;
 
-        bool ILookup<int, IStep>.HasKey(int key) => HasIndex(key);
+        bool ILookup<int, IStep>.HasAddress(int key) => HasIndex(key);
 
 
         IStep ILookup<int, IStep>.this[int key]
@@ -90,7 +90,7 @@ namespace Veruthian.Library.Steps
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        IEnumerable<int> ILookup<int, IStep>.Keys => Enumerables.GetRange(0, SubStepCount);
+        IEnumerable<int> ILookup<int, IStep>.Addresses => Enumerables.GetRange(0, SubStepCount);
 
         IEnumerable<(int, IStep)> ILookup<int, IStep>.Pairs
         {

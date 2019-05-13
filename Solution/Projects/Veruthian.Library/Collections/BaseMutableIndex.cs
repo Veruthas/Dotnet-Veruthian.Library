@@ -2,28 +2,28 @@ namespace Veruthian.Library.Collections
 {
     public abstract class BaseMutableIndex<T> : BaseIndex<T>, IMutableIndex<T>
     {
-        public new T this[int index]
+        public new T this[int address]
         {
             get
             {
-                VerifyIndex(index);
+                VerifyIndex(address);
 
-                return RawGet(index);
+                return RawGet(address);
             }
             set
             {
-                VerifyIndex(index);
+                VerifyIndex(address);
 
-                RawSet(index, value);
+                RawSet(address, value);
             }
 
         }
 
-        public bool TrySet(int index, T value)
+        public bool TrySet(int address, T value)
         {
-            if (IsValidIndex(index))
+            if (IsValidAddress(address))
             {
-                RawSet(index, value);
+                RawSet(address, value);
 
                 return true;
             }
@@ -31,6 +31,6 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        protected abstract void RawSet(int verifiedIndex, T value);
+        protected abstract void RawSet(int verifiedAddress, T value);
     }
 }

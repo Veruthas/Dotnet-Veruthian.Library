@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections
 {
-    public class SequentialDataLookup<K, V> : ILookup<K, V>
+    public class SequentialDataLookup<A, V> : ILookup<A, V>
     {
-        List<ILookup<K, V>> lookups;
+        List<ILookup<A, V>> lookups;
 
 
-        public SequentialDataLookup() => lookups = new List<ILookup<K, V>>();
+        public SequentialDataLookup() => lookups = new List<ILookup<A, V>>();
 
 
-        public V this[K key]
+        public V this[A address]
         {
             get
             {
                 foreach (var lookup in lookups)
                 {
-                    if (lookup.TryGet(key, out var value))
+                    if (lookup.TryGet(address, out var value))
                         return value;
                 }
 
@@ -34,19 +34,19 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public bool HasKey(K key)
+        public bool HasAddress(A address)
         {
             foreach (var lookup in lookups)
-                if (lookup.HasKey(key))
+                if (lookup.HasAddress(address))
                     return true;
 
             return false;
         }
 
-        public bool TryGet(K key, out V value)
+        public bool TryGet(A address, out V value)
         {
             foreach (var lookup in lookups)
-                if (lookup.TryGet(key, out value))
+                if (lookup.TryGet(address, out value))
                     return true;
 
             value = default(V);
@@ -58,29 +58,29 @@ namespace Veruthian.Library.Collections
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
-                    foreach (var key in lookup.Keys)
-                        keys.Add(key);
+                    foreach (var address in lookup.Addresses)
+                        addresses.Add(address);
 
-                return keys.Count;
+                return addresses.Count;
             }
         }
 
-        public IEnumerable<(K, V)> Pairs
+        public IEnumerable<(A, V)> Pairs
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
                 {
-                    foreach ((K Key, V Value) pair in lookup.Pairs)
+                    foreach ((A Address, V Value) pair in lookup.Pairs)
                     {
-                        if (!keys.Contains(pair.Key))
+                        if (!addresses.Contains(pair.Address))
                         {
-                            keys.Add(pair.Key);
+                            addresses.Add(pair.Address);
                             yield return pair;
                         }
                     }
@@ -88,20 +88,20 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<K> Keys
+        public IEnumerable<A> Addresses
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
                 {
-                    foreach (var key in lookup.Keys)
+                    foreach (var address in lookup.Addresses)
                     {
-                        if (!keys.Contains(key))
+                        if (!addresses.Contains(address))
                         {
-                            keys.Add(key);
-                            yield return key;
+                            addresses.Add(address);
+                            yield return address;
                         }
                     }
                 }
@@ -110,15 +110,15 @@ namespace Veruthian.Library.Collections
 
         public IEnumerator<V> GetEnumerator()
         {
-            var keys = new HashSet<K>();
+            var addresses = new HashSet<A>();
 
             foreach (var lookup in lookups)
             {
-                foreach ((K Key, V Value) pair in lookup.Pairs)
+                foreach ((A Address, V Value) pair in lookup.Pairs)
                 {
-                    if (!keys.Contains(pair.Key))
+                    if (!addresses.Contains(pair.Address))
                     {
-                        keys.Add(pair.Key);
+                        addresses.Add(pair.Address);
                         
                         yield return pair.Value;
                     }

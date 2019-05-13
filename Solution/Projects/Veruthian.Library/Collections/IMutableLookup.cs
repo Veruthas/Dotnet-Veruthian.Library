@@ -1,9 +1,9 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IMutableLookup<K, V> : ILookup<K, V>
+    public interface IMutableLookup<A, V> : ILookup<A, V>
     {
-        new V this[K key] { get; set; }
+        new V this[A address] { get; set; }
 
-        bool TrySet(K key, V value);
+        bool TrySet(A address, V value);
     }
 }

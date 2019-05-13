@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IOrderedIndex<K, V> : IIndex<K, V>, IExpandableContainer<V>
+    public interface IOrderedIndex<A, V> : IIndex<A, V>, IExpandableContainer<V>
     {
-        void RemoveBy(K key);
+        void RemoveBy(A key);
     }
 
     public interface IOrderedIndex<V> : IOrderedIndex<int, V>, IIndex<V>

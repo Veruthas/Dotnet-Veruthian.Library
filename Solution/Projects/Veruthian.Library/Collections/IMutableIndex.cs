@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IMutableIndex<K, V> : IIndex<K, V>, IMutableLookup<K, V>
+    public interface IMutableIndex<A, V> : IIndex<A, V>, IMutableLookup<A, V>
     {
 
     }
