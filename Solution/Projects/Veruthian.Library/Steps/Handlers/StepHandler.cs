@@ -14,7 +14,7 @@ namespace Veruthian.Library.Steps.Handlers
                         var result = OnStepStarted(tstep, state);
 
                         if (result == null)
-                            result = HandleStep(tstep, state, root);
+                            result = HandleStep(tstep, state, root ?? this);
 
                         OnStepCompleted(tstep, state, result);
 

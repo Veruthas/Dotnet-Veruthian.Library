@@ -26,21 +26,22 @@ namespace Veruthian.Library.Steps.Handlers
         public IExpandableIndex<IStepHandler<TState>> Handlers => handlers;
 
 
-        public override bool? Handle(IStep step, TState state, IStepHandler<TState> root)
+        public override bool? Handle(IStep step, TState state, IStepHandler<TState> root = null)
         {
             if (root == null)
                 root = this;
 
-            bool? result = null;
+            bool? result = OnStepStarted(step, state);
 
-            OnStepStarted(step, state);
-
-            foreach (var handler in handlers)
+            if (result != null)
             {
-                result = handler.Handle(step, state, root);
+                foreach (var handler in handlers)
+                {
+                    result = handler.Handle(step, state, root);
 
-                if (result != null)
-                    break;
+                    if (result != null)
+                        break;
+                }
             }
 
             OnStepCompleted(step, state, result);
