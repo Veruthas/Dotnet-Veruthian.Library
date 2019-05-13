@@ -21,11 +21,11 @@ namespace Veruthian.Library.Collections
 
         public V this[A address]
         {
-            get => TryGet(address, out var value) ? value : throw new KeyNotFoundException();
+            get => TryGet(address, out var value) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             set
             {
                 if (!TrySet(address, value))
-                    throw new KeyNotFoundException();
+                    throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             }
         }
 
@@ -210,16 +210,16 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach (var key in parent.Addresses)
+                    foreach (var address in parent.Addresses)
                     {
-                        if (!items.ContainsKey(key))
-                            yield return key;
+                        if (!items.ContainsKey(address))
+                            yield return address;
                     }
                 }
             }
         }
 
-        public IEnumerable<(A, V)> Pairs
+        public IEnumerable<(A Address, V Value)> Pairs
         {
             get
             {

@@ -4,26 +4,26 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataPool<A, V> : IPool<A, V>
+    public class DataPool<A, D> : IPool<A, D>
     {
-        Dictionary<A, (A, V)> items = new Dictionary<A, (A, V)>();
+        Dictionary<A, (A, D)> items = new Dictionary<A, (A, D)>();
 
 
         public int Count => items.Count;
 
-        bool IContainer<(A, V)>.Contains((A, V) value) => items.ContainsValue(value);
+        bool IContainer<(A, D)>.Contains((A, D) value) => items.ContainsValue(value);
 
-        public IEnumerator<(A, V)> GetEnumerator() => items.Values.GetEnumerator();
+        public IEnumerator<(A, D)> GetEnumerator() => items.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => items.Values.GetEnumerator();
 
         public bool HasAddress(A address) => items.ContainsKey(address);
 
-        public (A, V) Resolve(A address, V attribute = default(V))
+        public (A, D) Resolve(A address, D data = default(D))
         {
             if (!items.TryGetValue(address, out var pair))
             {
-                pair = (address, attribute);
+                pair = (address, data);
 
                 items.Add(address, pair);
             }

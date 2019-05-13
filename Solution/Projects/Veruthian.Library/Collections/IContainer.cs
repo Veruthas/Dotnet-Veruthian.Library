@@ -5,7 +5,7 @@ namespace Veruthian.Library.Collections
     /* 
         IContainer<T>
         IExpandableContainer<T> : IContainer<T> => DataSet        
-        IPool<A, V> : IContainer<(A, V)>
+        IPool<A, D> : IContainer<(A, V)>
 
         ILookup<A, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
         IMutableLookup<A, V> : ILookup<A, V>

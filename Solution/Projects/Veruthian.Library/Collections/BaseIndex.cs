@@ -57,7 +57,7 @@ namespace Veruthian.Library.Collections
 
         IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(0, Count - 1);
 
-        public IEnumerable<(int, T)> Pairs
+        public IEnumerable<(int Address, T Value)> Pairs
         {
             get
             {

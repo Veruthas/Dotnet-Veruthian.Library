@@ -4,7 +4,7 @@ namespace Veruthian.Library.Collections
     {
         void Insert(A address, V value);        
 
-        void RemoveBy(A key);
+        void RemoveBy(A address);
 
         void Clear();
     }

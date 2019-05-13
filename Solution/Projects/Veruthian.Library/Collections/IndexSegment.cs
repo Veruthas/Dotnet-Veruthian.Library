@@ -113,7 +113,7 @@ namespace Veruthian.Library.Collections
         IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(StartIndex, EndIndex);
 
 
-        public IEnumerable<(int, T)> Pairs
+        public IEnumerable<(int Address, T Value)> Pairs
         {
             get
             {

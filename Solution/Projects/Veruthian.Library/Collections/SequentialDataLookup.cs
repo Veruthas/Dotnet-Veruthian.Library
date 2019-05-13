@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace Veruthian.Library.Collections
                         return value;
                 }
 
-                throw new KeyNotFoundException();
+                throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             }
         }
 
@@ -68,7 +69,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<(A, V)> Pairs
+        public IEnumerable<(A Address, V Value)> Pairs
         {
             get
             {

@@ -8,10 +8,10 @@ namespace Veruthian.Library.Collections
 
         IEnumerable<A> Addresses { get; }
 
-        IEnumerable<(A, V)> Pairs { get; }
+        IEnumerable<(A Address, V Value)> Pairs { get; }
 
         bool HasAddress(A address);
 
-        bool TryGet(A address, out V value);
+        bool TryGet(A Address, out V Value);
     }
 }

@@ -15,8 +15,8 @@ namespace Veruthian.Library.Collections
 
         public V this[A address]
         {
-            get => dictionary.ContainsKey(address) ? dictionary[address] : throw new KeyNotFoundException();
-            set => dictionary[address] = dictionary.ContainsKey(address) ? value : throw new KeyNotFoundException();
+            get => dictionary.ContainsKey(address) ? dictionary[address] : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
+            set => dictionary[address] = dictionary.ContainsKey(address) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
         }
 
         V ILookup<A, V>.this[A address] => this[address];
@@ -57,7 +57,7 @@ namespace Veruthian.Library.Collections
 
         public IEnumerable<A> Addresses => dictionary.Keys;
 
-        public IEnumerable<(A, V)> Pairs
+        public IEnumerable<(A Address, V Value)> Pairs
         {
             get
             {
@@ -78,7 +78,7 @@ namespace Veruthian.Library.Collections
         public void Insert(A address, V value)
         {
             if (dictionary.ContainsKey(address))
-                throw new ArgumentException($"Key {address.ToString()} already exists", "key");
+                throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
 
             dictionary.Add(address, value);
         }
@@ -99,7 +99,7 @@ namespace Veruthian.Library.Collections
         public void RemoveBy(A address)
         {
             if (!HasAddress(address))
-                throw new ArgumentException($"Key {address.ToString()} does not exist", "key");
+                throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
 
             dictionary.Remove(address);
         }
