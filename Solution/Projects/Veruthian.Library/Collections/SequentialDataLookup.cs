@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections
 {
-    public class SequentialDataLookup<A, V> : ILookup<A, V>
+    public class SequentialDataLookup<A, T> : ILookup<A, T>
     {
-        List<ILookup<A, V>> lookups;
+        List<ILookup<A, T>> lookups;
 
 
-        public SequentialDataLookup() => lookups = new List<ILookup<A, V>>();
+        public SequentialDataLookup() => lookups = new List<ILookup<A, T>>();
 
 
-        public V this[A address]
+        public T this[A address]
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public bool Contains(V value)
+        public bool Contains(T value)
         {
             foreach (var lookup in lookups)
                 if (lookup.Contains(value))
@@ -44,13 +44,13 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public bool TryGet(A address, out V value)
+        public bool TryGet(A address, out T value)
         {
             foreach (var lookup in lookups)
                 if (lookup.TryGet(address, out value))
                     return true;
 
-            value = default(V);
+            value = default(T);
 
             return false;
         }
@@ -69,7 +69,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<(A Address, V Value)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
@@ -77,7 +77,7 @@ namespace Veruthian.Library.Collections
 
                 foreach (var lookup in lookups)
                 {
-                    foreach ((A Address, V Value) pair in lookup.Pairs)
+                    foreach ((A Address, T Value) pair in lookup.Pairs)
                     {
                         if (!addresses.Contains(pair.Address))
                         {
@@ -109,13 +109,13 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerator<V> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             var addresses = new HashSet<A>();
 
             foreach (var lookup in lookups)
             {
-                foreach ((A Address, V Value) pair in lookup.Pairs)
+                foreach ((A Address, T Value) pair in lookup.Pairs)
                 {
                     if (!addresses.Contains(pair.Address))
                     {

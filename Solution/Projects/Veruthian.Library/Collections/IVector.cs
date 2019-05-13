@@ -1,11 +1,11 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IVector<A, V> : ILookup<A, V>
+    public interface IVector<A, T> : ILookup<A, T>
     {
         A Start { get; }
     }
 
-    public interface IVector<V> : IVector<int, V>
+    public interface IVector<T> : IVector<int, T>
     {
 
     }

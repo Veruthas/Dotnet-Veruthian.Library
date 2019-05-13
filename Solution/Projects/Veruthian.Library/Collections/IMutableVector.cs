@@ -1,11 +1,11 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IMutableVector<A, V> : IVector<A, V>, IMutableLookup<A, V>
+    public interface IMutableVector<A, T> : IVector<A, T>, IMutableLookup<A, T>
     {
 
     }
 
-    public interface IMutableVector<V> : IMutableVector<int, V>, IVector<V>
+    public interface IMutableVector<T> : IMutableVector<int, T>, IVector<T>
     {
         
     }

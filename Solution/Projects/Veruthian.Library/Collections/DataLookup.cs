@@ -5,23 +5,23 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataLookup<A, V> : IMutableLookup<A, V>, IExpandableLookup<A, V>
+    public class DataLookup<A, T> : IMutableLookup<A, T>, IExpandableLookup<A, T>
     {
-        Dictionary<A, V> dictionary;
+        Dictionary<A, T> dictionary;
 
 
-        public DataLookup() => this.dictionary = new Dictionary<A, V>();
+        public DataLookup() => this.dictionary = new Dictionary<A, T>();
 
 
-        public V this[A address]
+        public T this[A address]
         {
             get => dictionary.ContainsKey(address) ? dictionary[address] : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             set => dictionary[address] = dictionary.ContainsKey(address) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
         }
 
-        V ILookup<A, V>.this[A address] => this[address];
+        T ILookup<A, T>.this[A address] => this[address];
 
-        public bool TryGet(A address, out V value)
+        public bool TryGet(A address, out T value)
         {
             if (dictionary.ContainsKey(address))
             {
@@ -31,13 +31,13 @@ namespace Veruthian.Library.Collections
             }
             else
             {
-                value = default(V);
+                value = default(T);
 
                 return false;
             }
         }
 
-        public bool TrySet(A address, V value)
+        public bool TrySet(A address, T value)
         {
             if (dictionary.ContainsKey(address))
             {
@@ -57,7 +57,7 @@ namespace Veruthian.Library.Collections
 
         public IEnumerable<A> Addresses => dictionary.Keys;
 
-        public IEnumerable<(A Address, V Value)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
@@ -66,16 +66,16 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerator<V> GetEnumerator() => dictionary.Values.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => dictionary.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-        public bool Contains(V value) => dictionary.ContainsValue(value);
+        public bool Contains(T value) => dictionary.ContainsValue(value);
 
         public bool HasAddress(A address) => dictionary.ContainsKey(address);
 
-        public void Insert(A address, V value)
+        public void Insert(A address, T value)
         {
             if (dictionary.ContainsKey(address))
                 throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
@@ -83,7 +83,7 @@ namespace Veruthian.Library.Collections
             dictionary.Add(address, value);
         }
 
-        public V GetOrInsert(A address, V value)
+        public T GetOrInsert(A address, T value)
         {
             if (TryGet(address, out var result))
             {

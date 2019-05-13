@@ -4,22 +4,22 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections
 {
-    public class NestedDataLookup<A, V> : IMutableLookup<A, V>, IExpandableLookup<A, V>
+    public class NestedDataLookup<A, T> : IMutableLookup<A, T>, IExpandableLookup<A, T>
     {
-        Dictionary<A, (V value, bool active)> items = new Dictionary<A, (V, bool)>();
+        Dictionary<A, (T value, bool active)> items = new Dictionary<A, (T, bool)>();
 
-        ILookup<A, V> parent;
+        ILookup<A, T> parent;
 
 
         public NestedDataLookup() { }
 
-        public NestedDataLookup(ILookup<A, V> parent) => this.parent = parent;
+        public NestedDataLookup(ILookup<A, T> parent) => this.parent = parent;
 
 
-        public ILookup<A, V> Parent => parent;
+        public ILookup<A, T> Parent => parent;
 
 
-        public V this[A address]
+        public T this[A address]
         {
             get => TryGet(address, out var value) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             set
@@ -29,9 +29,9 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        V ILookup<A, V>.this[A address] => this[address];
+        T ILookup<A, T>.this[A address] => this[address];
 
-        public bool TryGet(A address, out V value)
+        public bool TryGet(A address, out T value)
         {
             if (items.TryGetValue(address, out var result))
             {
@@ -47,12 +47,12 @@ namespace Veruthian.Library.Collections
                 return parent.TryGet(address, out value);
             }
 
-            value = default(V);
+            value = default(T);
 
             return false;
         }
 
-        public bool TrySet(A address, V value)
+        public bool TrySet(A address, T value)
         {
             if (items.TryGetValue(address, out var result))
             {
@@ -109,7 +109,7 @@ namespace Veruthian.Library.Collections
             parent = null;
         }
 
-        public bool Contains(V value)
+        public bool Contains(T value)
         {
             if (value == null)
             {
@@ -121,7 +121,7 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach ((A address, V value) pair in parent.Pairs)
+                    foreach ((A address, T value) pair in parent.Pairs)
                     {
                         if (!items.ContainsKey(pair.address) && pair.value == null)
                             return true;
@@ -138,7 +138,7 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach ((A address, V value) pair in parent.Pairs)
+                    foreach ((A address, T value) pair in parent.Pairs)
                     {
                         if (!items.ContainsKey(pair.address) && pair.value.Equals(value))
                             return true;
@@ -159,7 +159,7 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public void Insert(A address, V value)
+        public void Insert(A address, T value)
         {
             if (HasAddress(address))
                 throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
@@ -167,7 +167,7 @@ namespace Veruthian.Library.Collections
             items.Add(address, (value, true));
         }
 
-        public V GetOrInsert(A address, V value)
+        public T GetOrInsert(A address, T value)
         {
             if (TryGet(address, out var result))
             {
@@ -190,7 +190,7 @@ namespace Veruthian.Library.Collections
             else if (this.parent != null)
             {
                 if (this.parent.HasAddress(address))
-                    items.Add(address, (default(V), false));
+                    items.Add(address, (default(T), false));
             }
             else
             {
@@ -219,7 +219,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<(A Address, V Value)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
@@ -240,7 +240,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerator<V> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             foreach (var pair in items)
             {
