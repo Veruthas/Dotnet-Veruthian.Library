@@ -46,11 +46,14 @@ namespace Veruthian.Library.Numeric
         }
 
 
+        public bool IsZero => IsSimple && value == 0;
+
         private bool IsSimple => values == null;
 
         private uint this[int index] => values == null ? value : values.Length < index ? values[index] : 0;
 
         private int UnitCount => values != null ? values.Length : 1;
+
 
 
         #region Comparison
@@ -205,14 +208,7 @@ namespace Veruthian.Library.Numeric
 
         #region Arithmetic
 
-        public Number Next => this.Add(One);
-
-        public Number Previous => this.Subtract(One);
-
-
-        public bool IsZero => IsSimple && value == 0;
-
-
+        // Addition
         public Number Add(Number other)
         {
             if (this.IsSimple && other.IsSimple)
@@ -243,6 +239,10 @@ namespace Veruthian.Library.Numeric
             }
         }
 
+        public Number Next => this.Add(One);
+
+
+        // Subtraction
         public Number Subtract(Number other)
         {
             var result = Subtract(this, other);
@@ -331,6 +331,10 @@ namespace Veruthian.Library.Numeric
             }
         }
 
+        public Number Previous => this.Subtract(One);
+
+
+        // Multiplication
         public Number Multiply(Number other) => Multiply(this, other);
 
         private static Number Multiply(Number left, Number right)
@@ -373,6 +377,8 @@ namespace Veruthian.Library.Numeric
             }
         }
 
+
+        // Division
         public Number Divide(Number other) => DivideWithRemainder(other, false).Quotient;
 
         public Number Modulus(Number other) => DivideWithRemainder(other, false).Remainder;
@@ -438,6 +444,7 @@ namespace Veruthian.Library.Numeric
             return (new Number(units), new Number((uint)remainder));
         }
 
+        #region Operators
 
         public static Number operator ++(Number value) => value.Next;
 
@@ -453,6 +460,8 @@ namespace Veruthian.Library.Numeric
         public static Number operator /(Number left, Number right) => left.Divide(right);
 
         public static Number operator %(Number left, Number right) => left.Modulus(right);
+
+        #endregion
 
         #endregion
 
@@ -625,6 +634,5 @@ namespace Veruthian.Library.Numeric
         }
 
         #endregion
-
     }
 }
