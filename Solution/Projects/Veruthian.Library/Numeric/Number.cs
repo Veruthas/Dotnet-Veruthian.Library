@@ -370,35 +370,47 @@ namespace Veruthian.Library.Numeric
             }
             else
             {
-                var units = new List<uint>();
+                var leftCount = left.UnitCount;
 
-                for (var r = 0; r < right.UnitCount; r++)
+                var rightCount = right.UnitCount;
+
+                var units = new uint[leftCount + rightCount];
+
+                var index = 0;
+ 
+                int current = 0;
+
+                ulong value = 0;
+
+                while (current < rightCount)
                 {
-                    var b = (ulong)right[r];
+                    current++;
 
-                    var carry = (ulong)0;
-
-                    for (int l = 0; l < left.UnitCount; l++)
+                    for (int i = 0, j = current - 1; i < current; i++, j--)
                     {
-                        var a = (ulong)left[l];
-
-                        var result = (a * b) + carry;
-
-                        var index = l + r;
-
-                        if (units.Count >= index)
-                            units.Add(0);
-
-                        units[index] += (uint)result;
-
-                        carry = result >> BitsInUnit;
+                        value += (ulong)left[i] * (ulong)right[j];
                     }
 
-                    if (carry != 0)
-                        units.Add((uint)carry);
+                    units[index++] = (uint)value;
+
+                    value >>= BitsInUnit;
                 }
 
-                return new Number(units.ToArray());
+                while (current > 1)
+                {
+                    current--;
+
+                    for (int i = rightCount - current, j = leftCount - 1; i < rightCount; i++, j--)
+                    {
+                        value += (ulong)left[i] * (ulong)right[j];
+                    }
+
+                    units[index++] = (uint)value;
+
+                    value >>= BitsInUnit;
+                }
+
+                return new Number(units);
             }
         }
 
@@ -560,7 +572,7 @@ namespace Veruthian.Library.Numeric
                         builder.Append(separator ?? "");
 
                     current--;
-                    
+
                     builder.Append(symbols[0]);
 
                     actualLength++;
@@ -573,7 +585,7 @@ namespace Veruthian.Library.Numeric
             else if (this.units == null)
             {
                 var current = this;
-                
+
                 var rem = this;
 
                 while (!current.IsZero)

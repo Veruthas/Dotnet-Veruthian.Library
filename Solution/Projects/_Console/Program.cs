@@ -19,7 +19,7 @@ namespace _Console
             var f = a * b;
 
             var fs = f.ToString();
-            
+
             var f2 = f.Previous;
 
             var g = f / b;
