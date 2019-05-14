@@ -64,11 +64,11 @@ namespace _Console
 
             rules["Item"] = g.Choice(rules["Symbol"], rules["Number"], rules["Word"]);
 
-            tokens["Symbol"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Whitespace"]);
+            tokens["Symbol"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Symbol))), rules["Whitespace"]);
 
-            tokens["Number"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Digit)), rules["Whitespace"]);
+            tokens["Number"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Digit))), rules["Whitespace"]);
 
-            tokens["Word"] = g.Sequence(g.AtLeast(1, g.MatchSet(RuneSet.Letter)), rules["Whitespace"]);
+            tokens["Word"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Letter))), rules["Whitespace"]);
 
             rules["Whitespace"] = g.Repeat(g.MatchSet(RuneSet.Whitespace));
 
@@ -76,9 +76,14 @@ namespace _Console
             return rules;
         }
 
+        static LabeledStep Literal(this IStepGenerator generator, IStep step) => generator.Label(step, LiteralLabel);
+
+
         static string RuleLabel = "rule";
 
         static string TokenLabel = "token";
+
+        static string LiteralLabel = "literal";
 
         static string TokenFlagAddress = "tokenFlag";
 
@@ -98,7 +103,7 @@ namespace _Console
         public static IStepHandler GetHandler()
         {
             var labeled = new LabeledStepHandler();
-            
+
             labeled.StepStarted += (step, state) =>
             {
                 if (step.Has(RuleLabel))
@@ -121,22 +126,55 @@ namespace _Console
                     }
                 }
 
+                if (step.Has(TokenLabel))
+                {
+                    state.SetFlag(TokenFlagAddress, true);
+                }
+
+                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+                {
+                    var reader = state.GetReader();
+
+                    reader.Mark();
+                }
+
                 return null;
             };
 
             labeled.StepCompleted += (step, state, result) =>
             {
+                if (state.GetFlag(HandledFlagAddress))
+                {
+                    state.SetFlag(HandledFlagAddress, false);
+
+                    return;
+                }
+
                 if (step.Has(RuleLabel))
                 {
-                    if (result != null && !state.GetFlag(HandledFlagAddress) && state.GetFlag(MemoizeFlagAddress))
+                    if (result != null && state.GetFlag(MemoizeFlagAddress))
                     {
                         var reader = state.GetReader();
 
                         if (reader.IsSpeculating)
                             reader.StoreProgress(step, result.Value);
                     }
+                }
 
-                    state.SetFlag(HandledFlagAddress, false);
+                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+                {
+                    var reader = state.GetReader();
+
+                    var literal = new RuneString(reader.LookFromMark(0, null));
+
+                    Console.WriteLine($"*******Captured Literal: '{literal}'");
+
+                    reader.Commit();
+                }
+
+                if (step.Has(TokenLabel))
+                {
+                    state.SetFlag(TokenFlagAddress, false);
                 }
             };
 
@@ -183,6 +221,7 @@ namespace _Console
 
             return handlers;
         }
+
 
         public static StateTable GetState(RuneString value)
         {
