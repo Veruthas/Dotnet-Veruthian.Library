@@ -10,6 +10,9 @@ namespace _Console
             Number a = Number.Parse("80-00-00-00", Number.HexUpper);
             Number b = uint.MaxValue;
 
+            Number x = (ulong)uint.MaxValue + 1;
+            Console.WriteLine(x.ToString(Number.Decimal));
+
             var c = a + b;
             var d = b - a;
             var e = a - b;
@@ -18,7 +21,7 @@ namespace _Console
 
             var f = a * b;
 
-            var fs = f.ToString();
+            var fs = f.ToString(Number.Decimal);
 
             var f2 = f.Previous;
 

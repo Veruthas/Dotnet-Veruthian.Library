@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Numeric
 {
@@ -368,47 +369,30 @@ namespace Veruthian.Library.Numeric
             {
                 return (ulong)left.value * (ulong)right.value;
             }
+            else if (left.IsZero || right.IsZero)
+            {
+                return Zero;
+            }
             else
             {
-                var leftCount = left.UnitCount;
+                var units = new uint[left.UnitCount + right.UnitCount];
 
-                var rightCount = right.UnitCount;
-
-                var units = new uint[leftCount + rightCount];
-
-                var index = 0;
- 
-                int current = 0;
-
-                ulong value = 0;
-
-                while (current < rightCount)
+                for (int b = 0, column = 0; b < right.UnitCount; b++, column++)
                 {
-                    current++;
+                    ulong value = 0;
 
-                    for (int i = 0, j = current - 1; i < current; i++, j--)
+                    for (var a = 0; a < left.UnitCount; a++)
                     {
-                        value += (ulong)left[i] * (ulong)right[j];
+                        // add (A*B) + previous results + carry
+                        value = ((ulong)left[a] * (ulong)right[b]) + units[column + a] + value;
+
+                        units[column + a] = (uint)value;
+
+                        value >>= BitsInUnit;
                     }
-
-                    units[index++] = (uint)value;
-
-                    value >>= BitsInUnit;
                 }
 
-                while (current > 1)
-                {
-                    current--;
-
-                    for (int i = rightCount - current, j = leftCount - 1; i < rightCount; i++, j--)
-                    {
-                        value += (ulong)left[i] * (ulong)right[j];
-                    }
-
-                    units[index++] = (uint)value;
-
-                    value >>= BitsInUnit;
-                }
+                TrimUnits(ref units);
 
                 return new Number(units);
             }
@@ -434,7 +418,7 @@ namespace Veruthian.Library.Numeric
         {
             if (right.IsZero)
             {
-                return checkedZero ? (Zero, Zero) : throw new DivideByZeroException();
+                return checkedZero ? throw new DivideByZeroException() : (Zero, Zero);
             }
             else if (right.IsSimple)
             {
@@ -445,27 +429,28 @@ namespace Veruthian.Library.Numeric
             }
             else
             {
-
+                return DivideWithRemainder(left.units, right.units);
             }
-
-            throw new NotImplementedException();
         }
 
         private static (Number Quotient, Number Remainder) DivideWithRemainder(uint[] numerators, uint denominator)
         {
             var index = numerators.Length - 1;
 
-            var numerator = (ulong)numerators[index--];
+            var numerator = (ulong)numerators[index];
+
 
             var remainder = numerator % denominator;
 
-            var result = numerator / denominator;
+            numerator = numerator / denominator;
 
 
-            var units = new uint[index + (result == 0 ? 1 : 2)];
+            var units = new uint[index + (numerator == 0 ? 0 : 1)];
 
-            if (result != 0)
-                units[index + 1] = (uint)numerator;
+            if (numerator != 0)
+                units[index] = (uint)numerator;
+
+            index--;
 
             while (index >= 0)
             {
@@ -479,6 +464,11 @@ namespace Veruthian.Library.Numeric
             }
 
             return (new Number(units), new Number((uint)remainder));
+        }
+
+        private static (Number Quotient, Number Remainder) DivideWithRemainder(uint[] numerators, uint[] denominator)
+        {
+            throw new ArithmeticException();
         }
 
         #region Operators
@@ -554,7 +544,7 @@ namespace Veruthian.Library.Numeric
 
         public string ToString(string symbols, int groupLength = 0, string separator = null, bool pad = false)
         {
-            Utility.ExceptionHelper.VerifyNotNull(symbols, nameof(symbols));
+            ExceptionHelper.VerifyNotNull(symbols, nameof(symbols));
 
             var builder = new StringBuilder();
 
@@ -582,7 +572,7 @@ namespace Veruthian.Library.Numeric
             {
                 builder.Append(symbols[0]);
             }
-            else if (this.units == null)
+            else
             {
                 var current = this;
 
@@ -593,7 +583,7 @@ namespace Veruthian.Library.Numeric
                     if (groupLength > 0 && actualLength != 0 && actualLength % groupLength == 0)
                         builder.Append(separator ?? "");
 
-                    (current, rem) = DivideWithRemainder(this, numberBase, false);
+                    (current, rem) = current.DivideWithRemainder(numberBase);
 
                     builder.Append(symbols[(int)rem.value]);
 
@@ -601,7 +591,7 @@ namespace Veruthian.Library.Numeric
                 }
             }
 
-
+            // Pad with zero symbol
             if (pad && groupLength > 0)
             {
                 while (actualLength % groupLength != 0)
@@ -612,6 +602,7 @@ namespace Veruthian.Library.Numeric
                 }
             }
 
+            // Reverse string
             for (int i = 0, j = builder.Length - 1; i < builder.Length / 2; i++, j--)
                 (builder[i], builder[j]) = (builder[j], builder[i]);
 
