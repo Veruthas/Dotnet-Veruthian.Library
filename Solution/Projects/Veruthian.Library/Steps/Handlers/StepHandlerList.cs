@@ -33,7 +33,7 @@ namespace Veruthian.Library.Steps.Handlers
 
             bool? result = OnStepStarted(step, state);
 
-            if (result != null)
+            if (result == null)
             {
                 foreach (var handler in handlers)
                 {

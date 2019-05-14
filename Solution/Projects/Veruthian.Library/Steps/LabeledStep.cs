@@ -27,6 +27,6 @@ namespace Veruthian.Library.Steps
         }        
 
 
-        public bool Is(string label) => labels == null ? false : labels.Contains(label);
+        public bool Has(string label) => labels == null ? false : labels.Contains(label);
     }
 }
