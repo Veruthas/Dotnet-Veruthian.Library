@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class SequentialStepHandler<TState> : StepHandler<TState, SequentialStep>
+    public class SequentialStepHandler : StepHandler<SequentialStep>
     {
-        protected override bool? HandleStep(SequentialStep step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(SequentialStep step, StateTable state, IStepHandler root)
         {
             foreach (var substep in step.Sequence)
             {

@@ -1,7 +1,7 @@
 namespace Veruthian.Library.Steps.Handlers
 {
-    public interface IStepHandler<TState>
+    public interface IStepHandler
     {
-        bool? Handle(IStep step, TState state, IStepHandler<TState> root = null);
+        bool? Handle(IStep step, StateTable state, IStepHandler root = null);
     }
 }

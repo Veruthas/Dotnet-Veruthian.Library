@@ -2,9 +2,9 @@ using System;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public abstract class MatchStepHandler<TState, T> : StepHandler<TState, MatchStep<T>>
+    public abstract class MatchStepHandler<T> : StepHandler<MatchStep<T>>
     {
-        protected override bool? HandleStep(MatchStep<T> step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(MatchStep<T> step, StateTable state, IStepHandler root)
         {
             if (IsEnd(state))
                 return false;
@@ -34,11 +34,11 @@ namespace Veruthian.Library.Steps.Handlers
             return result.Success;
         }
 
-        protected abstract bool IsEnd(TState state);
+        protected abstract bool IsEnd(StateTable state);
 
-        protected abstract T GetCurrent(TState state);
+        protected abstract T GetCurrent(StateTable state);
 
-        protected abstract void Advance(TState state);
+        protected abstract void Advance(StateTable state);
 
         protected virtual void OnMatched(T item)
         {

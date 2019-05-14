@@ -2,10 +2,10 @@ using System;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public abstract class StepHandler<TState, TStep> : IStepHandler<TState>
+    public abstract class StepHandler<TStep> : IStepHandler
         where TStep : IStep
     {
-        public virtual bool? Handle(IStep step, TState state, IStepHandler<TState> root = null)
+        public virtual bool? Handle(IStep step, StateTable state, IStepHandler root = null)
         {
             switch (step)
             {
@@ -27,10 +27,10 @@ namespace Veruthian.Library.Steps.Handlers
             }
         }
 
-        protected abstract bool? HandleStep(TStep step, TState state, IStepHandler<TState> root);
+        protected abstract bool? HandleStep(TStep step, StateTable state, IStepHandler root);
 
 
-        protected virtual bool? OnStepStarted(TStep step, TState state)
+        protected virtual bool? OnStepStarted(TStep step, StateTable state)
         {
             if (StepStarted != null)
                 return StepStarted(step, state);
@@ -38,15 +38,15 @@ namespace Veruthian.Library.Steps.Handlers
             return null;
         }
 
-        protected virtual void OnStepCompleted(TStep step, TState state, bool? result)
+        protected virtual void OnStepCompleted(TStep step, StateTable state, bool? result)
         {
             if (StepCompleted != null)
                 StepCompleted(step, state, result);
         }
 
 
-        public event Func<TStep, TState, bool?> StepStarted;
+        public event Func<TStep, StateTable, bool?> StepStarted;
 
-        public event Action<TStep, TState, bool?> StepCompleted;
+        public event Action<TStep, StateTable, bool?> StepCompleted;
     }
 }

@@ -5,15 +5,14 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class SpeculativeConditonalStepHandler<TState> : ConditionalStepHandler<TState>
-        where TState : ILookup<string, object>
+    public class SpeculativeConditonalStepHandler : ConditionalStepHandler
     {
         public SpeculativeConditonalStepHandler(string speculativeAddress) => this.SpeculativeAddress = speculativeAddress;
 
         public string SpeculativeAddress { get; }
 
 
-        protected override void OnSpeculationStarted(IStep speculation, TState state)
+        protected override void OnSpeculationStarted(IStep speculation, StateTable state)
         {
             base.OnSpeculationStarted(speculation, state);
 
@@ -22,7 +21,7 @@ namespace Veruthian.Library.Steps.Handlers
             speculative.Mark();
         }
 
-        protected override void OnSpeculationCompleted(IStep speculation, TState state, bool? result)
+        protected override void OnSpeculationCompleted(IStep speculation, StateTable state, bool? result)
         {
             base.OnSpeculationCompleted(speculation, state, result);
 

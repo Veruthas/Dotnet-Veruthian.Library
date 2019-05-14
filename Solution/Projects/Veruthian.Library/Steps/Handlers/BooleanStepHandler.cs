@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class BooleanStepHandler<TState> : StepHandler<TState, BooleanStep>
+    public class BooleanStepHandler : StepHandler<BooleanStep>
     {
-        protected override bool? HandleStep(BooleanStep step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(BooleanStep step, StateTable state, IStepHandler root)
         {
             return step.Value;
         }

@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class RepeatedTryStepHandler<TState> : StepHandler<TState, RepeatedTryStep>
+    public class RepeatedTryStepHandler : StepHandler<RepeatedTryStep>
     {
-        protected override bool? HandleStep(RepeatedTryStep step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(RepeatedTryStep step, StateTable state, IStepHandler root)
         {
             if (step.Count == null)
             {

@@ -3,9 +3,9 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class LabeledStepHandler<TState> : StepHandler<TState, LabeledStep>
+    public class LabeledStepHandler : StepHandler<LabeledStep>
     {        
-        protected override bool? HandleStep(LabeledStep step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(LabeledStep step, StateTable state, IStepHandler root)
         {
             return root.Handle(step.Step, state);
         }

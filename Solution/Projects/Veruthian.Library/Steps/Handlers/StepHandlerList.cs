@@ -3,30 +3,30 @@ using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class StepHandlerList<TState> : StepHandler<TState, IStep>
+    public class StepHandlerList : StepHandler< IStep>
     {
-        IExpandableIndex<IStepHandler<TState>> handlers;
+        IExpandableIndex<IStepHandler> handlers;
 
 
         public StepHandlerList()
-            : this(DataList<IStepHandler<TState>>.New()) { }
+            : this(DataList<IStepHandler>.New()) { }
 
 
-        public StepHandlerList(params IStepHandler<TState>[] handlers)
-            : this(DataList<IStepHandler<TState>>.From(handlers)) { }
+        public StepHandlerList(params IStepHandler[] handlers)
+            : this(DataList<IStepHandler>.From(handlers)) { }
 
-        public StepHandlerList(IEnumerable<IStepHandler<TState>> handlers)
-            : this(DataList<IStepHandler<TState>>.Extract(handlers)) { }
-
-
-        public StepHandlerList(IExpandableIndex<IStepHandler<TState>> handlers)
-            => this.handlers = handlers ?? DataList<IStepHandler<TState>>.New();
+        public StepHandlerList(IEnumerable<IStepHandler> handlers)
+            : this(DataList<IStepHandler>.Extract(handlers)) { }
 
 
-        public IExpandableIndex<IStepHandler<TState>> Handlers => handlers;
+        public StepHandlerList(IExpandableIndex<IStepHandler> handlers)
+            => this.handlers = handlers ?? DataList<IStepHandler>.New();
 
 
-        public override bool? Handle(IStep step, TState state, IStepHandler<TState> root = null)
+        public IExpandableIndex<IStepHandler> Handlers => handlers;
+
+
+        public override bool? Handle(IStep step, StateTable state, IStepHandler root = null)
         {
             if (root == null)
                 root = this;
@@ -50,6 +50,6 @@ namespace Veruthian.Library.Steps.Handlers
         }
 
 
-        protected override bool? HandleStep(IStep step, TState state, IStepHandler<TState> root) => null;
+        protected override bool? HandleStep(IStep step, StateTable state, IStepHandler root) => null;
     }
 }

@@ -6,29 +6,28 @@ using Veruthian.Library.Types;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class ReaderStepHandler<TState, T> : MatchStepHandler<TState, T>
-        where TState : ILookup<string, object>
+    public class ReaderStepHandler<T> : MatchStepHandler<T>
     {
         public ReaderStepHandler(string readerAddress) => this.ReaderAddress = readerAddress;
 
         public string ReaderAddress { get; }
                     
         
-        protected override void Advance(TState state)
+        protected override void Advance(StateTable state)
         {
             state.Get(ReaderAddress, out IReader<T> reader);
 
             reader.Advance();
         }
 
-        protected override T GetCurrent(TState state)
+        protected override T GetCurrent(StateTable state)
         {
             state.Get(ReaderAddress, out IReader<T> reader);
 
             return reader.Current;
         }
 
-        protected override bool IsEnd(TState state)
+        protected override bool IsEnd(StateTable state)
         {
             state.Get(ReaderAddress, out IReader<T> reader);
 

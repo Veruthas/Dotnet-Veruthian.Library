@@ -2,9 +2,9 @@ using System;
 
 namespace Veruthian.Library.Steps.Handlers
 {
-    public class ConditionalStepHandler<TState> : StepHandler<TState, ConditionalStep>
+    public class ConditionalStepHandler : StepHandler<ConditionalStep>
     {
-        protected override bool? HandleStep(ConditionalStep step, TState state, IStepHandler<TState> root)
+        protected override bool? HandleStep(ConditionalStep step, StateTable state, IStepHandler root)
         {
             var result = HandleSpeculation(step.Condition, state, root);
 
@@ -28,7 +28,7 @@ namespace Veruthian.Library.Steps.Handlers
             }
         }
 
-        protected virtual bool? HandleSpeculation(IStep speculation, TState state, IStepHandler<TState> root)
+        protected virtual bool? HandleSpeculation(IStep speculation, StateTable state, IStepHandler root)
         {
             OnSpeculationStarted(speculation, state);
 
@@ -40,21 +40,21 @@ namespace Veruthian.Library.Steps.Handlers
         }
 
 
-        protected virtual void OnSpeculationStarted(IStep speculation, TState state)
+        protected virtual void OnSpeculationStarted(IStep speculation, StateTable state)
         {
             if (SpeculationStarted != null)
                 SpeculationStarted(speculation, state);
         }
 
-        protected virtual void OnSpeculationCompleted(IStep speculation, TState state, bool? result)
+        protected virtual void OnSpeculationCompleted(IStep speculation, StateTable state, bool? result)
         {
             if (SpeculationCompleted != null)
                 SpeculationCompleted(speculation, state, result);
         }
 
 
-        public event Action<IStep, TState> SpeculationStarted;
+        public event Action<IStep, StateTable> SpeculationStarted;
 
-        public event Action<IStep, TState, bool?> SpeculationCompleted;
+        public event Action<IStep, StateTable, bool?> SpeculationCompleted;
     }
 }
