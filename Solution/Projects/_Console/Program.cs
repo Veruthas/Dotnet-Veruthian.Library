@@ -7,28 +7,6 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            Number a = Number.Parse("80-00-00-00", Number.HexUpper);
-            Number b = uint.MaxValue;
-
-            Number x = (ulong)uint.MaxValue + 1;
-            Console.WriteLine(x.ToString(Number.Decimal));
-
-            var c = a + b;
-            var d = b - a;
-            var e = a - b;
-
-            var e2 = d + a;
-
-            var f = a * b;
-
-            var fs = f.ToString(Number.Decimal);
-
-            var f2 = f.Previous;
-
-            var g = f / b;
-
-            var h = a % b;
-
             Pause();
         }
 

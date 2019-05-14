@@ -61,7 +61,7 @@ namespace Veruthian.Library.Numeric
 
         private bool IsSimple => units == null;
 
-        private uint this[int index] => units == null ? value : units.Length < index ? units[index] : 0;
+        private uint this[int index] => units == null ? (index == 0 ? value : 0) : (index < units.Length ? units[index] : 0);
 
         private int UnitCount => units != null ? units.Length : 1;
 
@@ -312,7 +312,7 @@ namespace Veruthian.Library.Numeric
                 {
                     unchecked
                     {
-                        var result = (ulong)a[i] + ~(ulong)b[i] + carry;
+                        var result = (ulong)a[i] + (ulong)(~b[i]) + carry;
 
                         units[i] = (uint)result;
 
@@ -468,7 +468,18 @@ namespace Veruthian.Library.Numeric
 
         private static (Number Quotient, Number Remainder) DivideWithRemainder(uint[] numerators, uint[] denominator)
         {
-            throw new ArithmeticException();
+            // HACK: There is definitely a better algorithm out there...
+            Number num = new Number(numerators);
+            Number den = new Number(denominator);
+            Number quo = new Number(0);
+
+            while (num >= den)
+            {
+                num -= den;
+                quo++;
+            }
+
+            return (quo, num);
         }
 
         #region Operators
