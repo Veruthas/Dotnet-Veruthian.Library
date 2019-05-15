@@ -11,12 +11,33 @@ using Veruthian.Library.Steps.Generators;
 using Veruthian.Library.Steps.Handlers;
 using Veruthian.Library.Text.Runes;
 using Veruthian.Library.Types;
-using Veruthian.Library.Types.Extensions;
 
 namespace _Console
 {
     public static class TestParsers
     {
+        static string RuleLabel = "rule";
+
+        static string TokenLabel = "token";
+
+        static string LiteralLabel = "literal";
+
+        static string TokenFlagAddress = "tokenFlag";
+
+        static string MemoizeFlagAddress = "memoizeFlag";
+
+        static string TraceFlagAddress = "traceFlag";
+
+
+        static string ReaderAddress = "reader";
+
+        static string SpeculativeAddress = "reader";
+
+        static string CounterAddress = "counter";
+
+        static string IndentAddress = "indent";
+
+
         public static void Test()
         {
             var rules = GetRules();
@@ -48,6 +69,9 @@ namespace _Console
             Console.WriteLine();
         }
 
+
+        #region Rules
+
         private static StepTable GetRules()
         {
             var g = new MatchStepGenerator(new SpeculativeStepGenerator());
@@ -58,19 +82,25 @@ namespace _Console
 
             var tokens = rules.CreateSubTable(TokenLabel);
 
-
+            // rule File = Whitespace Items unless Any;
             rules["File"] = g.Sequence(rules["Whitespace"], rules["Items"], g.Unless(g.MatchSet(RuneSet.Complete)));
 
+            // rule Items = {Item};
             rules["Items"] = g.Repeat(rules["Item"]);
 
-            rules["Item"] = g.Choice(rules["Symbol"], rules["Number"], rules["Word"]);
+            // rule Item = Symbol or Number or Word
+            rules["Item"] = g.Choice(rules["Symbols"], rules["Number"], rules["Word"]);
 
-            tokens["Symbol"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Symbol))), rules["Whitespace"]);
+            // rule:token Symbols = (at least 1 Symbol):Literal Whitespace;
+            tokens["Symbols"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Symbol))), rules["Whitespace"]);
 
+            // rule:token Number = (at least 1 Digit):Literal Whitespace
             tokens["Number"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Digit))), rules["Whitespace"]);
 
+            // rule:token Word = (at least 1 Letter):Literal Whitespace
             tokens["Word"] = g.Sequence(g.Literal(g.AtLeast(1, g.MatchSet(RuneSet.Letter))), rules["Whitespace"]);
 
+            // rule Whitespace = {SpaceOrNewline};
             rules["Whitespace"] = g.Repeat(g.MatchSet(RuneSet.Whitespace));
 
 
@@ -79,25 +109,9 @@ namespace _Console
 
         static LabeledStep Literal(this IStepGenerator generator, IStep step) => generator.Label(step, LiteralLabel);
 
+        #endregion
 
-        static string RuleLabel = "rule";
-
-        static string TokenLabel = "token";
-
-        static string LiteralLabel = "literal";
-
-        static string TokenFlagAddress = "tokenFlag";
-
-        static string MemoizeFlagAddress = "memoizeFlag";
-
-
-        static string ReaderAddress = "reader";
-
-        static string SpeculativeAddress = "reader";
-
-        static string CounterAddress = "counter";
-
-        static string IndentAddress = "indent";
+        #region Handler
 
         public static IStepHandler GetHandler()
         {
@@ -115,105 +129,147 @@ namespace _Console
                     labeled
                 );
 
-            labeled.StepStarted += (step, state) =>
+            labeled.StepStarted += LabeledStepStarted;
+
+            labeled.StepCompleted += LabeledStepCompleted;
+
+            handlers.StepStarted += StepStarted;
+
+            handlers.StepCompleted += StepCompleted;
+
+            return handlers;
+        }
+
+
+        // Step Events
+        private static bool? StepStarted(IStep step, StateTable state)
+        {
+            var counter = state.GetCounter();
+
+            var indent = state.GetIndent();
+
+            var reader = state.GetReader();
+
+            counter.Value++;
+
+            indent.Value++;
+
+            if (state.GetFlag(TraceFlagAddress))
+                Console.WriteLine($"{new string('|', indent)}Started @({reader.Position}:'{reader.Current.ToPrintableString()}') #{counter} {step}");
+
+            return null;
+        }
+
+        private static void StepCompleted(IStep step, StateTable state, bool? result, bool handled)
+        {
+            var h = handled;
+
+            var indent = state.GetIndent();
+
+            var reader = state.GetReader();
+
+            if (state.GetFlag(TraceFlagAddress))
+                Console.WriteLine($"{new string('|', indent)}Completed @({reader.Position}:'{reader.Current.ToPrintableString()}') <{result.ToPrintable()}> {step}");
+
+            indent.Value--;
+        }
+
+
+
+        // Labeled Step Events
+        private static bool? LabeledStepStarted(LabeledStep step, StateTable state)
+        {
+            // Rule
+            if (step.Has(RuleLabel))
             {
-                // Rule
-                if (step.Has(RuleLabel))
-                {
-                    var result = CheckProgress(step, state, true);
+                var result = CheckProgress(step, state, true);
 
-                    if (result.Result != null)
-                        return result.Result;
+                if (result.Result != null)
+                    return result.Result;
+            }
+
+            // Token
+            if (step.Has(TokenLabel))
+            {
+                state.SetFlag(TokenFlagAddress, true);
+            }
+
+            // Literal
+            if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+            {
+                var result = CheckProgress(step, state, false);
+
+                if (result.Result != null)
+                {
+                    if (result.Result == true)
+                        Console.WriteLine($"*******RECALLED FOUND Literal: '{result.Data ?? ""}'");
+                    else
+                        Console.WriteLine($"*******RECALLED MISSING Literal!");
+
+                    return result.Result;
                 }
-
-                // Token
-                if (step.Has(TokenLabel))
+                else
                 {
-                    state.SetFlag(TokenFlagAddress, true);
-                }
-
-                // Literal
-                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
-                {
-                    var result = CheckProgress(step, state, false);
-
-                    if (result.Result != null)
-                        return result.Result;
-
                     var reader = state.GetReader();
 
                     reader.Mark();
 
-                    Console.WriteLine($"*******Capturing Literal");
+                    Console.WriteLine($"*******SEEKING Literal");
                 }
+            }
 
-                return null;
-            };
+            return null;
+        }
 
-            labeled.StepCompleted += (step, state, result, handled) =>
+        private static void LabeledStepCompleted(LabeledStep step, StateTable state, bool? result, bool handled)
+        {
+            if (handled)
+                return;
+
+            // Rule
+            if (step.Has(RuleLabel))
             {
-                if (step.Has(RuleLabel))
-                {
-                    if (result != null && !handled && state.GetFlag(MemoizeFlagAddress))
-                    {
-                        var reader = state.GetReader();
-
-                        if (reader.IsSpeculating) 
-                            reader.StoreProgress(step, result.Value);
-                    }
-                }
-
-                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+                if (result != null && !handled && state.GetFlag(MemoizeFlagAddress))
                 {
                     var reader = state.GetReader();
 
-                    if (result == true)
-                    {
-                        var literal = new RuneString(reader.LookFromMark(0, null));
-                        
-                        Console.WriteLine($"*******Captured Literal: '{literal}'");
-                    }
-
-                    reader.Commit();
+                    if (reader.IsSpeculating)
+                        reader.StoreProgress(step, result.Value);
                 }
+            }
 
-                if (step.Has(TokenLabel))
+            // Token
+            if (step.Has(TokenLabel))
+            {
+                state.SetFlag(TokenFlagAddress, false);
+            }
+
+            // Literal
+            if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+            {
+                var reader = state.GetReader();
+
+                if (result == true)
                 {
-                    state.SetFlag(TokenFlagAddress, false);
+                    var literal = new RuneString(reader.LookFromMark(0, null));
+
+                    if (reader.IsSpeculating && state.GetFlag(MemoizeFlagAddress))
+                        reader.StoreProgress(step, true, literal);
+
+                    Console.WriteLine($"*******FOUND Literal: '{literal}'");
                 }
-            };
+                else
+                {
+                    if (reader.IsSpeculating && state.GetFlag(MemoizeFlagAddress))
+                        reader.StoreProgress(step, false);
 
-            handlers.StepStarted += (step, state) =>
-            {
-                var counter = state.GetCounter();
+                    Console.WriteLine($"*******MISSING Literal!");
+                }
 
-                var indent = state.GetIndent();
-
-                var reader = state.GetReader();
-
-                counter.Value++;
-
-                indent.Value++;
-
-
-                Console.WriteLine($"{new string('|', indent)}Started @({reader.Position}:'{reader.Current.ToPrintableString()}') #{counter} {step}");
-
-                return null;
-            };
-
-            handlers.StepCompleted += (step, state, result, handled) =>
-            {
-                var indent = state.GetIndent();
-
-                var reader = state.GetReader();
-
-                Console.WriteLine($"{new string('|', indent)}Completed @({reader.Position}:'{reader.Current.ToPrintableString()}') <{result.ToPrintable()}> {step}");
-
-                indent.Value--;
-            };
-
-            return handlers;
+                reader.Commit();
+            }
         }
+
 
         private static (bool? Result, object Data) CheckProgress(IStep step, StateTable state, bool whenSpeculating)
         {
@@ -238,6 +294,13 @@ namespace _Console
             return (null, null);
         }
 
+
+        static string ToPrintable(this bool? value) => value == null ? "Unhandled" : value.ToString();
+
+        #endregion
+
+        #region State
+
         public static StateTable GetState(RuneString value)
         {
             var lookup = new StateTable();
@@ -254,13 +317,13 @@ namespace _Console
 
             lookup.InsertRef(MemoizeFlagAddress, false);
 
+            lookup.InsertRef(TraceFlagAddress, true);
+
             return lookup;
         }
 
 
-        static string ToPrintable(this bool? value) => value == null ? "Unhandled" : value.ToString();
-
-
+        // State Property
         static Ref<int> GetCounter(this StateTable state)
         {
             state.Get(CounterAddress, out Ref<int> counter);
@@ -281,5 +344,7 @@ namespace _Console
 
             return reader;
         }
+
+        #endregion
     }
 }
