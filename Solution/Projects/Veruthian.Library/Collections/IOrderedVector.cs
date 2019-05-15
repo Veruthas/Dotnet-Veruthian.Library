@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IOrderedVector<A, T> : IVector<A, T>, IExpandableContainer<T>
+    public interface IOrderedVector<A, T> : IVector<A, T>, IResizableContainer<T>
     {
         void RemoveBy(A address);
     }

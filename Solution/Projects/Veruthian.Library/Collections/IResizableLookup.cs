@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Collections
 {
-    public interface IExpandableLookup<A, T> : ILookup<A, T>
+    public interface IResizableLookup<A, T> : ILookup<A, T>
     {
         void Insert(A address, T value);        
 

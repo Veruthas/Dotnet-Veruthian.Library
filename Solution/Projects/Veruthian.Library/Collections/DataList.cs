@@ -5,7 +5,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataList<T> : BaseMutableVector<T>, IExpandableIndex<T>
+    public class DataList<T> : BaseMutableVector<T>, IResizableVector<T>
     {
         List<T> items;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections
 {
-    public class NestedDataLookup<A, T> : IMutableLookup<A, T>, IExpandableLookup<A, T>
+    public class NestedDataLookup<A, T> : IMutableLookup<A, T>, IResizableLookup<A, T>
     {
         Dictionary<A, (T value, bool active)> items = new Dictionary<A, (T, bool)>();
 

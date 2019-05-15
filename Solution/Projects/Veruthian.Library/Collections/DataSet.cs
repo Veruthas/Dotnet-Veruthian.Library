@@ -4,7 +4,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataSet<T> : IExpandableContainer<T>, IEnumerable<T>
+    public class DataSet<T> : IResizableContainer<T>, IEnumerable<T>
     {
         HashSet<T> items;
 
@@ -27,6 +27,11 @@ namespace Veruthian.Library.Collections
         public bool Contains(T value) => items.Contains(value);
 
         public void Add(T value) => items.Add(value);
+
+        public void AddRange(IEnumerable<T> values)
+        {
+            this.items.UnionWith(values);
+        }
 
         public bool Remove(T value) => items.Remove(value);
 

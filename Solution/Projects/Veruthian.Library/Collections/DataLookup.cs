@@ -5,7 +5,7 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataLookup<A, T> : IMutableLookup<A, T>, IExpandableLookup<A, T>
+    public class DataLookup<A, T> : IMutableLookup<A, T>, IResizableLookup<A, T>
     {
         Dictionary<A, T> dictionary;
 
