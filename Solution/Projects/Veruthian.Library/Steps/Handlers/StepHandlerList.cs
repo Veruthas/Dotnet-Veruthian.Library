@@ -5,7 +5,7 @@ namespace Veruthian.Library.Steps.Handlers
 {
     public class StepHandlerList : StepHandler< IStep>
     {
-        IExpandableIndex<IStepHandler> handlers;
+        IResizableVector<IStepHandler> handlers;
 
 
         public StepHandlerList()
@@ -19,11 +19,11 @@ namespace Veruthian.Library.Steps.Handlers
             : this(DataList<IStepHandler>.Extract(handlers)) { }
 
 
-        public StepHandlerList(IExpandableIndex<IStepHandler> handlers)
+        public StepHandlerList(IResizableVector<IStepHandler> handlers)
             => this.handlers = handlers ?? DataList<IStepHandler>.New();
 
 
-        public IExpandableIndex<IStepHandler> Handlers => handlers;
+        public IResizableVector<IStepHandler> Handlers => handlers;
 
 
         public override bool? Handle(IStep step, StateTable state, IStepHandler root = null)

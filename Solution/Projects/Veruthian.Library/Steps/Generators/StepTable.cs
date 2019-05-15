@@ -5,118 +5,124 @@ using Veruthian.Library.Collections.Extensions;
 
 namespace Veruthian.Library.Steps.Generators
 {
-    public delegate IExpandableContainer<string> LabelContainerGenerator(string name, string[] additionalLabels = null);
-
-    public delegate IExpandableContainer<string> LabelContainerModifier(string name, IExpandableContainer<string> container);
-
+    public delegate void Labeler(LabeledStep step, string[] additional = null);
 
     public class StepTable
     {
-        IExpandableLookup<string, LabeledStep> items;
+        DataLookup<string, LabeledStep> items;
 
-        IExpandableLookup<string, LabeledStep> subItems;
+        DataLookup<string, LabeledStep> subItems;
 
-        LabelContainerGenerator generator;
+        Labeler labeler;
 
-        LabelContainerModifier modifier;
+        Labeler subLabler;
 
 
         // Constructors
         public StepTable()
-            : this(null, DefaultGenerator) { }
+            : this((Labeler)null) { }
 
         public StepTable(params string[] defaultLabels)
-            : this(null, GetGenerator(null, defaultLabels)) { }
+            : this(WithDefaultLabels(false, defaultLabels)) { }
 
-        public StepTable(Func<string, string> nameProcessor)
-            : this(null, GetGenerator(nameProcessor, null)) { }
+        public StepTable(bool labelWithName, params string[] defaultLabels)
+            : this(WithDefaultLabels(labelWithName, defaultLabels)) { }
 
-        public StepTable(Func<string, string> nameProcessor, params string[] defaultLabels)
-            : this(null, GetGenerator(nameProcessor, defaultLabels)) { }
+        public StepTable(Labeler labeler)
+            : this(null, labeler) { }
 
-        public StepTable(LabelContainerGenerator generator)
-            : this(null, generator) { }
+        public StepTable(StepTable parent, params string[] defaultLabels)
+            : this(parent, WithDefaultLabels(false, defaultLabels)) { }
 
-        public StepTable(IExpandableLookup<string, LabeledStep> items, params string[] defaultLabels)
-            : this(items, GetGenerator(null, defaultLabels)) { }
+        public StepTable(StepTable parent, bool labelWithName, params string[] defaultLabels)
+            : this(parent, WithDefaultLabels(labelWithName, defaultLabels)) { }
 
-        public StepTable(IExpandableLookup<string, LabeledStep> items, Func<string, string> nameProcessor)
-            : this(items, GetGenerator(nameProcessor, null)) { }
-
-        public StepTable(IExpandableLookup<string, LabeledStep> items, Func<string, string> nameProcessor, params string[] defaultLabels)
-            : this(items, GetGenerator(nameProcessor, defaultLabels)) { }
-
-        public StepTable(IExpandableLookup<string, LabeledStep> items, LabelContainerGenerator generator)
+        public StepTable(StepTable parent, Labeler labeler)
         {
-            this.items = items ?? new DataLookup<string, LabeledStep>();
-
-            this.generator = generator ?? DefaultGenerator;
-        }
-
-
-        // SubTable
-        public StepTable CreateSubTable(params string[] additionalDefault) 
-            => CreateSubTable((name, container) =>
-                             {
-                                 if (additionalDefault != null)
-                                     foreach (var label in additionalDefault)
-                                         container.Add(label);
- 
-                                 return container;
-                             });
-
-        public StepTable CreateSubTable(LabelContainerModifier modifier)
-        {
-            var subTable = new StepTable(items, generator);
-
-            subTable.subItems = new DataLookup<string, LabeledStep>();
-
-            // If this is a new subtable
-            if (this.modifier == null)
+            if (parent == null)
             {
-                if (modifier == null)
-                    subTable.modifier = (name, container) => container;
-                else
-                    subTable.modifier = modifier;
+                this.items = new DataLookup<string, LabeledStep>();
+
+                this.labeler = labeler ?? DefaultLabeler;
             }
-            // If this is a nested subtable        
             else
             {
-                if (modifier == null)
-                    subTable.modifier = this.modifier;
-                else
-                    subTable.modifier = (name, container) => { modifier(name, container); this.modifier(name, container); return container; };
+                this.subLabler = labeler ?? DefaultLabeler;
+
+                this.subItems = new DataLookup<string, LabeledStep>();
+
+                this.items = parent.items;
+
+                this.labeler = labeler == null ? parent.labeler : ChainedLabeler(parent.labeler, labeler);
             }
-
-            return subTable;
         }
 
 
-        // Generators
-        static LabelContainerGenerator DefaultGenerator { get; } = GetGenerator(null, null);
+        // SubTables
+        public StepTable CreateSubTable(bool labelWithName) => new StepTable(this, labelWithName);
 
-        static LabelContainerGenerator GetGenerator(Func<string, string> nameProcessor, string[] defaultLabels)
+        public StepTable CreateSubTable(params string[] defaultLabels) => new StepTable(this, defaultLabels);
+
+        public StepTable CreateSubTable(bool labelWithName, params string[] defaultLabels) => new StepTable(this, labelWithName, defaultLabels);
+
+        public StepTable CreateSubTable(Labeler labeler) => new StepTable(this, labeler);
+
+
+        // Labelers
+        private static readonly Labeler DefaultLabeler = (step, additional) => { if (additional != null) step.Labels.AddRange(additional); };
+
+        private static Labeler ChainedLabeler(Labeler labeler, Labeler sublabeler) => (step, additional) => { labeler(step, additional); sublabeler(step, additional); };
+
+        private static Labeler WithDefaultLabels(bool labelWithName, params string[] defaultLabels)
         {
-            return ((name, additional) =>
+            if (labelWithName)
             {
-                var labels = new DataSet<string>();
+                if (defaultLabels == null || defaultLabels.Length == 0)
+                {
+                    return (step, additional) =>
+                    {
+                        if (labelWithName)
+                            step.Labels.Add(step.Name);
 
-                name = nameProcessor != null ? nameProcessor(name) : name;
+                        if (additional != null)
+                            step.Labels.AddRange(additional);
+                    };
+                }
+                else
+                {
+                    return (step, additional) =>
+                    {
+                        if (labelWithName)
+                            step.Labels.Add(step.Name);
 
-                if (name != null)
-                    labels.Add(name);
+                        if (defaultLabels != null)
+                            step.Labels.AddRange(defaultLabels);
 
-                if (defaultLabels != null)
-                    foreach (var label in defaultLabels)
-                        labels.Add(label);
+                        if (additional != null)
+                            step.Labels.AddRange(additional);
+                    };
+                }
+            }
+            else
+            {
+                if (defaultLabels == null || defaultLabels.Length == 0)
+                {
+                    return DefaultLabeler;
+                }
+                else
+                {
+                    return (step, additional) =>
+                    {
+                        if (defaultLabels != null)
+                            step.Labels.AddRange(defaultLabels);
 
-                if (additional != null)
-                    foreach (var label in additional)
-                        labels.Add(label);
-
-                return labels;
-            });
+                        if (additional != null)
+                            step.Labels.AddRange(additional);
+                    };
+                }
+            }
         }
+
 
         // Access
         public IStep this[string name]
@@ -135,9 +141,9 @@ namespace Veruthian.Library.Steps.Generators
         {
             if (!items.TryGet(name, out var item))
             {
-                var labels = generator(name, additionalLabels);
+                item = new LabeledStep(name, new DataSet<string>());
 
-                item = new LabeledStep(labels);
+                labeler(item, additionalLabels);
 
                 items.Insert(name, item);
             }
@@ -146,7 +152,7 @@ namespace Veruthian.Library.Steps.Generators
             {
                 subItems.Insert(name, item);
 
-                modifier(name, item.Labels);
+                labeler(item, additionalLabels);
             }
 
             if (additionalLabels != null)
@@ -159,7 +165,7 @@ namespace Veruthian.Library.Steps.Generators
         }
 
 
-        public ILookup<string, LabeledStep> Items => items;
+        public ReadOnlyLookup<string, LabeledStep> Items => new ReadOnlyLookup<string, LabeledStep>(items);
 
 
         // Label

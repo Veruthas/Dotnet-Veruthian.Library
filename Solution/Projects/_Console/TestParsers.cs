@@ -52,8 +52,9 @@ namespace _Console
         {
             var g = new MatchStepGenerator(new SpeculativeStepGenerator());
 
+            var items = new StepTable(true);
 
-            var rules = new StepTable(RuleLabel);
+            var rules = items.CreateSubTable(RuleLabel);
 
             var tokens = rules.CreateSubTable(TokenLabel);
 

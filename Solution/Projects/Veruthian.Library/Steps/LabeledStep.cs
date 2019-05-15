@@ -5,26 +5,40 @@ namespace Veruthian.Library.Steps
 {
     public class LabeledStep : NestedStep
     {
-        IExpandableContainer<string> labels;
+        string name;
+
+        IResizableContainer<string> labels;
 
 
         public LabeledStep() { }
 
-        public LabeledStep(IStep step) : base(step) { }
+        public LabeledStep(IResizableContainer<string> labels)
+            : this(null, null, labels) { }
 
-        public LabeledStep(IExpandableContainer<string> labels) => this.labels = labels;
+        public LabeledStep(string name, IResizableContainer<string> labels = null)
+            : this(null, name, labels) { }
 
-        public LabeledStep(IStep step, IExpandableContainer<string> labels) : base(step) => this.labels = labels;
+        public LabeledStep(IStep step, IResizableContainer<string> labels)
+            : this(step, null, labels) { }
+        
+        public LabeledStep(IStep step, string name = null, IResizableContainer<string> labels = null) : base(step)
+        {
+            this.name = name;
+
+            this.labels = labels;
+        }
 
 
-        public override string Description => labels == null ? "labeled<>" : "labeled" + labels.ToListString("<", ">");
+        public override string Description => $"labeled<{(name == null ? "" : name + ": ")}{(labels == null ? "" : labels.ToListString("", ""))}>";
 
 
-        public IExpandableContainer<string> Labels
+        public string Name => name;
+
+        public IResizableContainer<string> Labels
         {
             get => labels;
             set => labels = value;
-        }        
+        }
 
 
         public bool Has(string label) => labels == null ? false : labels.Contains(label);
