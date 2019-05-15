@@ -33,7 +33,9 @@ namespace Veruthian.Library.Steps.Handlers
 
             bool? result = OnStepStarted(step, state);
 
-            if (result == null)
+            bool handled = result == null;
+
+            if (!handled)
             {
                 foreach (var handler in handlers)
                 {
@@ -41,10 +43,11 @@ namespace Veruthian.Library.Steps.Handlers
 
                     if (result != null)
                         break;
-                }
+                }                         
             }
 
-            OnStepCompleted(step, state, result);
+            OnStepCompleted(step, state, result, handled);
+
 
             return result;
         }

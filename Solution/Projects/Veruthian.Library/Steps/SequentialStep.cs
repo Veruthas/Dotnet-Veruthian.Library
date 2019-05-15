@@ -23,7 +23,7 @@ namespace Veruthian.Library.Steps
             set => this.sequence = value ?? new DataVector<IStep>();
         }
 
-        public override string Description => "seqeunce";
+        public override string Description => $"sequence<{sequence.Count}>";
 
         protected override int SubStepCount => sequence == null ? 0 : sequence.Count;
 

@@ -89,8 +89,6 @@ namespace _Console
 
         static string MemoizeFlagAddress = "memoizeFlag";
 
-        static string HandledFlagAddress = "handledFlag";
-
 
         static string ReaderAddress = "reader";
 
@@ -104,80 +102,6 @@ namespace _Console
         {
             var labeled = new LabeledStepHandler();
 
-            labeled.StepStarted += (step, state) =>
-            {
-                if (step.Has(RuleLabel))
-                {
-                    state.SetFlag(HandledFlagAddress, true);
-
-                    var reader = state.GetReader();
-
-                    var progress = reader.RecallProgress(step);
-
-                    if (progress.Success == true)
-                    {
-                        reader.Advance(progress.Length);
-
-                        return true;
-                    }
-                    else if (progress.Success == false)
-                    {
-                        return false;
-                    }
-                }
-
-                if (step.Has(TokenLabel))
-                {
-                    state.SetFlag(TokenFlagAddress, true);
-                }
-
-                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
-                {
-                    var reader = state.GetReader();
-
-                    reader.Mark();
-                }
-
-                return null;
-            };
-
-            labeled.StepCompleted += (step, state, result) =>
-            {
-                if (state.GetFlag(HandledFlagAddress))
-                {
-                    state.SetFlag(HandledFlagAddress, false);
-
-                    return;
-                }
-
-                if (step.Has(RuleLabel))
-                {
-                    if (result != null && state.GetFlag(MemoizeFlagAddress))
-                    {
-                        var reader = state.GetReader();
-
-                        if (reader.IsSpeculating)
-                            reader.StoreProgress(step, result.Value);
-                    }
-                }
-
-                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
-                {
-                    var reader = state.GetReader();
-
-                    var literal = new RuneString(reader.LookFromMark(0, null));
-
-                    Console.WriteLine($"*******Captured Literal: '{literal}'");
-
-                    reader.Commit();
-                }
-
-                if (step.Has(TokenLabel))
-                {
-                    state.SetFlag(TokenFlagAddress, false);
-                }
-            };
-
             var handlers =
                 new StepHandlerList(
                     new BooleanStepHandler(),
@@ -189,6 +113,74 @@ namespace _Console
                     new ReaderStepHandler<Rune>(SpeculativeAddress),
                     labeled
                 );
+
+            labeled.StepStarted += (step, state) =>
+            {
+                // Rule
+                if (step.Has(RuleLabel))
+                {
+                    var result = CheckProgress(step, state, true);
+
+                    if (result.Result != null)
+                        return result.Result;
+                }
+
+                // Token
+                if (step.Has(TokenLabel))
+                {
+                    state.SetFlag(TokenFlagAddress, true);
+                }
+
+                // Literal
+                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+                {
+                    var result = CheckProgress(step, state, false);
+
+                    if (result.Result != null)
+                        return result.Result;
+
+                    var reader = state.GetReader();
+
+                    reader.Mark();
+
+                    Console.WriteLine($"*******Capturing Literal");
+                }
+
+                return null;
+            };
+
+            labeled.StepCompleted += (step, state, result, handled) =>
+            {
+                if (step.Has(RuleLabel))
+                {
+                    if (result != null && !handled && state.GetFlag(MemoizeFlagAddress))
+                    {
+                        var reader = state.GetReader();
+
+                        if (reader.IsSpeculating) 
+                            reader.StoreProgress(step, result.Value);
+                    }
+                }
+
+                if (step.Has(LiteralLabel) && state.GetFlag(TokenFlagAddress))
+                {
+                    var reader = state.GetReader();
+
+                    if (result == true)
+                    {
+                        var literal = new RuneString(reader.LookFromMark(0, null));
+                        
+                        Console.WriteLine($"*******Captured Literal: '{literal}'");
+                    }
+
+                    reader.Commit();
+                }
+
+                if (step.Has(TokenLabel))
+                {
+                    state.SetFlag(TokenFlagAddress, false);
+                }
+            };
 
             handlers.StepStarted += (step, state) =>
             {
@@ -208,7 +200,7 @@ namespace _Console
                 return null;
             };
 
-            handlers.StepCompleted += (step, state, result) =>
+            handlers.StepCompleted += (step, state, result, handled) =>
             {
                 var indent = state.GetIndent();
 
@@ -222,6 +214,28 @@ namespace _Console
             return handlers;
         }
 
+        private static (bool? Result, object Data) CheckProgress(IStep step, StateTable state, bool whenSpeculating)
+        {
+            var reader = state.GetReader();
+
+            if (!whenSpeculating || reader.IsSpeculating)
+            {
+                var progress = reader.RecallProgress(step);
+
+                if (progress.Success == true)
+                {
+                    reader.Advance(progress.Length);
+
+                    return (progress.Success, progress.Data);
+                }
+                else if (progress.Success == false)
+                {
+                    return (progress.Success, progress.Data);
+                }
+            }
+
+            return (null, null);
+        }
 
         public static StateTable GetState(RuneString value)
         {
@@ -238,8 +252,6 @@ namespace _Console
             lookup.InsertRef(TokenFlagAddress, false);
 
             lookup.InsertRef(MemoizeFlagAddress, false);
-
-            lookup.InsertRef(HandledFlagAddress, false);
 
             return lookup;
         }

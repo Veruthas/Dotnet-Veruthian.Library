@@ -13,10 +13,14 @@ namespace Veruthian.Library.Steps.Handlers
                     {
                         var result = OnStepStarted(tstep, state);
 
-                        if (result == null)
+                        var handled = result == null;
+
+                        if (!handled)
                             result = HandleStep(tstep, state, root ?? this);
 
-                        OnStepCompleted(tstep, state, result);
+
+                        OnStepCompleted(tstep, state, result, handled);
+
 
                         return result;
                     }
@@ -38,15 +42,15 @@ namespace Veruthian.Library.Steps.Handlers
             return null;
         }
 
-        protected virtual void OnStepCompleted(TStep step, StateTable state, bool? result)
+        protected virtual void OnStepCompleted(TStep step, StateTable state, bool? result, bool handled)
         {
             if (StepCompleted != null)
-                StepCompleted(step, state, result);
+                StepCompleted(step, state, result, handled);
         }
 
 
         public event Func<TStep, StateTable, bool?> StepStarted;
 
-        public event Action<TStep, StateTable, bool?> StepCompleted;
+        public event Action<TStep, StateTable, bool?, bool> StepCompleted;
     }
 }
