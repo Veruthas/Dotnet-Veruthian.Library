@@ -13,14 +13,12 @@ namespace Veruthian.Library.Steps.Handlers
                     {
                         var result = OnStepStarted(tstep, state);
 
-                        var handled = result == null;
+                        var handled = result != null;
 
                         if (!handled)
                             result = HandleStep(tstep, state, root ?? this);
 
-
                         OnStepCompleted(tstep, state, result, handled);
-
 
                         return result;
                     }

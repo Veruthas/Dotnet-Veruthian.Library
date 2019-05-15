@@ -33,7 +33,7 @@ namespace Veruthian.Library.Steps.Handlers
 
             bool? result = OnStepStarted(step, state);
 
-            bool handled = result == null;
+            bool handled = result != null;
 
             if (!handled)
             {
