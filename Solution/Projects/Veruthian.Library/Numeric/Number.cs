@@ -1,52 +1,54 @@
+#define ByteUnit
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Utility;
 
+#if ByteUnit
+using Unit = System.Byte;
+using TwoUnit = System.UInt16;
+#endif
+
+#if ShortUnit
+using Unit = System.UInt16;
+using TwoUnit = System.UInt32;
+#endif
+
+#if InitUnit
+using Unit = System.UInt32;
+using TwoUnit = System.UInt64;
+#endif
+
 namespace Veruthian.Library.Numeric
 {
     public struct Number : INumeric<Number>, ISequential<Number>
     {
-        const int UnitSize = 64;
+        readonly TwoUnit value;
 
-        const int HalfUnitSize = 32;
-
-        const ulong UpperMask = 0xFFFFFFFF00000000;
-
-        const ulong LowerMask = 0x00000000FFFFFFFF;
-
-
-        public static readonly Number Default = Zero;
-
-        public static readonly Number Zero = new Number(0);
-
-        public static readonly Number One = new Number(1);
-
-
-        readonly ulong value;
-
-        readonly uint[] units;
+        readonly Unit[] units;
 
 
         private Number(int size)
         {
             this.value = 0;
 
-            this.units = new uint[size];
+            this.units = new Unit[size];
         }
 
-        private Number(ulong value)
+        private Number(TwoUnit value)
         {
             this.value = value;
 
             this.units = null;
         }
 
-        private Number(params uint[] units)
+        private Number(params Unit[] units)
             : this(0, units) { }
 
-        private Number(ulong value, params uint[] units)
+
+        private Number(TwoUnit value, params Unit[] units)
         {
             if (units == null || units.Length == 0)
             {
@@ -62,7 +64,7 @@ namespace Veruthian.Library.Numeric
             }
             else if (units.Length == 2)
             {
-                this.value = units[0] | (units[1] << HalfUnitSize);
+                this.value = (TwoUnit)(units[0] | (units[1] << UnitBits));
 
                 this.units = null;
             }
@@ -75,16 +77,47 @@ namespace Veruthian.Library.Numeric
         }
 
 
+        #region Constants
+
+        const int BitsPerByte = 8;
+
+        const int UnitBytes = sizeof(Unit);
+
+        const int UnitBits = UnitBytes * BitsPerByte;
+
+        const int TwoUnitBits = UnitBits * 2;
+
+
+        const TwoUnit UpperMask = (Unit.MaxValue) << UnitBits;
+
+        const TwoUnit LowerMask = Unit.MaxValue;
+
+
+        public static readonly Number Default = Zero;
+
+        public static readonly Number Zero = new Number(0);
+
+        public static readonly Number One = new Number(1);
+
+        #endregion
+
+        #region Properties
 
         public bool IsZero => IsSimple && value == 0;
 
         private bool IsSimple => units == null;
 
-        private uint this[int index] => units == null ? (uint)(value >> (HalfUnitSize * index) & LowerMask) : (index < units.Length ? units[index] : 0);
+        private Unit this[int index] => units == null ? (Unit)(value >> (UnitBits * index) & LowerMask) : (index < units.Length ? units[index] : (Unit)0);
 
         private int UnitCount => units != null ? units.Length : (value & UpperMask) == 0 ? 1 : 2;
 
+        private Unit UpperValue => (Unit)(value >> UnitBits);
 
+        private Unit LowerUnit => (Unit)value;
+
+        private bool IsUnit => (value & UpperMask) == 0;
+
+        #endregion
 
         #region Comparison
 
@@ -170,7 +203,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        private static int CompareValues(uint left, uint right)
+        private static int CompareValues(Unit left, Unit right)
         {
             if (left == right)
                 return 0;
@@ -180,7 +213,7 @@ namespace Veruthian.Library.Numeric
                 return 1;
         }
 
-        private static int CompareValues(ulong left, ulong right)
+        private static int CompareValues(TwoUnit left, TwoUnit right)
         {
             if (left == right)
                 return 0;
@@ -189,6 +222,7 @@ namespace Veruthian.Library.Numeric
             else
                 return 1;
         }
+
 
         public bool Equals(Number other)
         {
@@ -196,23 +230,19 @@ namespace Veruthian.Library.Numeric
             {
                 return other.IsSimple && this.value == other.value;
             }
+            else if (this.UnitCount != other.UnitCount)
+            {
+                return false;
+            }
             else
             {
-                if (this.UnitCount == other.UnitCount)
-                {
-                    for (int i = 0; i < this.UnitCount; i++)
-                        if (this.units[i] != other.units[i])
-                            return false;
+                for (int i = 0; i < this.UnitCount; i++)
+                    if (this.units[i] != other.units[i])
+                        return false;
 
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
         }
-
 
         public override bool Equals(object obj)
         {
@@ -221,6 +251,7 @@ namespace Veruthian.Library.Numeric
             else
                 return Equals((Number)obj);
         }
+
 
         public override int GetHashCode()
         {
@@ -251,9 +282,9 @@ namespace Veruthian.Library.Numeric
         {
             if (left.IsSimple && right.IsSimple)
             {
-                var upperLeft = left.value >> HalfUnitSize;
+                var upperLeft = left.UpperValue;
 
-                var upperRight = left.value >> HalfUnitSize;
+                var upperRight = right.UpperValue;
 
                 if (upperLeft == 0 && upperRight == 0)
                 {
@@ -267,33 +298,33 @@ namespace Veruthian.Library.Numeric
 
                     var lower = lowerLeft + lowerRight;
 
-                    var carry = lower >> HalfUnitSize;
+                    var carry = lower >> UnitBits;
 
                     var upper = upperLeft + upperRight + carry;
 
                     if ((upper & UpperMask) == 0)
-                        return new Number((lower & LowerMask) + (upper << HalfUnitSize));
+                        return new Number((lower & LowerMask) + (upper << UnitBits));
                     else
-                        return new Number((uint)lower, (uint)upper, (uint)(upper >> HalfUnitSize));
+                        return new Number((Unit)lower, (Unit)upper, (Unit)(upper >> UnitBits));
                 }
             }
             else
             {
-                var units = new uint[Math.Max(left.UnitCount, right.UnitCount)];
+                var units = new Unit[Math.Max(left.UnitCount, right.UnitCount)];
 
-                var carry = ulong.MinValue;
+                var carry = new TwoUnit();
 
                 for (int i = 0; i < units.Length; i++)
                 {
-                    ulong result = (ulong)left[i] + (ulong)right[i] + carry;
+                    var result = (TwoUnit)left[i] + (TwoUnit)right[i] + carry;
 
-                    units[i] = (uint)result;
+                    units[i] = (Unit)result;
 
-                    carry = result >> UnitSize;
+                    carry = (TwoUnit)(result >> UnitBits);
                 }
 
                 if (carry != 0)
-                    units = units.Append((uint)carry);
+                    units = units.Append((Unit)carry);
 
                 return new Number(units);
             }
@@ -338,32 +369,32 @@ namespace Veruthian.Library.Numeric
             return new Number(result.Value, result.Units);
         }
 
-        private static (bool Positive, ulong Value, uint[] Units) Subtract(Number a, Number b)
+        private static (bool Positive, TwoUnit Value, Unit[] Units) Subtract(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
                 if (a.value >= b.value)
-                    return (true, a.value - b.value, null);
+                    return (true, (TwoUnit)(a.value - b.value), null);
                 else
-                    return (false, b.value - a.value, null);
+                    return (false, (TwoUnit)(b.value - a.value), null);
             }
             else
             {
                 var count = Math.Max(a.UnitCount, b.UnitCount);
 
-                var units = new uint[count];
+                var units = new Unit[count];
 
-                var carry = 1ul;
+                var carry = (TwoUnit)1;
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     unchecked
                     {
-                        var result = (ulong)a[i] + (ulong)(~b[i]) + carry;
+                        var result = (TwoUnit)a[i] + (TwoUnit)(~b[i]) + carry;
 
-                        units[i] = (uint)result;
+                        units[i] = (Unit)result;
 
-                        carry = result >> UnitSize;
+                        carry = (TwoUnit)(result >> UnitBits);
                     }
                 }
 
@@ -371,7 +402,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        private static void TrimUnits(ref uint[] units)
+        private static void TrimUnits(ref Unit[] units)
         {
             var adjusted = units.Length;
 
@@ -387,19 +418,19 @@ namespace Veruthian.Library.Numeric
                 units = units.Resize(adjusted);
         }
 
-        private static void AdjustNegative(uint[] units)
+        private static void AdjustNegative(Unit[] units)
         {
-            ulong carry = 1;
+            var carry = (TwoUnit)1;
 
             for (int i = 0; i < units.Length; i++)
             {
                 unchecked
                 {
-                    ulong inverse = ~units[i] + carry;
+                    var inverse = (TwoUnit)(~units[i] + carry);
 
-                    carry = inverse >> UnitSize;
+                    carry = (TwoUnit)(inverse >> UnitBits);
 
-                    units[i] = (uint)inverse;
+                    units[i] = (Unit)inverse;
                 }
             }
         }
@@ -422,20 +453,20 @@ namespace Veruthian.Library.Numeric
             }
             else
             {
-                var units = new uint[left.UnitCount + right.UnitCount];
+                var units = new Unit[left.UnitCount + right.UnitCount];
 
                 for (int b = 0, column = 0; b < right.UnitCount; b++, column++)
                 {
-                    ulong value = 0;
+                    var value = new ulong();
 
                     for (var a = 0; a < left.UnitCount; a++)
                     {
                         // add (A*B) + previous results + carry
-                        value = ((ulong)left[a] * (ulong)right[b]) + units[column + a] + value;
+                        value = ((ulong)left[a] * (ulong)right[b]) + (ulong)units[column + a] + (ulong)value;
 
-                        units[column + a] = (uint)value;
+                        units[column + a] = (Unit)value;
 
-                        value >>= UnitSize;
+                        value >>= UnitBits;
                     }
                 }
 
@@ -467,12 +498,12 @@ namespace Veruthian.Library.Numeric
             {
                 return checkedZero ? throw new DivideByZeroException() : (Zero, Zero);
             }
-            else if (right.IsSimple && (right.value & UpperMask) == 0)
+            else if (right.IsSimple && right.IsUnit)
             {
                 if (left.IsSimple)
                     return (new Number(left.value / right.value), new Number(left.value % right.value));
                 else
-                    return DivideWithRemainder(left.units, (uint)right.value);
+                    return DivideWithRemainder(left.units, (Unit)right.value);
             }
             else
             {
@@ -480,7 +511,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        private static (Number Quotient, Number Remainder) DivideWithRemainder(uint[] numerators, uint denominator)
+        private static (Number Quotient, Number Remainder) DivideWithRemainder(Unit[] numerators, Unit denominator)
         {
             var index = numerators.Length - 1;
 
@@ -492,28 +523,28 @@ namespace Veruthian.Library.Numeric
             numerator = numerator / denominator;
 
 
-            var units = new uint[index + (numerator == 0 ? 0 : 1)];
+            var units = new Unit[index + (numerator == 0 ? 0 : 1)];
 
             if (numerator != 0)
-                units[index] = (uint)numerator;
+                units[index] = (Unit)numerator;
 
             index--;
 
             while (index >= 0)
             {
-                numerator = (remainder << UnitSize) + numerators[index];
+                numerator = (remainder << UnitBits) + numerators[index];
 
                 remainder = numerator % denominator;
 
                 numerator = numerator / denominator;
 
-                units[index--] = (uint)numerator;
+                units[index--] = (Unit)numerator;
             }
 
-            return (new Number(units), new Number((uint)remainder));
+            return (new Number(units), new Number((Unit)remainder));
         }
 
-        private static (Number Quotient, Number Remainder) DivideWithRemainder(uint[] numerators, uint[] denominator)
+        private static (Number Quotient, Number Remainder) DivideWithRemainder(Unit[] numerators, Unit[] denominator)
         {
             // HACK: There is definitely a better algorithm out there...
             Number num = new Number(numerators);
@@ -552,40 +583,138 @@ namespace Veruthian.Library.Numeric
 
         #region Conversion
 
-        public static implicit operator Number(byte value) => new Number(value);
+        private static Number FromByte(byte value)
+            => new Number((TwoUnit)value);
 
-        public static implicit operator Number(ushort value) => new Number(value);
+        private static Number FromShort(ushort value)
+            => new Number((TwoUnit)value);
 
-        public static implicit operator Number(uint value) => new Number(value);
+        private static Number FromInt(uint value)
+        {
+#if ByteUnit
+            return new Number(
+                (Unit)(value & 0xFF),
+                (Unit)((value >> 8) & 0xFF),
+                (Unit)((value >> 16) & 0xFF),
+                (Unit)((value >> 24) & 0xFF)
+            );
+#else
+            return new Number(value);
+#endif
+        }
 
-        public static implicit operator Number(ulong value) => new Number(value);
+        private static Number FromLong(ulong value)
+        {
+#if ByteUnit
+            return new Number(
+                (Unit)(value & 0xFF),
+                (Unit)((value >> 8) & 0xFF),
+                (Unit)((value >> 16) & 0xFF),
+                (Unit)((value >> 24) & 0xFF),
+                (Unit)((value >> 32) & 0xFF),
+                (Unit)((value >> 40) & 0xFF),
+                (Unit)((value >> 48) & 0xFF),
+                (Unit)((value >> 56) & 0xFF)
+            );
+#elif ShortUnit
+            return new Number(
+                (Unit)(value & 0xFFFF),
+                (Unit)((value >> 16) & 0xFFFF),
+                (Unit)((value >> 32) & 0xFFFF),
+                (Unit)((value >> 48) & 0xFFFF),
+            );
+#else
+            return new Number(value);
+#endif
+        }
 
 
-        public static implicit operator Number(sbyte value) => new Number((ulong)Math.Abs(value));
+        public static implicit operator Number(byte value) => FromByte(value);
 
-        public static implicit operator Number(short value) => new Number((ulong)Math.Abs(value));
+        public static implicit operator Number(ushort value) => FromShort(value);
 
-        public static implicit operator Number(int value) => new Number((ulong)Math.Abs(value));
+        public static implicit operator Number(uint value) => FromInt(value);
 
-        public static implicit operator Number(long value) => (ulong)Math.Abs(value);
-
-
-        public static explicit operator byte(Number value) => (byte)value[0];
-
-        public static explicit operator ushort(Number value) => (ushort)value[0];
-
-        public static explicit operator uint(Number value) => (uint)value[0];
-
-        public static explicit operator ulong(Number value) => (ulong)value[0];
+        public static implicit operator Number(ulong value) => FromLong(value);
 
 
-        public static explicit operator sbyte(Number value) => (sbyte)(byte)value;
+        public static implicit operator Number(sbyte value) => FromByte((byte)Math.Abs(value));
 
-        public static explicit operator short(Number value) => (short)(ushort)value;
+        public static implicit operator Number(short value) => FromShort((ushort)Math.Abs(value));
 
-        public static explicit operator int(Number value) => (int)(uint)value;
+        public static implicit operator Number(int value) => FromInt((uint)Math.Abs(value));
 
-        public static explicit operator long(Number value) => (long)(ulong)value;
+        public static implicit operator Number(long value) => FromLong((ulong)Math.Abs(value));
+
+
+
+        public byte ToByte()
+        {
+            return (byte)value;
+        }
+
+        public ushort ToShort()
+        {
+            return (ushort)value;
+        }
+
+        public uint ToInt()
+        {
+#if ByteUnit
+            return (uint)units[0]
+                  | ((uint)units[1] << 8)
+                  | ((uint)units[2] << 16)
+                  | ((uint)units[3] << 24)
+                  ;
+#elif ShortUnit
+            return (uint)units[0]
+                  | ((uint)units[1] << 16)
+                  ;
+#else
+            return (uint)value;
+#endif
+        }
+
+        public ulong ToLong()
+        {
+#if ByteUnit
+            return (ulong)units[0]
+                  | ((ulong)units[1] << 8)
+                  | ((ulong)units[2] << 16)
+                  | ((ulong)units[3] << 24)
+                  | ((ulong)units[4] << 32)
+                  | ((ulong)units[5] << 40)
+                  | ((ulong)units[6] << 48)
+                  | ((ulong)units[7] << 56)
+                  ;
+#elif ShortUnit
+            return (ulong)units[0]
+                  | ((ulong)units[1] << 16)
+                  | ((ulong)units[2] << 32)
+                  | ((ulong)units[3] << 48)
+                  ;                  
+#else
+            return (ulong)value;
+#endif
+        }
+
+
+        public static explicit operator byte(Number value) => value.ToByte();
+
+        public static explicit operator ushort(Number value) => value.ToShort();
+
+        public static explicit operator uint(Number value) => value.ToInt();
+
+        public static explicit operator ulong(Number value) => value.ToLong();
+
+
+        public static explicit operator sbyte(Number value) => (sbyte)value.ToByte();
+
+        public static explicit operator short(Number value) => (short)value.ToShort();
+
+        public static explicit operator int(Number value) => (int)value.ToInt();
+
+        public static explicit operator long(Number value) => (long)value.ToLong();
 
         #endregion
 
@@ -598,7 +727,20 @@ namespace Veruthian.Library.Numeric
         public static readonly string HexLower = "0123456789abcdef";
 
 
-        public override string ToString() => ToString(Decimal, 3, ",");
+        public override string ToString() => ToDecimalString();
+
+
+        public string ToBinaryString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Binary, groupLength, separator, pad);
+
+        public string ToOctalString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Octal, groupLength, separator, pad);
+
+        public string ToDecimalString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Decimal, groupLength, separator, pad);
+
+        public string ToHexString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(upper ? HexUpper : HexLower, groupLength, separator, pad);
 
         public string ToString(string symbols, int groupLength = 0, string separator = null, bool pad = false)
         {
@@ -671,42 +813,162 @@ namespace Veruthian.Library.Numeric
 
         #region Parse
 
-        public static Number Parse(string value, string symbols, bool ignoreInvalid = true)
-        {
-            var index = TryParseIndex(value, symbols, ignoreInvalid, out var result);
+        const int BinaryBase = 2;
 
-            if (index != value.Length)
-                throw new FormatException($"Invalid character {value[index]} at position {index}.");
+        const int OctalBase = 8;
+
+        const int DecimalBase = 10;
+
+        const int HexBase = 16;
+
+
+        static readonly Dictionary<char, Number> BinaryNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1
+        };
+
+        static readonly Dictionary<char, Number> OctalNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['4'] = 4,
+            ['5'] = 5,
+            ['6'] = 6,
+            ['7'] = 7,
+        };
+
+        static readonly Dictionary<char, Number> DecimalNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['4'] = 4,
+            ['5'] = 5,
+            ['6'] = 6,
+            ['7'] = 7,
+            ['8'] = 8,
+            ['9'] = 9,
+        };
+
+        static readonly Dictionary<char, Number> HexNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['4'] = 4,
+            ['5'] = 5,
+            ['6'] = 6,
+            ['7'] = 7,
+            ['8'] = 8,
+            ['9'] = 9,
+            ['A'] = 10,
+            ['B'] = 11,
+            ['C'] = 12,
+            ['D'] = 13,
+            ['E'] = 14,
+            ['F'] = 15,
+            ['a'] = 10,
+            ['b'] = 11,
+            ['c'] = 12,
+            ['d'] = 13,
+            ['e'] = 14,
+            ['f'] = 15,
+        };
+
+
+        public static Number ParseBinary(string value, bool ignoreInvalid = true)
+            => Parse(value, BinaryNumeralMap, BinaryBase, ignoreInvalid);
+
+        public static bool TryParseBinary(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, BinaryNumeralMap, BinaryBase, out result, ignoreInvalid);
+
+
+        public static Number ParseOctal(string value, bool ignoreInvalid = true)
+            => Parse(value, OctalNumeralMap, OctalBase, ignoreInvalid);
+
+        public static bool TryParseOctal(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, OctalNumeralMap, OctalBase, out result, ignoreInvalid);
+
+
+        public static Number ParseDecimal(string value, bool ignoreInvalid = true)
+            => Parse(value, DecimalNumeralMap, DecimalBase, ignoreInvalid);
+
+        public static bool TryParseDecimal(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, DecimalNumeralMap, DecimalBase, out result, ignoreInvalid);
+
+
+        public static Number ParseHex(string value, bool ignoreInvalid = true)
+            => Parse(value, HexNumeralMap, HexBase, ignoreInvalid);
+
+        public static bool TryParseHex(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, HexNumeralMap, HexBase, out result, ignoreInvalid);
+
+
+        public static Number Parse<T>(IEnumerable<T> value, IEnumerable<T> symbols, bool ignoreInvalid = true)
+        {
+            var error = TryParseIndex(value, symbols, ignoreInvalid, out var result);
+
+            if (error.Position != -1)
+                throw new FormatException($"Invalid character {error.Value} at position {error.Position}.");
 
             return result;
         }
 
-        public static bool TryParse(string value, string symbols, out Number result, bool ignoreInvalid = true)
+        public static Number Parse<T>(IEnumerable<T> value, Dictionary<T, Number> map, Number numberBase, bool ignoreInvalid = true)
         {
-            return TryParseIndex(value, symbols, ignoreInvalid, out result) != value.Length;
+            var error = TryParseIndex(value, map, numberBase, ignoreInvalid, out var result);
+
+            if (error.Position != -1)
+                throw new FormatException($"Invalid character {error.Value} at position {error.Position}.");
+
+            return result;
         }
 
-        private static int TryParseIndex(string value, string symbols, bool ignoreInvalid, out Number result)
+
+        public static bool TryParse<T>(IEnumerable<T> value, IEnumerable<T> symbols, out Number result, bool ignoreInvalid = true)
+            => TryParseIndex(value, symbols, ignoreInvalid, out result).Position != -1;
+
+        public static bool TryParse<T>(IEnumerable<T> value, Dictionary<T, Number> symbolMap, Number numberBase, out Number result, bool ignoreInvalid = true)
+             => TryParseIndex(value, symbolMap, numberBase, ignoreInvalid, out result).Position != -1;
+
+
+        private static (int Position, T Value) TryParseIndex<T>(IEnumerable<T> value, IEnumerable<T> symbols, bool ignoreInvalid, out Number result)
         {
-            var map = new Dictionary<char, Number>();
+            ExceptionHelper.VerifyNotNull(symbols, nameof(symbols));
 
-            Number numberBase = symbols.Length;
+            var map = new Dictionary<T, Number>();
 
-            for (int i = 0; i < symbols.Length; i++)
-                map.Add(symbols[i], i);
+            int numberBase = 0;
+
+            foreach (var symbol in symbols)
+                map.Add(symbol, numberBase++);
+
+            return TryParseIndex(value, map, numberBase, ignoreInvalid, out result);
+        }
+
+        private static (int Position, T Value) TryParseIndex<T>(IEnumerable<T> value, Dictionary<T, Number> symbolMap, Number numberBase, bool ignoreInvalid, out Number result)
+        {
+            ExceptionHelper.VerifyNotNull(symbolMap, nameof(symbolMap));
 
             result = Zero;
 
-            int index = 0;
+            var index = 0;
 
-            for (; index < value.Length; index++)
+            foreach (var numeral in value)
             {
-                if (!map.TryGetValue(value[index], out var digit))
+                index++;
+
+                if (!symbolMap.TryGetValue(numeral, out var digit))
                 {
                     if (ignoreInvalid)
                         continue;
                     else
-                        break;
+                        return (index, numeral);
                 }
 
                 result *= numberBase;
@@ -714,7 +976,7 @@ namespace Veruthian.Library.Numeric
                 result += digit;
             }
 
-            return index;
+            return (-1, default(T));
         }
 
         #endregion
