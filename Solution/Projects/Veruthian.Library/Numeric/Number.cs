@@ -8,7 +8,13 @@ namespace Veruthian.Library.Numeric
 {
     public struct Number : INumeric<Number>, ISequential<Number>
     {
-        const int BitsInUnit = 32;
+        const int UnitSize = 64;
+
+        const int HalfUnitSize = 32;
+
+        const ulong UpperMask = 0xFFFFFFFF00000000;
+
+        const ulong LowerMask = 0x00000000FFFFFFFF;
 
 
         public static readonly Number Default = Zero;
@@ -18,12 +24,19 @@ namespace Veruthian.Library.Numeric
         public static readonly Number One = new Number(1);
 
 
-        readonly uint value;
+        readonly ulong value;
 
         readonly uint[] units;
 
 
-        private Number(uint value)
+        private Number(int size)
+        {
+            this.value = 0;
+
+            this.units = new uint[size];
+        }
+
+        private Number(ulong value)
         {
             this.value = value;
 
@@ -33,7 +46,7 @@ namespace Veruthian.Library.Numeric
         private Number(params uint[] units)
             : this(0, units) { }
 
-        private Number(uint value, uint[] units)
+        private Number(ulong value, params uint[] units)
         {
             if (units == null || units.Length == 0)
             {
@@ -44,6 +57,12 @@ namespace Veruthian.Library.Numeric
             else if (units.Length == 1)
             {
                 this.value = units[0];
+
+                this.units = null;
+            }
+            else if (units.Length == 2)
+            {
+                this.value = units[0] | (units[1] << HalfUnitSize);
 
                 this.units = null;
             }
@@ -61,9 +80,9 @@ namespace Veruthian.Library.Numeric
 
         private bool IsSimple => units == null;
 
-        private uint this[int index] => units == null ? (index == 0 ? value : 0) : (index < units.Length ? units[index] : 0);
+        private uint this[int index] => units == null ? (uint)(value >> (HalfUnitSize * index) & LowerMask) : (index < units.Length ? units[index] : 0);
 
-        private int UnitCount => units != null ? units.Length : 1;
+        private int UnitCount => units != null ? units.Length : (value & UpperMask) == 0 ? 1 : 2;
 
 
 
@@ -122,17 +141,21 @@ namespace Veruthian.Library.Numeric
             if (this.IsSimple)
             {
                 if (other.IsSimple)
-                {
                     return CompareValues(this.value, other.value);
-                }
                 else
-                {
                     return -1;
-                }
             }
             else
             {
-                if (this.UnitCount == other.UnitCount)
+                if (this.UnitCount < other.UnitCount)
+                {
+                    return -1;
+                }
+                else if (this.UnitCount > other.UnitCount)
+                {
+                    return 1;
+                }
+                else
                 {
                     for (int i = this.UnitCount - 1; i >= 0; i--)
                     {
@@ -144,18 +167,20 @@ namespace Veruthian.Library.Numeric
 
                     return 0;
                 }
-                else if (this.UnitCount < other.UnitCount)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return 1;
-                }
             }
         }
 
         private static int CompareValues(uint left, uint right)
+        {
+            if (left == right)
+                return 0;
+            else if (left < right)
+                return -1;
+            else
+                return 1;
+        }
+
+        private static int CompareValues(ulong left, ulong right)
         {
             if (left == right)
                 return 0;
@@ -226,9 +251,31 @@ namespace Veruthian.Library.Numeric
         {
             if (left.IsSimple && right.IsSimple)
             {
-                ulong result = (ulong)left.value + (ulong)right.value;
+                var upperLeft = left.value >> HalfUnitSize;
 
-                return result;
+                var upperRight = left.value >> HalfUnitSize;
+
+                if (upperLeft == 0 && upperRight == 0)
+                {
+                    return new Number(left.value + right.value);
+                }
+                else
+                {
+                    var lowerLeft = left.value & LowerMask;
+
+                    var lowerRight = right.value & LowerMask;
+
+                    var lower = lowerLeft + lowerRight;
+
+                    var carry = lower >> HalfUnitSize;
+
+                    var upper = upperLeft + upperRight + carry;
+
+                    if ((upper & UpperMask) == 0)
+                        return new Number((lower & LowerMask) + (upper << HalfUnitSize));
+                    else
+                        return new Number((uint)lower, (uint)upper, (uint)(upper >> HalfUnitSize));
+                }
             }
             else
             {
@@ -242,7 +289,7 @@ namespace Veruthian.Library.Numeric
 
                     units[i] = (uint)result;
 
-                    carry = result >> BitsInUnit;
+                    carry = result >> UnitSize;
                 }
 
                 if (carry != 0)
@@ -291,7 +338,7 @@ namespace Veruthian.Library.Numeric
             return new Number(result.Value, result.Units);
         }
 
-        private static (bool Positive, uint Value, uint[] Units) Subtract(Number a, Number b)
+        private static (bool Positive, ulong Value, uint[] Units) Subtract(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
@@ -316,7 +363,7 @@ namespace Veruthian.Library.Numeric
 
                         units[i] = (uint)result;
 
-                        carry = result >> BitsInUnit;
+                        carry = result >> UnitSize;
                     }
                 }
 
@@ -350,7 +397,7 @@ namespace Veruthian.Library.Numeric
                 {
                     ulong inverse = ~units[i] + carry;
 
-                    carry = inverse >> BitsInUnit;
+                    carry = inverse >> UnitSize;
 
                     units[i] = (uint)inverse;
                 }
@@ -365,9 +412,9 @@ namespace Veruthian.Library.Numeric
 
         private static Number Multiply(Number left, Number right)
         {
-            if (left.IsSimple && right.IsSimple)
+            if (left.IsSimple && right.IsSimple && ((left.value | right.value) & UpperMask) == 0)
             {
-                return (ulong)left.value * (ulong)right.value;
+                return new Number(left.value * right.value);
             }
             else if (left.IsZero || right.IsZero)
             {
@@ -388,7 +435,7 @@ namespace Veruthian.Library.Numeric
 
                         units[column + a] = (uint)value;
 
-                        value >>= BitsInUnit;
+                        value >>= UnitSize;
                     }
                 }
 
@@ -420,12 +467,12 @@ namespace Veruthian.Library.Numeric
             {
                 return checkedZero ? throw new DivideByZeroException() : (Zero, Zero);
             }
-            else if (right.IsSimple)
+            else if (right.IsSimple && (right.value & UpperMask) == 0)
             {
                 if (left.IsSimple)
                     return (new Number(left.value / right.value), new Number(left.value % right.value));
                 else
-                    return DivideWithRemainder(left.units, right.value);
+                    return DivideWithRemainder(left.units, (uint)right.value);
             }
             else
             {
@@ -454,7 +501,7 @@ namespace Veruthian.Library.Numeric
 
             while (index >= 0)
             {
-                numerator = (remainder << BitsInUnit) + numerators[index];
+                numerator = (remainder << UnitSize) + numerators[index];
 
                 remainder = numerator % denominator;
 
@@ -491,7 +538,7 @@ namespace Veruthian.Library.Numeric
 
         public static Number operator +(Number left, Number right) => left.Add(right);
 
-        public static Number operator -(Number left, Number right) => left.Delta(right);
+        public static Number operator -(Number left, Number right) => left.Subtract(right);
 
         public static Number operator *(Number left, Number right) => left.Multiply(right);
 
@@ -511,14 +558,14 @@ namespace Veruthian.Library.Numeric
 
         public static implicit operator Number(uint value) => new Number(value);
 
-        public static implicit operator Number(ulong value) => value <= uint.MaxValue ? new Number((uint)value) : new Number((uint)value, (uint)(value >> BitsInUnit));
+        public static implicit operator Number(ulong value) => new Number(value);
 
 
-        public static implicit operator Number(sbyte value) => new Number((uint)Math.Abs(value));
+        public static implicit operator Number(sbyte value) => new Number((ulong)Math.Abs(value));
 
-        public static implicit operator Number(short value) => new Number((uint)Math.Abs(value));
+        public static implicit operator Number(short value) => new Number((ulong)Math.Abs(value));
 
-        public static implicit operator Number(int value) => new Number((uint)Math.Abs(value));
+        public static implicit operator Number(int value) => new Number((ulong)Math.Abs(value));
 
         public static implicit operator Number(long value) => (ulong)Math.Abs(value);
 
@@ -529,7 +576,7 @@ namespace Veruthian.Library.Numeric
 
         public static explicit operator uint(Number value) => (uint)value[0];
 
-        public static explicit operator ulong(Number value) => value.UnitCount > 1 ? ((ulong)value[1] << BitsInUnit) + value[0] : value.value;
+        public static explicit operator ulong(Number value) => (ulong)value[0];
 
 
         public static explicit operator sbyte(Number value) => (sbyte)(byte)value;
