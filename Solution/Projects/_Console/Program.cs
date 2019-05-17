@@ -1,4 +1,5 @@
 ﻿using System;
+using Veruthian.Library.Numeric;
 
 namespace _Console
 {
@@ -6,7 +7,13 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            TestParsers.Test();
+            Number a = ushort.MaxValue;
+
+            Number b = a + a + a;
+
+            Number c = a * 3;
+
+            Number d = c / 256;
             
             Pause();
         }
