@@ -29,9 +29,6 @@ namespace Veruthian.Library.Text.Runes
         public static RuneSet operator -(RuneSet set, RuneSet remove) => Remove(set, remove);
 
 
-        public static RuneSet operator ~(RuneSet set) => Complement(set);
-
-
         public static RuneSet List(RuneString runes) => FromList(runes);
 
         public static RuneSet List(string runes) => FromList(runes.ToRunes());

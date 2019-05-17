@@ -8,12 +8,9 @@ using Veruthian.Library.Utility;
 namespace Veruthian.Library.Numeric
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : ISequential<T>, IBounded<T>
+        where T : ISequential<T>
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
-
-        public RangeSet<T> Complement() => Complement(this);
-
 
         public static bool operator ==(RangeSet<T> left, RangeSet<T> right) => left.Equals(right);
 
@@ -27,14 +24,11 @@ namespace Veruthian.Library.Numeric
         public static RangeSet<T> operator +(RangeSet<T> left, RangeSet<T> right) => Union(left, right);
 
         public static RangeSet<T> operator -(RangeSet<T> set, RangeSet<T> remove) => Remove(set, remove);
-
-
-        public static RangeSet<T> operator ~(RangeSet<T> set) => Complement(set);
     }
 
 
     public abstract class RangeSet<T, TSet> : IEquatable<TSet>, IContainer<T>
-        where T : ISequential<T>, IBounded<T>
+        where T : ISequential<T>
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;
@@ -164,7 +158,7 @@ namespace Veruthian.Library.Numeric
                 {
                     items.Add(current);
 
-                    if (current.Equals(current.MaxValue))
+                    if (current.Equals(high))
                         break;
                     else
                         current = current.Next;
@@ -198,7 +192,7 @@ namespace Veruthian.Library.Numeric
                     {
                         yield return current;
 
-                        if (current.Equals(current.MaxValue))
+                        if (current.Equals(high))
                             break;
                         else
                             current = current.Next;
@@ -274,17 +268,6 @@ namespace Veruthian.Library.Numeric
             var reduced = Range<T>.NormalizeUnordered(ranges);
 
             return Create(reduced);
-        }
-
-
-        // From Complement
-        public static TSet Complement(TSet set) => FromComplement(set);
-
-        protected static TSet FromComplement(TSet set)
-        {
-            var ranges = Range<T>.NormalizedComplement(set.RangeArray);
-
-            return Create(ranges);
         }
 
         // Subtraction    
