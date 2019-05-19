@@ -131,17 +131,40 @@ namespace Veruthian.Library.Numeric.Binary
 
         public bool Follows(Nibble other) => this > other;
 
-        Nibble INumeric<Nibble>.Add(Nibble other) => this + other;
+        Nibble INumeric<Nibble>.Sum(Nibble addend) => this + addend;
 
-        Nibble INumeric<Nibble>.Subtract(Nibble other) => this - other;
+        Nibble INumeric<Nibble>.Difference(Nibble subtrahend) => this - subtrahend;
 
-        Nibble INumeric<Nibble>.Delta(Nibble other) => this - other;
+        Nibble INumeric<Nibble>.Delta(Nibble subtrahend) => this - subtrahend;
 
-        Nibble INumeric<Nibble>.Multiply(Nibble other) => this * other;
+        Nibble INumeric<Nibble>.Product(Nibble multiplicand) => this * multiplicand;
 
-        Nibble INumeric<Nibble>.Divide(Nibble other) => this / other;
+        Nibble INumeric<Nibble>.Power(Nibble exponent)
+        {
+            ulong last = value;
 
-        Nibble INumeric<Nibble>.Modulus(Nibble other) => this % other;
+            ulong result = 0;
+
+            while (exponent != 0)
+            {
+                if ((exponent & 1) == 1)
+                    result *= last;
+
+                exponent >>= 1;
+
+                last *= last;
+            }
+
+            return new Nibble((int)result);
+        }
+
+        Nibble INumeric<Nibble>.Quotient(Nibble divisor) => this / divisor;
+
+        Nibble INumeric<Nibble>.Remainder(Nibble divisor) => this % divisor;
+
+        (Nibble Quotient, Nibble Remainder) INumeric<Nibble>.Division(Nibble divisor) => (this / divisor, this % divisor);
+
+
 
         #endregion
 
@@ -204,7 +227,7 @@ namespace Veruthian.Library.Numeric.Binary
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        
+
         IEnumerable<int> ILookup<int, bool>.Addresses
         {
             get

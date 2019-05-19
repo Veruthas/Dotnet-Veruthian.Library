@@ -268,10 +268,45 @@ namespace Veruthian.Library.Numeric
 
         #region Arithmetic
 
-        // Addition
-        public Number Add(Number other) => Add(this, other);
+        // Adjustment
+        private static void TrimUnits(ref Unit[] units)
+        {
+            var adjusted = units.Length;
 
-        private static Number Add(Number left, Number right)
+            for (int i = units.Length - 1; i >= 0; i--)
+            {
+                if (units[i] == 0)
+                    adjusted--;
+                else
+                    break;
+            }
+
+            if (adjusted != units.Length)
+                units = units.Resize(adjusted);
+        }
+
+        private static void AdjustNegative(Unit[] units)
+        {
+            ulong carry = 1;
+
+            for (int i = 0; i < units.Length; i++)
+            {
+                unchecked
+                {
+                    TwoUnit inverse = (TwoUnit)(~units[i]) + carry;
+
+                    carry = inverse >> UnitBits;
+
+                    units[i] = (uint)inverse;
+                }
+            }
+        }
+
+
+        // Addition
+        public Number Sum(Number addend) => Sum(this, addend);
+
+        private static Number Sum(Number left, Number right)
         {
             if (left.IsSimple && right.IsSimple)
             {
@@ -323,20 +358,20 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        public Number Next => this.Add(One);
+        public Number Next => this.Sum(One);
 
 
         // Subtraction
-        public Number Subtract(Number other)
+        public Number Difference(Number subtrahend)
         {
-            var result = Subtract(this, other);
+            var result = Difference(this, subtrahend);
 
             return result.Positive ? new Number(result.Value, result.Units) : Zero;
         }
 
-        public Number CheckedSubtract(Number other)
+        public Number SafeDifference(Number subtrahend)
         {
-            var result = Subtract(this, other);
+            var result = Difference(this, subtrahend);
 
             if (!result.Positive)
                 throw new InvalidOperationException("Cannot subtract larger number from smaller one");
@@ -347,9 +382,9 @@ namespace Veruthian.Library.Numeric
             return new Number(result.Value, result.Units);
         }
 
-        public Number Delta(Number other)
+        public Number Delta(Number subtrahend)
         {
-            var result = Subtract(this, other);
+            var result = Difference(this, subtrahend);
 
             if (result.Units != null)
             {
@@ -362,7 +397,7 @@ namespace Veruthian.Library.Numeric
             return new Number(result.Value, result.Units);
         }
 
-        private static (bool Positive, TwoUnit Value, Unit[] Units) Subtract(Number a, Number b)
+        private static (bool Positive, ulong Value, uint[] Units) Difference(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
@@ -397,46 +432,13 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        private static void TrimUnits(ref Unit[] units)
-        {
-            var adjusted = units.Length;
-
-            for (int i = units.Length - 1; i >= 0; i--)
-            {
-                if (units[i] == 0)
-                    adjusted--;
-                else
-                    break;
-            }
-
-            if (adjusted != units.Length)
-                units = units.Resize(adjusted);
-        }
-
-        private static void AdjustNegative(Unit[] units)
-        {
-            var carry = (TwoUnit)1;
-
-            for (int i = 0; i < units.Length; i++)
-            {
-                unchecked
-                {
-                    var inverse = (TwoUnit)(~units[i] + carry);
-
-                    carry = (TwoUnit)(inverse >> UnitBits);
-
-                    units[i] = (Unit)inverse;
-                }
-            }
-        }
-
-        public Number Previous => this.Subtract(One);
+        public Number Previous => this.Difference(One);
 
 
         // Multiplication
-        public Number Multiply(Number other) => Multiply(this, other);
+        public Number Product(Number multiplicand) => Product(this, multiplicand);
 
-        private static Number Multiply(Number left, Number right)
+        private static Number Product(Number left, Number right)
         {
             if (left.IsSimple && right.IsSimple && ((left.value | right.value) & UpperMask) == 0)
             {
@@ -475,41 +477,98 @@ namespace Veruthian.Library.Numeric
         }
 
 
+        // Power
+        public Number Power(Number exponent)
+        {
+            if (exponent.IsSimple)
+                return Power(this, exponent.value);
+            else
+                return Power(this, exponent);
+        }
+
+        private static Number Power(Number value, ulong exponent)
+        {
+            var result = One;
+
+            var last = value;
+
+            while (exponent != 0)
+            {
+                if ((exponent & 0x1) == 1)
+                    result *= last;
+
+                exponent >>= 1;
+
+                last *= last;
+            }
+
+            return result;
+        }
+
+
+        private static Number Power(Number value, Number exponent)
+        {
+            var result = One;
+
+            var last = value;
+
+            var bitIndex = 0;
+
+            var index = 0;
+
+            var exponentUnit = exponent[index];
+
+            // while (index < exponent.UnitCount || bitIndex < Unit)
+            // {
+            //     if ((exponentUnit & 0x1) == 1)
+            //         result *= last;
+
+            //     exponentUnit >>= 1;
+
+            //     last *= last;
+            // }
+
+            return result;
+        }
+
         // Division
-        public Number Divide(Number other) => DivideWithRemainder(other, false).Quotient;
+        public Number Quotient(Number divisor) => Division(divisor, false).Quotient;
 
-        public Number Modulus(Number other) => DivideWithRemainder(other, false).Remainder;
+        public Number Remainder(Number divisor) => Division(divisor, false).Remainder;
 
-        public (Number Quotient, Number Remainder) DivideWithRemainder(Number other) => DivideWithRemainder(other, false);
+        public Number SafeQuotient(Number divisor) => Division(divisor, true).Quotient;
 
-        public Number CheckedDivide(Number other) => DivideWithRemainder(other, true).Quotient;
+        public Number SafeRemainder(Number divisor) => Division(divisor, true).Remainder;
 
-        public Number CheckedModulus(Number other) => DivideWithRemainder(other, true).Remainder;
 
-        public (Number Quotient, Number Remainder) CheckedDivideWithRemainder(Number other) => DivideWithRemainder(other, true);
+        public (Number Quotient, Number Remainder) Division(Number divisor) => Division(divisor, false);
 
-        public (Number Quotient, Number Remainder) DivideWithRemainder(Number other, bool checkedZero) => DivideWithRemainder(this, other, checkedZero);
+        public (Number Quotient, Number Remainder) SafeDivision(Number divisor) => Division(divisor, true);
 
-        private static (Number Quotient, Number Remainder) DivideWithRemainder(Number left, Number right, bool checkedZero)
+
+        private (Number Quotient, Number Remainder) Division(Number divisor, bool checkedDivisor) => Division(this, divisor, checkedDivisor);
+
+
+        private static (Number Quotient, Number Remainder) Division(Number left, Number right, bool checkedDivisor)
         {
             if (right.IsZero)
             {
-                return checkedZero ? throw new DivideByZeroException() : (Zero, Zero);
+                return checkedDivisor ? throw new DivideByZeroException() : (Zero, Zero);
             }
             else if (right.IsSimple && right.IsUnit)
             {
                 if (left.IsSimple)
                     return (new Number((TwoUnit)(left.value / right.value)), new Number((TwoUnit)(left.value % right.value)));
                 else
-                    return DivideWithRemainder(left.units, (Unit)right.value);
+                    return Division(left, (Unit)right.value);
             }
             else
             {
-                return DivideWithRemainder(left, right);
+                return Division(left, right);
             }
         }
 
-        private static (Number Quotient, Number Remainder) DivideWithRemainder(Unit[] numerators, Unit denominator)
+        private static (Number Quotient, Number Remainder) Division(uint[] numerators, uint denominator)
         {
             var index = numerators.Length - 1;
 
@@ -542,19 +601,20 @@ namespace Veruthian.Library.Numeric
             return (new Number(units), new Number((Unit)remainder));
         }
 
-        private static (Number Quotient, Number Remainder) DivideWithRemainder(Number num, Number den)
+        private static (Number Quotient, Number Remainder) Division(Number numerator, Number denominator)
         {
             // HACK: There is definitely a better algorithm out there...            
-            Number quo = new Number(0);
+            Number quotient = new Number(0);
 
-            while (num >= den)
+            while (numerator >= denominator)
             {
-                num -= den;
-                quo++;
+                numerator -= denominator;
+                quotient++;
             }
 
-            return (quo, num);
+            return (quotient, numerator);
         }
+
 
         #region Operators
 
@@ -563,15 +623,15 @@ namespace Veruthian.Library.Numeric
         public static Number operator --(Number value) => value.Previous;
 
 
-        public static Number operator +(Number left, Number right) => left.Add(right);
+        public static Number operator +(Number left, Number right) => left.Sum(right);
 
-        public static Number operator -(Number left, Number right) => left.Subtract(right);
+        public static Number operator -(Number left, Number right) => left.Difference(right);
 
-        public static Number operator *(Number left, Number right) => left.Multiply(right);
+        public static Number operator *(Number left, Number right) => left.Product(right);
 
-        public static Number operator /(Number left, Number right) => left.Divide(right);
+        public static Number operator /(Number left, Number right) => left.Quotient(right);
 
-        public static Number operator %(Number left, Number right) => left.Modulus(right);
+        public static Number operator %(Number left, Number right) => left.Remainder(right);
 
         #endregion
 
@@ -795,7 +855,7 @@ namespace Veruthian.Library.Numeric
                     if (groupLength > 0 && actualLength != 0 && actualLength % groupLength == 0)
                         builder.Append(separator ?? "");
 
-                    (current, rem) = current.DivideWithRemainder(numberBase);
+                    (current, rem) = current.Division(numberBase);
 
                     builder.Append(symbols[(int)rem.value]);
 

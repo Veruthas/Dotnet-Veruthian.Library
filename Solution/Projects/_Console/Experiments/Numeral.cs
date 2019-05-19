@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Numeric
+namespace _Console.Experiments
 {
     public struct Numeral
     {
