@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -9,7 +10,7 @@ namespace Veruthian.Library.Collections
         Dictionary<A, (A, D)> items = new Dictionary<A, (A, D)>();
 
 
-        public int Count => items.Count;
+        public Number Count => items.Count;
 
         bool IContainer<(A, D)>.Contains((A, D) value) => items.ContainsValue(value);
 

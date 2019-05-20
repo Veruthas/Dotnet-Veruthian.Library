@@ -1,3 +1,5 @@
+using Veruthian.Library.Numeric;
+
 namespace Veruthian.Library.Steps
 {
     public abstract class NestedStep : Step
@@ -14,8 +16,8 @@ namespace Veruthian.Library.Steps
             set => step = value;
         }
 
-        protected override int SubStepCount => 1;
+        protected override Number SubStepCount => 1;
 
-        protected override IStep GetSubStep(int verifiedAddress) => step;
+        protected override IStep GetSubStep(Number verifiedAddress) => step;
     }
 }

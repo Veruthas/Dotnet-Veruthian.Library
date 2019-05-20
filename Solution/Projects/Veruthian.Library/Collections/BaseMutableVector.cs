@@ -1,8 +1,10 @@
+using Veruthian.Library.Numeric;
+
 namespace Veruthian.Library.Collections
 {
     public abstract class BaseMutableVector<T> : BaseVector<T>, IMutableVector<T>
     {
-        public new T this[int address]
+        public new T this[Number address]
         {
             get
             {
@@ -19,7 +21,7 @@ namespace Veruthian.Library.Collections
 
         }
 
-        public bool TrySet(int address, T value)
+        public bool TrySet(Number address, T value)
         {
             if (IsValidAddress(address))
             {
@@ -31,6 +33,6 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        protected abstract void RawSet(int verifiedAddress, T value);
+        protected abstract void RawSet(Number verifiedAddress, T value);
     }
 }

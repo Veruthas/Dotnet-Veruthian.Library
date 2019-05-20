@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -25,7 +26,7 @@ namespace Veruthian.Library.Collections
 
     public interface IContainer<T> : IEnumerable<T>
     {
-        int Count { get; }
+        Number Count { get; }
 
         bool Contains(T value);
     }

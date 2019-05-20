@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -52,7 +53,7 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public int Count => dictionary.Count;
+        public Number Count => dictionary.Count;
 
 
         public IEnumerable<A> Addresses => dictionary.Keys;

@@ -1,15 +1,17 @@
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public interface IResizableVector<A, T> : IResizableContainer<T>, IResizableLookup<A, T>
+    public interface IResizableVector<A, T> : IResizableContainer<T>, IResizableLookup<A, T>, IMutableVector<A, T>
+        where A : ISequential<A>
     {
         void InsertRange(A address, IEnumerable<T> values);
-        
-        void RemoveRange(A address, int count);
+
+        void RemoveRange(A address, Number count);
     }
 
-    public interface IResizableVector<V> : IResizableVector<int, V>, IVector<V>
+    public interface IResizableVector<V> : IResizableVector<Number, V>, IVector<V>
     {
 
     }

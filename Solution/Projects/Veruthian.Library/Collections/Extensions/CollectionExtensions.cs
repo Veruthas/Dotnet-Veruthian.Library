@@ -6,7 +6,7 @@ namespace Veruthian.Library.Collections.Extensions
     {
         public static DataVector<T> ToDataIndex<T>(this IContainer<T> items) => DataVector<T>.Extract(items, items.Count);
 
-        public static DataArray<T> ToDataArray<T>(this IContainer<T> items) => DataArray<T>.Extract(items, items.Count);
+        public static DataArray<T> ToDataArray<T>(this IContainer<T> items) => DataArray<T>.Extract(items, items.Count.ToCheckedSignedInt());
 
         public static DataList<T> ToDataList<T>(this IContainer<T> items) => DataList<T>.Extract(items);
 

@@ -1,24 +1,25 @@
 using System.Collections.Generic;
 using System.Text;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Steps.Formatting
 {
     public class FlattenedStep
     {
-        private FlattenedStep(int index, IStep step, int substepCount)
+        private FlattenedStep(int index, IStep step, Number substepCount)
         {
             this.Index = index;
 
             this.Step = step;
 
-            this.SubStepIndices = new int[substepCount];
+            this.SubStepIndices = new Number[substepCount.ToCheckedSignedInt()];
         }
 
-        public int Index { get; }
+        public Number Index { get; }
 
         public IStep Step { get; }
 
-        public int[] SubStepIndices { get; }
+        public Number[] SubStepIndices { get; }
 
 
         public override string ToString() => FlattenedString();

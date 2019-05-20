@@ -3,46 +3,47 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public struct IndexSegment<T> : IVector<T>, IEnumerable<T>
+    public struct VectorSpan<T> : IVector<T>, IEnumerable<T>
     {
-        IVector<T> index;
+        IVector<T> vector;
 
-        int offset;
+        Number offset;
 
-        int count;
+        Number count;
 
-        int start;
+        Number start;
 
 
 
-        public IndexSegment(IVector<T> index)
+        public VectorSpan(IVector<T> vector)
         {
-            this.index = index;
+            this.vector = vector;
 
             this.offset = 0;
 
-            this.count = index.Count;
+            this.count = vector.Count;
 
             this.start = 0;
         }
 
-        public IndexSegment(IVector<T> index, int offset)
+        public VectorSpan(IVector<T> vector, Number offset)
         {
-            this.index = index;
+            this.vector = vector;
 
             this.offset = offset;
 
-            this.count = index.Count - offset;
+            this.count = vector.Count - offset;
 
             this.start = 0;
         }
 
-        public IndexSegment(IVector<T> index, int offset, int count)
+        public VectorSpan(IVector<T> vector, Number offset, Number count)
         {
-            this.index = index;
+            this.vector = vector;
 
             this.offset = offset;
 
@@ -51,9 +52,9 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public IndexSegment(IVector<T> index, int offset, int count, int start)
+        public VectorSpan(IVector<T> vector, Number offset, Number count, Number start)
         {
-            this.index = index;
+            this.vector = vector;
 
             this.offset = offset;
 
@@ -62,17 +63,16 @@ namespace Veruthian.Library.Collections
             this.start = start;
         }
 
+        public Number Count => count;
 
-        public int Count => count;
+        Number IVector<Number, T>.Start => start;
 
-        int IVector<int, T>.Start => start;
+        private Number StartIndex => start;
 
-        private int StartIndex => start;
-
-        private int EndIndex => start + count - 1;
+        private Number EndIndex => start + count - Number.One;
 
 
-        public T this[int address]
+        public T this[Number address]
         {
             get
             {
@@ -82,15 +82,15 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        private void VerifyAddress(int address)
+        private void VerifyAddress(Number address)
         {
             if (!IsValidAddress(address))
                 throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        private T RawGet(int verifiedAddress) => this.index[offset + (verifiedAddress - start)];
+        private T RawGet(Number verifiedAddress) => this.vector[offset + (verifiedAddress - start)];
 
-        public bool TryGet(int address, out T value)
+        public bool TryGet(Number address, out T value)
         {
             if (IsValidAddress(address))
             {
@@ -106,26 +106,26 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public bool IsValidAddress(int address) => address >= StartIndex && address <= EndIndex;
+        public bool IsValidAddress(Number address) => address >= StartIndex && address <= EndIndex;
 
 
 
-        IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(StartIndex, EndIndex);
+        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(StartIndex, EndIndex);
 
 
-        public IEnumerable<(int Address, T Value)> Pairs
+        public IEnumerable<(Number Address, T Value)> Pairs
         {
             get
             {
-                for (int i = 0; i < count; i++)
-                    yield return (start + i, index[offset + i]);
+                for (var i = new Number(); i < count; i++)
+                    yield return (start + i, vector[offset + i]);
             }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
             for (int i = 0; i < count; i++)
-                yield return (index[offset + i]);
+                yield return (vector[offset + i]);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -153,7 +153,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        bool ILookup<int, T>.HasAddress(int address) => IsValidAddress(address);
+        bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
 
         public override string ToString() => this.ToListString();
     }

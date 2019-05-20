@@ -55,7 +55,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public int Count
+        public Numeric.Number Count
         {
             get
             {

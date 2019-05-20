@@ -57,7 +57,7 @@ namespace Veruthian.Library.Numeric
 
         public static readonly TSet Empty = new TSet();
 
-        public int Count => ranges == null ? 0 : ranges.Length;
+        public Number Count => ranges == null ? Number.Zero : ranges.Length;
 
         private Range<T>[] RangeArray => ranges ?? defaultRanges;
 

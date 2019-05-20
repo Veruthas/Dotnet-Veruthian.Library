@@ -3,19 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
     public abstract class BaseVector<T> : IVector<T>, IEnumerable<T>
     {
 
-        public int Start => 0;
+        public Number Start => 0;
 
-        public abstract int Count { get; }
+        public abstract Number Count { get; }
 
-
-
-        public T this[int address]
+        public T this[Number address]
         {
             get
             {
@@ -25,9 +24,9 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        protected abstract T RawGet(int verifiedAddress);
+        protected abstract T RawGet(Number verifiedAddress);
 
-        public bool TryGet(int address, out T value)
+        public bool TryGet(Number address, out T value)
         {
             if (IsValidAddress(address))
             {
@@ -44,31 +43,31 @@ namespace Veruthian.Library.Collections
         public abstract bool Contains(T value);
 
 
-        protected void VerifyIndex(int address)
+        protected void VerifyIndex(Number address)
         {
             if (!IsValidAddress(address))
                 throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        protected bool IsValidAddress(int address) => (uint)address < Count;
+        protected bool IsValidAddress(Number address) => (uint)address < Count;
 
-        bool ILookup<int, T>.HasAddress(int address) => IsValidAddress(address);
+        bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
 
 
-        IEnumerable<int> ILookup<int, T>.Addresses => Enumerables.GetRange(0, Count - 1);
+        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(Number.Zero, Count- 1);
 
-        public IEnumerable<(int Address, T Value)> Pairs
+        public IEnumerable<(Number Address, T Value)> Pairs
         {
             get
             {
-                for (int i = 0; i < Count; i++)
+                for (var i = Number.Zero; i < Count; i++)
                     yield return (i, RawGet(i));
             }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = Number.Zero; i < Count; i++)
                 yield return RawGet(i);
         }
 

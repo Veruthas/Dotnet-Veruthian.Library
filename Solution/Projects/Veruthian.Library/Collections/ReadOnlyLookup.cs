@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -13,7 +14,8 @@ namespace Veruthian.Library.Collections
 
         public V this[A address] => lookup[address];
 
-        public int Count => lookup.Count;
+        public Number Count => lookup.Count;
+        
 
         public IEnumerable<A> Addresses => lookup.Addresses;
 

@@ -189,20 +189,20 @@ namespace Veruthian.Library.Numeric.Binary
 
         const int bits = 4;
 
-        int IVector<int, bool>.Start => 0;
+        Number IVector<Number, bool>.Start => Number.Zero;
 
-        bool ILookup<int, bool>.this[int address] => TryGet(address, out var result) ? result : throw new ArgumentOutOfRangeException(nameof(address));
+        bool ILookup<Number, bool>.this[Number address] => TryGet(address, out var result) ? result : throw new ArgumentOutOfRangeException(nameof(address));
 
 
         bool IContainer<bool>.Contains(bool value) => (value && this.value != 0) || (!value && this.value != 0xF);
 
-        bool ILookup<int, bool>.HasAddress(int address) => (uint)address <= bits;
+        bool ILookup<Number, bool>.HasAddress(Number address) => (uint)address <= bits;
 
-        private bool TryGet(int address, out bool value)
+        private bool TryGet(Number address, out bool value)
         {
             if ((uint)address <= bits)
             {
-                value = ((this.value >> address) & 0x1) == 1;
+                value = ((this.value >> (byte)address) & 0x1) == 1;
 
                 return true;
             }
@@ -214,10 +214,10 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        bool ILookup<int, bool>.TryGet(int address, out bool value) => TryGet(address, out value);
+        bool ILookup<Number, bool>.TryGet(Number address, out bool value) => TryGet(address, out value);
 
 
-        int IContainer<bool>.Count => bits;
+        Number IContainer<bool>.Count => bits;
 
 
         public IEnumerator<bool> GetEnumerator()
@@ -228,7 +228,7 @@ namespace Veruthian.Library.Numeric.Binary
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        IEnumerable<int> ILookup<int, bool>.Addresses
+        IEnumerable<Number> ILookup<Number, bool>.Addresses
         {
             get
             {
@@ -237,7 +237,7 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        IEnumerable<(int Address, bool Value)> ILookup<int, bool>.Pairs
+        IEnumerable<(Number Address, bool Value)> ILookup<Number, bool>.Pairs
         {
             get
             {

@@ -260,7 +260,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.AppendSpace(items.Count);
+                var newArray = array.AppendSpace(items.Count.ToCheckedSignedInt());
 
                 int index = 0;
 
@@ -279,7 +279,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.AppendSpace(items.Count);
+                var newArray = array.AppendSpace(items.Count.ToCheckedSignedInt());
 
                 int index = array.Length;
 
@@ -306,7 +306,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.InsertSpace(index, items.Count);
+                var newArray = array.InsertSpace(index, items.Count.ToCheckedSignedInt());
 
                 foreach (var item in items)
                     newArray[index++] = item;

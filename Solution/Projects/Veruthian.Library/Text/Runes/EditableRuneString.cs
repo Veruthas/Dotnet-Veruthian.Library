@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Text.Runes
 {
@@ -14,7 +15,7 @@ namespace Veruthian.Library.Text.Runes
         public EditableRuneString(RuneString value) => this.value = value ?? RuneString.Empty;
 
 
-        public int Length => value.Length;
+        public Number Length => (int)value.Length;
 
         public RuneString Value => value;
 

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Text;
 using Veruthian.Library.Collections;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 using Veruthian.Library.Text.Runes.Extensions;
 using Veruthian.Library.Utility;
 using Veruthian.Library.Utility.Extensions;
@@ -51,10 +52,10 @@ namespace Veruthian.Library.Text.Runes
         public RuneString(IList<Rune> runes, int index, int length)
             : this(GetFromList(runes, index, length), false) { }
 
-        public RuneString(IVector<int, Rune> runes, int index)
+        public RuneString(IVector<Rune> runes, Number index)
             : this(GetFromVector(runes, index, runes.Count - index), false) { }
 
-        public RuneString(IVector<int, Rune> runes, int index, int length)
+        public RuneString(IVector<Rune> runes, Number index, Number length)
             : this(GetFromVector(runes, index, length), false) { }
 
         private static Rune[] GetFromCollection(ICollection<Rune> ruins)
@@ -94,27 +95,19 @@ namespace Veruthian.Library.Text.Runes
             return values;
         }
 
-        private static Rune[] GetFromVector(IVector<int, Rune> runes, int index, int length)
+        private static Rune[] GetFromVector(IVector<Rune> runes, Number index, Number length)
         {
             if (runes == null)
                 throw new ArgumentNullException("runes");
-            if ((uint)index > runes.Count)
+            if (index > runes.Count)
                 throw new ArgumentOutOfRangeException("index");
-            if ((uint)index + (uint)length > runes.Count)
+            if (index + length > runes.Count)
                 throw new ArgumentOutOfRangeException("length");
 
-            Rune[] values = new Rune[length];
+            Rune[] values = new Rune[length.ToCheckedInt()];
 
-            if (runes is List<Rune>)
-            {
-                var list = runes as List<Rune>;
-                list.CopyTo(index, values, 0, length);
-            }
-            else
-            {
-                for (int i = 0; i < length; i++)
-                    values[i] = runes[index + i];
-            }
+            for (int i = 0; i < length; i++)
+                values[i] = runes[index + i];
 
             return values;
         }
@@ -215,9 +208,9 @@ namespace Veruthian.Library.Text.Runes
             if (other == null)
                 return 1;
 
-            int length = Math.Min(this.Length, other.Length);
+            var length = Math.Min((int)this.Length, (int)other.Length);
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 var thisRune = this.runes[i];
                 var otherRune = other.runes[i];
@@ -279,11 +272,11 @@ namespace Veruthian.Library.Text.Runes
             if (right == null)
                 return null;
 
-            var combined = new Rune[left.Length + right.Length];
+            var combined = new Rune[(int)left.Length + (int)right.Length];
 
-            Array.Copy(left.runes, 0, combined, 0, left.Length);
+            Array.Copy(left.runes, 0, combined, 0, (int)left.Length);
 
-            Array.Copy(right.runes, left.Length, combined, 0, right.Length);
+            Array.Copy(right.runes, (int)left.Length, combined, 0, (int)right.Length);
 
             return new RuneString(combined, false);
         }
@@ -293,11 +286,11 @@ namespace Veruthian.Library.Text.Runes
             if (left == null)
                 return new RuneString(right);
 
-            var combined = new Rune[left.Length + 1];
+            var combined = new Rune[(int)left.Length + 1];
 
-            Array.Copy(left.runes, 0, combined, 0, left.Length);
+            Array.Copy(left.runes, 0, combined, 0, (int)left.Length);
 
-            combined[left.Length] = right;
+            combined[(int)left.Length] = right;
 
             return new RuneString(combined, false);
         }
@@ -308,11 +301,11 @@ namespace Veruthian.Library.Text.Runes
                 return new RuneString(left);
 
 
-            var combined = new Rune[right.Length + 1];
+            var combined = new Rune[(int)right.Length + 1];
 
             combined[0] = left;
 
-            Array.Copy(right.runes, 1, combined, 0, right.Length);
+            Array.Copy(right.runes, 1, combined, 0, (int)right.Length);
 
             return new RuneString(combined, false);
         }
@@ -326,7 +319,7 @@ namespace Veruthian.Library.Text.Runes
             foreach (var value in values)
             {
                 if (value != null)
-                    length += value.Length;
+                    length += (int)value.Length;
             }
 
             var combined = new Rune[length];
@@ -337,8 +330,8 @@ namespace Veruthian.Library.Text.Runes
             {
                 if (value != null)
                 {
-                    Array.Copy(value.runes, 0, combined, index, value.Length);
-                    index += value.Length;
+                    Array.Copy(value.runes, 0, combined, index, (int)value.Length);
+                    index += (int)value.Length;
                 }
             }
 
@@ -436,7 +429,7 @@ namespace Veruthian.Library.Text.Runes
 
         #region Extract
 
-        public RuneString Extract(int start) => Extract(start, Length - start);
+        public RuneString Extract(int start) => Extract(start, (int)Length - start);
 
         public RuneString Extract(int start, int length)
         {
@@ -459,9 +452,9 @@ namespace Veruthian.Library.Text.Runes
         #region Reverse
         public RuneString Reverse()
         {
-            var reversed = new Rune[Length];
+            var reversed = new Rune[(int)Length];
 
-            for (int i = 0, r = Length - 1; i < Length; i++, r--)
+            for (int i = 0, r = (int)Length - 1; i < Length; i++, r--)
                 reversed[i] = runes[r];
 
             return new RuneString(reversed, false);
@@ -510,16 +503,16 @@ namespace Veruthian.Library.Text.Runes
 
         #region Vector
 
-        int IVector<int, Rune>.Start => 0;
+        Number IVector<Number, Rune>.Start => Number.Zero;
 
 
-        public int Length => runes.Length;
+        public Number Length => runes.Length;
 
-        int IContainer<Rune>.Count => Length;
+        Number IContainer<Rune>.Count => Length;
 
-        IEnumerable<int> ILookup<int, Rune>.Addresses => Enumerables.GetRange(0, Length);
+        IEnumerable<Number> ILookup<Number, Rune>.Addresses => Enumerables.GetRange(Number.Zero, Length);
 
-        IEnumerable<(int Address, Rune Value)> ILookup<int, Rune>.Pairs
+        IEnumerable<(Number Address, Rune Value)> ILookup<Number, Rune>.Pairs
         {
             get
             {
@@ -528,22 +521,22 @@ namespace Veruthian.Library.Text.Runes
             }
         }
 
-        public Rune this[int address]
+        public Rune this[Number address]
         {
             get
             {
                 if (HasAddress(address))
-                    return runes[address];
+                    return runes[(int)address];
                 else
                     throw new ArgumentOutOfRangeException(nameof(address));
             }
         }
 
-        bool ILookup<int, Rune>.TryGet(int address, out Rune value)
+        bool ILookup<Number, Rune>.TryGet(Number address, out Rune value)
         {
             if (HasAddress(address))
             {
-                value = runes[address];
+                value = runes[(int)address];
 
                 return true;
             }
@@ -555,9 +548,9 @@ namespace Veruthian.Library.Text.Runes
             }
         }
 
-        private bool HasAddress(int address) => (uint)address < Length;
+        private bool HasAddress(Number address) => address.ToInt() < Length;
 
-        bool ILookup<int, Rune>.HasAddress(int index) => HasAddress(index);
+        bool ILookup<Number, Rune>.HasAddress(Number index) => HasAddress(index);
 
 
         bool IContainer<Rune>.Contains(Rune value)

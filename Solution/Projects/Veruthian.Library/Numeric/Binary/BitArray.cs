@@ -3,22 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
+using Unit = System.UInt64;
+
 namespace Veruthian.Library.Numeric.Binary
 {
     public sealed class BitArray : IMutableVector<bool>
     {
-        const int lengthOfUlong = 64;
+        const int UnitBits = 64;
 
-        ulong value;
+        Unit value;
 
-        ulong[] values;
+        Unit[] values;
 
-        int count;
+        Number count;
 
 
-        public BitArray(int size)
+        public BitArray(Number size)
         {
-            if ((uint)size < lengthOfUlong)
+            if ((uint)size < UnitBits)
             {
                 this.value = 0;
 
@@ -26,19 +28,20 @@ namespace Veruthian.Library.Numeric.Binary
             }
             else
             {
-                int valueSize = size / lengthOfUlong;
+                int valueSize = size.ToCheckedSignedInt() / UnitBits;
 
-                if (size % lengthOfUlong != 0)
+                if (size % UnitBits != 0)
                     valueSize++;
 
-                values = new ulong[valueSize];
+                values = new Unit[valueSize];
             }
 
             this.value = 0;
+
             this.count = size;
         }
 
-        public bool this[int address]
+        public bool this[Number address]
         {
             get
             {
@@ -54,13 +57,15 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        bool ILookup<int, bool>.this[int address] => this[address];
+        bool ILookup<Number, bool>.this[Number address] => this[address];
 
-        public bool TryGet(int address, out bool value)
+        public bool TryGet(Number address, out bool value)
         {
             if (HasAddress(address))
             {
-                ulong longValue;
+                Unit longValue;
+
+                var intAddress = (int)address;
 
                 if (this.values == null)
                 {
@@ -68,15 +73,15 @@ namespace Veruthian.Library.Numeric.Binary
                 }
                 else
                 {
-                    int segmentIndex = address / lengthOfUlong;
+                    var segmentIndex = intAddress / UnitBits;
 
-                    address = address % lengthOfUlong;
+                    intAddress = intAddress % UnitBits;
 
                     longValue = this.values[segmentIndex];
                 }
 
 
-                value = ((this.value >> address) & 0x1) == 0x1;
+                value = ((this.value >> intAddress) & 0x1) == 0x1;
 
                 return true;
             }
@@ -88,19 +93,21 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        public bool TrySet(int address, bool value)
+        public bool TrySet(Number address, bool value)
         {
             if (HasAddress(address))
             {
+                var intAddress = (int)address;
+
                 if (this.values == null)
                 {
-                    SetBit(ref this.value, address, value);
+                    SetBit(ref this.value, intAddress, value);
                 }
                 else
                 {
-                    int valueIndex = address / lengthOfUlong;
+                    int valueIndex = intAddress / UnitBits;
 
-                    SetBit(ref this.values[valueIndex], address % lengthOfUlong, value);
+                    SetBit(ref this.values[valueIndex], intAddress % UnitBits, value);
                 }
 
                 return true;
@@ -109,9 +116,9 @@ namespace Veruthian.Library.Numeric.Binary
             return false;
         }
 
-        private static void SetBit(ref ulong value, int address, bool bit)
+        private static void SetBit(ref Unit value, int address, bool bit)
         {
-            ulong longBit = 0x01;
+            Unit longBit = 0x01;
 
             longBit <<= address;
 
@@ -120,11 +127,11 @@ namespace Veruthian.Library.Numeric.Binary
             value |= (bit ? longBit : 0x0);
         }
 
-        public int Count => count;
+        public Number Count => count;
 
-        int IVector<int, bool>.Start => 0;
+        Number IVector<Number, bool>.Start => Number.Zero;
 
-        IEnumerable<int> ILookup<int, bool>.Addresses => Enumerables.GetRange(0, Count - 1);
+        IEnumerable<Number> ILookup<Number, bool>.Addresses => Enumerables.GetRange(0, Count - 1);
 
         public IEnumerator<bool> GetEnumerator() => Values.GetEnumerator();
 
@@ -155,7 +162,7 @@ namespace Veruthian.Library.Numeric.Binary
 
                     for (int i = 0; i < count; i++)
                     {
-                        if (i % lengthOfUlong == 0)
+                        if (i % UnitBits == 0)
                             current = values[++index];
 
                         bool value = (current & 0x1) == 0x1;
@@ -168,7 +175,7 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        IEnumerable<(int Address, bool Value)> ILookup<int, bool>.Pairs
+        IEnumerable<(Number Address, bool Value)> ILookup<Number, bool>.Pairs
         {
             get
             {
@@ -193,7 +200,7 @@ namespace Veruthian.Library.Numeric.Binary
 
                     for (int i = 0; i < count; i++)
                     {
-                        if (i % lengthOfUlong == 0)
+                        if (i % UnitBits == 0)
                             current = values[++index];
 
                         bool value = (current & 0x1) == 0x1;
@@ -206,9 +213,9 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        bool ILookup<int, bool>.HasAddress(int address) => HasAddress(address);
+        bool ILookup<Number, bool>.HasAddress(Number address) => HasAddress(address);
 
-        bool HasAddress(int address) => (uint)address < Count;
+        bool HasAddress(Number address) => (uint)address < Count;
 
         bool IContainer<bool>.Contains(bool value)
         {

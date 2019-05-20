@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Steps
 {
@@ -11,9 +12,9 @@ namespace Veruthian.Library.Steps
 
         public abstract string Description { get; }
 
-        protected abstract int SubStepCount { get; }
+        protected abstract Number SubStepCount { get; }
 
-        protected abstract IStep GetSubStep(int verifiedAddress);
+        protected abstract IStep GetSubStep(Number verifiedAddress);
 
         #endregion
 
@@ -27,23 +28,23 @@ namespace Veruthian.Library.Steps
 
         IVector<IStep> IStep.SubSteps => this;
 
-        int IVector<int, IStep>.Start => 0;
+        Number IVector<Number, IStep>.Start => new Number();
 
-        int IContainer<IStep>.Count => SubStepCount;
+        Number IContainer<IStep>.Count => SubStepCount;
 
 
-        private void VerifyAddress(int address)
+        private void VerifyAddress(Number address)
         {
             if (!HasAddress(address))
                 throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        private bool HasAddress(int address) => (uint)address < SubStepCount;
+        private bool HasAddress(Number address) => address < SubStepCount;
 
-        bool ILookup<int, IStep>.HasAddress(int address) => HasAddress(address);
+        bool ILookup<Number, IStep>.HasAddress(Number address) => HasAddress(address);
 
 
-        IStep ILookup<int, IStep>.this[int address]
+        IStep ILookup<Number, IStep>.this[Number address]
         {
             get
             {
@@ -53,7 +54,7 @@ namespace Veruthian.Library.Steps
             }
         }
 
-        bool ILookup<int, IStep>.TryGet(int address, out IStep value)
+        bool ILookup<Number, IStep>.TryGet(Number address, out IStep value)
         {
             if (HasAddress(address))
             {
@@ -90,13 +91,13 @@ namespace Veruthian.Library.Steps
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        IEnumerable<int> ILookup<int, IStep>.Addresses => Enumerables.GetRange(0, SubStepCount);
+        IEnumerable<Number> ILookup<Number, IStep>.Addresses => Enumerables.GetRange(Number.Zero, SubStepCount);
 
-        IEnumerable<(int Address, IStep Value)> ILookup<int, IStep>.Pairs
+        IEnumerable<(Number Address, IStep Value)> ILookup<Number, IStep>.Pairs
         {
             get
             {
-                for (int i = 0; i < SubStepCount; i++)
+                for (var i = Number.Zero; i < SubStepCount; i++)
                     yield return (i, GetSubStep(i));
             }
         }

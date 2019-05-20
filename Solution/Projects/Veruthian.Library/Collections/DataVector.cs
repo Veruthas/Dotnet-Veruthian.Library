@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
@@ -26,10 +27,9 @@ namespace Veruthian.Library.Collections
 
         public static DataVector<T> Extract(IEnumerable<T> items) => new DataVector<T>(items.ToArray());
 
-        public static DataVector<T> Extract(IEnumerable<T> items, int amount) => new DataVector<T>(items.ToArray(amount));
+        public static DataVector<T> Extract(IEnumerable<T> items, Number amount) => new DataVector<T>(items.ToArray(amount.ToCheckedSignedInt()));
 
-
-        public override int Count => items.Length;
+        public override Number Count => items.Length;
 
         public override bool Contains(T value)
         {
@@ -53,7 +53,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        protected override T RawGet(int verifiedAddress) => items[verifiedAddress];
+        protected override T RawGet(Number verifiedAddress) => items[verifiedAddress.ToCheckedSignedInt()];
 
 
         public static implicit operator DataVector<T>(T item) => new DataVector<T>(new T[] { item });

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -74,11 +75,11 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public int Count
+        public Number Count
         {
             get
             {
-                int count = 0;
+                var count = Number.Zero;
 
                 // Should I cache this value?
                 foreach (var item in items.Values)

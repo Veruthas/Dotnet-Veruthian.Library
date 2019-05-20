@@ -1,3 +1,5 @@
+using Veruthian.Library.Numeric;
+
 namespace Veruthian.Library.Steps
 {
     public class ConditionalStep : Step
@@ -42,13 +44,13 @@ namespace Veruthian.Library.Steps
                                               (HasThenStep ? "-then" : "") +
                                               (HasElseStep ? "-else" : "");
 
-        protected override int SubStepCount => 1 +
+        protected override Number SubStepCount => 1 +
                                               (HasThenStep ? 1 : 0) +
                                               (HasElseStep ? 1 : 0);
 
-        protected override IStep GetSubStep(int verifiedAddress)
+        protected override IStep GetSubStep(Number verifiedAddress)
         {
-            switch (verifiedAddress)
+            switch (verifiedAddress.ToByte())
             {
                 case 0:
                     return condition;

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -21,8 +22,8 @@ namespace Veruthian.Library.Collections
 
         public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);
 
+        public Number Count => items.Count;
 
-        public int Count => items.Count;
 
         public bool Contains(T value) => items.Contains(value);
 

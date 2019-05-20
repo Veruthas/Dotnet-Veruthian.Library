@@ -257,6 +257,11 @@ namespace Veruthian.Library.Numeric
         }
 
 
+        public static Number Max(Number a, Number b) => a > b ? a : b;
+
+        public static Number Min(Number a, Number b) => a < b ? a : b;
+
+
         public static bool operator ==(Number left, Number right) => left.Equals(right);
 
         public static bool operator !=(Number left, Number right) => !left.Equals(right);
@@ -380,7 +385,7 @@ namespace Veruthian.Library.Numeric
             return new Number(result.Value, result.Units);
         }
 
-        public Number SafeDifference(Number subtrahend)
+        public Number CheckedDifference(Number subtrahend)
         {
             var result = Difference(this, subtrahend);
 
@@ -577,14 +582,14 @@ namespace Veruthian.Library.Numeric
 
         public Number Remainder(Number divisor) => Division(divisor, false).Remainder;
 
-        public Number SafeQuotient(Number divisor) => Division(divisor, true).Quotient;
+        public Number CheckedQuotient(Number divisor) => Division(divisor, true).Quotient;
 
-        public Number SafeRemainder(Number divisor) => Division(divisor, true).Remainder;
+        public Number CheckedRemainder(Number divisor) => Division(divisor, true).Remainder;
 
 
         public (Number Quotient, Number Remainder) Division(Number divisor) => Division(divisor, false);
 
-        public (Number Quotient, Number Remainder) SafeDivision(Number divisor) => Division(divisor, true);
+        public (Number Quotient, Number Remainder) CheckedDivision(Number divisor) => Division(divisor, true);
 
 
         private (Number Quotient, Number Remainder) Division(Number divisor, bool checkedDivisor) => Division(this, divisor, checkedDivisor);
@@ -903,6 +908,111 @@ namespace Veruthian.Library.Numeric
         }
 
 
+        public sbyte ToSignedByte() => (sbyte)(ToByte() & 0x7F);
+
+        public short ToSignedShort() => (short)(ToShort() & 0x7FFF);
+
+        public int ToSignedInt() => (int)(ToInt() & 0x7FFF_FFFF);
+
+        public long ToSignedLong() => (long)(ToLong() & 0x7FFF_FFFF_FFFF_FFFF);
+
+
+        public byte ToCheckedByte()
+        {
+            if (!IsSimple || value > byte.MaxValue)
+                throw new InvalidCastException($"Number is larger than Byte Maximum {byte.MaxValue}");
+
+            return ToByte();
+        }
+
+        public ushort ToCheckedShort()
+        {
+#if ByteUnit
+            if (!IsSimple)
+#else
+            if (!IsSimple || value > ushort.MaxValue)
+#endif
+                throw new InvalidCastException($"Number is larger than short Maximum {ushort.MaxValue}");
+
+            return ToShort();
+        }
+
+        public uint ToCheckedInt()
+        {
+#if ByteUnit
+            if (!IsSimple || units.Length > 4)
+#elif ShortUnit
+            if (!IsSimple)
+#else
+            if (!IsSimple || value > uint.MaxValue)
+#endif
+                throw new InvalidCastException($"Number is larger than Int Maximum {uint.MaxValue}");
+
+            return ToShort();
+        }
+
+        public ulong ToCheckedLong()
+        {
+#if ByteUnit
+            if (!IsSimple || units.Length > 8)
+#elif ShortUnit
+            if (!IsSimple || units.Length > 4)
+#else
+            if (!IsSimple)
+#endif
+                throw new InvalidCastException($"Number is larger than Long Maximum {ulong.MaxValue}");
+
+            return ToShort();
+        }
+
+
+        public sbyte ToCheckedSignedByte()
+        {
+            if (!IsSimple || value > (byte)sbyte.MaxValue)
+                throw new InvalidCastException($"Number is larger than Byte Maximum {byte.MaxValue}");
+
+            return ToSignedByte();
+        }
+
+        public short ToCheckedSignedShort()
+        {
+#if ByteUnit
+            if (!IsSimple)
+#else
+            if (!IsSimple || value > (ushort)short.MaxValue)
+#endif
+                throw new InvalidCastException($"Number is larger than short Maximum {short.MaxValue}");
+
+            return ToSignedShort();
+        }
+
+        public int ToCheckedSignedInt()
+        {
+#if ByteUnit
+            if (!IsSimple || units.Length > 4 || units[UnitCount - 1] > 0x7F)
+#else
+            if (!IsSimple || value > (uint)int.MaxValue)
+#endif
+                throw new InvalidCastException($"Number is larger than Int Maximum {int.MaxValue}");
+
+            return ToSignedInt();
+        }
+
+        public long ToCheckedSignedLong()
+        {
+#if ByteUnit
+            if (!IsSimple || units.Length > 8 || units[UnitCount - 1] > 0x7F)
+#elif ShortUnit
+            if (!IsSimple || units.Length > 4 || units[UnitCount - 1] > 0x7F)
+#else
+            if (!IsSimple || value > (ulong)long.MaxValue)
+#endif
+                throw new InvalidCastException($"Number is larger than Long Maximum {long.MaxValue}");
+
+            return ToSignedLong();
+        }
+
+
         public static explicit operator byte(Number value) => value.ToByte();
 
         public static explicit operator ushort(Number value) => value.ToShort();
@@ -912,13 +1022,13 @@ namespace Veruthian.Library.Numeric
         public static explicit operator ulong(Number value) => value.ToLong();
 
 
-        public static explicit operator sbyte(Number value) => (sbyte)value.ToByte();
+        public static explicit operator sbyte(Number value) => value.ToSignedByte();
 
-        public static explicit operator short(Number value) => (short)value.ToShort();
+        public static explicit operator short(Number value) => value.ToSignedShort();
 
-        public static explicit operator int(Number value) => (int)value.ToInt();
+        public static explicit operator int(Number value) => value.ToSignedInt();
 
-        public static explicit operator long(Number value) => (long)value.ToLong();
+        public static explicit operator long(Number value) => value.ToSignedLong();
 
         #endregion
 

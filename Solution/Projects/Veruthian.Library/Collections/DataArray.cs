@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
@@ -32,12 +33,11 @@ namespace Veruthian.Library.Collections
 
         public static DataArray<T> Extract(IEnumerable<T> items, int amount) => new DataArray<T>(items.ToArray(amount));
 
+        public sealed override Number Count => items.Length;
 
-        public sealed override int Count => items.Length;
+        protected sealed override T RawGet(Number verifiedAddress) => items[verifiedAddress.ToCheckedSignedInt()];
 
-        protected sealed override T RawGet(int verifiedAddress) => items[verifiedAddress];
-
-        protected sealed override void RawSet(int verifiedAddress, T value) => items[verifiedAddress] = value;
+        protected sealed override void RawSet(Number verifiedAddress, T value) => items[verifiedAddress.ToCheckedSignedInt()] = value;
 
         public sealed override bool Contains(T value)
         {

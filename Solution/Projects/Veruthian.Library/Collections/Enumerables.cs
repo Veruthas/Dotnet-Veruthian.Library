@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
@@ -59,6 +60,26 @@ namespace Veruthian.Library.Collections
         #endregion
 
         #region Ranges
+
+        public static IEnumerable<Number> GetRange(Number first, Number last)
+        {
+            if (first < last)
+                for (var i = first; i <= last; i++)
+                    yield return i;
+            else
+                for (var i = first; i >= last; i--)
+                    yield return i;
+        }
+
+        public static IEnumerable<Number> GetRange(Number first, Number last, Number step)
+        {
+            if (first < last)
+                for (var i = first; i <= last; i += step)
+                    yield return i;
+            else
+                for (var i = first; i >= last; i -= step)
+                    yield return i;
+        }
 
         public static IEnumerable<int> GetRange(int first, int last, int step = 1)
         {
