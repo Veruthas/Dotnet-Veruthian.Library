@@ -30,6 +30,8 @@ namespace Veruthian.Library.Numeric
         readonly Unit[] units;
 
 
+        #region Constructors
+
         private Number(TwoUnit value)
         {
             this.value = value;
@@ -69,6 +71,7 @@ namespace Veruthian.Library.Numeric
             }
         }
 
+        #endregion
 
         #region Constants
 
@@ -97,6 +100,8 @@ namespace Veruthian.Library.Numeric
         #region Properties
 
         public bool IsZero => IsSimple && value == 0;
+
+        public bool IsOne => value == 1;
 
         private bool IsSimple => units == null;
 
@@ -287,17 +292,17 @@ namespace Veruthian.Library.Numeric
 
         private static void AdjustNegative(Unit[] units)
         {
-            ulong carry = 1;
+            var carry = (TwoUnit)1;
 
             for (int i = 0; i < units.Length; i++)
             {
                 unchecked
                 {
-                    TwoUnit inverse = (TwoUnit)(~units[i]) + carry;
+                    TwoUnit inverse = (TwoUnit)(((Unit)~units[i]) + carry);
 
-                    carry = inverse >> UnitBits;
+                    carry = (TwoUnit)(inverse >> UnitBits);
 
-                    units[i] = (uint)inverse;
+                    units[i] = (Unit)inverse;
                 }
             }
         }
@@ -366,7 +371,13 @@ namespace Veruthian.Library.Numeric
         {
             var result = Difference(this, subtrahend);
 
-            return result.Positive ? new Number(result.Value, result.Units) : Zero;
+            if (!result.Positive)
+                return Zero;
+
+            if (result.Units != null)
+                TrimUnits(ref result.Units);
+
+            return new Number(result.Value, result.Units);
         }
 
         public Number SafeDifference(Number subtrahend)
@@ -384,7 +395,14 @@ namespace Veruthian.Library.Numeric
 
         public Number Delta(Number subtrahend)
         {
-            var result = Difference(this, subtrahend);
+            var result = Delta(this, subtrahend);
+
+            return result.Value;
+        }
+
+        private static (Number Value, bool Positive) Delta(Number a, Number b)
+        {
+            var result = Difference(a, b);
 
             if (result.Units != null)
             {
@@ -394,10 +412,11 @@ namespace Veruthian.Library.Numeric
                 TrimUnits(ref result.Units);
             }
 
-            return new Number(result.Value, result.Units);
+            return (new Number(result.Value, result.Units), result.Positive);
         }
 
-        private static (bool Positive, ulong Value, uint[] Units) Difference(Number a, Number b)
+
+        private static (bool Positive, TwoUnit Value, Unit[] Units) Difference(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
@@ -426,8 +445,6 @@ namespace Veruthian.Library.Numeric
                     }
                 }
 
-                TrimUnits(ref units);
-
                 return (carry == 1, 0, units);
             }
         }
@@ -447,6 +464,14 @@ namespace Veruthian.Library.Numeric
             else if (left.IsZero || right.IsZero)
             {
                 return Zero;
+            }
+            else if (left.IsOne)
+            {
+                return right;
+            }
+            else if (right.IsOne)
+            {
+                return left;
             }
             else
             {
@@ -486,7 +511,7 @@ namespace Veruthian.Library.Numeric
                 return Power(this, exponent);
         }
 
-        private static Number Power(Number value, ulong exponent)
+        private static Number Power(Number value, TwoUnit exponent)
         {
             var result = One;
 
@@ -505,7 +530,6 @@ namespace Veruthian.Library.Numeric
             return result;
         }
 
-
         private static Number Power(Number value, Number exponent)
         {
             var result = One;
@@ -514,19 +538,36 @@ namespace Veruthian.Library.Numeric
 
             var bitIndex = 0;
 
-            var index = 0;
+            var unitIndex = 0;
 
-            var exponentUnit = exponent[index];
+            var exponentUnit = exponent.units[unitIndex];
 
-            // while (index < exponent.UnitCount || bitIndex < Unit)
-            // {
-            //     if ((exponentUnit & 0x1) == 1)
-            //         result *= last;
+            while (true)
+            {
+                if (unitIndex == exponent.UnitCount - 1)
+                {
+                    if (exponentUnit == 0)
+                        break;
+                }
 
-            //     exponentUnit >>= 1;
+                if (bitIndex == UnitBits)
+                {
+                    unitIndex++;
 
-            //     last *= last;
-            // }
+                    bitIndex = 0;
+
+                    exponentUnit = exponent.units[unitIndex];
+                }
+
+                if ((exponentUnit & 0x1) == 1)
+                    result *= last;
+
+                exponentUnit >>= 1;
+
+                bitIndex++;
+
+                last *= last;
+            }
 
             return result;
         }
@@ -568,9 +609,9 @@ namespace Veruthian.Library.Numeric
             }
         }
 
-        private static (Number Quotient, Number Remainder) Division(uint[] numerators, uint denominator)
+        private static (Number Quotient, Number Remainder) Division(Number numerators, Unit denominator, int offset = 0)
         {
-            var index = numerators.Length - 1;
+            var index = numerators.UnitCount - 1;
 
             var numerator = (ulong)numerators[index];
 
@@ -580,14 +621,14 @@ namespace Veruthian.Library.Numeric
             numerator = numerator / denominator;
 
 
-            var units = new Unit[index + (numerator == 0 ? 0 : 1)];
+            var units = new Unit[index + (numerator == 0 ? 0 : 1) - offset];
 
             if (numerator != 0)
-                units[index] = (Unit)numerator;
+                units[index - offset] = (Unit)numerator;
 
             index--;
 
-            while (index >= 0)
+            while (index >= offset)
             {
                 numerator = (remainder << UnitBits) + numerators[index];
 
@@ -595,7 +636,9 @@ namespace Veruthian.Library.Numeric
 
                 numerator = numerator / denominator;
 
-                units[index--] = (Unit)numerator;
+                units[index - offset] = (Unit)numerator;
+
+                index--;
             }
 
             return (new Number(units), new Number((Unit)remainder));
@@ -603,18 +646,54 @@ namespace Veruthian.Library.Numeric
 
         private static (Number Quotient, Number Remainder) Division(Number numerator, Number denominator)
         {
-            // HACK: There is definitely a better algorithm out there...            
-            Number quotient = new Number(0);
-
-            while (numerator >= denominator)
+            if (numerator < denominator)
             {
-                numerator -= denominator;
-                quotient++;
+                return (Zero, numerator);
             }
+            else
+            {
+                var offset = denominator.UnitCount - 1;
 
-            return (quotient, numerator);
+                var simpleDenominator = denominator[offset];
+
+
+                var original = numerator;
+
+
+                var result = Division(numerator, simpleDenominator, offset);
+
+                var quotient = result.Quotient;
+
+
+                var estimated = result.Quotient * denominator;
+
+                var error = Delta(numerator, estimated);
+
+                var positive = error.Positive;
+
+
+                while (error.Value >= denominator)
+                {
+                    result = Division(error.Value, simpleDenominator, offset);
+
+                    if (positive)
+                        quotient += result.Quotient;
+                    else
+                        quotient -= result.Quotient;
+
+                    estimated = quotient * denominator;
+
+                    error = Delta(numerator, estimated);
+
+                    positive = error.Positive;
+                }
+
+                return (quotient, error.Value);
+            }
         }
 
+
+        #endregion
 
         #region Operators
 
@@ -633,7 +712,7 @@ namespace Veruthian.Library.Numeric
 
         public static Number operator %(Number left, Number right) => left.Remainder(right);
 
-        #endregion
+        public static Number operator ^(Number left, Number right) => left.Power(right);
 
         #endregion
 
@@ -652,6 +731,12 @@ namespace Veruthian.Library.Numeric
                 return new Number((byte)value);
             else if ((value & 0xFF_FF_00_00) == 0)
                 return new Number((ushort)value);
+            else if ((value & 0xFF_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF)
+                );
             else
                 return new Number(
                     (Unit)(value & 0xFF),
@@ -671,6 +756,46 @@ namespace Veruthian.Library.Numeric
                 return new Number((byte)value);
             else if ((value & 0xFF_FF_FF_FF_FF_FF_00_00) == 0)
                 return new Number((ushort)value);
+            else if ((value & 0xFF_FF_FF_FF_FF_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF)
+                );
+            else if ((value & 0xFF_FF_FF_FF_00_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF),
+                    (Unit)((value >> 24) & 0xFF)
+                );
+            else if ((value & 0xFF_FF_FF_00_00_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF),
+                    (Unit)((value >> 24) & 0xFF),
+                    (Unit)((value >> 32) & 0xFF)
+                );
+            else if ((value & 0xFF_FF_00_00_00_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF),
+                    (Unit)((value >> 24) & 0xFF),
+                    (Unit)((value >> 32) & 0xFF),
+                    (Unit)((value >> 40) & 0xFF)
+                );
+            else if ((value & 0xFF_00_00_00_00_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFF),
+                    (Unit)((value >> 8) & 0xFF),
+                    (Unit)((value >> 16) & 0xFF),
+                    (Unit)((value >> 24) & 0xFF),
+                    (Unit)((value >> 32) & 0xFF),
+                    (Unit)((value >> 40) & 0xFF),
+                    (Unit)((value >> 48) & 0xFF)
+                );
             else
                 return new Number(
                     (Unit)(value & 0xFF),
@@ -689,13 +814,19 @@ namespace Veruthian.Library.Numeric
                 return new Number((ushort)value);
             else if ((value & 0xFF_FF_FF_FF_00_00_00_00) == 0)
                 return new Number((uint)value);
-                
-            return new Number(
-                (Unit)(value & 0xFFFF),
-                (Unit)((value >> 16) & 0xFFFF),
-                (Unit)((value >> 32) & 0xFFFF),
-                (Unit)((value >> 48) & 0xFFFF),
-            );
+            else if ((value ^ 0xFF_FF_00_00_00_00_00_00) == 0)
+                return new Number(
+                    (Unit)(value & 0xFFFF),
+                    (Unit)((value >> 16) & 0xFFFF),
+                    (Unit)((value >> 32) & 0xFFFF)
+                );
+            else
+                return new Number(
+                    (Unit)(value & 0xFFFF),
+                    (Unit)((value >> 16) & 0xFFFF),
+                    (Unit)((value >> 32) & 0xFFFF),
+                    (Unit)((value >> 48) & 0xFFFF),
+                );
 #else
             return new Number(value);
 #endif
@@ -800,7 +931,7 @@ namespace Veruthian.Library.Numeric
         public static readonly string HexLower = "0123456789abcdef";
 
 
-        public override string ToString() => ToDecimalString(3, ",", false);
+        public override string ToString() => ToHexString(true, 4, "_", true); //ToDecimalString(3, ",", false);
 
         public string ToBinaryString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Binary, groupLength, separator, pad);
