@@ -26,7 +26,6 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-
         // Copy
         public static T[] Copy<T>(this T[] array)
         {
@@ -42,6 +41,32 @@ namespace Veruthian.Library.Collections.Extensions
 
                 return newArray;
             }
+        }
+
+        // Clear
+        public static void Clear<T>(this T[] array)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            Array.Clear(array, 0, array.Length);
+        }
+
+        public static void Clear<T>(this T[] array, int start)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            ExceptionHelper.VerifyAtLeast(start, array.Length, nameof(start));
+
+            Array.Clear(array, start, array.Length);
+        }
+
+        public static void Clear<T>(this T[] array, int start, int length)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            ExceptionHelper.VerifyInBounds(start, length, 0, array.Length - 1, nameof(start), nameof(length));
+
+            Array.Clear(array, start, length);
         }
 
 
@@ -146,8 +171,18 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
+        public static void ForceSpace<T>(this T[] array, int index, int amount, int? size = null)
+        {
+            ExceptionHelper.VerifyIndexInBounds(index, 0, array.Length);
 
-        // Insert
+            if (size != null)
+                ExceptionHelper.VerifyBetween(size.Value, 0, array.Length, nameof(size));            
+
+            Array.Copy(array, index, array, index + amount, (size ?? array.Length) - index);
+        }
+
+
+        // Insert Item
         public static T[] Append<T>(this T[] array, T item)
         {
             var newArray = array.AppendSpace(1);

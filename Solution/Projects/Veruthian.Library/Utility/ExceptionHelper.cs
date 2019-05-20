@@ -10,16 +10,28 @@ namespace Veruthian.Library.Utility
         public static void VerifyNegative(int value, string argumentName = null)
             => VerifyAtMost(value, -1, argumentName);
 
+        public static void VerifyLessThan(int value, int lessThan, string argumentName = null)
+        {
+            if (value < lessThan)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be less than {lessThan}");
+        }
+
+        public static void VerifyGreaterThan(int value, int greaterThan, string argumentName = null)
+        {
+            if (value > greaterThan)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be greater than {greaterThan}");
+        }
+
         public static void VerifyAtLeast(int value, int atLeast, string argumentName = null)
         {
-            if (value < atLeast)
-                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must at least {atLeast}");
+            if (value <= atLeast)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be at least {atLeast}");
         }
 
         public static void VerifyAtMost(int value, int atMost, string argumentName = null)
         {
-            if (value > atMost)
-                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must at most {atMost}");
+            if (value >= atMost)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be at most {atMost}");
         }
 
         public static void VerifyInBetween(int value, int start, int end, string argumentName = null)

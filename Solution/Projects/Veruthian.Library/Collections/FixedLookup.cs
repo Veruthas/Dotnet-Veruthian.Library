@@ -4,12 +4,12 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public struct ReadOnlyLookup<A, V> : ILookup<A, V>
+    public struct FixedLookup<A, V> : ILookup<A, V>
     {
         ILookup<A, V> lookup;
 
 
-        public ReadOnlyLookup(ILookup<A, V> lookup) => this.lookup = lookup;
+        public FixedLookup(ILookup<A, V> lookup) => this.lookup = lookup;
 
 
         public V this[A address] => lookup[address];

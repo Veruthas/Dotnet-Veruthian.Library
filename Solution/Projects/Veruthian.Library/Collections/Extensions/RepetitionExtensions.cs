@@ -25,25 +25,5 @@ namespace Veruthian.Library.Collections.Extensions
 
             return items;
         }
-
-        public static DataArray<T> RepeatAsDataArray<T>(this T value, int times = 1)
-        {
-            var items = DataArray<T>.New(times);
-
-            for (int i = 0; i < times; i++)
-                items[i] = value;
-
-            return items;
-        }
-
-        public static DataList<T> RepeatAsDataList<T>(this T value, int times = 1)
-        {
-            var items = DataList<T>.NewWith(times);
-
-            for (int i = 0; i < times; i++)
-                items.Add(value);
-
-            return items;
-        }
     }
 }

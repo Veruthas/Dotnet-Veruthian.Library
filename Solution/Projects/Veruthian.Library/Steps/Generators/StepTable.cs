@@ -165,7 +165,7 @@ namespace Veruthian.Library.Steps.Generators
         }
 
 
-        public ReadOnlyLookup<string, LabeledStep> Items => new ReadOnlyLookup<string, LabeledStep>(items);
+        public FixedLookup<string, LabeledStep> Items => new FixedLookup<string, LabeledStep>(items);
 
 
         // Label

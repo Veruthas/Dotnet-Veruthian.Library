@@ -33,7 +33,5 @@ namespace Veruthian.Library.Collections
 
             return false;
         }
-
-        protected abstract void RawSet(Number verifiedAddress, T value);
     }
 }

@@ -12,19 +12,55 @@ namespace Veruthian.Library.Collections
     public abstract class BaseVector<T, TVector> : IVector<T>, IEnumerable<T>
         where TVector : BaseVector<T, TVector>, new()
     {
-        // Abstract Methods
-        public abstract Number Count { get; }
+        protected T[] items;
 
-        public abstract bool Contains(T value);
-
-        protected abstract T RawGet(Number verifiedAddress);
-
-        protected abstract void SetSize(Number size);
-
-        protected abstract void SetData(T[] items);
+        protected Number size;
 
 
-        public Number Start => Number.Zero;
+        private static readonly T[] empty = new T[0];
+
+        public BaseVector()
+        {
+            items = empty;
+
+            size = Number.Zero;
+        }
+
+
+        protected virtual Number Capacity => items.Length;
+
+        public virtual Number Count => size;
+
+
+        protected virtual T RawGet(Number verifiedAddress) => items[(int)verifiedAddress];
+
+        protected virtual T RawSet(Number verifiedAddress, T value) => items[(int)verifiedAddress] = value;
+
+
+        public virtual bool Contains(T value)
+        {
+            {
+                if (value == null)
+                {
+                    foreach (var item in items)
+                    {
+                        if (item == null)
+                            return true;
+                    }
+                }
+                else
+                {
+                    foreach (var item in items)
+                    {
+                        if (item.Equals(value))
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
 
         public T this[Number address]
         {
@@ -37,16 +73,20 @@ namespace Veruthian.Library.Collections
         }
 
 
+        public Number Start => Number.Zero;
+
         public bool TryGet(Number address, out T value)
         {
             if (IsValidAddress(address))
             {
                 value = RawGet(address);
+
                 return true;
             }
             else
             {
                 value = default(T);
+
                 return false;
             }
         }
@@ -58,7 +98,7 @@ namespace Veruthian.Library.Collections
                 throw new ArgumentOutOfRangeException(nameof(address));
         }
 
-        protected bool IsValidAddress(Number address) => (uint)address < Count;
+        protected bool IsValidAddress(Number address) => address.ToCheckedInt() < Count;
 
         bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
 
@@ -82,28 +122,59 @@ namespace Veruthian.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
+
         public override string ToString() => this.ToListString();
 
 
-        public static TVector New() => new TVector();
-
-        public static TVector New(Number size)
+        protected virtual void SetSize(Number size, Number capacity)
         {
             var vector = new TVector();
 
-            vector.SetSize(size);
+            vector.size = size;
 
-            return vector;
+            vector.items = new T[capacity.ToCheckedInt()];
         }
 
-        private static TVector Make(T[] items)
+        protected virtual void SetData(T[] items)
         {
             var vector = new TVector();
 
             vector.SetData(items ?? new T[0]);
+        }
+
+
+        protected static TVector Make(Number size, Number capacity)
+        {
+            var vector = new TVector();
+
+            vector.SetSize(size, capacity);
 
             return vector;
         }
+
+        protected static TVector Make(Number size)
+        {
+            var vector = new TVector();
+
+            vector.SetSize(size, size);
+
+            return vector;
+        }
+
+        protected static TVector Make(T[] items)
+        {
+            var vector = new TVector();
+
+            vector.SetData(items);
+
+            return vector;
+        }
+
+
+
+        public static TVector New() => new TVector();
+
+        public static TVector New(Number size) => Make(size);
 
         public static TVector Of(T item) => Make(new T[] { item });
 

@@ -7,7 +7,7 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public struct VectorSpan<T> : IVector<T>, IEnumerable<T>
+    public struct FixedVector<T> : IVector<T>, IEnumerable<T>
     {
         IVector<T> vector;
 
@@ -18,8 +18,7 @@ namespace Veruthian.Library.Collections
         Number start;
 
 
-
-        public VectorSpan(IVector<T> vector)
+        public FixedVector(IVector<T> vector)
         {
             this.vector = vector;
 
@@ -30,7 +29,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public VectorSpan(IVector<T> vector, Number offset)
+        public FixedVector(IVector<T> vector, Number offset)
         {
             this.vector = vector;
 
@@ -41,7 +40,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public VectorSpan(IVector<T> vector, Number offset, Number count)
+        public FixedVector(IVector<T> vector, Number offset, Number count)
         {
             this.vector = vector;
 
@@ -52,7 +51,7 @@ namespace Veruthian.Library.Collections
             this.start = 0;
         }
 
-        public VectorSpan(IVector<T> vector, Number offset, Number count, Number start)
+        public FixedVector(IVector<T> vector, Number offset, Number count, Number start)
         {
             this.vector = vector;
 
