@@ -1,4 +1,4 @@
-#define ByteUnit
+#define IntUnit
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using Unit = System.UInt16;
 using TwoUnit = System.UInt32;
 #endif
 
-#if InitUnit
+#if IntUnit
 using Unit = System.UInt32;
 using TwoUnit = System.UInt64;
 #endif
