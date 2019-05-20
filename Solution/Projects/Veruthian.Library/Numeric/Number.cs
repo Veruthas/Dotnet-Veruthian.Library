@@ -931,7 +931,7 @@ namespace Veruthian.Library.Numeric
         public static readonly string HexLower = "0123456789abcdef";
 
 
-        public override string ToString() => ToHexString(true, 4, "_", true); //ToDecimalString(3, ",", false);
+        public override string ToString() => ToDecimalString(3, ",", false); // ToHexString(true, 4, "_", true);
 
         public string ToBinaryString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Binary, groupLength, separator, pad);
