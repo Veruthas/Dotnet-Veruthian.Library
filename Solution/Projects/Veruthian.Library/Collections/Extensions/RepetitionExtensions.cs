@@ -38,7 +38,7 @@ namespace Veruthian.Library.Collections.Extensions
 
         public static DataList<T> RepeatAsDataList<T>(this T value, int times = 1)
         {
-            var items = new DataList<T>(times);
+            var items = DataList<T>.NewWith(times);
 
             for (int i = 0; i < times; i++)
                 items.Add(value);

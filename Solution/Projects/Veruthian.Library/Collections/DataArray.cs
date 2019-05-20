@@ -9,29 +9,12 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataArray<T> : BaseMutableVector<T>
+    public class DataArray<T> : BaseMutableVector<T, DataArray<T>>
     {
         T[] items;
 
         public DataArray() => items = new T[0];
 
-        private DataArray(T[] items) => this.items = items;
-
-
-        public static DataArray<T> New(int size)
-        {
-            ExceptionHelper.VerifyPositive(size, nameof(size));
-
-            return new DataArray<T>(new T[size]);
-        }
-
-        public static DataArray<T> Of(T item) => new DataArray<T>(new T[] {item});
-
-        public static DataArray<T> From(params T[] items) => new DataArray<T>(items.Copy());
-
-        public static DataArray<T> Extract(IEnumerable<T> items) => new DataArray<T>(items.ToArray());
-
-        public static DataArray<T> Extract(IEnumerable<T> items, int amount) => new DataArray<T>(items.ToArray(amount));
 
         public sealed override Number Count => items.Length;
 
@@ -61,32 +44,36 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
+        protected override void SetSize(Number size) => items = new T[size.ToCheckedInt()];
 
-        public static implicit operator DataArray<T>(T item) => new DataArray<T>(new T[] { item });
-
-        public static DataArray<T> operator +(DataArray<T> items, T item) => new DataArray<T>(items.items.Append(item));
-
-        public static DataArray<T> operator +(T item, DataArray<T> items) => new DataArray<T>(items.items.Prepend(item));
+        protected override void SetData(T[] items) => this.items = items;
 
 
-        public static DataArray<T> operator +(DataArray<T> left, T[] right) => new DataArray<T>(left.items.AppendArray(right));
+        public static implicit operator DataArray<T>(T item) => From(new T[] { item });
 
-        public static DataArray<T> operator +(T[] left, DataArray<T> right) => new DataArray<T>(right.items.PrependArray(left));
+        public static DataArray<T> operator +(DataArray<T> items, T item) => From(items.items.Append(item));
 
-
-        public static DataArray<T> operator +(DataArray<T> left, IEnumerable<T> right) => new DataArray<T>(left.items.AppendEnumerable(right));
-
-        public static DataArray<T> operator +(IEnumerable<T> left, DataArray<T> right) => new DataArray<T>(right.items.PrependEnumerable(left));
+        public static DataArray<T> operator +(T item, DataArray<T> items) => From(items.items.Prepend(item));
 
 
-        public static DataArray<T> operator +(DataArray<T> left, IContainer<T> right) => new DataArray<T>(left.items.AppendContainer(right));
+        public static DataArray<T> operator +(DataArray<T> left, T[] right) => From(left.items.AppendArray(right));
 
-        public static DataArray<T> operator +(IContainer<T> left, DataArray<T> right) => new DataArray<T>(right.items.PrependContainer(left));
-
-
-        public static DataArray<T> operator +(DataArray<T> left, DataArray<T> right) => new DataArray<T>(left.items.AppendContainer(right));
+        public static DataArray<T> operator +(T[] left, DataArray<T> right) => From(right.items.PrependArray(left));
 
 
-        public static DataArray<T> operator *(DataArray<T> items, int times) => new DataArray<T>(items.items.Multiply(times));
+        public static DataArray<T> operator +(DataArray<T> left, IEnumerable<T> right) => From(left.items.AppendEnumerable(right));
+
+        public static DataArray<T> operator +(IEnumerable<T> left, DataArray<T> right) => From(right.items.PrependEnumerable(left));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, IContainer<T> right) => From(left.items.AppendContainer(right));
+
+        public static DataArray<T> operator +(IContainer<T> left, DataArray<T> right) => From(right.items.PrependContainer(left));
+
+
+        public static DataArray<T> operator +(DataArray<T> left, DataArray<T> right) => From(left.items.AppendContainer(right));
+
+
+        public static DataArray<T> operator *(DataArray<T> items, int times) => From(items.items.Multiply(times));
     }
 }

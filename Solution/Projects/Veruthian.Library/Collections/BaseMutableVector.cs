@@ -2,19 +2,20 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseMutableVector<T> : BaseVector<T>, IMutableVector<T>
+    public abstract class BaseMutableVector<T, TVector> : BaseVector<T, TVector>, IMutableVector<T>
+        where TVector : BaseMutableVector<T, TVector>, new()
     {
         public new T this[Number address]
         {
             get
             {
-                VerifyIndex(address);
+                VerifyAddress(address);
 
                 return RawGet(address);
             }
             set
             {
-                VerifyIndex(address);
+                VerifyAddress(address);
 
                 RawSet(address, value);
             }

@@ -6,28 +6,13 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataVector<T> : BaseVector<T>
+    public class DataVector<T> : BaseVector<T, DataVector<T>>
     {
         T[] items;
 
         public DataVector() => items = new T[0];
 
         private DataVector(T[] items) => this.items = items;
-
-        public static DataVector<T> New(int size)
-        {
-            ExceptionHelper.VerifyPositive(size, nameof(size));
-
-            return new DataVector<T>(new T[size]);
-        }
-
-        public static DataVector<T> Of(T item) => new DataVector<T>(new T[] { item });
-
-        public static DataVector<T> From(params T[] items) => new DataVector<T>(items.Copy());
-
-        public static DataVector<T> Extract(IEnumerable<T> items) => new DataVector<T>(items.ToArray());
-
-        public static DataVector<T> Extract(IEnumerable<T> items, Number amount) => new DataVector<T>(items.ToArray(amount.ToCheckedSignedInt()));
 
         public override Number Count => items.Length;
 
@@ -54,6 +39,13 @@ namespace Veruthian.Library.Collections
         }
 
         protected override T RawGet(Number verifiedAddress) => items[verifiedAddress.ToCheckedSignedInt()];
+
+        protected override void SetSize(Number size) => this.items = new T[size.ToCheckedInt()];
+
+        protected override void SetData(T[] items) => this.items = items;
+
+
+        public static DataVector<T> Default { get; } = New();
 
 
         public static implicit operator DataVector<T>(T item) => new DataVector<T>(new T[] { item });
