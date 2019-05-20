@@ -34,7 +34,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // byte.Utf8... -> Rune
-        public static IEnumerable<Rune> AsUtf8Runes(this IEnumerable<byte> bytes)
+        public static IEnumerable<Rune> FromByteUtf8(this IEnumerable<byte> bytes)
         {
             var decoder = new Utf8.ByteDecoder();
 
@@ -42,7 +42,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
         // byte.Utf16... -> Rune
-        public static IEnumerable<Rune> AsUtf16Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> FromByteUtf16(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf16.ByteDecoder(endianness);
 
@@ -51,11 +51,48 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // byte.Utf32... -> Rune
-        public static IEnumerable<Rune> AsUtf32Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> FromByteUtf32(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
 
             return DecodeValues(bytes, decoder, "Ill-formed Utf32.");
+        }
+
+
+        // Rune... -> byte.Utf8
+        public static IEnumerable<byte> ToByteUtf8(this IEnumerable<Rune> runes)
+        {
+            foreach(var rune in runes)
+            {
+                var bytes = rune.ToUtf8();
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
+        }
+
+        // Rune... -> byte.Utf16
+        public static IEnumerable<byte> ToByteUtf16(this IEnumerable<Rune> runes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            foreach (var rune in runes)
+            {
+                var bytes = rune.ToUtf16(endianness);
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
+        }
+
+        // Rune... -> byte.Utf32
+        public static IEnumerable<byte> ToByteUtf32(this IEnumerable<Rune> runes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            foreach (var rune in runes)
+            {
+                var bytes = rune.ToUtf32(endianness);
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
         }
 
 
