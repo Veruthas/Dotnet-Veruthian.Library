@@ -228,44 +228,29 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // -> RuneString
-        public static RuneString ToRuneString(this ICollection<Rune> runes)
-        {
-            return new RuneString(runes);
-        }
-
-        public static RuneString ToRuneString(this IList<Rune> runes, int index)
-        {
-            return new RuneString(runes, index);
-        }
-
-        public static RuneString ToRuneString(this IList<Rune> runes, int index, int length)
-        {
-            return new RuneString(runes, index, length);
-        }
-
         public static RuneString ToRuneString(this IEnumerable<Rune> runes)
         {
-            return new RuneString(runes);
+            return RuneString.Withdraw(runes);
         }
 
         public static RuneString ToRuneString(this IEnumerable<char> chars)
         {
-            return new RuneString(ToRunes(chars));
+            return RuneString.Withdraw(ToRunes(chars));
         }
 
         public static RuneString ToRuneString(this string value)
         {
-            return new RuneString(value);
+            return RuneString.From(value);
         }
 
         public static RuneString ToRuneString(this string value, int start)
         {
-            return new RuneString(value, start);
+            return RuneString.From(value.ToRuneArray(), start);
         }
 
         public static RuneString ToRuneString(this string value, int start, int amount)
         {
-            return new RuneString(value, start, amount);
+            return RuneString.From(value.ToRuneArray(), start, amount);
         }
 
 
@@ -308,15 +293,15 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return TextSegment.GetLines(values, (c => (uint)c), new RuneBuffer(), (b => b.ToRuneString()), ending, withEnding);
         }
 
-        public static IEnumerable<(TextSegment Segment, RuneString Value)> GetLineData(this RuneString values, LineEnding ending = null, bool withEnding = true)
-        {
-            return TextSegment.GetLineData<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
-        }
+        // public static IEnumerable<(TextSegment Segment, RuneString Value)> GetLineData(this RuneString values, LineEnding ending = null, bool withEnding = true)
+        // {
+        //     return TextSegment.GetLineData<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
+        // }
 
-        public static IEnumerable<RuneString> GetLines(this RuneString values, LineEnding ending = null, bool withEnding = true)
-        {
-            return TextSegment.GetLines<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
-        }
+        // public static IEnumerable<RuneString> GetLines(this RuneString values, LineEnding ending = null, bool withEnding = true)
+        // {
+        //     return TextSegment.GetLines<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
+        // }
 
     }
 }

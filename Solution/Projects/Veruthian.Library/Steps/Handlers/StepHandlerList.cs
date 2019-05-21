@@ -16,7 +16,7 @@ namespace Veruthian.Library.Steps.Handlers
             : this(DataList<IStepHandler>.From(handlers)) { }
 
         public StepHandlerList(IEnumerable<IStepHandler> handlers)
-            : this(DataList<IStepHandler>.Extract(handlers)) { }
+            : this(DataList<IStepHandler>.Withdraw(handlers)) { }
 
 
         public StepHandlerList(IResizableVector<IStepHandler> handlers)

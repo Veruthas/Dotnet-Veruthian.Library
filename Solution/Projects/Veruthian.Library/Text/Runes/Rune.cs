@@ -237,11 +237,11 @@ namespace Veruthian.Library.Text.Runes
 
 
         // RuneString
-        public RuneString ToRuneString() => new RuneString(this);
+        public RuneString ToRuneString() => RuneString.Of(this);
 
-        public RuneString Replicate(int count) => new RuneString(this, count);
+        public RuneString Replicate(int count) => RuneString.Repeat(this, count);
 
-        public static RuneString operator *(Rune value, int count) => new RuneString(value, count);
+        public static RuneString operator *(Rune value, int count) => value.Replicate(count);
 
 
         // Equality

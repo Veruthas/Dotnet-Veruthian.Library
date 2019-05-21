@@ -105,6 +105,34 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
+        // Extract
+        public static T[] Extract<T>(this T[] array, int start)
+        {
+            ExceptionHelper.VerifyAtMost(start, array.Length, nameof(start));
+
+            var size = array.Length - start;
+
+            var newArray = new T[size];
+
+            array.CopyTo(newArray, start);
+
+            return newArray;
+        }
+
+        public static T[] Extract<T>(this T[] array, int start, int amount)
+        {
+            ExceptionHelper.VerifyPositiveInBounds(start, amount, 0, array.Length, nameof(start), nameof(amount));
+
+            var size = array.Length - start;
+
+            var newArray = new T[size];
+
+            array.CopyTo(newArray, start, 0, amount);
+
+            return newArray;
+        }
+
+
         // Move
         public static void Move<T>(this T[] array, int index, int amount, int? size = null)
         {
@@ -112,7 +140,7 @@ namespace Veruthian.Library.Collections.Extensions
                 return;
             else if (size != null)
                 ExceptionHelper.VerifyBetween(size.Value, 0, array.Length, nameof(size));
-            else 
+            else
                 size = array.Length;
 
             ExceptionHelper.VerifyInBounds(index, amount, 0, size.Value, nameof(index), nameof(amount));

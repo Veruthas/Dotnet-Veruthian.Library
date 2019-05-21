@@ -87,7 +87,7 @@ namespace Veruthian.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            return Append(value, start, (int)value.Length - start);
+            return Append(value, start, (int)value.Count - start);
         }
 
         public RuneBuffer Append(RuneString value, int start, int length)
@@ -123,7 +123,7 @@ namespace Veruthian.Library.Text.Runes
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            return Insert(position, value, start, (int)value.Length - start);
+            return Insert(position, value, start, (int)value.Count - start);
         }
 
         public RuneBuffer Insert(int position, RuneString value, int start, int length)
@@ -483,17 +483,17 @@ namespace Veruthian.Library.Text.Runes
         // Conversion
         public RuneString ToRuneString()
         {
-            return new RuneString(runes);
+            return RuneString.From(runes.ToArray());
         }
 
         public RuneString ToRuneString(int position)
         {
-            return new RuneString(runes, position);
+            return RuneString.From(runes.ToArray(), position);
         }
 
         public RuneString ToRuneString(int position, int amount)
         {
-            return new RuneString(runes, position, amount);
+            return RuneString.From(runes.ToArray(), position, amount);
         }
 
         public Rune[] ToRunes()

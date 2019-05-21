@@ -195,13 +195,13 @@ namespace Veruthian.Library.Text.Lines.Test
             : base(new EditableString(), new CharLineTable<EditableString>(ending), new StringBuffer(), Extract, (c => (uint)c), (b => b.ToString())) { }
     }
 
-    public class RuneLineBuilder : LineBuilder<Rune, EditableRuneString, RuneLineTable<EditableRuneString>, RuneBuffer>
-    {
-        public static EditableRuneString Extract(EditableRuneString value, int position, int amount) => value.Value.Extract(position, amount);
+    // public class RuneLineBuilder : LineBuilder<Rune, EditableRuneString, RuneLineTable<EditableRuneString>, RuneBuffer>
+    // {
+    //     public static EditableRuneString Extract(EditableRuneString value, int position, int amount) => value.Value.Extract(position, amount);
 
-        public RuneLineBuilder(LineEnding ending)
-            : base(new EditableRuneString(), new RuneLineTable<EditableRuneString>(ending), new RuneBuffer(), Extract, (r => (uint)r), (b => b.ToRuneString())) { }
-    }
+    //     public RuneLineBuilder(LineEnding ending)
+    //         : base(new EditableRuneString(), new RuneLineTable<EditableRuneString>(ending), new RuneBuffer(), Extract, (r => (uint)r), (b => b.ToRuneString())) { }
+    // }
 
 
     public static class CharLineTester
