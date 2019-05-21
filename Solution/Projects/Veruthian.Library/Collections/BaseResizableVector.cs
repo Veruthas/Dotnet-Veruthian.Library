@@ -1,59 +1,120 @@
 using System.Collections.Generic;
+using System.Linq;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public class BaseResizableVector<T, TVector> : BaseMutableVector<T, TVector>, IResizableVector<T>
+    public abstract class BaseResizableVector<T, TVector> : BaseMutableVector<T, TVector>, IResizableVector<T>
         where TVector : BaseResizableVector<T, TVector>, new()
     {
-        private void Resize()
+        private void Resize(int requestedSpace)
         {
+            int newSize = (int)size + requestedSpace;
 
+            int newCapacity = 0x4;
+
+            while (newCapacity < newSize)
+            {
+                newCapacity <<= 1;
+            }
+
+            this.items = items.Resize(newCapacity);
         }
 
         public void Add(T value)
         {
-            if (size == Capacity)
-                Resize();
+            if (this.size == Capacity)
+                Resize(1);
 
-            items[(int)size] = value;
+            this.items[(int)size] = value;
 
-            size++;
+            this.size++;
         }
 
         public void AddRange(IEnumerable<T> values)
         {
-            throw new System.NotImplementedException();
+            var items = values.ToArray();
+
+            if (!HasCapacity(items.Length))
+                Resize(items.Length);
+
+            items.CopyTo(this.items, (int)size);
+
+            this.size += items.Length;
         }
 
         public void Insert(Number address, T value)
         {
-            throw new System.NotImplementedException();
+            if (this.size == Capacity)
+                Resize(1);
+
+            var index = address.ToCheckedSignedInt();
+
+            this.items.Move(address.ToCheckedSignedInt(), 1, this.size.ToSignedInt());
+
+            this.items[index] = value;
+
+            this.size++;
         }
 
         public void InsertRange(Number address, IEnumerable<T> values)
         {
-            throw new System.NotImplementedException();
+            var items = values.ToArray();
+
+            if (!HasCapacity(items.Length))
+                Resize(items.Length);
+
+            var index = address.ToCheckedSignedInt();
+
+            this.items.Move(index, items.Length, size.ToSignedInt());
+
+            items.CopyTo(this.items, 0, index, items.Length);
+
+            this.size += items.Length;
         }
 
         public bool Remove(T value)
         {
-            throw new System.NotImplementedException();
+            var index = IndexOf(value);
+
+            if (index == -1)
+            {
+                this.items.Move(index, -1, (int)size);
+
+                this.size--;
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void RemoveBy(Number address)
         {
-            throw new System.NotImplementedException();
+            VerifyAddress(address);
+
+            this.items.Move((int)address, -1, (int)this.size);
+
+            this.size--;
         }
 
-        public void RemoveRange(Number address, Number count)
+        public void RemoveRange(Number address, Number amount)
         {
-            throw new System.NotImplementedException();
+            VerifyRange(address, amount);
+
+            this.items.Move((int)address, -(int)amount, (int)this.size);
+
+            this.size -= amount;
         }
 
         public void Clear()
         {
-            throw new System.NotImplementedException();
+            this.items.Clear();
+
+            this.size = 0;            
         }
     }
 }

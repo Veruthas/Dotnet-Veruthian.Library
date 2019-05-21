@@ -46,18 +46,27 @@ namespace Veruthian.Library.Utility
                 throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be between {start} and {end}");
         }
 
-        public static void VerifyInBounds(int value, int length, int start, int end, string indexName = null, string lengthName = null)
+        public static void VerifyPositiveInBounds(int value, int length, int start, int end, string indexName = null, string lengthName = null)
         {
-            if (value < start || value >= end)
+            if (value < start || value > end)
                 throw new ArgumentOutOfRangeException(indexName);
 
             if (length < 0 || value + length > end)
                 throw new ArgumentOutOfRangeException(lengthName);
         }
 
+        public static void VerifyInBounds(int value, int length, int start, int end, string indexName = null, string lengthName = null)
+        {
+            if (value < start || value > end)
+                throw new ArgumentOutOfRangeException(indexName);
+
+            if (value + length > end)
+                throw new ArgumentOutOfRangeException(lengthName);
+        }
+
         public static void VerifyIndexInBounds(int index, int start, int end)
         {
-            if (index < start || index >= end)
+            if (index < start || index > end)
                 throw new IndexOutOfRangeException();
         }
 

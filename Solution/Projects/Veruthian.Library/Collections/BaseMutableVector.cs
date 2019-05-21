@@ -33,5 +33,8 @@ namespace Veruthian.Library.Collections
 
             return false;
         }
+
+
+        protected virtual T RawSet(Number verifiedAddress, T value) => items[(int)verifiedAddress] = value;
     }
 }

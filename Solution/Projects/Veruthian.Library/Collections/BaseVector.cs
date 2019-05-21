@@ -19,6 +19,7 @@ namespace Veruthian.Library.Collections
 
         private static readonly T[] empty = new T[0];
 
+
         public BaseVector()
         {
             items = empty;
@@ -27,41 +28,16 @@ namespace Veruthian.Library.Collections
         }
 
 
+        public Number Start => Number.Zero;
+
         protected virtual Number Capacity => items.Length;
+
+        protected bool HasCapacity(int amount) => size + amount <= Capacity;
 
         public virtual Number Count => size;
 
 
-        protected virtual T RawGet(Number verifiedAddress) => items[(int)verifiedAddress];
-
-        protected virtual T RawSet(Number verifiedAddress, T value) => items[(int)verifiedAddress] = value;
-
-
-        public virtual bool Contains(T value)
-        {
-            {
-                if (value == null)
-                {
-                    foreach (var item in items)
-                    {
-                        if (item == null)
-                            return true;
-                    }
-                }
-                else
-                {
-                    foreach (var item in items)
-                    {
-                        if (item.Equals(value))
-                            return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-
-
+        // Access
         public T this[Number address]
         {
             get
@@ -72,8 +48,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-
-        public Number Start => Number.Zero;
+        protected virtual T RawGet(Number verifiedAddress) => items[(int)verifiedAddress];
 
         public bool TryGet(Number address, out T value)
         {
@@ -92,6 +67,7 @@ namespace Veruthian.Library.Collections
         }
 
 
+        // Contains
         protected void VerifyAddress(Number address)
         {
             if (!IsValidAddress(address))
@@ -100,8 +76,41 @@ namespace Veruthian.Library.Collections
 
         protected bool IsValidAddress(Number address) => address.ToCheckedInt() < Count;
 
+        protected void VerifyRange(Number address, Number amount)
+        {
+            ExceptionHelper.VerifyPositiveInBounds(address.ToCheckedSignedInt(), amount.ToCheckedSignedInt(), 0, (int)size, nameof(address), nameof(amount));
+        }
+
         bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
 
+        public virtual bool Contains(T value) => IndexOf(value) > -1;
+
+        protected int IndexOf(T value)
+        {
+            {
+                if (value == null)
+                {
+                    for (int i = 0; i < (int)size; i++)
+                    {
+                        if (items[i] == null)
+                            return i;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < (int)size; i++)
+                    {
+                        if (items[i].Equals(value))
+                            return i;
+                    }
+                }
+
+                return -1;
+            }
+        }
+
+
+        // Enumerables
         IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(Number.Zero, Count - 1);
 
         public IEnumerable<(Number Address, T Value)> Pairs
@@ -122,27 +131,11 @@ namespace Veruthian.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-
+        // String
         public override string ToString() => this.ToListString();
 
 
-        protected virtual void SetSize(Number size, Number capacity)
-        {
-            var vector = new TVector();
-
-            vector.size = size;
-
-            vector.items = new T[capacity.ToCheckedInt()];
-        }
-
-        protected virtual void SetData(T[] items)
-        {
-            var vector = new TVector();
-
-            vector.SetData(items ?? new T[0]);
-        }
-
-
+        // Creation        
         protected static TVector Make(Number size, Number capacity)
         {
             var vector = new TVector();
@@ -171,6 +164,24 @@ namespace Veruthian.Library.Collections
         }
 
 
+        private void SetSize(Number size, Number capacity)
+        {
+            this.size = size;
+
+            var items = new T[capacity.ToCheckedInt()];
+
+            SetData(items);
+        }
+
+        private void SetData(T[] items)
+        {
+            SetData(items ?? new T[0]);
+
+            OnCreated();
+        }
+
+        protected virtual void OnCreated() { }
+        
 
         public static TVector New() => new TVector();
 

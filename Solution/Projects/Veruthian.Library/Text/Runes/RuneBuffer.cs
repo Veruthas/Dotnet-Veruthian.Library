@@ -468,7 +468,7 @@ namespace Veruthian.Library.Text.Runes
 
         public RuneBuffer Replace(Rune oldValue, Rune newValue, int position, int amount)
         {
-            ExceptionHelper.VerifyInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
+            ExceptionHelper.VerifyPositiveInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
 
             for (int i = position; i < position + amount; i++)
             {
@@ -505,7 +505,7 @@ namespace Veruthian.Library.Text.Runes
 
         public Rune[] ToRunes(int position, int amount)
         {
-            ExceptionHelper.VerifyInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
+            ExceptionHelper.VerifyPositiveInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
 
             Rune[] result = new Rune[amount];
 
@@ -531,7 +531,7 @@ namespace Veruthian.Library.Text.Runes
 
         public string ToString(int position, int amount)
         {
-            ExceptionHelper.VerifyInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
+            ExceptionHelper.VerifyPositiveInBounds(position, amount, 0, runes.Count, nameof(position), nameof(amount));
 
             var builder = new StringBuilder();
 

@@ -26,6 +26,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
+
         // Copy
         public static T[] Copy<T>(this T[] array)
         {
@@ -64,7 +65,7 @@ namespace Veruthian.Library.Collections.Extensions
         {
             ExceptionHelper.VerifyNotNull(array, nameof(array));
 
-            ExceptionHelper.VerifyInBounds(start, length, 0, array.Length - 1, nameof(start), nameof(length));
+            ExceptionHelper.VerifyPositiveInBounds(start, length, 0, array.Length - 1, nameof(start), nameof(length));
 
             Array.Clear(array, start, length);
         }
@@ -101,6 +102,22 @@ namespace Veruthian.Library.Collections.Extensions
         public static void CopyFrom<T>(this T[] destination, T[] source, int sourceIndex, int destinationIndex, int amount)
         {
             Array.Copy(source, sourceIndex, destination, destinationIndex, amount);
+        }
+
+
+        // Move
+        public static void Move<T>(this T[] array, int index, int amount, int? size = null)
+        {
+            if (size == 0)
+                return;
+            else if (size != null)
+                ExceptionHelper.VerifyBetween(size.Value, 0, array.Length, nameof(size));
+            else 
+                size = array.Length;
+
+            ExceptionHelper.VerifyInBounds(index, amount, 0, size.Value, nameof(index), nameof(amount));
+
+            Array.Copy(array, index, array, index + amount, size.Value - index);
         }
 
 
@@ -169,16 +186,6 @@ namespace Veruthian.Library.Collections.Extensions
 
                 return newArray;
             }
-        }
-
-        public static void ForceSpace<T>(this T[] array, int index, int amount, int? size = null)
-        {
-            ExceptionHelper.VerifyIndexInBounds(index, 0, array.Length);
-
-            if (size != null)
-                ExceptionHelper.VerifyBetween(size.Value, 0, array.Length, nameof(size));            
-
-            Array.Copy(array, index, array, index + amount, (size ?? array.Length) - index);
         }
 
 

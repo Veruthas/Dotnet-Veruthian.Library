@@ -16,7 +16,7 @@ namespace Veruthian.Library.Collections
         IMutableLookup<A, T> : ILookup<A, T>
         IExpandableLookup<A, T> : ILookup<A, T> => DataLookup
 
-        IVector<A, T>: ILookup<K, T> => DataVector
+        IVector<A, T>: ILookup<A, T> => DataVector
         IMutableVector<A, T>: IVector<A, T>, IMutableLookup<A, T> => DataArray
         IExpandableVector<A, T> : IVector<A, T>, IExpandableLookup<A, T>, IExpandableContainer<T> => DataList
         IOrderedVector<A, T>: IVector<A, T>, IExpandableContainer<T> => SortedDataList*, SortedDataSet*
