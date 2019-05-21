@@ -34,6 +34,6 @@ namespace Veruthian.Library.Collections
         }
 
 
-        protected virtual T RawSet(A verifiedAddress, T value) => items[VerifiedAddressToIndex(verifiedAddress)] = value;
+        protected virtual T RawSet(A verifiedAddress, T value) => this.Items[VerifiedAddressToIndex(verifiedAddress)] = value;
     }
 }

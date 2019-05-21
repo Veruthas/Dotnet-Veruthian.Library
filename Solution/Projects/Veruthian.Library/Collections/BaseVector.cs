@@ -13,20 +13,45 @@ namespace Veruthian.Library.Collections
         where A : ISequential<A>
         where TVector : BaseVector<A, T, TVector>, new()
     {
-        protected T[] items;
+        private T[] items;
 
-        protected int size;
-
-
-        private static readonly T[] empty = new T[0];
+        private int size;
 
 
         public BaseVector()
         {
-            items = empty;
+            items = new T[0]; 
 
             size = 0;
         }
+
+
+        protected Number Size
+        {
+            get => size;
+            set
+            {
+                this.size = value.ToCheckedSignedInt();
+
+                OnSizeSet();
+            }
+        }
+
+        protected T[] Items
+        {
+            get => this.items;
+            set
+            {
+                this.items = value ?? new T[0];
+
+                OnItemsSet();
+            }
+        }
+
+
+        protected virtual void OnSizeSet() { }
+
+        protected virtual void OnItemsSet() { }
 
 
         protected virtual Number Capacity => items.Length;
@@ -174,51 +199,25 @@ namespace Veruthian.Library.Collections
 
 
         // Creation        
-        protected static TVector Make(Number size, Number capacity)
-        {
-            var vector = new TVector();
+        protected static TVector Make(Number capacity, Number size)
+            => Make(new T[capacity.ToCheckedInt()], size);
 
-            vector.SetSize(size, capacity);
-
-            return vector;
-        }
-
-        protected static TVector Make(Number size)
-        {
-            var vector = new TVector();
-
-            vector.SetSize(size, size);
-
-            return vector;
-        }
+        protected static TVector Make(Number capacity)
+            => Make(new T[capacity.ToCheckedInt()], capacity.ToCheckedInt());
 
         protected static TVector Make(T[] items)
+            => Make(items, items.Length);
+
+        protected static TVector Make(T[] items, Number size)
         {
             var vector = new TVector();
 
-            vector.SetData(items);
+            vector.items = items;
+
+            vector.Size = size;
 
             return vector;
         }
-
-
-        private void SetSize(Number size, Number capacity)
-        {
-            this.size = size.ToCheckedSignedInt();
-
-            var items = new T[capacity.ToCheckedInt()];
-
-            SetData(items);
-        }
-
-        private void SetData(T[] items)
-        {
-            SetData(items ?? new T[0]);
-
-            OnCreated();
-        }
-
-        protected virtual void OnCreated() { }
 
 
         public static TVector New() => new TVector();
@@ -227,7 +226,11 @@ namespace Veruthian.Library.Collections
 
         public static TVector Of(T item) => Make(new T[] { item });
 
+        public static TVector Of(Number multiple, T item) => Make(item.RepeatAsArray(multiple.ToCheckedSignedInt()));
+
         public static TVector From(params T[] items) => Make(items.Copy());
+
+        public static TVector From(Number mutiple, params T[] items) => Make(items.Multiply(mutiple.ToCheckedSignedInt()));
 
         public static TVector Extract(IEnumerable<T> items) => Make(items.ToArray());
 

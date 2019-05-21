@@ -11,7 +11,7 @@ namespace Veruthian.Library.Collections
     {
         private void Resize(int requestedSpace)
         {
-            int newSize = (int)size + requestedSpace;
+            int newSize = (int)this.Size + requestedSpace;
 
             int newCapacity = 0x4;
 
@@ -20,17 +20,17 @@ namespace Veruthian.Library.Collections
                 newCapacity <<= 1;
             }
 
-            this.items = items.Resize(newCapacity);
+            this.Items = (this.Items.Resize(newCapacity));
         }
 
         public void Add(T value)
         {
-            if (this.size == Capacity)
+            if (this.Size == Capacity)
                 Resize(1);
 
-            this.items[(int)size] = value;
+            this.Items[(int)this.Size] = value;
 
-            this.size++;
+            this.Size++;
         }
 
         public void AddRange(IEnumerable<T> values)
@@ -40,25 +40,25 @@ namespace Veruthian.Library.Collections
             if (!HasCapacity(items.Length))
                 Resize(items.Length);
 
-            items.CopyTo(this.items, (int)size);
+            items.CopyTo(this.Items, (int)this.Size);
 
-            this.size += items.Length;
+            this.Size += items.Length;
         }
 
         public void Insert(A address, T value)
         {
-            if (this.size == Capacity)
+            if (this.Size == Capacity)
                 Resize(1);
 
             VerifyAddress(address);
 
             var index = VerifiedAddressToIndex(address);
 
-            this.items.Move(index, 1, this.size);
+            this.Items.Move(index, 1, (int)this.Size);
 
-            this.items[index] = value;
+            this.Items[index] = value;
 
-            this.size++;
+            this.Size++;
         }
 
         public void InsertRange(A address, IEnumerable<T> values)
@@ -72,11 +72,11 @@ namespace Veruthian.Library.Collections
 
             var index = VerifiedAddressToIndex(address);
 
-            this.items.Move(index, items.Length, size);
+            this.Items.Move(index, items.Length, (int)this.Size);
 
-            items.CopyTo(this.items, 0, index, items.Length);
+            items.CopyTo(this.Items, 0, index, items.Length);
 
-            this.size += items.Length;
+            this.Size += items.Length;
         }
 
         public bool Remove(T value)
@@ -85,9 +85,9 @@ namespace Veruthian.Library.Collections
 
             if (index == -1)
             {
-                this.items.Move(index, -1, (int)size);
+                this.Items.Move(index, -1, (int)this.Size);
 
-                this.size--;
+                this.Size--;
 
                 return false;
             }
@@ -103,9 +103,9 @@ namespace Veruthian.Library.Collections
 
             var index = VerifiedAddressToIndex(address);
 
-            this.items.Move(index, -1, (int)this.size);
+            this.Items.Move(index, -1, (int)this.Size);
 
-            this.size--;
+            this.Size--;
         }
 
         public void RemoveRange(A address, Number amount)
@@ -116,16 +116,16 @@ namespace Veruthian.Library.Collections
 
             var count = (int)amount;
 
-            this.items.Move(index, -count, (int)this.size);
+            this.Items.Move(index, -count, (int)this.Size);
 
-            this.size -= count;
+            this.Size -= count;
         }
 
         public void Clear()
         {
-            this.items.Clear();
+            this.Items.Clear();
 
-            this.size = 0;
+            this.Size = 0;
         }
     }
 }

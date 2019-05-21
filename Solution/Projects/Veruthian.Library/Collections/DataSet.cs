@@ -22,6 +22,7 @@ namespace Veruthian.Library.Collections
 
         public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);
 
+
         public Number Count => items.Count;
 
 
