@@ -8,7 +8,7 @@ namespace Veruthian.Library.Collections
     {
         void InsertRange(A address, IEnumerable<T> values);
 
-        void RemoveRange(A address, Number count);
+        void RemoveRange(A address, Number amount);
     }
 
     public interface IResizableVector<V> : IResizableVector<Number, V>, IVector<V>

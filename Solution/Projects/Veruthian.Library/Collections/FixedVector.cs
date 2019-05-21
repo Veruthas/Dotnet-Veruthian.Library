@@ -64,9 +64,7 @@ namespace Veruthian.Library.Collections
 
         public Number Count => count;
 
-        Number IVector<Number, T>.Start => start;
-
-        private Number StartIndex => start;
+        public Number Start => start;
 
         private Number EndIndex => start + count - Number.One;
 
@@ -87,6 +85,15 @@ namespace Veruthian.Library.Collections
                 throw new ArgumentOutOfRangeException(nameof(address));
         }
 
+        public Number GetAddress(Number offset)
+        {
+            var address = start + offset;
+
+            VerifyAddress(address);
+
+            return address;
+        }
+
         private T RawGet(Number verifiedAddress) => this.vector[offset + (verifiedAddress - start)];
 
         public bool TryGet(Number address, out T value)
@@ -105,11 +112,11 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public bool IsValidAddress(Number address) => address >= StartIndex && address <= EndIndex;
+        public bool IsValidAddress(Number address) => address >= Start && address <= EndIndex;
 
 
 
-        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(StartIndex, EndIndex);
+        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(Start, EndIndex);
 
 
         public IEnumerable<(Number Address, T Value)> Pairs
@@ -152,7 +159,7 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
+        bool ILookup<Number, T>.IsValidAddress(Number address) => IsValidAddress(address);
 
         public override string ToString() => this.ToListString();
     }

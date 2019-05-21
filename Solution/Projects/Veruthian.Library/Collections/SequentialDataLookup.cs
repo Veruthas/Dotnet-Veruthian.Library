@@ -35,10 +35,10 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public bool HasAddress(A address)
+        public bool IsValidAddress(A address)
         {
             foreach (var lookup in lookups)
-                if (lookup.HasAddress(address))
+                if (lookup.IsValidAddress(address))
                     return true;
 
             return false;

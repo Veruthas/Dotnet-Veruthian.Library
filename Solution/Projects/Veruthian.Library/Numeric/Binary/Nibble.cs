@@ -186,7 +186,9 @@ namespace Veruthian.Library.Numeric.Binary
 
         Nibble ILogical<Nibble>.Not() => ~this;
 
+        #endregion
 
+        #region IVector
         const int bits = 4;
 
         Number IVector<Number, bool>.Start => Number.Zero;
@@ -196,7 +198,7 @@ namespace Veruthian.Library.Numeric.Binary
 
         bool IContainer<bool>.Contains(bool value) => (value && this.value != 0) || (!value && this.value != 0xF);
 
-        bool ILookup<Number, bool>.HasAddress(Number address) => (uint)address <= bits;
+        bool ILookup<Number, bool>.IsValidAddress(Number address) => (uint)address <= bits;
 
         private bool TryGet(Number address, out bool value)
         {
@@ -219,6 +221,13 @@ namespace Veruthian.Library.Numeric.Binary
 
         Number IContainer<bool>.Count => bits;
 
+        Number IVector<Number, bool>.GetAddress(Number offset)
+        {
+            if (offset >= bits)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+
+            return offset;
+        }
 
         public IEnumerator<bool> GetEnumerator()
         {

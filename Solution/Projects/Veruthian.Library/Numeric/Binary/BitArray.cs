@@ -127,6 +127,14 @@ namespace Veruthian.Library.Numeric.Binary
             value |= (bit ? longBit : 0x0);
         }
 
+        Number IVector<Number, bool>.GetAddress(Number offset)
+        {
+            if (offset >= Count)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            
+            return offset;
+        }
+        
         public Number Count => count;
 
         Number IVector<Number, bool>.Start => Number.Zero;
@@ -213,7 +221,7 @@ namespace Veruthian.Library.Numeric.Binary
             }
         }
 
-        bool ILookup<Number, bool>.HasAddress(Number address) => HasAddress(address);
+        bool ILookup<Number, bool>.IsValidAddress(Number address) => HasAddress(address);
 
         bool HasAddress(Number address) => (uint)address < Count;
 

@@ -10,7 +10,7 @@ namespace Veruthian.Library.Collections
 
         IEnumerable<(A Address, T Value)> Pairs { get; }
 
-        bool HasAddress(A address);
+        bool IsValidAddress(A address);
 
         bool TryGet(A Address, out T Value);
     }

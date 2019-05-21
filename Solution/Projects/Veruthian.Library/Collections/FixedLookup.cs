@@ -23,7 +23,7 @@ namespace Veruthian.Library.Collections
 
         public bool Contains(V value) => lookup.Contains(value);
         
-        public bool HasAddress(A address) => lookup.HasAddress(address);
+        public bool IsValidAddress(A address) => lookup.IsValidAddress(address);
 
         public bool TryGet(A Address, out V Value) => lookup.TryGet(Address, out Value);
         

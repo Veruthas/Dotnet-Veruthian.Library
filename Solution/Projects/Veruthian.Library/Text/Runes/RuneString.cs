@@ -510,6 +510,14 @@ namespace Veruthian.Library.Text.Runes
 
         Number IContainer<Rune>.Count => Length;
 
+        Number IVector<Number, Rune>.GetAddress(Number offset)
+        {
+            if (offset > Length)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+
+            return offset;
+        }
+
         IEnumerable<Number> ILookup<Number, Rune>.Addresses => Enumerables.GetRange(Number.Zero, Length);
 
         IEnumerable<(Number Address, Rune Value)> ILookup<Number, Rune>.Pairs
@@ -550,7 +558,7 @@ namespace Veruthian.Library.Text.Runes
 
         private bool HasAddress(Number address) => address.ToInt() < Length;
 
-        bool ILookup<Number, Rune>.HasAddress(Number index) => HasAddress(index);
+        bool ILookup<Number, Rune>.IsValidAddress(Number index) => HasAddress(index);
 
 
         bool IContainer<Rune>.Contains(Rune value)

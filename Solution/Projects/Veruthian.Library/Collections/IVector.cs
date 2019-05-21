@@ -6,6 +6,8 @@ namespace Veruthian.Library.Collections
         where A : ISequential<A>
     {
         A Start { get; }
+
+        A GetAddress(Number offset);
     }
 
     public interface IVector<T> : IVector<Number, T>

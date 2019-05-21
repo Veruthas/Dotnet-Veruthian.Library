@@ -5,8 +5,9 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseResizableVector<T, TVector> : BaseMutableVector<T, TVector>, IResizableVector<T>
-        where TVector : BaseResizableVector<T, TVector>, new()
+    public abstract class BaseResizableVector<A, T, TVector> : BaseMutableVector<A, T, TVector>, IResizableVector<A, T>
+        where A : ISequential<A>
+        where TVector : BaseResizableVector<A, T, TVector>, new()
     {
         private void Resize(int requestedSpace)
         {
@@ -44,30 +45,34 @@ namespace Veruthian.Library.Collections
             this.size += items.Length;
         }
 
-        public void Insert(Number address, T value)
+        public void Insert(A address, T value)
         {
             if (this.size == Capacity)
                 Resize(1);
 
-            var index = address.ToCheckedSignedInt();
+            VerifyAddress(address);
 
-            this.items.Move(address.ToCheckedSignedInt(), 1, this.size.ToSignedInt());
+            var index = VerifiedAddressToIndex(address);
+
+            this.items.Move(index, 1, this.size);
 
             this.items[index] = value;
 
             this.size++;
         }
 
-        public void InsertRange(Number address, IEnumerable<T> values)
+        public void InsertRange(A address, IEnumerable<T> values)
         {
             var items = values.ToArray();
 
             if (!HasCapacity(items.Length))
                 Resize(items.Length);
 
-            var index = address.ToCheckedSignedInt();
+            VerifyAddress(address);
 
-            this.items.Move(index, items.Length, size.ToSignedInt());
+            var index = VerifiedAddressToIndex(address);
+
+            this.items.Move(index, items.Length, size);
 
             items.CopyTo(this.items, 0, index, items.Length);
 
@@ -92,29 +97,35 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public void RemoveBy(Number address)
+        public void RemoveBy(A address)
         {
             VerifyAddress(address);
 
-            this.items.Move((int)address, -1, (int)this.size);
+            var index = VerifiedAddressToIndex(address);
+
+            this.items.Move(index, -1, (int)this.size);
 
             this.size--;
         }
 
-        public void RemoveRange(Number address, Number amount)
+        public void RemoveRange(A address, Number amount)
         {
-            VerifyRange(address, amount);
+            VerifyOffset(address, amount);
 
-            this.items.Move((int)address, -(int)amount, (int)this.size);
+            var index = VerifiedAddressToIndex(address);
 
-            this.size -= amount;
+            var count = (int)amount;
+
+            this.items.Move(index, -count, (int)this.size);
+
+            this.size -= count;
         }
 
         public void Clear()
         {
             this.items.Clear();
 
-            this.size = 0;            
+            this.size = 0;
         }
     }
 }

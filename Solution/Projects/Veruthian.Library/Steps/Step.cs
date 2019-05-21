@@ -32,7 +32,14 @@ namespace Veruthian.Library.Steps
 
         Number IContainer<IStep>.Count => SubStepCount;
 
+        Number IVector<Number, IStep>.GetAddress(Number offset)
+        {
+            if (offset > SubStepCount)
+                throw new ArgumentOutOfRangeException(nameof(offset));
 
+            return offset;
+        }
+        
         private void VerifyAddress(Number address)
         {
             if (!HasAddress(address))
@@ -41,7 +48,7 @@ namespace Veruthian.Library.Steps
 
         private bool HasAddress(Number address) => address < SubStepCount;
 
-        bool ILookup<Number, IStep>.HasAddress(Number address) => HasAddress(address);
+        bool ILookup<Number, IStep>.IsValidAddress(Number address) => HasAddress(address);
 
 
         IStep ILookup<Number, IStep>.this[Number address]

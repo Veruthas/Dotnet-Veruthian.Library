@@ -74,7 +74,7 @@ namespace Veruthian.Library.Collections
 
         public bool Contains(T value) => dictionary.ContainsValue(value);
 
-        public bool HasAddress(A address) => dictionary.ContainsKey(address);
+        public bool IsValidAddress(A address) => dictionary.ContainsKey(address);
 
         public void Insert(A address, T value)
         {
@@ -99,7 +99,7 @@ namespace Veruthian.Library.Collections
 
         public void RemoveBy(A address)
         {
-            if (!HasAddress(address))
+            if (!IsValidAddress(address))
                 throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
 
             dictionary.Remove(address);

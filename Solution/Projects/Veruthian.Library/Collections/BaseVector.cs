@@ -9,12 +9,13 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseVector<T, TVector> : IVector<T>, IEnumerable<T>
-        where TVector : BaseVector<T, TVector>, new()
+    public abstract class BaseVector<A, T, TVector> : IVector<A, T>
+        where A : ISequential<A>
+        where TVector : BaseVector<A, T, TVector>, new()
     {
         protected T[] items;
 
-        protected Number size;
+        protected int size;
 
 
         private static readonly T[] empty = new T[0];
@@ -24,21 +25,54 @@ namespace Veruthian.Library.Collections
         {
             items = empty;
 
-            size = Number.Zero;
+            size = 0;
         }
 
 
-        public Number Start => Number.Zero;
-
         protected virtual Number Capacity => items.Length;
 
-        protected bool HasCapacity(int amount) => size + amount <= Capacity;
+        protected bool HasCapacity(Number amount) => size + amount <= Capacity;
 
         public virtual Number Count => size;
 
 
+        // Addresses
+        protected abstract int VerifiedAddressToIndex(A address);
+
+        protected abstract A OffsetStartAddress(Number offset);
+
+        public abstract bool IsValidAddress(A address);
+
+        public abstract A Start { get; }
+
+        public A GetAddress(Number offset)
+        {
+            var address = OffsetStartAddress(offset);
+
+            VerifyAddress(address);
+
+            return address;
+        }
+
+        protected void VerifyAddress(A address)
+        {
+            if (!IsValidAddress(address))
+                throw new ArgumentOutOfRangeException(nameof(address));
+        }
+
+        protected void VerifyOffset(A address, Number offset)
+        {
+            VerifyAddress(address);
+
+            var index = VerifiedAddressToIndex(address);
+
+            ExceptionHelper.VerifyPositiveInBounds(index, offset.ToCheckedSignedInt(), 0, size, nameof(address), nameof(offset));
+        }
+
+
+
         // Access
-        public T this[Number address]
+        public T this[A address]
         {
             get
             {
@@ -48,9 +82,9 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        protected virtual T RawGet(Number verifiedAddress) => items[(int)verifiedAddress];
+        protected virtual T RawGet(A verifiedAddress) => items[VerifiedAddressToIndex(verifiedAddress)];
 
-        public bool TryGet(Number address, out T value)
+        public bool TryGet(A address, out T value)
         {
             if (IsValidAddress(address))
             {
@@ -68,21 +102,6 @@ namespace Veruthian.Library.Collections
 
 
         // Contains
-        protected void VerifyAddress(Number address)
-        {
-            if (!IsValidAddress(address))
-                throw new ArgumentOutOfRangeException(nameof(address));
-        }
-
-        protected bool IsValidAddress(Number address) => address.ToCheckedInt() < Count;
-
-        protected void VerifyRange(Number address, Number amount)
-        {
-            ExceptionHelper.VerifyPositiveInBounds(address.ToCheckedSignedInt(), amount.ToCheckedSignedInt(), 0, (int)size, nameof(address), nameof(amount));
-        }
-
-        bool ILookup<Number, T>.HasAddress(Number address) => IsValidAddress(address);
-
         public virtual bool Contains(T value) => IndexOf(value) > -1;
 
         protected int IndexOf(T value)
@@ -111,21 +130,40 @@ namespace Veruthian.Library.Collections
 
 
         // Enumerables
-        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(Number.Zero, Count - 1);
-
-        public IEnumerable<(Number Address, T Value)> Pairs
+        public IEnumerable<A> Addresses
         {
             get
             {
-                for (var i = Number.Zero; i < Count; i++)
-                    yield return (i, RawGet(i));
+                var address = Start;
+
+                for (int i = 0; i < size; i++)
+                {
+                    yield return address;
+
+                    address = address.Next;
+                }
+            }
+        }
+
+        public IEnumerable<(A Address, T Value)> Pairs
+        {
+            get
+            {
+                var address = Start;
+
+                for (int i = 0; i < size; i++)
+                {
+                    yield return (address, items[i]);
+
+                    address = address.Next;
+                }
             }
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (var i = Number.Zero; i < Count; i++)
-                yield return RawGet(i);
+            for (var i = 0; i < size; i++)
+                yield return items[i];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -166,7 +204,7 @@ namespace Veruthian.Library.Collections
 
         private void SetSize(Number size, Number capacity)
         {
-            this.size = size;
+            this.size = size.ToCheckedSignedInt();
 
             var items = new T[capacity.ToCheckedInt()];
 
@@ -181,7 +219,7 @@ namespace Veruthian.Library.Collections
         }
 
         protected virtual void OnCreated() { }
-        
+
 
         public static TVector New() => new TVector();
 

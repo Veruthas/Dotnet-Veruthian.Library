@@ -2,16 +2,15 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseMutableVector<T, TVector> : BaseVector<T, TVector>, IMutableVector<T>
-        where TVector : BaseMutableVector<T, TVector>, new()
+    public abstract class BaseMutableVector<A, T, TVector> : BaseVector<A, T, TVector>, IMutableVector<A, T>
+        where A : ISequential<A>
+        where TVector : BaseMutableVector<A, T, TVector>, new()
     {
-        public new T this[Number address]
+        public new T this[A address]
         {
             get
             {
-                VerifyAddress(address);
-
-                return RawGet(address);
+                return base[address];
             }
             set
             {
@@ -22,7 +21,7 @@ namespace Veruthian.Library.Collections
 
         }
 
-        public bool TrySet(Number address, T value)
+        public bool TrySet(A address, T value)
         {
             if (IsValidAddress(address))
             {
@@ -35,6 +34,6 @@ namespace Veruthian.Library.Collections
         }
 
 
-        protected virtual T RawSet(Number verifiedAddress, T value) => items[(int)verifiedAddress] = value;
+        protected virtual T RawSet(A verifiedAddress, T value) => items[VerifiedAddressToIndex(verifiedAddress)] = value;
     }
 }

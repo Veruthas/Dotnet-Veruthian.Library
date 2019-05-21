@@ -67,7 +67,7 @@ namespace Veruthian.Library.Collections
                     return false;
                 }
             }
-            else if (parent != null && parent.HasAddress(address))
+            else if (parent != null && parent.IsValidAddress(address))
             {
                 items.Add(address, (value, true));
             }
@@ -151,18 +151,18 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public bool HasAddress(A address)
+        public bool IsValidAddress(A address)
         {
             if (items.TryGetValue(address, out var item))
                 return item.active;
             else
-                return parent != null && parent.HasAddress(address);
+                return parent != null && parent.IsValidAddress(address);
         }
 
 
         public void Insert(A address, T value)
         {
-            if (HasAddress(address))
+            if (IsValidAddress(address))
                 throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
 
             items.Add(address, (value, true));
@@ -190,7 +190,7 @@ namespace Veruthian.Library.Collections
             }
             else if (this.parent != null)
             {
-                if (this.parent.HasAddress(address))
+                if (this.parent.IsValidAddress(address))
                     items.Add(address, (default(T), false));
             }
             else

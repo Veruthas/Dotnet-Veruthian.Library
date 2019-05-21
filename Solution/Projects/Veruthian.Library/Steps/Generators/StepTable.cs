@@ -148,7 +148,7 @@ namespace Veruthian.Library.Steps.Generators
                 items.Insert(name, item);
             }
 
-            if (subItems != null && !subItems.HasAddress(name))
+            if (subItems != null && !subItems.IsValidAddress(name))
             {
                 subItems.Insert(name, item);
 
