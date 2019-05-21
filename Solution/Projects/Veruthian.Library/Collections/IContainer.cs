@@ -4,24 +4,18 @@ using Veruthian.Library.Numeric;
 namespace Veruthian.Library.Collections
 {
     /* 
-        IContainer<T>
-        IExpandableContainer<T> : IContainer<T> => DataSet        
+        IContainer<T> => FixedContainer
+        IResizableContainer<T> : IContainer<T> => DataSet        
+
         IPool<A, D> : IContainer<(A, D)>
         
-        *IStack<T> : IContainer<T>
-        *IQueue<T> : IContainer<T>
-        *IDeque<T> : IStack<T>, IQueue<T>        
-
-        ILookup<A, T> : IContainer<T>  => NestedDataLookup, SequentialDataLookup
+        ILookup<A, T> : IContainer<T>  => FixedLookup, NestedDataLookup, SequentialDataLookup
         IMutableLookup<A, T> : ILookup<A, T>
-        IExpandableLookup<A, T> : ILookup<A, T> => DataLookup
+        IResizableLookup<A, T> : ILookup<A, T> => DataLookup
 
-        IVector<A, T>: ILookup<A, T> => DataVector
-        IMutableVector<A, T>: IVector<A, T>, IMutableLookup<A, T> => DataArray
+        IVector<A, T>: ILookup<A, T> => FixedVector, DataString
+        IResizableVector<A, T>: IVector<A, T>, IMutableLookup<A, T> => DataVector
         IExpandableVector<A, T> : IVector<A, T>, IExpandableLookup<A, T>, IExpandableContainer<T> => DataList
-        IOrderedVector<A, T>: IVector<A, T>, IExpandableContainer<T> => SortedDataList*, SortedDataSet*
-        
-        IVectorLookup<L, V, T> : IVector<V, T>, ILookup<L, T>        
     */
 
     public interface IContainer<T> : IEnumerable<T>

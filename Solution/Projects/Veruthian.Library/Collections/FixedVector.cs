@@ -1,166 +1,71 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public struct FixedVector<T> : IVector<T>, IEnumerable<T>
+    public struct FixedVector<A, T> : IVector<A, T>
+        where A : ISequential<A>
     {
-        IVector<T> vector;
+        private IVector<A, T> vector;
 
-        Number offset;
-
-        Number count;
-
-        Number start;
+        public FixedVector(IVector<A, T> vector) => this.vector = vector;
 
 
-        public FixedVector(IVector<T> vector)
-        {
-            this.vector = vector;
+        public T this[A address] => vector[address];
 
-            this.offset = 0;
+        public A Start => vector.Start;
 
-            this.count = vector.Count;
+        public IEnumerable<A> Addresses => vector.Addresses;
 
-            this.start = 0;
-        }
+        public IEnumerable<(A Address, T Value)> Pairs => vector.Pairs;
 
-        public FixedVector(IVector<T> vector, Number offset)
-        {
-            this.vector = vector;
+        public Number Count => vector.Count;
 
-            this.offset = offset;
+        public bool Contains(T value) => vector.Contains(value);
 
-            this.count = vector.Count - offset;
+        public A GetAddress(Number offset) => vector.GetAddress(offset);
 
-            this.start = 0;
-        }
+        public IEnumerator<T> GetEnumerator() => vector.GetEnumerator();
 
-        public FixedVector(IVector<T> vector, Number offset, Number count)
-        {
-            this.vector = vector;
+        public bool IsValidAddress(A address) => vector.IsValidAddress(address);
 
-            this.offset = offset;
+        public bool TryGet(A Address, out T Value) => vector.TryGet(Address, out Value);
 
-            this.count = count;
+        IEnumerator IEnumerable.GetEnumerator() => vector.GetEnumerator();
 
-            this.start = 0;
-        }
+        public override string ToString() => vector.ToListString();
+    }
 
-        public FixedVector(IVector<T> vector, Number offset, Number count, Number start)
-        {
-            this.vector = vector;
+    public struct FixedVector<T> : IVector<T>
+    {
+        private IVector<T> vector;
 
-            this.offset = offset;
+        public FixedVector(IVector<T> vector) => this.vector = vector;
 
-            this.count = count;
+        public T this[Number address] => vector[address];
 
-            this.start = start;
-        }
+        public Number Start => vector.Start;
 
-        public Number Count => count;
+        public IEnumerable<Number> Addresses => vector.Addresses;
 
-        public Number Start => start;
+        public IEnumerable<(Number Address, T Value)> Pairs => vector.Pairs;
 
-        private Number EndIndex => start + count - Number.One;
+        public Number Count => vector.Count;
 
+        public bool Contains(T value) => vector.Contains(value);
 
-        public T this[Number address]
-        {
-            get
-            {
-                VerifyAddress(address);
+        public Number GetAddress(Number offset) => vector.GetAddress(offset);
 
-                return RawGet(address);
-            }
-        }
+        public IEnumerator<T> GetEnumerator() => vector.GetEnumerator();
 
-        private void VerifyAddress(Number address)
-        {
-            if (!IsValidAddress(address))
-                throw new ArgumentOutOfRangeException(nameof(address));
-        }
+        public bool IsValidAddress(Number address) => vector.IsValidAddress(address);
 
-        public Number GetAddress(Number offset)
-        {
-            var address = start + offset;
+        public bool TryGet(Number Address, out T Value) => vector.TryGet(Address, out Value);
 
-            VerifyAddress(address);
+        IEnumerator IEnumerable.GetEnumerator() => vector.GetEnumerator();
 
-            return address;
-        }
-
-        private T RawGet(Number verifiedAddress) => this.vector[offset + (verifiedAddress - start)];
-
-        public bool TryGet(Number address, out T value)
-        {
-            if (IsValidAddress(address))
-            {
-                value = RawGet(address);
-
-                return true;
-            }
-            else
-            {
-                value = default(T);
-
-                return false;
-            }
-        }
-
-        public bool IsValidAddress(Number address) => address >= Start && address <= EndIndex;
-
-
-
-        IEnumerable<Number> ILookup<Number, T>.Addresses => Enumerables.GetRange(Start, EndIndex);
-
-
-        public IEnumerable<(Number Address, T Value)> Pairs
-        {
-            get
-            {
-                for (var i = new Number(); i < count; i++)
-                    yield return (start + i, vector[offset + i]);
-            }
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            for (int i = 0; i < count; i++)
-                yield return (vector[offset + i]);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-
-        bool IContainer<T>.Contains(T value)
-        {
-            if (value == null)
-            {
-                foreach (var item in this)
-                {
-                    if (value == null)
-                        return true;
-                }
-            }
-            else
-            {
-                foreach (var item in this)
-                {
-                    if (item.Equals(value))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        bool ILookup<Number, T>.IsValidAddress(Number address) => IsValidAddress(address);
-
-        public override string ToString() => this.ToListString();
+        public override string ToString() => vector.ToListString();
     }
 }
