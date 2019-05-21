@@ -36,4 +36,16 @@ namespace Veruthian.Library.Collections
 
         protected virtual T RawSet(A verifiedAddress, T value) => this.Items[VerifiedAddressToIndex(verifiedAddress)] = value;
     }
+
+    public abstract class BaseMutableVector<T, TVector> : BaseMutableVector<Number, T, TVector>, IMutableVector<T>
+       where TVector : BaseMutableVector<T, TVector>, new()
+    {
+        public override Number Start => Number.Zero;
+
+        protected override int VerifiedAddressToIndex(Number address) => (int)address;
+
+        protected override Number OffsetStartAddress(Number offset) => offset;
+
+        public override bool IsValidAddress(Number address) => address < Count;
+    }
 }

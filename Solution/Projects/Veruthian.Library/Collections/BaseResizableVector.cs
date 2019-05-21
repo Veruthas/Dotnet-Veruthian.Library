@@ -128,4 +128,16 @@ namespace Veruthian.Library.Collections
             this.Size = 0;
         }
     }
+
+    public abstract class BaseResizableVector<T, TVector> : BaseResizableVector<Number, T, TVector>, IResizableVector<T>
+        where TVector : BaseResizableVector<T, TVector>, new()
+    {
+        public override Number Start => Number.Zero;
+
+        protected override int VerifiedAddressToIndex(Number address) => (int)address;
+
+        protected override Number OffsetStartAddress(Number offset) => offset;
+
+        public override bool IsValidAddress(Number address) => address < Count;
+    }
 }

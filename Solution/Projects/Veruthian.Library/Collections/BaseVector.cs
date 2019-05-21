@@ -20,7 +20,7 @@ namespace Veruthian.Library.Collections
 
         public BaseVector()
         {
-            items = new T[0]; 
+            items = new T[0];
 
             size = 0;
         }
@@ -235,5 +235,17 @@ namespace Veruthian.Library.Collections
         public static TVector Extract(IEnumerable<T> items) => Make(items.ToArray());
 
         public static TVector Extract(IEnumerable<T> items, Number amount) => Make(items.ToArray(amount.ToCheckedSignedInt()));
+    }
+
+    public abstract class BaseVector<T, TVector> : BaseVector<Number, T, TVector>, IVector<T>
+        where TVector : BaseVector<T, TVector>, new()
+    {
+        public override Number Start => Number.Zero;
+
+        protected override int VerifiedAddressToIndex(Number address) => (int)address;
+
+        protected override Number OffsetStartAddress(Number offset) => offset;
+
+        public override bool IsValidAddress(Number address) => address < Count;
     }
 }

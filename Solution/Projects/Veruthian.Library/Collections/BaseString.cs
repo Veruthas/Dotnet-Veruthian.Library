@@ -210,7 +210,7 @@ namespace Veruthian.Library.Collections
         public int CompareToVector<B>(IVector<B, T> other, Comparison<T> comparer) where B : ISequential<B>
             => CompareEnumerable(comparer, this.GetEnumerator(), other.GetEnumerator());
 
-        public int CompareToArray(T[] other, Comparison<T> comparer) 
+        public int CompareToArray(T[] other, Comparison<T> comparer)
             => CompareEnumerable(comparer, this.GetEnumerator(), GetEnumerable(other).GetEnumerator());
 
         public int CompareToEnumeratble(IEnumerable<T> other, Comparison<T> comparer)
@@ -234,5 +234,18 @@ namespace Veruthian.Library.Collections
         }
 
         #endregion
+    }
+
+
+    public abstract class BaseString<T, TString> : BaseString<Number, T, TString>, IVector<T>
+        where TString : BaseString<T, TString>, new()
+    {
+        public override Number Start => Number.Zero;
+
+        protected override int VerifiedAddressToIndex(Number address) => (int)address;
+
+        protected override Number OffsetStartAddress(Number offset) => offset;
+
+        public override bool IsValidAddress(Number address) => address < Count;
     }
 }
