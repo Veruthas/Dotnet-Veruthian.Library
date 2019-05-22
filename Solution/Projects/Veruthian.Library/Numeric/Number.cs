@@ -42,7 +42,6 @@ namespace Veruthian.Library.Numeric
         private Number(params Unit[] units)
             : this(0, units) { }
 
-
         private Number(TwoUnit value, params Unit[] units)
         {
             if (units == null || units.Length == 0)
@@ -1290,6 +1289,59 @@ namespace Veruthian.Library.Numeric
             }
 
             return (-1, default(T));
+        }
+
+        #endregion
+
+
+        #region ProcessFrom
+
+        // Bytes
+        public static IEnumerable<Number> Process(IEnumerable<byte> bytes, Number perNumber)
+        {
+            yield break;
+        }
+
+        public static Number Extract(IEnumerator<byte> bytes, Number perNumber)
+        {
+            for (var i = Number.Zero; i < perNumber; i++)
+            {
+            }
+
+            return Number.Zero;
+        }
+
+        public static Number Extract(IEnumerable<byte> bytes, Number perNumber)
+        {
+            for (var i = Number.Zero; i < perNumber; i++)
+            {
+            }
+
+            return Number.Zero;
+        }
+
+        public static Number From(IEnumerable<byte> bytes)
+        {
+            return Number.Zero;
+        }
+
+        #endregion
+
+        #region ProcessTo
+
+        public IEnumerable<byte> GetBytes(Number value)
+        {
+            yield break;
+        }
+
+        public IEnumerable<byte> GetBytes(Number value, Number maxPerNumber)
+        {
+            yield break;
+        }
+
+        public static IEnumerable<byte> GetBytes(IEnumerable<Number> values, Number maxPerNumber)
+        {
+            yield break;
         }
 
         #endregion
