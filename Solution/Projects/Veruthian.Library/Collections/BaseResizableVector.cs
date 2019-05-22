@@ -9,6 +9,22 @@ namespace Veruthian.Library.Collections
         where A : ISequential<A>
         where TVector : BaseResizableVector<A, T, TVector>, new()
     {
+        private int size;
+
+        protected Number Size
+        {
+            get => size;
+            set => this.size = value.ToCheckedSignedInt();
+        }
+
+        protected virtual Number Capacity => Items.Length;
+
+        protected bool HasCapacity(Number amount) => Count + amount <= Capacity;
+
+
+        public override Number Count => Size;
+
+
         public new T this[A address]
         {
             get
@@ -156,8 +172,27 @@ namespace Veruthian.Library.Collections
         }
 
 
+        protected static TVector Create(Number capacity)
+        {
+            var vector = new TVector();
+
+            vector.Initialize(new T[capacity.ToCheckedSignedInt()], Number.Zero);
+
+            return vector;
+        }
+
+        protected virtual void Initialize(T[] items, Number size)
+        {
+            this.Items = items;
+
+            this.Size = size;
+        }
+
+        protected override void Initialize(T[] items)
+            => Initialize(items, items.Length);
+
         public static TVector Prepare(Number capacity)
-            => Create(capacity, Number.Zero);
+            => Create(capacity);
     }
 
     public abstract class BaseResizableVector<T, TVector> : BaseResizableVector<Number, T, TVector>, IResizableVector<T>

@@ -13,54 +13,22 @@ namespace Veruthian.Library.Collections
         where A : ISequential<A>
         where TVector : BaseVector<A, T, TVector>, new()
     {
+        public BaseVector() => items = new T[0];
+
+
+        // Items
         private T[] items;
-
-        private int size;
-
-
-        public BaseVector()
-        {
-            items = new T[0];
-
-            size = 0;
-        }
-
-
-        protected Number Size
-        {
-            get => size;
-            set
-            {
-                this.size = value.ToCheckedSignedInt();
-
-                OnSizeSet();
-            }
-        }
 
         protected T[] Items
         {
             get => this.items;
-            set
-            {
-                this.items = value ?? new T[0];
-
-                OnItemsSet();
-            }
+            set => this.items = value ?? new T[0];
         }
 
-
-        protected virtual void OnSizeSet() { }
-
-        protected virtual void OnItemsSet() { }
-
-        public static bool IsNullOrEmpty(TVector value) => value == null || value.Size.IsZero;
+        public static bool IsNullOrEmpty(TVector value) => value == null || value.Count.IsZero;
 
 
-        protected virtual Number Capacity => items.Length;
-
-        protected bool HasCapacity(Number amount) => size + amount <= Capacity;
-
-        public virtual Number Count => size;
+        public virtual Number Count => items.Length;
 
 
         // Addresses
@@ -93,7 +61,7 @@ namespace Veruthian.Library.Collections
 
             var index = VerifiedAddressToIndex(address);
 
-            ExceptionHelper.VerifyPositiveInBounds(index, offset.ToCheckedSignedInt(), 0, size, nameof(address), nameof(offset));
+            ExceptionHelper.VerifyPositiveInBounds(index, offset.ToCheckedSignedInt(), 0, (int)Count, nameof(address), nameof(offset));
         }
 
 
@@ -112,7 +80,7 @@ namespace Veruthian.Library.Collections
         protected virtual T RawGet(A verifiedAddress) => items[VerifiedAddressToIndex(verifiedAddress)];
 
         protected virtual T RawSet(A verifiedAddress, T value) => this.Items[VerifiedAddressToIndex(verifiedAddress)] = value;
-        
+
         public bool TryGet(A address, out T value)
         {
             if (IsValidAddress(address))
@@ -136,9 +104,11 @@ namespace Veruthian.Library.Collections
         protected int IndexOf(T value)
         {
             {
+                var count = (int)Count;
+
                 if (value == null)
                 {
-                    for (int i = 0; i < (int)size; i++)
+                    for (int i = 0; i < count; i++)
                     {
                         if (items[i] == null)
                             return i;
@@ -146,7 +116,7 @@ namespace Veruthian.Library.Collections
                 }
                 else
                 {
-                    for (int i = 0; i < (int)size; i++)
+                    for (int i = 0; i < count; i++)
                     {
                         if (items[i].Equals(value))
                             return i;
@@ -165,7 +135,9 @@ namespace Veruthian.Library.Collections
             {
                 var address = Start;
 
-                for (int i = 0; i < size; i++)
+                var count = (int)Count;
+
+                for (int i = 0; i < count; i++)
                 {
                     yield return address;
 
@@ -180,7 +152,9 @@ namespace Veruthian.Library.Collections
             {
                 var address = Start;
 
-                for (int i = 0; i < size; i++)
+                var count = (int)Count;
+
+                for (int i = 0; i < count; i++)
                 {
                     yield return (address, items[i]);
 
@@ -191,7 +165,9 @@ namespace Veruthian.Library.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (var i = 0; i < size; i++)
+            var count = (int)Count;
+
+            for (var i = 0; i < count; i++)
                 yield return items[i];
         }
 
@@ -203,9 +179,11 @@ namespace Veruthian.Library.Collections
         {
             VerifyAddress(start);
 
-            int index = VerifiedAddressToIndex(start);
+            var index = VerifiedAddressToIndex(start);
 
-            var newItems = items.Extracted(index, size - index);
+            var count = (int)Count;
+
+            var newItems = items.Extracted(index, count - index);
 
             return Create(newItems);
         }
@@ -226,42 +204,22 @@ namespace Veruthian.Library.Collections
         public override string ToString() => this.ToListString();
 
 
-        // Creation        
-        protected static TVector Create(Number capacity, Number size)
-            => Create(new T[capacity.ToCheckedInt()], size);
-
-        protected static TVector Create(Number capacity)
-            => Create(new T[capacity.ToCheckedInt()], capacity.ToCheckedInt());
-
+        // Creation
         protected static TVector Create(T[] items)
-            => Create(items, items.Length);
-
-        protected static TVector Create(T[] items, Number size)
         {
             var vector = new TVector();
 
-            vector.items = items;
-
-            vector.Size = size;
+            vector.Initialize(items);
 
             return vector;
         }
 
-        protected static TVector Create(T[] items, Number capacity, Number size)
-        {
-            var vector = new TVector();
-
-            vector.items = items;
-
-            vector.Size = size;
-
-            return vector;
-        }
+        protected virtual void Initialize(T[] items) => this.Items = items;
 
 
         public static TVector New() => new TVector();
 
-        public static TVector New(Number size) => Create(size);
+        public static TVector New(Number size) => Create(new T[size.ToCheckedInt()]);
 
 
         public static TVector Of(T item) => Create(new T[] { item });
@@ -286,52 +244,6 @@ namespace Veruthian.Library.Collections
         public static TVector Extract(IEnumerable<T> items) => Create(items.ToArray());
 
         public static TVector Extract(IEnumerable<T> items, Number amount) => Create(items.ToArray(amount.ToCheckedSignedInt()));
-
-
-        public static TVector Join(TVector left, TVector right)
-        {
-            if (IsNullOrEmpty(left))
-                return Create(right.items);
-
-            if (IsNullOrEmpty(right))
-                return Create(left.items);
-
-            var newSize = left.size + right.size;
-
-            var newItems = new T[newSize];
-
-            left.items.CopyTo(newItems, 0, 0, left.size);
-
-            right.items.CopyTo(newItems, 0, left.size, right.size);
-
-            return Create(newItems);
-        }
-
-        public static TVector Join(TVector left, T right)
-        {
-            if (IsNullOrEmpty(left))
-                return Of(right);
-
-            var newItems = left.items.Resize(left.size + 1);
-
-            newItems[left.size] = right;
-
-            return Create(newItems);
-        }
-
-        public static TVector Join(T left, TVector right)
-        {
-            if (IsNullOrEmpty(right))
-                return Of(left);
-
-            var newItems = new T[right.size + 1];
-
-            newItems[0] = left;
-
-            right.items.CopyTo(newItems, 0, 1, right.size);
-
-            return Create(newItems);
-        }        
     }
 
 

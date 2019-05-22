@@ -228,10 +228,13 @@ namespace Veruthian.Library.Collections
         // Hashcode
         public override int GetHashCode() => this.hashcode;
 
-        protected override void OnSizeSet()
+        protected override void Initialize(T[] items)
         {
-            this.hashcode = HashCodes.Default.Combine((int)this.Size, this.Items);
+            base.Initialize(items);
+            
+            this.hashcode = HashCodes.Default.Combine(Count.ToSignedInt(), this.Items);   
         }
+
 
         #endregion
     }
