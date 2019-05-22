@@ -78,9 +78,11 @@ namespace Veruthian.Library.Numeric
 
         const int UnitBytes = sizeof(Unit);
 
+        const int TwoUnitBytes = UnitBytes * 2;
+
         const int UnitBits = UnitBytes * BitsPerByte;
 
-        const int TwoUnitBits = UnitBits * 2;
+        const int TwoUnitBits = TwoUnitBytes * BitsPerByte;
 
 
         const TwoUnit UpperMask = (Unit.MaxValue) << UnitBits;
@@ -1329,12 +1331,46 @@ namespace Veruthian.Library.Numeric
 
         #region ProcessTo
 
-        public IEnumerable<byte> GetBytes(Number value)
+        public IEnumerable<byte> GetBytes()
         {
-            yield break;
+            if (IsSimple)
+            {
+                var twoUnit = this.value;
+
+                for (var i = 0; i < TwoUnitBytes; i++)
+                {
+                    var piece = twoUnit & 0xFF;
+
+                    yield return (byte)piece;
+
+                    twoUnit >>= 8;
+
+                    if (twoUnit == 0)
+                        break;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < units.Length; i++)
+                {
+                    var unit = units[i];
+
+                    for (var j = 0; j < UnitBytes; j++)
+                    {
+                        var piece = unit & 0xFF;
+
+                        yield return (byte)piece;
+
+                        unit >>= 8;
+
+                        if (i == units.Length - 1 && unit == 0)
+                            break;
+                    }
+                }
+            }
         }
 
-        public IEnumerable<byte> GetBytes(Number value, Number maxPerNumber)
+        public IEnumerable<byte> GetBytes(Number maxPerNumber)
         {
             yield break;
         }
