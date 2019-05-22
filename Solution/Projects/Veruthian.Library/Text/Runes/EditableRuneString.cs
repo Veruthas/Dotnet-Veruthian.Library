@@ -39,16 +39,16 @@ namespace Veruthian.Library.Text.Runes
         public void Prepend(IEnumerable<Rune> values) => this.value = RuneString.Extract(values) + this.value;
 
 
-        public void Insert(int position, Rune value) => this.value = RuneString.Insert(this.value, position, value);
+        public void Insert(int position, Rune value) => this.value = this.value.Inserted(position, value);
 
-        public void Insert(int position, RuneString value) => this.value = RuneString.Insert(this.value, position, value);
+        public void Insert(int position, RuneString value) => this.value = this.value.Inserted(position, value);
 
-        public void Insert(int position, EditableRuneString value) => this.value = RuneString.Insert(this.value, position, value.value);
+        public void Insert(int position, EditableRuneString value) => this.value = this.value.Inserted(position, value.value);
 
-        public void Insert(int position, IEnumerable<Rune> values) => this.value = RuneString.Insert(this.value, position, RuneString.Extract(values));
+        public void Insert(int position, IEnumerable<Rune> values) => this.value = this.value.Inserted( position, RuneString.Extract(values));
 
 
-        public void Remove(int position, int amount) => this.value = RuneString.Remove(this.value, position, amount);
+        public void Remove(int position, int amount) => this.value = this.value.Removed(position, amount);
 
 
         public void Clear() => this.value = string.Empty;
