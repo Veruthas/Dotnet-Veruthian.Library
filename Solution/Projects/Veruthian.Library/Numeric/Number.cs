@@ -362,7 +362,7 @@ namespace Veruthian.Library.Numeric
                 }
 
                 if (carry != 0)
-                    units = units.Append((Unit)carry);
+                    units = units.Appended((Unit)carry);
 
                 return new Number(units);
             }

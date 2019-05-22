@@ -154,6 +154,10 @@ namespace Veruthian.Library.Collections
 
             this.Size = 0;
         }
+
+
+        public static TVector Prepare(Number capacity)
+            => Create(capacity, Number.Zero);
     }
 
     public abstract class BaseResizableVector<T, TVector> : BaseResizableVector<Number, T, TVector>, IResizableVector<T>

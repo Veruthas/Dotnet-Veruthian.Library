@@ -205,7 +205,7 @@ namespace Veruthian.Library.Collections
 
             int index = VerifiedAddressToIndex(start);
 
-            var newItems = items.Extract(index, size - index);
+            var newItems = items.Extracted(index, size - index);
 
             return Create(newItems);
         }
@@ -216,7 +216,7 @@ namespace Veruthian.Library.Collections
 
             var index = VerifiedAddressToIndex(start);
 
-            var newItems = items.Extract(index, (int)amount);
+            var newItems = items.Extracted(index, (int)amount);
 
             return Create(newItems);
         }
@@ -269,18 +269,18 @@ namespace Veruthian.Library.Collections
 
         public static TVector From(params T[] items) => Create(items.Copy());
 
-        public static TVector From(T[] items, int start) => Create(items.Extract(start));
+        public static TVector From(T[] items, int start) => Create(items.Extracted(start));
 
-        public static TVector From(T[] items, int start, int amount) => Create(items.Extract(start, amount));
+        public static TVector From(T[] items, int start, int amount) => Create(items.Extracted(start, amount));
 
 
         public static TVector Repeat(T item, Number mutiple) => Create(item.RepeatAsArray(mutiple.ToCheckedSignedInt()));
 
-        public static TVector Repeat(T[] items, Number mutiple) => Create(ArrayExtensions.Repeat(items, mutiple.ToCheckedSignedInt()));
+        public static TVector Repeat(T[] items, Number mutiple) => Create(ArrayExtensions.Repeated(items, mutiple.ToCheckedSignedInt()));
 
-        public static TVector Repeat(TVector value, Number multiple) => Create(ArrayExtensions.Repeat(value.items, multiple.ToCheckedSignedInt()));
+        public static TVector Repeat(TVector value, Number multiple) => Create(ArrayExtensions.Repeated(value.items, multiple.ToCheckedSignedInt()));
 
-        public static TVector Repeat(IEnumerable<T> items, Number mutiple) => Create(ArrayExtensions.Repeat(items.ToArray(), mutiple.ToCheckedSignedInt()));
+        public static TVector Repeat(IEnumerable<T> items, Number mutiple) => Create(ArrayExtensions.Repeated(items.ToArray(), mutiple.ToCheckedSignedInt()));
 
 
         public static TVector Extract(IEnumerable<T> items) => Create(items.ToArray());
@@ -331,7 +331,7 @@ namespace Veruthian.Library.Collections
             right.items.CopyTo(newItems, 0, 1, right.size);
 
             return Create(newItems);
-        }
+        }        
     }
 
 
