@@ -30,7 +30,7 @@ namespace Veruthian.Library.Collections
 
         public void Add(T value) => items.Add(value);
 
-        public void AddRange(IEnumerable<T> values)
+        public void Add(IEnumerable<T> values)
         {
             this.items.UnionWith(values);
         }

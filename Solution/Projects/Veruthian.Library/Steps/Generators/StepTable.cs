@@ -69,7 +69,7 @@ namespace Veruthian.Library.Steps.Generators
 
 
         // Labelers
-        private static readonly Labeler DefaultLabeler = (step, additional) => { if (additional != null) step.Labels.AddRange(additional); };
+        private static readonly Labeler DefaultLabeler = (step, additional) => { if (additional != null) step.Labels.Add(additional); };
 
         private static Labeler ChainedLabeler(Labeler labeler, Labeler sublabeler) => (step, additional) => { labeler(step, additional); sublabeler(step, additional); };
 
@@ -85,7 +85,7 @@ namespace Veruthian.Library.Steps.Generators
                             step.Labels.Add(step.Name);
 
                         if (additional != null)
-                            step.Labels.AddRange(additional);
+                            step.Labels.Add(additional);
                     };
                 }
                 else
@@ -96,10 +96,10 @@ namespace Veruthian.Library.Steps.Generators
                             step.Labels.Add(step.Name);
 
                         if (defaultLabels != null)
-                            step.Labels.AddRange(defaultLabels);
+                            step.Labels.Add(defaultLabels);
 
                         if (additional != null)
-                            step.Labels.AddRange(additional);
+                            step.Labels.Add(additional);
                     };
                 }
             }
@@ -114,10 +114,10 @@ namespace Veruthian.Library.Steps.Generators
                     return (step, additional) =>
                     {
                         if (defaultLabels != null)
-                            step.Labels.AddRange(defaultLabels);
+                            step.Labels.Add(defaultLabels);
 
                         if (additional != null)
-                            step.Labels.AddRange(additional);
+                            step.Labels.Add(additional);
                     };
                 }
             }

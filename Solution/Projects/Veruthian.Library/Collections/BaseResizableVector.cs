@@ -66,7 +66,8 @@ namespace Veruthian.Library.Collections
             this.Items = (this.Items.Resize(newCapacity));
         }
 
-        public void Add(T value)
+
+        public void Append(T value)
         {
             if (this.Size == Capacity)
                 Resize(1);
@@ -76,9 +77,9 @@ namespace Veruthian.Library.Collections
             this.Size++;
         }
 
-        public void AddRange(IEnumerable<T> values)
+        public void Append(IEnumerable<T> values)
         {
-            var items = values.ToArray();
+            var items = values is T[]? (T[])values : values.ToArray();
 
             if (!HasCapacity(items.Length))
                 Resize(items.Length);
@@ -87,6 +88,14 @@ namespace Veruthian.Library.Collections
 
             this.Size += items.Length;
         }
+
+
+        public void Prepend(T value)
+            => Insert(Start, value);
+
+        public void Prepend(IEnumerable<T> values)
+            => Insert(Start, values);
+
 
         public void Insert(A address, T value)
         {
@@ -104,9 +113,9 @@ namespace Veruthian.Library.Collections
             this.Size++;
         }
 
-        public void InsertRange(A address, IEnumerable<T> values)
+        public void Insert(A address, IEnumerable<T> values)
         {
-            var items = values.ToArray();
+            var items = values is T[]? (T[])values : values.ToArray();
 
             if (!HasCapacity(items.Length))
                 Resize(items.Length);
@@ -151,7 +160,7 @@ namespace Veruthian.Library.Collections
             this.Size--;
         }
 
-        public void RemoveRange(A address, Number amount)
+        public void RemoveBy(A address, Number amount)
         {
             VerifyOffset(address, amount);
 
