@@ -293,15 +293,14 @@ namespace Veruthian.Library.Text.Runes.Extensions
             return TextSegment.GetLines(values, (c => (uint)c), new RuneBuffer(), (b => b.ToRuneString()), ending, withEnding);
         }
 
-        // public static IEnumerable<(TextSegment Segment, RuneString Value)> GetLineData(this RuneString values, LineEnding ending = null, bool withEnding = true)
-        // {
-        //     return TextSegment.GetLineData<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
-        // }
+        public static IEnumerable<(TextSegment Segment, RuneString Value)> GetLineData(this RuneString values, LineEnding ending = null, bool withEnding = true)
+        {
+            return TextSegment.GetLineData<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
+        }
 
-        // public static IEnumerable<RuneString> GetLines(this RuneString values, LineEnding ending = null, bool withEnding = true)
-        // {
-        //     return TextSegment.GetLines<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
-        // }
-
+        public static IEnumerable<RuneString> GetLines(this RuneString values, LineEnding ending = null, bool withEnding = true)
+        {
+            return TextSegment.GetLines<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
+        }
     }
 }
