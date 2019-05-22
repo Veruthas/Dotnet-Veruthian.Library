@@ -5,10 +5,37 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseResizableVector<A, T, TVector> : BaseMutableVector<A, T, TVector>, IResizableVector<A, T>
+    public abstract class BaseResizableVector<A, T, TVector> : BaseVector<A, T, TVector>, IMutableVector<A, T>, IResizableVector<A, T>
         where A : ISequential<A>
         where TVector : BaseResizableVector<A, T, TVector>, new()
     {
+        public new T this[A address]
+        {
+            get
+            {
+                return base[address];
+            }
+            set
+            {
+                VerifyAddress(address);
+
+                RawSet(address, value);
+            }
+
+        }
+
+        public bool TrySet(A address, T value)
+        {
+            if (IsValidAddress(address))
+            {
+                RawSet(address, value);
+
+                return true;
+            }
+
+            return false;
+        }
+
         private void Resize(int requestedSpace)
         {
             int newSize = (int)this.Size + requestedSpace;

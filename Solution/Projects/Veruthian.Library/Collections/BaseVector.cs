@@ -111,6 +111,8 @@ namespace Veruthian.Library.Collections
 
         protected virtual T RawGet(A verifiedAddress) => items[VerifiedAddressToIndex(verifiedAddress)];
 
+        protected virtual T RawSet(A verifiedAddress, T value) => this.Items[VerifiedAddressToIndex(verifiedAddress)] = value;
+        
         public bool TryGet(A address, out T value)
         {
             if (IsValidAddress(address))

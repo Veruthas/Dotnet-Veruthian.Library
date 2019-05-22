@@ -2,7 +2,7 @@ using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseMutableVector<A, T, TVector> : BaseVector<A, T, TVector>, IMutableVector<A, T>
+    public abstract class BaseMutableVector<A, T, TVector> : BaseFixedVector<A, T, TVector>, IMutableVector<A, T>
         where A : ISequential<A>
         where TVector : BaseMutableVector<A, T, TVector>, new()
     {
@@ -32,9 +32,6 @@ namespace Veruthian.Library.Collections
 
             return false;
         }
-
-
-        protected virtual T RawSet(A verifiedAddress, T value) => this.Items[VerifiedAddressToIndex(verifiedAddress)] = value;
     }
 
     public abstract class BaseMutableVector<T, TVector> : BaseMutableVector<Number, T, TVector>, IMutableVector<T>

@@ -5,7 +5,7 @@ using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Collections
 {
-    public abstract class BaseString<A, T, TString> : BaseVector<A, T, TString>, IEquatable<TString>, IComparable<TString>
+    public abstract class BaseString<A, T, TString> : BaseFixedVector<A, T, TString>, IEquatable<TString>, IComparable<TString>
         where A : ISequential<A>
         where TString : BaseString<A, T, TString>, new()
     {
