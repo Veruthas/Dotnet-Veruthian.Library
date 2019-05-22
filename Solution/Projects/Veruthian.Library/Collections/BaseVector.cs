@@ -247,6 +247,48 @@ namespace Veruthian.Library.Collections
         public static TVector Extract(IEnumerable<T> items) => Create(items.ToArray());
 
         public static TVector Extract(IEnumerable<T> items, Number amount) => Create(items.ToArray(amount.ToCheckedSignedInt()));
+
+
+        public static TVector Join(TVector left, TVector right)
+        {
+            var leftCount = left.Count.ToSignedInt();
+            
+            var rightCount = right.Count.ToSignedInt();
+
+            var newItems = new T[leftCount + rightCount];
+
+            left.Items.CopyTo(newItems);
+
+            right.Items.CopyTo(newItems, 0, leftCount, rightCount);
+
+            return Create(newItems);
+        }
+
+        public static TVector Join(params TVector[] items)
+            => Join((IEnumerable<TVector>)items);
+
+        public static TVector Join(IEnumerable<TVector> items)
+        {
+            var total = 0;
+
+            foreach (var item in items)
+                total += item.Count.ToSignedInt();
+
+            var newItems = new T[total];
+
+            var size = 0;
+
+            foreach (var item in items)
+            {
+                var amount = item.Count.ToSignedInt();
+
+                item.items.CopyTo(newItems, 0, size, amount);
+
+                size += amount;
+            }
+
+            return Create(newItems);
+        }
     }
 
 
