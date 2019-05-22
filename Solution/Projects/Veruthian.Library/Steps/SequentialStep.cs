@@ -13,7 +13,7 @@ namespace Veruthian.Library.Steps
 
         public SequentialStep(IVector<IStep> sequence) => Sequence = sequence;
 
-        public SequentialStep(IEnumerable<IStep> sequence) => Sequence = DataVector<IStep>.Withdraw(sequence);
+        public SequentialStep(IEnumerable<IStep> sequence) => Sequence = DataVector<IStep>.Extract(sequence);
 
         public SequentialStep(params IStep[] sequence) => Sequence = DataVector<IStep>.From(sequence);
 

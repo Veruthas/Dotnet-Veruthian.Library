@@ -251,7 +251,7 @@ namespace _Console
 
                 if (result == true)
                 {
-                    var literal = RuneString.Withdraw(reader.LookFromMark(0, null));
+                    var literal = RuneString.Extract(reader.LookFromMark(0, null));
 
                     if (reader.IsSpeculating && state.GetFlag(MemoizeFlagAddress))
                         reader.StoreProgress(step, true, literal);

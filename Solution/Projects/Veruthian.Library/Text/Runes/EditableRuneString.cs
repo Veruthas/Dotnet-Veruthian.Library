@@ -26,7 +26,7 @@ namespace Veruthian.Library.Text.Runes
 
         public void Append(EditableRuneString value) => this.value += value.value;
 
-        public void Append(IEnumerable<Rune> values) => this.value += RuneString.Withdraw(values);
+        public void Append(IEnumerable<Rune> values) => this.value += RuneString.Extract(values);
 
 
 
@@ -36,7 +36,7 @@ namespace Veruthian.Library.Text.Runes
 
         public void Prepend(EditableRuneString value) => Prepend(value.value);
 
-        public void Prepend(IEnumerable<Rune> values) => this.value = RuneString.Withdraw(values) + this.value;
+        public void Prepend(IEnumerable<Rune> values) => this.value = RuneString.Extract(values) + this.value;
 
 
         public void Insert(int position, Rune value) => this.value = RuneString.Insert(this.value, position, value);
@@ -45,7 +45,7 @@ namespace Veruthian.Library.Text.Runes
 
         public void Insert(int position, EditableRuneString value) => this.value = RuneString.Insert(this.value, position, value.value);
 
-        public void Insert(int position, IEnumerable<Rune> values) => this.value = RuneString.Insert(this.value, position, RuneString.Withdraw(values));
+        public void Insert(int position, IEnumerable<Rune> values) => this.value = RuneString.Insert(this.value, position, RuneString.Extract(values));
 
 
         public void Remove(int position, int amount) => this.value = RuneString.Remove(this.value, position, amount);

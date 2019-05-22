@@ -54,7 +54,7 @@ namespace Veruthian.Library.Collections
         protected virtual void OnItemsSet() { }
 
         public static bool IsNullOrEmpty(TVector value) => value == null || value.Size.IsZero;
-        
+
 
         protected virtual Number Capacity => items.Length;
 
@@ -196,6 +196,30 @@ namespace Veruthian.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
+        // Extract
+        public TVector Extract(A start)
+        {
+            VerifyAddress(start);
+
+            int index = VerifiedAddressToIndex(start);
+
+            var newItems = items.Extract(index, size - index);
+
+            return Create(newItems);
+        }
+
+        public TVector Extract(A start, Number amount)
+        {
+            VerifyOffset(start, amount);
+
+            var index = VerifiedAddressToIndex(start);
+
+            var newItems = items.Extract(index, (int)amount);
+
+            return Create(newItems);
+        }
+
+
         // String
         public override string ToString() => this.ToListString();
 
@@ -250,14 +274,62 @@ namespace Veruthian.Library.Collections
 
         public static TVector Repeat(T item, Number mutiple) => Create(item.RepeatAsArray(mutiple.ToCheckedSignedInt()));
 
-        public static TVector Repeat(T[] items, Number mutiple) => Create(items.Multiply(mutiple.ToCheckedSignedInt()));
+        public static TVector Repeat(T[] items, Number mutiple) => Create(ArrayExtensions.Repeat(items, mutiple.ToCheckedSignedInt()));
 
-        public static TVector Repeat(IEnumerable<T> items, Number mutiple) => Create(items.ToArray().Multiply(mutiple.ToCheckedSignedInt()));
+        public static TVector Repeat(TVector value, Number multiple) => Create(ArrayExtensions.Repeat(value.items, multiple.ToCheckedSignedInt()));
+
+        public static TVector Repeat(IEnumerable<T> items, Number mutiple) => Create(ArrayExtensions.Repeat(items.ToArray(), mutiple.ToCheckedSignedInt()));
 
 
-        public static TVector Withdraw(IEnumerable<T> items) => Create(items.ToArray());
+        public static TVector Extract(IEnumerable<T> items) => Create(items.ToArray());
 
-        public static TVector Withdraw(IEnumerable<T> items, Number amount) => Create(items.ToArray(amount.ToCheckedSignedInt()));
+        public static TVector Extract(IEnumerable<T> items, Number amount) => Create(items.ToArray(amount.ToCheckedSignedInt()));
+
+
+        public static TVector Join(TVector left, TVector right)
+        {
+            if (IsNullOrEmpty(left))
+                return Create(right.items);
+
+            if (IsNullOrEmpty(right))
+                return Create(left.items);
+
+            var newSize = left.size + right.size;
+
+            var newItems = new T[newSize];
+
+            left.items.CopyTo(newItems, 0, 0, left.size);
+
+            right.items.CopyTo(newItems, 0, left.size, right.size);
+
+            return Create(newItems);
+        }
+
+        public static TVector Join(TVector left, T right)
+        {
+            if (IsNullOrEmpty(left))
+                return Of(right);
+
+            var newItems = left.items.Resize(left.size + 1);
+
+            newItems[left.size] = right;
+
+            return Create(newItems);
+        }
+
+        public static TVector Join(T left, TVector right)
+        {
+            if (IsNullOrEmpty(right))
+                return Of(left);
+
+            var newItems = new T[right.size + 1];
+
+            newItems[0] = left;
+
+            right.items.CopyTo(newItems, 0, 1, right.size);
+
+            return Create(newItems);
+        }
     }
 
 

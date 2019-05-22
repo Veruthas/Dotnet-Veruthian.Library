@@ -230,12 +230,12 @@ namespace Veruthian.Library.Text.Runes.Extensions
         // -> RuneString
         public static RuneString ToRuneString(this IEnumerable<Rune> runes)
         {
-            return RuneString.Withdraw(runes);
+            return RuneString.Extract(runes);
         }
 
         public static RuneString ToRuneString(this IEnumerable<char> chars)
         {
-            return RuneString.Withdraw(ToRunes(chars));
+            return RuneString.Extract(ToRunes(chars));
         }
 
         public static RuneString ToRuneString(this string value)

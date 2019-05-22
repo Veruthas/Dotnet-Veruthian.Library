@@ -123,9 +123,7 @@ namespace Veruthian.Library.Collections.Extensions
         {
             ExceptionHelper.VerifyPositiveInBounds(start, amount, 0, array.Length, nameof(start), nameof(amount));
 
-            var size = array.Length - start;
-
-            var newArray = new T[size];
+            var newArray = new T[amount];
 
             array.CopyTo(newArray, start, 0, amount);
 
@@ -436,8 +434,8 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
-        // Mutliply
-        public static T[] Multiply<T>(this T[] array, int times)
+        // Repeat
+        public static T[] Repeat<T>(this T[] array, int times)
         {
             ExceptionHelper.VerifyPositive(times, nameof(times));
 
