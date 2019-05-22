@@ -523,7 +523,7 @@ namespace Veruthian.Library.Collections.Extensions
 
             var newArray = new T[array.Length];
 
-            for (int i = 0, j = array.Length - 1; i < array.Length / 2; i++, j--)
+            for (int i = 0, j = array.Length - 1; i < (array.Length / 2) + 1; i++, j--)
             {
                 (newArray[i], newArray[j]) = (array[j], array[i]);
             }

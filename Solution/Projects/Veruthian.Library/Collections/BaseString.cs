@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Library.Numeric;
 using Veruthian.Library.Utility;
+using Veruthian.Library.Utility.Extensions;
 
 namespace Veruthian.Library.Collections
 {
@@ -44,9 +45,9 @@ namespace Veruthian.Library.Collections
 
         public bool Equals(TString other, EqualityComparison<T> equals)
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
-            else if (Equals(this, other))
+            else if (object.ReferenceEquals(this, other))
                 return true;
             else if (this.Count != other.Count)
                 return false;
@@ -64,7 +65,7 @@ namespace Veruthian.Library.Collections
 
         public bool EqualsVector(IVector<A, T> other, EqualityComparison<T> equals)
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
             else if (this.Count != other.Count)
                 return false;
@@ -81,7 +82,7 @@ namespace Veruthian.Library.Collections
         public bool EqualsVector<B>(IVector<B, T> other, EqualityComparison<T> equals)
             where B : ISequential<B>
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
             else if (this.Count != other.Count)
                 return false;
@@ -97,7 +98,7 @@ namespace Veruthian.Library.Collections
 
         public bool EqualsVector(IVector<T> other, EqualityComparison<T> equals)
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
             else if (this.Count != other.Count)
                 return false;
@@ -113,7 +114,7 @@ namespace Veruthian.Library.Collections
 
         public bool EqualsArray(T[] other, EqualityComparison<T> equals)
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
             else if (this.Count != other.Length)
                 return false;
@@ -142,17 +143,18 @@ namespace Veruthian.Library.Collections
 
         public bool EqualsVector(IVector<A, T> other) => EqualsVector(other, EqualityComparer);
 
-        public bool EqualsVector<OA>(IVector<OA, T> other) where OA : ISequential<OA> => EqualsVector(other, EqualityComparer);
+        public bool EqualsVector<B>(IVector<B, T> other) where B : ISequential<B> => EqualsVector(other, EqualityComparer);
 
         public bool EqualsVector(IVector<T> other) => EqualsVector(other, EqualityComparer);
 
-        public bool EqualsArray(T[] other) => EqualsArray(other, EqualityComparer);
+        public bool EqualsArray(params T[] other) => EqualsArray(other, EqualityComparer);
 
         public bool EqualsEnumerable(IEnumerable<T> other) => EqualsEnumerable(other, EqualityComparer);
 
+
         public override bool Equals(object other)
         {
-            if (other == null)
+            if (other.IsNull())
                 return false;
             else if (other is TString)
                 return Equals((TString)other);
@@ -165,6 +167,43 @@ namespace Veruthian.Library.Collections
             else
                 return false;
         }
+
+
+        public static bool Equals(TString left, object right)
+            => left.IsNull() ? right.IsNull() : left.Equals(right);
+
+
+        public static bool Equals(TString left, TString right)
+            => left.IsNull() ? right.IsNull() : left.Equals(right);
+
+        public static bool EqualsVector(TString left, IVector<A, T> right)
+            => left.IsNull() ? right.IsNull() : left.EqualsVector(right);
+
+        public static bool EqualsVector<B>(TString left, IVector<B, T> right) where B : ISequential<B>
+            => left.IsNull() ? right.IsNull() : left.EqualsVector<B>(right);
+
+        public static bool EqualsArray(TString left, params T[] right)
+            => left.IsNull() ? right.IsNull() : left.EqualsArray(right);
+
+        public static bool EqualsEnumerable(TString left, IEnumerable<T> right)
+            => left.IsNull() ? right.IsNull() : left.EqualsEnumerable(right);
+
+
+
+        public static bool Equals(TString left, TString right, EqualityComparison<T> equals)
+            => left.IsNull() ? right.IsNull() : left.Equals(right, equals);
+
+        public static bool EqualsVector(TString left, IVector<A, T> right, EqualityComparison<T> equals)
+            => left.IsNull() ? right.IsNull() : left.EqualsVector(right, equals);
+
+        public static bool EqualsVector<B>(TString left, IVector<B, T> right, EqualityComparison<T> equals) where B : ISequential<B>
+            => left.IsNull() ? right.IsNull() : left.EqualsVector<B>(right, equals);
+
+        public static bool EqualsArray(TString left, T[] right, EqualityComparison<T> equals)
+            => left.IsNull() ? right.IsNull() : left.EqualsArray(right, equals);
+
+        public static bool EqualsEnumerable(TString left, IEnumerable<T> right, EqualityComparison<T> equals)
+            => left.IsNull() ? right.IsNull() : left.EqualsEnumerable(right, equals);
 
         #endregion
 
@@ -213,11 +252,65 @@ namespace Veruthian.Library.Collections
         public int CompareToArray(T[] other, Comparison<T> comparer)
             => CompareEnumerable(comparer, this.GetEnumerator(), GetEnumerable(other).GetEnumerator());
 
-        public int CompareToEnumeratble(IEnumerable<T> other, Comparison<T> comparer)
+        public int CompareToEnumerable(IEnumerable<T> other, Comparison<T> comparer)
             => CompareEnumerable(comparer, this.GetEnumerator(), other.GetEnumerator());
+
 
         public int CompareTo(TString other)
             => CompareTo(other, Comparer);
+
+        public int CompareToVector(IVector<A, T> other)
+            => CompareEnumerable(Comparer, this.GetEnumerator(), other.GetEnumerator());
+
+        public int CompareToVector(IVector<T> other)
+            => CompareEnumerable(Comparer, this.GetEnumerator(), other.GetEnumerator());
+
+        public int CompareToVector<B>(IVector<B, T> other) where B : ISequential<B>
+            => CompareEnumerable(Comparer, this.GetEnumerator(), other.GetEnumerator());
+
+        public int CompareToArray(T[] other)
+            => CompareEnumerable(Comparer, this.GetEnumerator(), GetEnumerable(other).GetEnumerator());
+
+        public int CompareToEnumerable(IEnumerable<T> other)
+            => CompareEnumerable(Comparer, this.GetEnumerator(), other.GetEnumerator());
+
+
+        public static int Compare(TString left, TString right)
+            => left == null ? (right == null ? 0 : -1) : left.CompareTo(right);
+
+        public static int CompareToVector(TString left, IVector<A, T> right)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right);
+
+        public static int CompareToVector(TString left, IVector<T> right)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right);
+
+        public static int CompareToVector<B>(TString left, IVector<B, T> right) where B : ISequential<B>
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right);
+
+        public static int CompareToArray(TString left, T[] right)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToArray(right);
+
+        public static int CompareToEnumerable(TString left, IEnumerable<T> right)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToEnumerable(right);
+
+
+        public static int Compare(TString left, TString right, Comparison<T> comparer)
+            => left == null ? (right == null ? 0 : -1) : left.CompareTo(right, comparer);
+
+        public static int CompareToVector(TString left, IVector<A, T> right, Comparison<T> comparer)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right, comparer);
+
+        public static int CompareToVector(TString left, IVector<T> right, Comparison<T> comparer)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right, comparer);
+
+        public static int CompareToVector<B>(TString left, IVector<B, T> right, Comparison<T> comparer) where B : ISequential<B>
+            => left == null ? (right == null ? 0 : -1) : left.CompareToVector(right, comparer);
+
+        public static int CompareToArray(TString left, T[] right, Comparison<T> comparer)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToArray(right, comparer);
+
+        public static int CompareToEnumerable(TString left, IEnumerable<T> right, Comparison<T> comparer)
+            => left == null ? (right == null ? 0 : -1) : left.CompareToEnumerable(right, comparer);
 
         #endregion
 
@@ -231,8 +324,8 @@ namespace Veruthian.Library.Collections
         protected override void Initialize(T[] items)
         {
             base.Initialize(items);
-            
-            this.hashcode = HashCodes.Default.Combine(Count.ToSignedInt(), this.Items);   
+
+            this.hashcode = HashCodes.Default.Combine(Count.ToSignedInt(), this.Items);
         }
 
 

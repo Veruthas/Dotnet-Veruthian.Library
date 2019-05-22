@@ -12,6 +12,10 @@ namespace Veruthian.Library.Collections
         public TVector Reversed()
             => Create(Items.Reversed());
 
+        // Repeated
+        public TVector Repeated(Number multiple)
+            => Repeat(This, multiple);
+
         // Prepended
         public TVector Prepended(T value)
             => Create(Items.Prepended(value));

@@ -251,6 +251,10 @@ namespace Veruthian.Library.Collections
 
         public static TVector Join(TVector left, TVector right)
         {
+            ExceptionHelper.VerifyNotNull(left, nameof(left));
+
+            ExceptionHelper.VerifyNotNull(left, nameof(right));            
+
             var leftCount = left.Count.ToSignedInt();
             
             var rightCount = right.Count.ToSignedInt();
