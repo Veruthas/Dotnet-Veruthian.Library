@@ -7,6 +7,8 @@ namespace Veruthian.Library.Text.Runes
 {
     public class RuneString : BaseString<Rune, RuneString>
     {
+        protected override RuneString This => this;
+
         public static implicit operator RuneString(string value) => From(value.ToRuneArray());
 
         public static implicit operator string (RuneString value) => From(value.ToString());

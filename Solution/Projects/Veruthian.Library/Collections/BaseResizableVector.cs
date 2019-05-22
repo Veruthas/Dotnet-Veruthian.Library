@@ -67,7 +67,7 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public void Append(T value)
+        public TVector Append(T value)
         {
             if (this.Size == Capacity)
                 Resize(1);
@@ -75,9 +75,11 @@ namespace Veruthian.Library.Collections
             this.Items[(int)this.Size] = value;
 
             this.Size++;
+
+            return This;
         }
 
-        public void Append(IEnumerable<T> values)
+        public TVector Append(IEnumerable<T> values)
         {
             var items = values is T[]? (T[])values : values.ToArray();
 
@@ -87,17 +89,27 @@ namespace Veruthian.Library.Collections
             items.CopyTo(this.Items, (int)this.Size);
 
             this.Size += items.Length;
+
+            return This;
         }
 
 
-        public void Prepend(T value)
-            => Insert(Start, value);
+        public TVector Prepend(T value)
+        {
+            Insert(Start, value);
 
-        public void Prepend(IEnumerable<T> values)
-            => Insert(Start, values);
+            return This;
+        }
+
+        public TVector Prepend(IEnumerable<T> values)
+        {
+            Insert(Start, values);
+
+            return This;
+        }
 
 
-        public void Insert(A address, T value)
+        public TVector Insert(A address, T value)
         {
             if (this.Size == Capacity)
                 Resize(1);
@@ -111,9 +123,11 @@ namespace Veruthian.Library.Collections
             this.Items[index] = value;
 
             this.Size++;
+
+            return This;
         }
 
-        public void Insert(A address, IEnumerable<T> values)
+        public TVector Insert(A address, IEnumerable<T> values)
         {
             var items = values is T[]? (T[])values : values.ToArray();
 
@@ -129,7 +143,10 @@ namespace Veruthian.Library.Collections
             items.CopyTo(this.Items, 0, index, items.Length);
 
             this.Size += items.Length;
+
+            return This;
         }
+
 
         public bool Remove(T value)
         {
@@ -149,7 +166,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public void RemoveBy(A address)
+        public TVector RemoveBy(A address)
         {
             VerifyAddress(address);
 
@@ -158,9 +175,11 @@ namespace Veruthian.Library.Collections
             this.Items.Move(index, -1, (int)this.Size);
 
             this.Size--;
+
+            return This;
         }
 
-        public void RemoveBy(A address, Number amount)
+        public TVector RemoveBy(A address, Number amount)
         {
             VerifyOffset(address, amount);
 
@@ -171,15 +190,51 @@ namespace Veruthian.Library.Collections
             this.Items.Move(index, -count, (int)this.Size);
 
             this.Size -= count;
+
+            return This;
         }
 
-        public void Clear()
+
+        public TVector Clear()
         {
             this.Items.Clear();
 
             this.Size = 0;
-        }
 
+            return This;
+        }
+        
+
+        void IResizableVector<A, T>.Append(T value)
+            => Append(value);
+
+        void IResizableVector<A, T>.Append(IEnumerable<T> values)
+            => Append(values);
+
+
+        void IResizableVector<A, T>.Prepend(T value)
+            => Prepend(value);
+
+        void IResizableVector<A, T>.Prepend(IEnumerable<T> values)
+            => Prepend(values);
+
+
+        void IResizableLookup<A, T>.Insert(A address, T value)
+            => Insert(address, value);
+
+        void IResizableVector<A, T>.Insert(A address, IEnumerable<T> values)
+            => Insert(address, values);
+
+
+        void IResizableLookup<A, T>.RemoveBy(A address)
+            => RemoveBy(address);
+
+        void IResizableVector<A, T>.RemoveBy(A address, Number amount)
+            => RemoveBy(address, amount);
+
+
+        void IResizableLookup<A, T>.Clear()
+            => Clear();
 
         protected static TVector Create(Number capacity)
         {
@@ -199,6 +254,7 @@ namespace Veruthian.Library.Collections
 
         protected override void Initialize(T[] items)
             => Initialize(items, items.Length);
+
 
         public static TVector Prepare(Number capacity)
             => Create(capacity);

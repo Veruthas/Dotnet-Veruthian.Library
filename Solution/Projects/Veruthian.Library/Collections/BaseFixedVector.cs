@@ -8,10 +8,11 @@ namespace Veruthian.Library.Collections
         where A : ISequential<A>
         where TVector : BaseFixedVector<A, T, TVector>, new()
     {
+        // Reversed
         public TVector Reversed()
             => Create(Items.Reversed());
 
-
+        // Prepended
         public TVector Prepended(T value)
             => Create(Items.Prepended(value));
 
@@ -30,7 +31,7 @@ namespace Veruthian.Library.Collections
         public TVector Prepended(TVector value)
             => Create(Items.PrependedArray(value.Items));
 
-
+        // Appended
         public TVector Appended(T value)
             => Create(Items.Appended(value));
 
@@ -49,7 +50,7 @@ namespace Veruthian.Library.Collections
         public TVector Appended(TVector value)
             => Create(Items.AppendedArray(value.Items));
 
-
+        // Inserted
         public TVector Inserted(A address, T value)
         {
             VerifyAddress(address);
@@ -104,7 +105,7 @@ namespace Veruthian.Library.Collections
             return Create(Items.InsertedArray(index, value.Items));
         }
 
-
+        // Removed
         public TVector Removed(A address)
         {
             VerifyAddress(address);

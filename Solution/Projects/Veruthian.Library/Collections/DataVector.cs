@@ -11,6 +11,8 @@ namespace Veruthian.Library.Collections
 {
     public class DataVector<T> : BaseMutableVector<T, DataVector<T>>
     {
+        protected override DataVector<T> This => this;
+
         public static DataVector<T> Default { get; } = new DataVector<T>();
     }
 }

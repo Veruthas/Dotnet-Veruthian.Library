@@ -16,6 +16,9 @@ namespace Veruthian.Library.Collections
         public BaseVector() => items = new T[0];
 
 
+        // TVector
+        protected abstract TVector This { get; }
+
         // Items
         private T[] items;
 
