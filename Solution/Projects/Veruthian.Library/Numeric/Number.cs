@@ -1295,89 +1295,40 @@ namespace Veruthian.Library.Numeric
 
         #endregion
 
-
         #region ProcessFrom
 
-        // Bytes
-        public static IEnumerable<Number> Process(IEnumerable<byte> bytes, Number perNumber)
+        public Number From(IEnumerable<byte> items)
         {
-            yield break;
+
         }
 
-        public static Number Extract(IEnumerator<byte> bytes, Number perNumber)
+        public Number From(IEnumerable<byte> items, int step)
         {
-            for (var i = Number.Zero; i < perNumber; i++)
-            {
-            }
 
-            return Number.Zero;
         }
 
-        public static Number Extract(IEnumerable<byte> bytes, Number perNumber)
+        public Number From(IEnumerator<byte> items, int step)
         {
-            for (var i = Number.Zero; i < perNumber; i++)
-            {
-            }
 
-            return Number.Zero;
-        }
-
-        public static Number From(IEnumerable<byte> bytes)
-        {
-            return Number.Zero;
         }
 
         #endregion
 
         #region ProcessTo
 
-        public IEnumerable<byte> GetBytes()
+        public IEnumerable<byte> ToBytes(Number value)
         {
-            if (IsSimple)
-            {
-                var twoUnit = this.value;
 
-                for (var i = 0; i < TwoUnitBytes; i++)
-                {
-                    var piece = twoUnit & 0xFF;
-
-                    yield return (byte)piece;
-
-                    twoUnit >>= 8;
-
-                    if (twoUnit == 0)
-                        break;
-                }
-            }
-            else
-            {
-                for (var i = 0; i < units.Length; i++)
-                {
-                    var unit = units[i];
-
-                    for (var j = 0; j < UnitBytes; j++)
-                    {
-                        var piece = unit & 0xFF;
-
-                        yield return (byte)piece;
-
-                        unit >>= 8;
-
-                        if (i == units.Length - 1 && unit == 0)
-                            break;
-                    }
-                }
-            }
         }
 
-        public IEnumerable<byte> GetBytes(Number maxPerNumber)
+        public IEnumerable<byte> ToBytes(Number value, int step)
         {
-            yield break;
+
         }
 
-        public static IEnumerable<byte> GetBytes(IEnumerable<Number> values, Number maxPerNumber)
+        public IEnumerable<byte> ToBytes(IEnumerable<Number> values, int step)
         {
-            yield break;
+
         }
 
         #endregion
