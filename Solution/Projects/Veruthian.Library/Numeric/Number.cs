@@ -277,9 +277,8 @@ namespace Veruthian.Library.Numeric
 
         #endregion
 
-        #region Arithmetic
+        #region Helpers
 
-        // Adjustment
         private static void TrimUnits(ref Unit[] units)
         {
             var adjusted = units.Length;
@@ -296,6 +295,11 @@ namespace Veruthian.Library.Numeric
                 units = units.Resize(adjusted);
         }
 
+        #endregion
+
+        #region Arithmetic
+
+        // Adjustment
         private static void AdjustNegative(Unit[] units)
         {
             var carry = (TwoUnit)1;
@@ -1295,40 +1299,278 @@ namespace Veruthian.Library.Numeric
 
         #endregion
 
-        #region ProcessFrom
+        #region Bytes
 
-        public Number From(IEnumerable<byte> items)
+        public static Number ByteCount(Number value)
         {
+            if (value.IsSimple)
+            {
+                var result = 0;
+
+                var units = value.value;
+
+                do
+                {
+                    result++;
+
+                    units >>= 8;
+
+                } while (units != 0);
+
+                return result;
+            }
+            else
+            {
+                var result = (value.units.Length - 1) * UnitBytes;
+
+                var unit = value.units[value.units.Length - 1];
+
+                while (unit != 0)
+                {
+                    result++;
+
+                    unit >>= 8;
+                }
+
+                return result;
+            }
+        }
+
+        // To
+        public static IEnumerable<byte> ToBytes(Number value)
+        {
+            if (value.IsZero)
+            {
+                yield return 0;
+            }
+            else if (value.IsSimple)
+            {
+                var units = value.value;
+
+                for (int i = 0; i < TwoUnitBytes; i++)
+                {
+                    var chunk = (byte)(units & 0xFF);
+
+                    yield return chunk;
+
+                    units >>= 8;
+
+                    if (units == 0)
+                        break;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < value.units.Length - 1; i++)
+                {
+                    var unit = value.units[i];
+
+                    for (int j = 0; j < UnitBytes; j++)
+                    {
+                        var chunk = (byte)(unit & 0xFF);
+
+                        yield return chunk;
+
+                        unit >>= 8;
+                    }
+                }
+
+                // Only return bytes on hightest unit when unit is non zero
+                {
+                    var unit = value.units[value.units.Length - 1];
+
+                    for (var j = 0; j < UnitBytes; j++)
+                    {
+                        var chunk = (byte)(unit & 0xFF);
+
+                        yield return chunk;
+
+                        unit >>= 8;
+
+                        if (unit == 0)
+                            break;
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<byte> ToBytes(Number value, Number step)
+        {
+            if (value.IsSimple)
+            {
+                var units = value.value;
+
+                for (var i = Zero; i < step; i++)
+                {
+                    var chunk = (byte)(units & 0xFF);
+
+                    yield return chunk;
+
+                    units >>= 8;
+                }
+            }
+            else
+            {
+                var units = value.units;
+
+                var sent = step;
+
+                for (var i = 0; i < units.Length; i++)
+                {
+                    var unit = units[units.Length - 1];
+
+                    for (var j = 0; j < UnitBytes; j++)
+                    {
+                        if (sent.IsZero)
+                            yield break;
+
+                        var chunk = (byte)(unit & 0xFF);
+
+                        yield return chunk;
+
+                        unit >>= 8;
+
+                        sent--;
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<byte> ToBytes(IEnumerable<Number> values, Number step)
+        {
+            foreach (var value in values)
+            {
+                if (value.IsSimple)
+                {
+                    var units = value.value;
+
+                    for (var i = Zero; i < step; i++)
+                    {
+                        var chunk = (byte)(units & 0xFF);
+
+                        yield return chunk;
+
+                        units >>= 8;
+                    }
+                }
+                else
+                {
+                    var units = value.units;
+
+                    var sent = step;
+
+                    for (var i = 0; i < units.Length; i++)
+                    {
+                        var unit = units[units.Length - 1];
+
+                        for (var j = 0; j < UnitBytes; j++)
+                        {
+                            if (sent.IsZero)
+                                yield break;
+
+                            var chunk = (byte)(unit & 0xFF);
+
+                            yield return chunk;
+
+                            unit >>= 8;
+
+                            sent--;
+                        }
+                    }
+                }
+            }
 
         }
 
-        public Number From(IEnumerable<byte> items, int step)
-        {
 
+        // From
+        private static (Unit Value, bool Done) GetUnit(IEnumerator<byte> enumerator)
+        {
+            var unit = new Unit();
+
+            for (int i = 0; i < UnitBytes; i++)
+            {
+                unit <<= 8;
+
+                unit |= enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                    return (unit, true);
+            }
+
+            return (unit, false);
         }
 
-        public Number From(IEnumerator<byte> items, int step)
+        private static (Number Value, bool Done) GetNumber(IEnumerator<byte> items, Number step)
         {
-
+            return (0, false);
         }
 
-        #endregion
 
-        #region ProcessTo
-
-        public IEnumerable<byte> ToBytes(Number value)
+        public static Number FromBytes(IEnumerable<byte> items)
         {
+            var enumerator = items.GetEnumerator();
 
+            if (!enumerator.MoveNext())
+                return Zero;
+
+            var twoUnits = new TwoUnit();
+
+            for (int i = 0; i < TwoUnitBytes; i++)
+            {
+                twoUnits <<= 8;
+
+                twoUnits |= enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                    return new Number(twoUnits);
+            }
+
+            var units = new Unit[4];
+
+            units[0] = (Unit)(twoUnits);
+
+            units[1] = (Unit)(twoUnits >> UnitBits);
+
+            var index = 2;
+
+            while (true)
+            {
+                var result = GetUnit(enumerator);
+
+                if (index == units.Length)
+                    units.Resize(result.Done ? index + 1 : index * 2);
+
+                units[index++] = result.Value;
+
+                if (result.Done)
+                    break;
+            }
+
+            TrimUnits(ref units);
+
+            return new Number(units);
         }
 
-        public IEnumerable<byte> ToBytes(Number value, int step)
+        public static Number FromBytes(IEnumerator<byte> items, Number step)
         {
-
+            return GetNumber(items, step).Value;
         }
 
-        public IEnumerable<byte> ToBytes(IEnumerable<Number> values, int step)
+        public static IEnumerable<Number> FromBytes(IEnumerable<byte> items, Number step)
         {
+            var enumerator = items.GetEnumerator();
 
+            var result = GetNumber(enumerator, step);
+
+            yield return result.Value;
+
+            while (!result.Done)
+            {
+                result = GetNumber(enumerator, step);
+
+                yield return result.Value;
+            }
         }
 
         #endregion
