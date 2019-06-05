@@ -567,7 +567,7 @@ namespace Veruthian.Library.Numeric
             else if (right.IsSimple)
             {
                 if (left.IsSimple)
-                    return ((left / right), (left % right));
+                    return ((left.value / right.value), (left.value % right.value));
                 else
                     return Division(left, right.value);
             }
@@ -1047,9 +1047,14 @@ namespace Veruthian.Library.Numeric
 
         public static readonly string Decimal = "0123456789";
         public static readonly string Binary = "01";
+        public static readonly string Trinary = "012";
+        public static readonly string Quaternary = "0123";
+        public static readonly string Pental = "01234";
         public static readonly string Octal = "01234567";
-        public static readonly string HexUpper = "0123456789ABCDEF";
-        public static readonly string HexLower = "0123456789abcdef";
+        public static readonly string DuodecimalUpper = "0123456789EX";
+        public static readonly string DuodecimalLower = "0123456789ex";
+        public static readonly string HexadecimalUpper = "0123456789ABCDEF";
+        public static readonly string HexadecimalLower = "0123456789abcdef";
 
 
         public override string ToString() => ToDecimalString(3, ",", false); // ToHexString(true, 4, "_", true);
@@ -1057,14 +1062,26 @@ namespace Veruthian.Library.Numeric
         public string ToBinaryString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Binary, groupLength, separator, pad);
 
+        public string ToTrinaryString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Trinary, groupLength, separator, pad);
+
+        public string ToQuaternaryString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Quaternary, groupLength, separator, pad);
+
+        public string ToPentalString(int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(Pental, groupLength, separator, pad);
+
         public string ToOctalString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Octal, groupLength, separator, pad);
 
         public string ToDecimalString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Decimal, groupLength, separator, pad);
 
-        public string ToHexString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
-            => ToString(upper ? HexUpper : HexLower, groupLength, separator, pad);
+        public string ToDuoadecimalString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(upper ? DuodecimalUpper : DuodecimalLower, groupLength, separator, pad);
+
+        public string ToHexadecimalString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
+            => ToString(upper ? HexadecimalUpper : HexadecimalLower, groupLength, separator, pad);
 
         public string ToString(string symbols, int groupLength = 0, string separator = null, bool pad = false)
         {
@@ -1139,17 +1156,49 @@ namespace Veruthian.Library.Numeric
 
         const int BinaryBase = 2;
 
+        const int TrinaryBase = 3;
+
+        const int QuaternaryBase = 4;
+
+        const int PentalBase = 5;
+
         const int OctalBase = 8;
 
         const int DecimalBase = 10;
 
-        const int HexBase = 16;
+        const int DuodecimalBase = 12;
+
+        const int HexadecimalBase = 16;
 
 
         static readonly Dictionary<char, Number> BinaryNumeralMap = new Dictionary<char, Number>
         {
             ['0'] = 0,
             ['1'] = 1
+        };
+
+        static readonly Dictionary<char, Number> TrinaryNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+        };
+
+        static readonly Dictionary<char, Number> QuaternaryNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+        };
+
+        static readonly Dictionary<char, Number> PentalNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['3'] = 4,
         };
 
         static readonly Dictionary<char, Number> OctalNumeralMap = new Dictionary<char, Number>
@@ -1178,7 +1227,25 @@ namespace Veruthian.Library.Numeric
             ['9'] = 9,
         };
 
-        static readonly Dictionary<char, Number> HexNumeralMap = new Dictionary<char, Number>
+        static readonly Dictionary<char, Number> DuodecimalNumeralMap = new Dictionary<char, Number>
+        {
+            ['0'] = 0,
+            ['1'] = 1,
+            ['2'] = 2,
+            ['3'] = 3,
+            ['4'] = 4,
+            ['5'] = 5,
+            ['6'] = 6,
+            ['7'] = 7,
+            ['8'] = 8,
+            ['9'] = 9,
+            ['X'] = 10,
+            ['x'] = 10,
+            ['E'] = 11,
+            ['e'] = 11,
+        };
+
+        static readonly Dictionary<char, Number> HexadecimalNumeralMap = new Dictionary<char, Number>
         {
             ['0'] = 0,
             ['1'] = 1,
@@ -1191,46 +1258,74 @@ namespace Veruthian.Library.Numeric
             ['8'] = 8,
             ['9'] = 9,
             ['A'] = 10,
-            ['B'] = 11,
-            ['C'] = 12,
-            ['D'] = 13,
-            ['E'] = 14,
-            ['F'] = 15,
             ['a'] = 10,
+            ['B'] = 11,
             ['b'] = 11,
+            ['C'] = 12,
             ['c'] = 12,
+            ['D'] = 13,
             ['d'] = 13,
+            ['E'] = 14,
             ['e'] = 14,
+            ['F'] = 15,
             ['f'] = 15,
         };
 
-
+        // Binary
         public static Number ParseBinary(string value, bool ignoreInvalid = true)
             => Parse(value, BinaryNumeralMap, BinaryBase, ignoreInvalid);
 
         public static bool TryParseBinary(string value, out Number result, bool ignoreInvalid = true)
             => TryParse(value, BinaryNumeralMap, BinaryBase, out result, ignoreInvalid);
 
+        // Trinary
+        public static Number ParseTrinary(string value, bool ignoreInvalid = true)
+            => Parse(value, TrinaryNumeralMap, TrinaryBase, ignoreInvalid);
 
+        public static bool TryParseTrinary(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, TrinaryNumeralMap, TrinaryBase, out result, ignoreInvalid);
+
+        // Quaternary
+        public static Number ParseQuaternary(string value, bool ignoreInvalid = true)
+            => Parse(value, QuaternaryNumeralMap, QuaternaryBase, ignoreInvalid);
+
+        public static bool TryParseQuaternary(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, QuaternaryNumeralMap, QuaternaryBase, out result, ignoreInvalid);
+
+        // Pental
+        public static Number ParsePental(string value, bool ignoreInvalid = true)
+            => Parse(value, PentalNumeralMap, PentalBase, ignoreInvalid);
+
+        public static bool TryParsePental(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, PentalNumeralMap, PentalBase, out result, ignoreInvalid);
+
+        // Octal
         public static Number ParseOctal(string value, bool ignoreInvalid = true)
             => Parse(value, OctalNumeralMap, OctalBase, ignoreInvalid);
 
         public static bool TryParseOctal(string value, out Number result, bool ignoreInvalid = true)
             => TryParse(value, OctalNumeralMap, OctalBase, out result, ignoreInvalid);
 
-
+        // Decimal
         public static Number ParseDecimal(string value, bool ignoreInvalid = true)
             => Parse(value, DecimalNumeralMap, DecimalBase, ignoreInvalid);
 
         public static bool TryParseDecimal(string value, out Number result, bool ignoreInvalid = true)
             => TryParse(value, DecimalNumeralMap, DecimalBase, out result, ignoreInvalid);
 
+        // Duodecimal
+        public static Number ParseDuodecimal(string value, bool ignoreInvalid = true)
+            => Parse(value, DuodecimalNumeralMap, DuodecimalBase, ignoreInvalid);
 
-        public static Number ParseHex(string value, bool ignoreInvalid = true)
-            => Parse(value, HexNumeralMap, HexBase, ignoreInvalid);
+        public static bool TryParseDuodecimal(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, DuodecimalNumeralMap, DuodecimalBase, out result, ignoreInvalid);
 
-        public static bool TryParseHex(string value, out Number result, bool ignoreInvalid = true)
-            => TryParse(value, HexNumeralMap, HexBase, out result, ignoreInvalid);
+        // Hexadecimal
+        public static Number ParseHexadecimal(string value, bool ignoreInvalid = true)
+            => Parse(value, HexadecimalNumeralMap, HexadecimalBase, ignoreInvalid);
+
+        public static bool TryParseHexadecimal(string value, out Number result, bool ignoreInvalid = true)
+            => TryParse(value, HexadecimalNumeralMap, HexadecimalBase, out result, ignoreInvalid);
 
 
         public static Number Parse<T>(IEnumerable<T> value, IEnumerable<T> symbols, bool ignoreInvalid = true)
@@ -1345,56 +1440,52 @@ namespace Veruthian.Library.Numeric
         // To
         public static IEnumerable<byte> ToBytes(Number value)
         {
-            if (value.IsZero)
+            if (value.IsSimple)
             {
-                yield return 0;
-            }
-            else if (value.IsSimple)
-            {
-                var units = value.value;
+                var unit = value.value;
 
-                for (int i = 0; i < UnitBytes; i++)
+                for (int j = 0; j < UnitBytes; j++)
                 {
-                    var chunk = (byte)(units & 0xFF);
+                    var chunk = (byte)unit;
 
                     yield return chunk;
 
-                    units >>= 8;
+                    if (unit == 0)
+                        yield break;
 
-                    if (units == 0)
-                        break;
+                    unit >>= 8;
                 }
             }
             else
             {
-                for (var i = 0; i < value.units.Length - 1; i++)
+                for (int i = 0; i < value.UnitCount; i++)
                 {
-                    var unit = value.units[i];
+                    var unit = value[i];
 
-                    for (int j = 0; j < UnitBytes; j++)
+                    if (i < value.UnitCount - 1)
                     {
-                        var chunk = (byte)(unit & 0xFF);
+                        for (int j = 0; j < UnitBytes; i++)
+                        {
+                            var chunk = (byte)unit;
 
-                        yield return chunk;
+                            yield return chunk;
 
-                        unit >>= 8;
+                            unit >>= 8;
+                        }
                     }
-                }
-
-                // Only return bytes on highest unit when unit is non zero
-                {
-                    var unit = value.units[value.units.Length - 1];
-
-                    for (var j = 0; j < UnitBytes; j++)
+                    else
                     {
-                        var chunk = (byte)(unit & 0xFF);
+                        for (int j = 0; j < UnitBytes; i++)
+                        {
+                            var chunk = (byte)unit;
 
-                        yield return chunk;
+                            yield return chunk;
 
-                        unit >>= 8;
+                            if (unit == 0)
+                                yield break;
 
-                        if (unit == 0)
-                            break;
+                            unit >>= 8;
+                        }
                     }
                 }
             }
@@ -1497,8 +1588,10 @@ namespace Veruthian.Library.Numeric
 
                         remaining--;
                     }
+
+
+                Continue:;
                 }
-            Continue:;
             }
         }
 
@@ -1556,8 +1649,7 @@ namespace Veruthian.Library.Numeric
                 {
                     var unit = new Unit();
 
-                    // TODO: THIS REMOVES WHEN BYTE = UNIT
-                    var bytes = i == unitCount - 1 ? unitRemainder : UnitBytes;
+                    var bytes = (i == unitCount - 1 && unitRemainder != 0) ? unitRemainder : UnitBytes;
 
                     for (int j = 0; j < bytes; j++)
                     {
