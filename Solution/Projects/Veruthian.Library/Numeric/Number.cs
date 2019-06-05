@@ -1,5 +1,4 @@
 #define ByteUnit
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,31 +7,31 @@ using Veruthian.Library.Utility;
 
 #if ByteUnit
 using Unit = System.Byte;
-using TwoUnit = System.UInt16;
+using UpperUnit = System.UInt16;
 #endif
 
 #if ShortUnit
 using Unit = System.UInt16;
-using TwoUnit = System.UInt32;
+using UpperUnit = System.UInt32;
 #endif
 
 #if IntUnit
 using Unit = System.UInt32;
-using TwoUnit = System.UInt64;
+using UpperUnit = System.UInt64;
 #endif
 
 namespace Veruthian.Library.Numeric
 {
     public struct Number : INumeric<Number>, ISequential<Number>
     {
-        readonly TwoUnit value;
+        readonly Unit value;
 
         readonly Unit[] units;
 
 
         #region Constructors
 
-        private Number(TwoUnit value)
+        private Number(Unit value)
         {
             this.value = value;
 
@@ -42,7 +41,7 @@ namespace Veruthian.Library.Numeric
         private Number(params Unit[] units)
             : this(0, units) { }
 
-        private Number(TwoUnit value, params Unit[] units)
+        private Number(Unit value, Unit[] units)
         {
             if (units == null || units.Length == 0)
             {
@@ -53,12 +52,6 @@ namespace Veruthian.Library.Numeric
             else if (units.Length == 1)
             {
                 this.value = units[0];
-
-                this.units = null;
-            }
-            else if (units.Length == 2)
-            {
-                this.value = (TwoUnit)(units[0] | (units[1] << UnitBits));
 
                 this.units = null;
             }
@@ -78,16 +71,7 @@ namespace Veruthian.Library.Numeric
 
         const int UnitBytes = sizeof(Unit);
 
-        const int TwoUnitBytes = UnitBytes * 2;
-
         const int UnitBits = UnitBytes * BitsPerByte;
-
-        const int TwoUnitBits = TwoUnitBytes * BitsPerByte;
-
-
-        const TwoUnit UpperMask = (Unit.MaxValue) << UnitBits;
-
-        const TwoUnit LowerMask = Unit.MaxValue;
 
 
         public static readonly Number Default = Zero;
@@ -106,15 +90,11 @@ namespace Veruthian.Library.Numeric
 
         private bool IsSimple => units == null;
 
-        private Unit this[int index] => units == null ? (Unit)(value >> (UnitBits * index) & LowerMask) : (index < units.Length ? units[index] : (Unit)0);
+        private Unit LowUnit => IsSimple ? value : units[0];
 
-        private int UnitCount => units != null ? units.Length : (value & UpperMask) == 0 ? 1 : 2;
+        private Unit this[int index] => IsSimple ? (index == 0 ? value : new Unit()) : (index < units.Length ? units[index] : new Unit());
 
-        private Unit UpperValue => (Unit)(value >> UnitBits);
-
-        private Unit LowerValue => (Unit)value;
-
-        private bool IsUnit => (value & UpperMask) == 0;
+        private int UnitCount => IsSimple ? 1 : units.Length;
 
         #endregion
 
@@ -122,10 +102,9 @@ namespace Veruthian.Library.Numeric
 
         public bool Precedes(Number other)
         {
-            // this < other?
             if (this.IsSimple)
             {
-                return other.IsSimple ? this.value < other.value : true;
+                return other.IsSimple || this.value < other.value;
             }
             else
             {
@@ -146,10 +125,9 @@ namespace Veruthian.Library.Numeric
 
         public bool Follows(Number other)
         {
-            // this > other?
             if (this.IsSimple)
             {
-                return other.IsSimple ? this.value > other.value : false;
+                return other.IsSimple && this.value > other.value;
             }
             else
             {
@@ -203,16 +181,6 @@ namespace Veruthian.Library.Numeric
         }
 
         private static int CompareValues(Unit left, Unit right)
-        {
-            if (left == right)
-                return 0;
-            else if (left < right)
-                return -1;
-            else
-                return 1;
-        }
-
-        private static int CompareValues(TwoUnit left, TwoUnit right)
         {
             if (left == right)
                 return 0;
@@ -279,7 +247,7 @@ namespace Veruthian.Library.Numeric
 
         #region Helpers
 
-        private static void TrimUnits(ref Unit[] units)
+        private static Unit[] TrimUnits(Unit[] units, bool clone = false)
         {
             var adjusted = units.Length;
 
@@ -291,8 +259,10 @@ namespace Veruthian.Library.Numeric
                     break;
             }
 
-            if (adjusted != units.Length)
-                units = units.Resize(adjusted);
+            if (adjusted != units.Length || clone)
+                return units.Resize(adjusted);
+            else
+                return units;
         }
 
         #endregion
@@ -302,15 +272,15 @@ namespace Veruthian.Library.Numeric
         // Adjustment
         private static void AdjustNegative(Unit[] units)
         {
-            var carry = (TwoUnit)1;
+            var carry = (UpperUnit)1;
 
             for (int i = 0; i < units.Length; i++)
             {
                 unchecked
                 {
-                    TwoUnit inverse = (TwoUnit)(((Unit)~units[i]) + carry);
+                    UpperUnit inverse = (UpperUnit)(((Unit)~units[i]) + carry);
 
-                    carry = (TwoUnit)(inverse >> UnitBits);
+                    carry = (UpperUnit)(inverse >> UnitBits);
 
                     units[i] = (Unit)inverse;
                 }
@@ -325,45 +295,27 @@ namespace Veruthian.Library.Numeric
         {
             if (left.IsSimple && right.IsSimple)
             {
-                var upperLeft = left.UpperValue;
+                var result = (UpperUnit)left + (UpperUnit)right;
 
-                var upperRight = right.UpperValue;
-
-                if (upperLeft == 0 && upperRight == 0)
-                {
-                    return new Number((TwoUnit)(left.value + right.value));
-                }
+                if (result <= Unit.MaxValue)
+                    return new Number((Unit)result);
                 else
-                {
-                    var lowerLeft = left.value & LowerMask;
+                    return new Number((Unit)result, (Unit)(result >> UnitBits));
 
-                    var lowerRight = right.value & LowerMask;
-
-                    var lower = lowerLeft + lowerRight;
-
-                    var carry = lower >> UnitBits;
-
-                    var upper = upperLeft + upperRight + carry;
-
-                    if ((upper & UpperMask) == 0)
-                        return new Number((TwoUnit)((lower & LowerMask) + (upper << UnitBits)));
-                    else
-                        return new Number((Unit)lower, (Unit)upper, (Unit)(upper >> UnitBits));
-                }
             }
             else
             {
                 var units = new Unit[Math.Max(left.UnitCount, right.UnitCount)];
 
-                var carry = new TwoUnit();
+                var carry = new UpperUnit();
 
                 for (int i = 0; i < units.Length; i++)
                 {
-                    var result = (TwoUnit)left[i] + (TwoUnit)right[i] + carry;
+                    var result = (UpperUnit)left[i] + (UpperUnit)right[i] + carry;
 
                     units[i] = (Unit)result;
 
-                    carry = (TwoUnit)(result >> UnitBits);
+                    carry = (UpperUnit)(result >> UnitBits);
                 }
 
                 if (carry != 0)
@@ -385,7 +337,7 @@ namespace Veruthian.Library.Numeric
                 return Zero;
 
             if (result.Units != null)
-                TrimUnits(ref result.Units);
+                result.Units = TrimUnits(result.Units);
 
             return new Number(result.Value, result.Units);
         }
@@ -398,7 +350,7 @@ namespace Veruthian.Library.Numeric
                 throw new InvalidOperationException("Cannot subtract larger number from smaller one");
 
             if (result.Units != null)
-                TrimUnits(ref result.Units);
+                result.Units = TrimUnits(result.Units);
 
             return new Number(result.Value, result.Units);
         }
@@ -419,21 +371,21 @@ namespace Veruthian.Library.Numeric
                 if (!result.Positive)
                     AdjustNegative(result.Units);
 
-                TrimUnits(ref result.Units);
+                result.Units = TrimUnits(result.Units);
             }
 
             return (new Number(result.Value, result.Units), result.Positive);
         }
 
 
-        private static (bool Positive, TwoUnit Value, Unit[] Units) Difference(Number a, Number b)
+        private static (bool Positive, Unit Value, Unit[] Units) Difference(Number a, Number b)
         {
             if (a.IsSimple && b.IsSimple)
             {
                 if (a.value >= b.value)
-                    return (true, (TwoUnit)(a.value - b.value), null);
+                    return (true, (Unit)(a.value - b.value), null);
                 else
-                    return (false, (TwoUnit)(b.value - a.value), null);
+                    return (false, (Unit)(b.value - a.value), null);
             }
             else
             {
@@ -441,17 +393,17 @@ namespace Veruthian.Library.Numeric
 
                 var units = new Unit[count];
 
-                var carry = (TwoUnit)1;
+                var carry = (UpperUnit)1;
 
                 for (var i = 0; i < count; i++)
                 {
                     unchecked
                     {
-                        var result = (TwoUnit)a[i] + (TwoUnit)((Unit)(~b[i])) + carry;
+                        var result = (UpperUnit)a[i] + (UpperUnit)((Unit)(~b[i])) + carry;
 
                         units[i] = (Unit)result;
 
-                        carry = (TwoUnit)(result >> UnitBits);
+                        carry = (UpperUnit)(result >> UnitBits);
                     }
                 }
 
@@ -467,9 +419,15 @@ namespace Veruthian.Library.Numeric
 
         private static Number Product(Number left, Number right)
         {
-            if (left.IsSimple && right.IsSimple && ((left.value | right.value) & UpperMask) == 0)
+            if (left.IsSimple && right.IsSimple)
             {
-                return new Number((TwoUnit)(left.value * right.value));
+                var result = (UpperUnit)left.value * (UpperUnit)right.value;
+
+                if (result <= Unit.MaxValue)
+                    return new Number((Unit)result);
+                else
+                    return new Number((Unit)result, (Unit)(result >> UnitBits));
+
             }
             else if (left.IsZero || right.IsZero)
             {
@@ -505,7 +463,7 @@ namespace Veruthian.Library.Numeric
                         units[column + left.UnitCount] = (Unit)value;
                 }
 
-                TrimUnits(ref units);
+                units = TrimUnits(units);
 
                 return new Number(units);
             }
@@ -521,7 +479,7 @@ namespace Veruthian.Library.Numeric
                 return Power(this, exponent);
         }
 
-        private static Number Power(Number value, TwoUnit exponent)
+        private static Number Power(Number value, Unit exponent)
         {
             var result = One;
 
@@ -606,12 +564,12 @@ namespace Veruthian.Library.Numeric
             {
                 return checkedDivisor ? throw new DivideByZeroException() : (Zero, Zero);
             }
-            else if (right.IsSimple && right.IsUnit)
+            else if (right.IsSimple)
             {
                 if (left.IsSimple)
-                    return (new Number((TwoUnit)(left.value / right.value)), new Number((TwoUnit)(left.value % right.value)));
+                    return ((left / right), (left % right));
                 else
-                    return Division(left, (Unit)right.value);
+                    return Division(left, right.value);
             }
             else
             {
@@ -729,30 +687,53 @@ namespace Veruthian.Library.Numeric
         #region Conversion
 
         private static Number FromByte(byte value)
-            => new Number((TwoUnit)value);
+            => new Number((Unit)value);
 
         private static Number FromShort(ushort value)
-            => new Number((TwoUnit)value);
+        {
+#if ByteUnit
+            if ((value & 0xFF_0) == 0)
+                return new Number((Unit)value);
+            else
+                return new Number(
+                    (Unit)(value),
+                    (Unit)(value >> 8)
+                );
+#else
+            return new Number((Unit)value);
+#endif
+        }
 
         private static Number FromInt(uint value)
         {
 #if ByteUnit
             if ((value & 0xFF_FF_FF_00) == 0)
-                return new Number((byte)value);
+                return new Number((Unit)value);
             else if ((value & 0xFF_FF_00_00) == 0)
-                return new Number((ushort)value);
+                return new Number(
+                    (Unit)(value),
+                    (Unit)(value >> 8)
+                );
             else if ((value & 0xFF_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16)
                 );
             else
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24)
+                );
+#elif ShortUnit
+            else if ((value & 0xFF_FF_00_00) == 0)
+                return new Number((Unit)value);
+            else
+                return new Number(
+                    (Unit)(value),                    
+                    (Unit)(value >> 16),                    
                 );
 #else
             return new Number(value);
@@ -765,80 +746,90 @@ namespace Veruthian.Library.Numeric
             if ((value & 0xFF_FF_FF_FF_FF_FF_FF_00) == 0)
                 return new Number((byte)value);
             else if ((value & 0xFF_FF_FF_FF_FF_FF_00_00) == 0)
-                return new Number((ushort)value);
+                return new Number(
+                    (Unit)(value),
+                    (Unit)(value >> 8)
+                );
             else if ((value & 0xFF_FF_FF_FF_FF_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16)
                 );
             else if ((value & 0xFF_FF_FF_FF_00_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24)
                 );
             else if ((value & 0xFF_FF_FF_00_00_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF),
-                    (Unit)((value >> 32) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24),
+                    (Unit)(value >> 32)
                 );
             else if ((value & 0xFF_FF_00_00_00_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF),
-                    (Unit)((value >> 32) & 0xFF),
-                    (Unit)((value >> 40) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24),
+                    (Unit)(value >> 32),
+                    (Unit)(value >> 40)
                 );
             else if ((value & 0xFF_00_00_00_00_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF),
-                    (Unit)((value >> 32) & 0xFF),
-                    (Unit)((value >> 40) & 0xFF),
-                    (Unit)((value >> 48) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24),
+                    (Unit)(value >> 32),
+                    (Unit)(value >> 40),
+                    (Unit)(value >> 48)
                 );
             else
                 return new Number(
-                    (Unit)(value & 0xFF),
-                    (Unit)((value >> 8) & 0xFF),
-                    (Unit)((value >> 16) & 0xFF),
-                    (Unit)((value >> 24) & 0xFF),
-                    (Unit)((value >> 32) & 0xFF),
-                    (Unit)((value >> 40) & 0xFF),
-                    (Unit)((value >> 48) & 0xFF),
-                    (Unit)((value >> 56) & 0xFF)
+                    (Unit)(value),
+                    (Unit)(value >> 8),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 24),
+                    (Unit)(value >> 32),
+                    (Unit)(value >> 40),
+                    (Unit)(value >> 48),
+                    (Unit)(value >> 56)
                 );
 #elif ShortUnit
-            if ((value & 0xFF_FF_FF_FF_FF_FF_FF_00) == 0)
-                return new Number((byte)value);
-            else if ((value & 0xFF_FF_FF_FF_FF_FF_00_00) == 0)
-                return new Number((ushort)value);
+            if ((value & 0xFF_FF_FF_FF_FF_FF_00_00) == 0)
+                return new Number((Unit)value);
             else if ((value & 0xFF_FF_FF_FF_00_00_00_00) == 0)
-                return new Number((uint)value);
+                return new Number(
+                    (Unit)(value),
+                    (Unit)(value >> 16)
+                );
             else if ((value ^ 0xFF_FF_00_00_00_00_00_00) == 0)
                 return new Number(
-                    (Unit)(value & 0xFFFF),
-                    (Unit)((value >> 16) & 0xFFFF),
-                    (Unit)((value >> 32) & 0xFFFF)
+                    (Unit)(value),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 32)
                 );
             else
                 return new Number(
-                    (Unit)(value & 0xFFFF),
-                    (Unit)((value >> 16) & 0xFFFF),
-                    (Unit)((value >> 32) & 0xFFFF),
-                    (Unit)((value >> 48) & 0xFFFF),
+                    (Unit)(value),
+                    (Unit)(value >> 16),
+                    (Unit)(value >> 32),
+                    (Unit)(value >> 48),
                 );
 #else
-            return new Number(value);
+            if ((value & 0xFF_FF_FF_FF_00_00_00_00) == 0)
+                return new Number((Unit)value);
+            else
+                return new Number(
+                    (Unit)(value),
+                    (Unit)(value >> 32)
+                );
 #endif
         }
 
@@ -864,28 +855,34 @@ namespace Veruthian.Library.Numeric
 
         public byte ToByte()
         {
-            return (byte)value;
+            return (byte)LowUnit;
         }
 
         public ushort ToShort()
         {
-            return (ushort)value;
+#if ByteUnit
+            return (ushort)((uint)this[0]
+                | ((uint)this[1] << 8))
+                ;
+#else
+            return (ushort)LowUnit;
+#endif
         }
 
         public uint ToInt()
         {
 #if ByteUnit
             return (uint)this[0]
-                  | ((uint)this[1] << 8)
-                  | ((uint)this[2] << 16)
-                  | ((uint)this[3] << 24)
-                  ;
+                | ((uint)this[1] << 8)
+                | ((uint)this[2] << 16)
+                | ((uint)this[3] << 24)
+                ;
 #elif ShortUnit
             return (uint)this[0]
-                  | ((uint)this[1] << 16)
-                  ;
+                | ((uint)this[1] << 16)
+                ;
 #else
-            return (uint)value;
+            return (uint)LowUnit;
 #endif
         }
 
@@ -893,22 +890,23 @@ namespace Veruthian.Library.Numeric
         {
 #if ByteUnit
             return (ulong)this[0]
-                  | ((ulong)this[1] << 8)
-                  | ((ulong)this[2] << 16)
-                  | ((ulong)this[3] << 24)
-                  | ((ulong)this[4] << 32)
-                  | ((ulong)this[5] << 40)
-                  | ((ulong)this[6] << 48)
-                  | ((ulong)this[7] << 56)
-                  ;
+                | ((ulong)this[1] << 8)
+                | ((ulong)this[2] << 16)
+                | ((ulong)this[3] << 24)
+                | ((ulong)this[4] << 32)
+                | ((ulong)this[5] << 40)
+                | ((ulong)this[6] << 48)
+                | ((ulong)this[7] << 56)
+                ;
 #elif ShortUnit
-            return (ulong)units[0]
-                  | ((ulong)this[1] << 16)
-                  | ((ulong)this[2] << 32)
-                  | ((ulong)this[3] << 48)
-                  ;                  
+            return (ulong)this[0]
+                | ((ulong)this[1] << 16)
+                | ((ulong)this[2] << 32)
+                | ((ulong)this[3] << 48)
+                ;                  
 #else
-            return (ulong)value;
+            return (ulong)this[0]
+                | ((ulong)this[1] << 32);
 #endif
         }
 
@@ -924,8 +922,12 @@ namespace Veruthian.Library.Numeric
 
         public byte ToCheckedByte()
         {
-            if (!IsSimple || value > byte.MaxValue)
-                throw new InvalidCastException($"Number is larger than Byte Maximum {byte.MaxValue}");
+#if ByteUnit
+            if (!IsSimple)
+#else
+            if (!IsSimple || value > byte.Max)
+#endif
+                throw new InvalidCastException($"Number is larger than byte maximum {byte.MaxValue}");
 
             return ToByte();
         }
@@ -933,11 +935,13 @@ namespace Veruthian.Library.Numeric
         public ushort ToCheckedShort()
         {
 #if ByteUnit
+            if (!IsSimple && units.Length > 2)
+#elif ShortUnit
             if (!IsSimple)
 #else
-            if (!IsSimple && value > ushort.MaxValue)
+            if (!IsSimple || value > ushort.Max)
 #endif
-                throw new InvalidCastException($"Number is larger than short Maximum {ushort.MaxValue}");
+                throw new InvalidCastException($"Number is larger than short maximum {ushort.MaxValue}");
 
             return ToShort();
         }
@@ -947,11 +951,11 @@ namespace Veruthian.Library.Numeric
 #if ByteUnit
             if (!IsSimple && units.Length > 4)
 #elif ShortUnit
-            if (!IsSimple)
+            if (!IsSimple && units.Length > 2)
 #else
-            if (!IsSimple || value > uint.MaxValue)
+            if (!IsSimple)
 #endif
-                throw new InvalidCastException($"Number is larger than Int Maximum {uint.MaxValue}");
+                throw new InvalidCastException($"Number is larger than int maximum {uint.MaxValue}");
 
             return ToInt();
         }
@@ -963,9 +967,9 @@ namespace Veruthian.Library.Numeric
 #elif ShortUnit
             if (!IsSimple && units.Length > 4)
 #else
-            if (!IsSimple)
+            if (!IsSimple && units.Length > 2)
 #endif
-                throw new InvalidCastException($"Number is larger than Long Maximum {ulong.MaxValue}");
+                throw new InvalidCastException($"Number is larger than long maximum {ulong.MaxValue}");
 
             return ToLong();
         }
@@ -974,7 +978,7 @@ namespace Veruthian.Library.Numeric
         public sbyte ToCheckedSignedByte()
         {
             if (!IsSimple || value > (byte)sbyte.MaxValue)
-                throw new InvalidCastException($"Number is larger than Byte Maximum {byte.MaxValue}");
+                throw new InvalidCastException($"Number is larger than signed byte maximum {sbyte.MaxValue}");
 
             return ToSignedByte();
         }
@@ -982,11 +986,11 @@ namespace Veruthian.Library.Numeric
         public short ToCheckedSignedShort()
         {
 #if ByteUnit
-            if (!IsSimple)
+            if (!IsSimple && (units.Length > 2 || (units.Length == 2 && units[1] > 0x7F)))
 #else
             if (!IsSimple || value > (ushort)short.MaxValue)
 #endif
-                throw new InvalidCastException($"Number is larger than short Maximum {short.MaxValue}");
+                throw new InvalidCastException($"Number is larger than signed short maximum {short.MaxValue}");
 
             return ToSignedShort();
         }
@@ -995,10 +999,12 @@ namespace Veruthian.Library.Numeric
         {
 #if ByteUnit
             if (!IsSimple && (units.Length > 4 || (units.Length == 4 && units[3] > 0x7F)))
+#elif ShortUnit
+            if (!IsSimple && (units.Length > 2 || (units.Length == 2 && units[1] > 0x7FFF)))
 #else
             if (!IsSimple || value > (uint)int.MaxValue)
 #endif
-                throw new InvalidCastException($"Number is larger than Int Maximum {int.MaxValue}");
+                throw new InvalidCastException($"Number is larger than signed int maximum {int.MaxValue}");
 
             return ToSignedInt();
         }
@@ -1008,11 +1014,11 @@ namespace Veruthian.Library.Numeric
 #if ByteUnit
             if (!IsSimple && (units.Length > 8 || (units.Length == 8 && units[7] > 0x7F)))
 #elif ShortUnit
-            if (!IsSimple && (units.Length > 4 || (units.Length == 4 && units[3] > 0x7F)))
+            if (!IsSimple && (units.Length > 4 || (units.Length == 4 && units[3] > 0x7FFF)))
 #else
-            if (!IsSimple || value > (ulong)long.MaxValue)
+            if (!IsSimple && (units.Length > 2 || (units.Length == 2 && units[1] > 0x7FFF_FFFF)))
 #endif
-                throw new InvalidCastException($"Number is larger than Long Maximum {long.MaxValue}");
+                throw new InvalidCastException($"Number is larger than signed long maximum {long.MaxValue}");
 
             return ToSignedLong();
         }
@@ -1347,7 +1353,7 @@ namespace Veruthian.Library.Numeric
             {
                 var units = value.value;
 
-                for (int i = 0; i < TwoUnitBytes; i++)
+                for (int i = 0; i < UnitBytes; i++)
                 {
                     var chunk = (byte)(units & 0xFF);
 
@@ -1515,9 +1521,9 @@ namespace Veruthian.Library.Numeric
 
         private static (Number Value, bool Done) GetNumber(IEnumerator<byte> items, Number step)
         {
-            if (step <= TwoUnitBytes)
+            if (step <= UnitBytes)
             {
-                var value = new TwoUnit();
+                var value = new Unit();
 
                 var done = false;
 
@@ -1569,7 +1575,7 @@ namespace Veruthian.Library.Numeric
                         break;
                 }
 
-                TrimUnits(ref units);
+                units = TrimUnits(units);
 
                 return (new Number(units), done);
             }
@@ -1583,23 +1589,21 @@ namespace Veruthian.Library.Numeric
             if (!enumerator.MoveNext())
                 return Zero;
 
-            var twoUnits = new TwoUnit();
+            var unit = new Unit();
 
-            for (int i = 0; i < TwoUnitBytes; i++)
+            for (int i = 0; i < UnitBytes; i++)
             {
-                twoUnits |= (TwoUnit)(enumerator.Current << (8 * i));
+                unit |= (Unit)(enumerator.Current << (8 * i));
 
                 if (!enumerator.MoveNext())
-                    return new Number(twoUnits);
+                    return new Number(unit);
             }
 
-            var units = new Unit[4];
+            var units = new Unit[2];
 
-            units[0] = (Unit)(twoUnits);
+            units[0] = (Unit)(unit);
 
-            units[1] = (Unit)(twoUnits >> UnitBits);
-
-            var index = 2;
+            var index = 1;
 
             while (true)
             {
@@ -1614,7 +1618,7 @@ namespace Veruthian.Library.Numeric
                     break;
             }
 
-            TrimUnits(ref units);
+            units = TrimUnits(units);
 
             return new Number(units);
         }
