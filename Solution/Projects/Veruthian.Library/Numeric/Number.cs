@@ -1490,9 +1490,7 @@ namespace Veruthian.Library.Numeric
 
             for (int i = 0; i < UnitBytes; i++)
             {
-                unit <<= 8;
-
-                unit |= enumerator.Current;
+                unit |= (Unit)(enumerator.Current << (8 * i));
 
                 if (!enumerator.MoveNext())
                     return (unit, true);
@@ -1503,7 +1501,30 @@ namespace Veruthian.Library.Numeric
 
         private static (Number Value, bool Done) GetNumber(IEnumerator<byte> items, Number step)
         {
-            return (0, false);
+            if (step <= TwoUnitBytes)
+            {
+                var value = new TwoUnit();
+
+                var done = false;
+
+                for (int i = 0; i < step; i++)
+                {
+                    if (!done)
+                    {
+                        value |= items.Current;
+
+                        done = items.MoveNext();
+                    }
+
+                    value <<= 8;
+                }
+
+                return (new Number(value), done);
+            }
+            else
+            {
+                
+            }
         }
 
 
@@ -1517,10 +1538,8 @@ namespace Veruthian.Library.Numeric
             var twoUnits = new TwoUnit();
 
             for (int i = 0; i < TwoUnitBytes; i++)
-            {
-                twoUnits <<= 8;
-
-                twoUnits |= enumerator.Current;
+            {                
+                twoUnits |= (Unit)(enumerator.Current << (8 * i));
 
                 if (!enumerator.MoveNext())
                     return new Number(twoUnits);
