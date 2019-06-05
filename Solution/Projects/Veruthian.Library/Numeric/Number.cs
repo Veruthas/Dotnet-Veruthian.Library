@@ -1507,7 +1507,7 @@ namespace Veruthian.Library.Numeric
 
                 var done = false;
 
-                for (int i = 0; i < step; i++)
+                for (var i = Zero; i < step; i++)
                 {
                     if (!done)
                     {
@@ -1523,7 +1523,13 @@ namespace Veruthian.Library.Numeric
             }
             else
             {
-                
+                var checkedStep = step.ToCheckedInt();
+
+                var unitCount = (checkedStep / UnitBytes) + (checkedStep % UnitBytes == 0 ? 0 : 1);
+
+                var units = new Unit[unitCount];
+
+                throw new NotImplementedException();
             }
         }
 
@@ -1538,7 +1544,7 @@ namespace Veruthian.Library.Numeric
             var twoUnits = new TwoUnit();
 
             for (int i = 0; i < TwoUnitBytes; i++)
-            {                
+            {
                 twoUnits |= (Unit)(enumerator.Current << (8 * i));
 
                 if (!enumerator.MoveNext())
