@@ -1375,7 +1375,7 @@ namespace Veruthian.Library.Numeric
                     }
                 }
 
-                // Only return bytes on hightest unit when unit is non zero
+                // Only return bytes on highest unit when unit is non zero
                 {
                     var unit = value.units[value.units.Length - 1];
 
@@ -1457,7 +1457,7 @@ namespace Veruthian.Library.Numeric
                 {
                     var units = value.units;
 
-                    var sent = step;
+                    var current = step;
 
                     for (var i = 0; i < units.Length; i++)
                     {
@@ -1465,7 +1465,7 @@ namespace Veruthian.Library.Numeric
 
                         for (var j = 0; j < UnitBytes; j++)
                         {
-                            if (sent.IsZero)
+                            if (current.IsZero)
                                 yield break;
 
                             var chunk = (byte)(unit & 0xFF);
@@ -1474,7 +1474,7 @@ namespace Veruthian.Library.Numeric
 
                             unit >>= 8;
 
-                            sent--;
+                            current--;
                         }
                     }
                 }
@@ -1507,16 +1507,14 @@ namespace Veruthian.Library.Numeric
 
                 var done = false;
 
-                for (var i = Zero; i < step; i++)
+                for (int i = 0; i < step.ToInt(); i++)
                 {
-                    if (!done)
-                    {
-                        value |= items.Current;
+                    value |= (Unit)(items.Current << (8 * i));
 
-                        done = items.MoveNext();
-                    }
+                    done = items.MoveNext();
 
-                    value <<= 8;
+                    if (done)
+                        break;
                 }
 
                 return (new Number(value), done);
@@ -1525,11 +1523,40 @@ namespace Veruthian.Library.Numeric
             {
                 var checkedStep = step.ToCheckedInt();
 
-                var unitCount = (checkedStep / UnitBytes) + (checkedStep % UnitBytes == 0 ? 0 : 1);
+                var unitRemainder = checkedStep % UnitBytes;
+
+                var unitCount = (checkedStep / UnitBytes) + (unitRemainder == 0 ? 0 : 1);
+
 
                 var units = new Unit[unitCount];
 
-                throw new NotImplementedException();
+                var done = false;
+
+                for (int i = 0; i < unitCount; i++)
+                {
+                    var unit = new Unit();
+
+                    var bytes = i == unitCount - 1 ? unitRemainder : UnitBytes;
+
+                    for (int j = 0; j < bytes; j++)
+                    {
+                        unit |= (Unit)(items.Current << (j * 8));
+
+                        done = items.MoveNext();
+
+                        if (done)
+                            break;
+                    }
+
+                    units[i] = unit;
+
+                    if (done)
+                        break;
+                }
+
+                TrimUnits(ref units);
+
+                return (new Number(units), done);
             }
         }
 
@@ -1585,6 +1612,8 @@ namespace Veruthian.Library.Numeric
         public static IEnumerable<Number> FromBytes(IEnumerable<byte> items, Number step)
         {
             var enumerator = items.GetEnumerator();
+
+            enumerator.MoveNext();
 
             var result = GetNumber(enumerator, step);
 
