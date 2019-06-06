@@ -1,4 +1,5 @@
-#define ByteUnit
+#define IntUnit
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -295,13 +296,12 @@ namespace Veruthian.Library.Numeric
         {
             if (left.IsSimple && right.IsSimple)
             {
-                var result = (UpperUnit)left + (UpperUnit)right;
+                var result = (UpperUnit)left.value + (UpperUnit)right.value;
 
                 if (result <= Unit.MaxValue)
                     return new Number((Unit)result);
                 else
                     return new Number((Unit)result, (Unit)(result >> UnitBits));
-
             }
             else
             {
@@ -925,7 +925,7 @@ namespace Veruthian.Library.Numeric
 #if ByteUnit
             if (!IsSimple)
 #else
-            if (!IsSimple || value > byte.Max)
+            if (!IsSimple || value > byte.MaxValue)
 #endif
                 throw new InvalidCastException($"Number is larger than byte maximum {byte.MaxValue}");
 
@@ -939,7 +939,7 @@ namespace Veruthian.Library.Numeric
 #elif ShortUnit
             if (!IsSimple)
 #else
-            if (!IsSimple || value > ushort.Max)
+            if (!IsSimple || value > ushort.MaxValue)
 #endif
                 throw new InvalidCastException($"Number is larger than short maximum {ushort.MaxValue}");
 
