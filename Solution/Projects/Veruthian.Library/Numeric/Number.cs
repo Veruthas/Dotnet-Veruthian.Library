@@ -104,7 +104,7 @@ namespace Veruthian.Library.Numeric
         {
             if (this.IsSimple)
             {
-                return other.IsSimple || this.value < other.value;
+                return !other.IsSimple || this.value < other.value;
             }
             else
             {
@@ -1051,8 +1051,8 @@ namespace Veruthian.Library.Numeric
         public static readonly string Quaternary = "0123";
         public static readonly string Pental = "01234";
         public static readonly string Octal = "01234567";
-        public static readonly string DuodecimalUpper = "0123456789EX";
-        public static readonly string DuodecimalLower = "0123456789ex";
+        public static readonly string DuodecimalUpper = "0123456789XE";
+        public static readonly string DuodecimalLower = "0123456789xe";
         public static readonly string HexadecimalUpper = "0123456789ABCDEF";
         public static readonly string HexadecimalLower = "0123456789abcdef";
 
@@ -1077,7 +1077,7 @@ namespace Veruthian.Library.Numeric
         public string ToDecimalString(int groupLength = 0, string separator = null, bool pad = false)
             => ToString(Decimal, groupLength, separator, pad);
 
-        public string ToDuoadecimalString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
+        public string ToDuodecimalString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
             => ToString(upper ? DuodecimalUpper : DuodecimalLower, groupLength, separator, pad);
 
         public string ToHexadecimalString(bool upper = true, int groupLength = 0, string separator = null, bool pad = false)
