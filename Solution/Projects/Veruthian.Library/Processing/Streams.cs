@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Veruthian.Library.Processing.Extensions
 {
-    public static class StreamExtensions
+    public static class Streams
     {
         public static IEnumerable<byte> GetBytes(this Stream stream)
         {
