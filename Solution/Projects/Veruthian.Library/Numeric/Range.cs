@@ -6,7 +6,7 @@ using Veruthian.Library.Utility;
 namespace Veruthian.Library.Numeric
 {
     public struct Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>, IComparable<T>, IEnumerable<T>
-        where T : ISequential<T>, IBounded<T>
+        where T : ISequential<T>
     {
         readonly T low, high;
 
@@ -59,43 +59,47 @@ namespace Veruthian.Library.Numeric
             {
                 yield return current;
 
-                if (current.Equals(current.MaxValue))
+                if (current.Equals(high))
                     break;
                 else
                     current = current.Next;
             }
         }
 
-        const string StringStart = "(";
+        const string StringStart = "";
 
         const string StringMiddle = " to ";
 
-        const string StringEnd = ")";
+        const string StringEnd = "";
 
 
         public override string ToString() => ToString(StringStart, StringMiddle, StringEnd);
 
-        public string ToString(string start, string middle, string end)
+        public string ToString(string start, string middle, string end, bool wrapOnSingle = false)
         {
             if (IsSingle)
-                return low.ToString();
+                if (wrapOnSingle)
+                    return start + low.ToString() + end;
+                else
+                    return low.ToString();
             else
                 return start + low.ToString() + middle + high.ToString() + end;
         }
 
 
-        public string ToString(Func<T, string> toString, string start = StringStart, string middle = StringMiddle, string end = StringEnd)
+        public string ToString(Func<T, string> toString, string start = StringStart, string middle = StringMiddle, string end = StringEnd, bool wrapOnSingle = false)
         {
             if (IsSingle)
-                return toString(low);
+                if (wrapOnSingle)
+                    return start + toString(low) + end;
+                else
+                    return toString(low);
             else
                 return start + toString(low) + middle + toString(high) + end;
         }
 
 
         #region Comparison
-
-        public bool IsComplete => low.Equals(low.MinValue) && high.Equals(low.MaxValue);
 
         public bool IsSingle => low.Equals(high);
 
@@ -445,67 +449,7 @@ namespace Veruthian.Library.Numeric
 
             return list.ToArray();
         }
-
-        // Complement
-        public static Range<T>[] UnnormalizedComplement(IEnumerable<Range<T>> ranges)
-        {
-            var orderedSet = NormalizeUnordered(ranges);
-
-            var complement = NormalizedComplement(orderedSet);
-
-            return complement;
-        }
-
-        public static Range<T>[] NormalizedComplement(IEnumerable<Range<T>> ranges)
-        {
-            // Complement just creates ranges that exclude the ranges in the set
-            // ex: ('A') => (Min, 'A' - 1), ('A' + 1, Max)
-            var complement = new List<Range<T>>();
-
-            bool started = false;
-
-            T min = default(T);
-
-            T max = default(T);
-
-            T low = default(T);
-
-            foreach (var range in ranges)
-            {
-                if (!started)
-                {
-                    started = true;
-
-                    min = range.low.MinValue;
-
-                    max = range.low.MaxValue;
-
-                    low = min;
-                }
-
-                if (!range.Low.Equals(min))
-                {
-                    var newRange = new Range<T>(low.Next, range.Low.Previous);
-
-                    complement.Add(newRange);
-                }
-
-                low = range.High;
-            }
-
-            if (started && !low.Equals(max))
-            {
-                var newLow = low.Equals(min) ? low : low.Next;
-
-                var newRange = new Range<T>(newLow, max);
-
-                complement.Add(newRange);
-            }
-
-
-            return complement.ToArray();
-        }
-
+        
         // Remove
         public static Range<T>[] UnnormalizedRemove(Range<T>[] ranges, params Range<T>[] removing)
         {

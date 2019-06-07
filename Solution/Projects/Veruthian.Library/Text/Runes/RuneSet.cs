@@ -29,9 +29,6 @@ namespace Veruthian.Library.Text.Runes
         public static RuneSet operator -(RuneSet set, RuneSet remove) => Remove(set, remove);
 
 
-        public static RuneSet operator ~(RuneSet set) => Complement(set);
-
-
         public static RuneSet List(RuneString runes) => FromList(runes);
 
         public static RuneSet List(string runes) => FromList(runes.ToRunes());
@@ -43,9 +40,9 @@ namespace Veruthian.Library.Text.Runes
 
         public static readonly RuneSet NewLine = List("\n\r");
 
-        public static readonly RuneSet SpaceOrTab = List(" \t");
+        public static readonly RuneSet TabOrSpace = List(" \t");
 
-        public static readonly RuneSet Whitespace = SpaceOrTab + NewLine;
+        public static readonly RuneSet Whitespace = TabOrSpace + NewLine;
 
         public static readonly RuneSet Lower = Range('a', 'z');
 

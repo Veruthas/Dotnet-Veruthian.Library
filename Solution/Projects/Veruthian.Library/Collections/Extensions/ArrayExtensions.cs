@@ -12,7 +12,7 @@ namespace Veruthian.Library.Collections.Extensions
         {
             ExceptionHelper.VerifyPositive(size, nameof(size));
 
-            if (array == null || array.Length == 0)
+            if (array == null || array.Length == 0 || size == 0)
             {
                 return new T[size];
             }
@@ -42,6 +42,32 @@ namespace Veruthian.Library.Collections.Extensions
 
                 return newArray;
             }
+        }
+
+        // Clear
+        public static void Clear<T>(this T[] array)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            Array.Clear(array, 0, array.Length);
+        }
+
+        public static void Clear<T>(this T[] array, int start)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            ExceptionHelper.VerifyAtLeast(start, array.Length, nameof(start));
+
+            Array.Clear(array, start, array.Length);
+        }
+
+        public static void Clear<T>(this T[] array, int start, int length)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            ExceptionHelper.VerifyPositiveInBounds(start, length, 0, array.Length - 1, nameof(start), nameof(length));
+
+            Array.Clear(array, start, length);
         }
 
 
@@ -79,8 +105,50 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
+        // Extract
+        public static T[] Extracted<T>(this T[] array, int start)
+        {
+            ExceptionHelper.VerifyAtMost(start, array.Length, nameof(start));
+
+            var size = array.Length - start;
+
+            var newArray = new T[size];
+
+            array.CopyTo(newArray, start);
+
+            return newArray;
+        }
+
+        public static T[] Extracted<T>(this T[] array, int start, int amount)
+        {
+            ExceptionHelper.VerifyPositiveInBounds(start, amount, 0, array.Length, nameof(start), nameof(amount));
+
+            var newArray = new T[amount];
+
+            array.CopyTo(newArray, start, 0, amount);
+
+            return newArray;
+        }
+
+
+        // Move
+        public static void Move<T>(this T[] array, int index, int amount, int? size = null)
+        {
+            if (size == 0)
+                return;
+            else if (size != null)
+                ExceptionHelper.VerifyBetween(size.Value, 0, array.Length, nameof(size));
+            else
+                size = array.Length;
+
+            ExceptionHelper.VerifyInBounds(index, amount, 0, size.Value, nameof(index), nameof(amount));
+
+            Array.Copy(array, index, array, index + amount, size.Value - index);
+        }
+
+
         // Insert Space
-        public static T[] AppendSpace<T>(this T[] array, int amount)
+        public static T[] AppendedSpace<T>(this T[] array, int amount)
         {
             ExceptionHelper.VerifyPositive(amount, nameof(amount));
 
@@ -100,7 +168,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] PrependSpace<T>(this T[] array, int amount)
+        public static T[] PrependedSpace<T>(this T[] array, int amount)
         {
             ExceptionHelper.VerifyPositive(amount, nameof(amount));
 
@@ -120,15 +188,15 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] InsertSpace<T>(this T[] array, int index, int amount)
+        public static T[] InsertedSpace<T>(this T[] array, int index, int amount)
         {
             if (index == 0)
             {
-                return PrependSpace(array, amount);
+                return PrependedSpace(array, amount);
             }
             else if (index == array.Length)
             {
-                return AppendSpace(array, amount);
+                return AppendedSpace(array, amount);
             }
             else
             {
@@ -147,28 +215,28 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
-        // Insert
-        public static T[] Append<T>(this T[] array, T item)
+        // Insert Item
+        public static T[] Appended<T>(this T[] array, T item)
         {
-            var newArray = array.AppendSpace(1);
+            var newArray = array.AppendedSpace(1);
 
             newArray[array.Length] = item;
 
             return newArray;
         }
 
-        public static T[] Prepend<T>(this T[] array, T item)
+        public static T[] Prepended<T>(this T[] array, T item)
         {
-            var newArray = array.PrependSpace(1);
+            var newArray = array.PrependedSpace(1);
 
             newArray[0] = item;
 
             return newArray;
         }
 
-        public static T[] Insert<T>(this T[] array, int index, T item)
+        public static T[] Inserted<T>(this T[] array, int index, T item)
         {
-            var newArray = array.InsertSpace(index, 1);
+            var newArray = array.InsertedSpace(index, 1);
 
             newArray[index] = item;
 
@@ -177,7 +245,7 @@ namespace Veruthian.Library.Collections.Extensions
 
 
         // Insert Array
-        public static T[] AppendArray<T>(this T[] array, T[] items)
+        public static T[] AppendedArray<T>(this T[] array, T[] items)
         {
             if (items == null)
             {
@@ -185,7 +253,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.AppendSpace(items.Length);
+                var newArray = array.AppendedSpace(items.Length);
 
                 newArray.CopyFrom(items, 0, array.Length, items.Length);
 
@@ -193,7 +261,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] PrependArray<T>(this T[] array, T[] items)
+        public static T[] PrependedArray<T>(this T[] array, T[] items)
         {
             if (items == null)
             {
@@ -201,7 +269,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.PrependSpace(items.Length);
+                var newArray = array.PrependedSpace(items.Length);
 
                 newArray.CopyFrom(items, 0, 0, items.Length);
 
@@ -209,7 +277,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] InsertArray<T>(this T[] array, int index, T[] items)
+        public static T[] InsertedArray<T>(this T[] array, int index, T[] items)
         {
             if (items == null)
             {
@@ -217,15 +285,15 @@ namespace Veruthian.Library.Collections.Extensions
             }
             if (index == 0)
             {
-                return array.PrependArray(items);
+                return array.PrependedArray(items);
             }
             else if (index == array?.Length)
             {
-                return array.AppendArray(items);
+                return array.AppendedArray(items);
             }
             else
             {
-                var newArray = array.InsertSpace(index, items.Length);
+                var newArray = array.InsertedSpace(index, items.Length);
 
                 newArray.CopyFrom(items, 0, index, items.Length);
 
@@ -235,24 +303,83 @@ namespace Veruthian.Library.Collections.Extensions
 
 
         // Insert Enumerable
-        public static T[] AppendEnumerable<T>(this T[] array, IEnumerable<T> items)
+        public static T[] AppendedEnumerable<T>(this T[] array, IEnumerable<T> items)
         {
-            return array.AppendArray(items.ToArray());
+            return array.AppendedArray(items.ToArray());
         }
 
-        public static T[] PrependEnumerable<T>(this T[] array, IEnumerable<T> items)
+        public static T[] PrependedEnumerable<T>(this T[] array, IEnumerable<T> items)
         {
-            return array.PrependArray(items.ToArray());
+            return array.PrependedArray(items.ToArray());
         }
 
-        public static T[] InsertEnumerable<T>(this T[] array, int index, IEnumerable<T> items)
+        public static T[] InsertedEnumerable<T>(this T[] array, int index, IEnumerable<T> items)
         {
-            return array.InsertArray(index, items.ToArray());
+            return array.InsertedArray(index, items.ToArray());
         }
+
+
+        public static T[] AppendedEnumerable<T>(this T[] array, IEnumerable<T> items, int amount)
+        {
+            ExceptionHelper.VerifyPositive(amount, nameof(amount));
+
+            var newArray = array.AppendedSpace(amount);
+
+            var i = 0;
+
+            foreach (var item in items)
+            {
+                if (i >= amount)
+                    break;
+
+                newArray[array.Length + i++] = item;
+            }
+
+            return newArray;
+        }
+
+        public static T[] PrependedEnumerable<T>(this T[] array, IEnumerable<T> items, int amount)
+        {
+            ExceptionHelper.VerifyPositive(amount, nameof(amount));
+
+            var newArray = array.PrependedSpace(amount);
+
+            var i = 0;
+
+            foreach (var item in items)
+            {
+                if (i >= amount)
+                    break;
+
+                newArray[i++] = item;
+            }
+
+            return newArray;
+        }
+
+        public static T[] InsertedEnumerable<T>(this T[] array, int index, IEnumerable<T> items, int amount)
+        {
+            ExceptionHelper.VerifyPositive(amount, nameof(amount));
+
+            var newArray = array.InsertedSpace(index, amount);
+
+            var i = 0;
+
+            foreach (var item in items)
+            {
+                if (i >= amount)
+                    break;
+
+                newArray[index + i++] = item;
+            }
+
+            return newArray;
+        }
+
 
 
         // Insert Container
-        public static T[] AppendContainer<T>(this T[] array, IContainer<T> items)
+        public static T[] AppendedContainer<T>(this T[] array, IContainer<T> items)
         {
             if (items == null)
             {
@@ -260,7 +387,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.AppendSpace(items.Count);
+                var newArray = array.AppendedSpace(items.Count.ToCheckedSignedInt());
 
                 int index = 0;
 
@@ -271,7 +398,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] PrependContainer<T>(this T[] array, IContainer<T> items)
+        public static T[] PrependedContainer<T>(this T[] array, IContainer<T> items)
         {
             if (items == null)
             {
@@ -279,7 +406,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else
             {
-                var newArray = array.AppendSpace(items.Count);
+                var newArray = array.AppendedSpace(items.Count.ToCheckedSignedInt());
 
                 int index = array.Length;
 
@@ -290,7 +417,7 @@ namespace Veruthian.Library.Collections.Extensions
             }
         }
 
-        public static T[] InsertContainer<T>(this T[] array, int index, IContainer<T> items)
+        public static T[] InsertedContainer<T>(this T[] array, int index, IContainer<T> items)
         {
             if (items == null)
             {
@@ -298,15 +425,15 @@ namespace Veruthian.Library.Collections.Extensions
             }
             else if (index == 0)
             {
-                return array.PrependContainer(items);
+                return array.PrependedContainer(items);
             }
             else if (index == array?.Length)
             {
-                return array.AppendContainer(items);
+                return array.AppendedContainer(items);
             }
             else
             {
-                var newArray = array.InsertSpace(index, items.Count);
+                var newArray = array.InsertedSpace(index, items.Count.ToCheckedSignedInt());
 
                 foreach (var item in items)
                     newArray[index++] = item;
@@ -317,13 +444,13 @@ namespace Veruthian.Library.Collections.Extensions
 
 
         // Remove
-        public static T[] Remove<T>(this T[] array, int index, int count = 1)
+        public static T[] Removed<T>(this T[] array, int index, int count = 1)
         {
-            ExceptionHelper.VerifyInBounds(index, 0, array.Length, nameof(index));
+            ExceptionHelper.VerifyBetween(index, 0, array.Length - 1, nameof(index));
 
             ExceptionHelper.VerifyPositive(count, nameof(count));
 
-            ExceptionHelper.VerifyInBounds(index + count, 0, array.Length + 1, nameof(count));
+            ExceptionHelper.VerifyBetween(index + count, 0, array.Length, nameof(count));
 
 
             var newsize = array.Length - count;
@@ -343,17 +470,17 @@ namespace Veruthian.Library.Collections.Extensions
 
 
         // Combine
-        public static T[] Combine<T>(params T[][] arrays) => Combine((IEnumerable<T[]>)arrays);
+        public static T[] Combined<T>(params T[][] arrays) => Combined((IEnumerable<T[]>)arrays);
 
-        public static T[] Combine<T>(IEnumerable<T[]> arrays) => Combine(arrays.GetEnumerator(), 0);
+        public static T[] Combined<T>(IEnumerable<T[]> arrays) => Combined(arrays.GetEnumerator(), 0);
 
-        private static T[] Combine<T>(IEnumerator<T[]> arrays, int size)
+        private static T[] Combined<T>(IEnumerator<T[]> arrays, int size)
         {
             if (arrays.MoveNext())
             {
                 var array = arrays.Current;
 
-                var newArray = Combine(arrays, size + array.Length);
+                var newArray = Combined(arrays, size + array.Length);
 
                 newArray.CopyFrom(array, 0, size, array.Length);
 
@@ -366,8 +493,8 @@ namespace Veruthian.Library.Collections.Extensions
         }
 
 
-        // Mutliply
-        public static T[] Multiply<T>(this T[] array, int times)
+        // Repeat
+        public static T[] Repeated<T>(this T[] array, int times)
         {
             ExceptionHelper.VerifyPositive(times, nameof(times));
 
@@ -375,6 +502,31 @@ namespace Veruthian.Library.Collections.Extensions
 
             for (int i = 0; i < times; i++)
                 newArray.CopyFrom(array, 0, i * array.Length, array.Length);
+
+            return newArray;
+        }
+
+        // Reverse
+        public static void Reverse<T>(this T[] array)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            for (int i = 0, j = array.Length - 1; i < array.Length / 2; i++, j--)
+            {
+                (array[i], array[j]) = (array[j], array[i]);
+            }
+        }
+
+        public static T[] Reversed<T>(this T[] array)
+        {
+            ExceptionHelper.VerifyNotNull(array, nameof(array));
+
+            var newArray = new T[array.Length];
+
+            for (int i = 0, j = array.Length - 1; i < (array.Length / 2) + 1; i++, j--)
+            {
+                (newArray[i], newArray[j]) = (array[j], array[i]);
+            }
 
             return newArray;
         }

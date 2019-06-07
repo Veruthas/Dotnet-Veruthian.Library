@@ -1,31 +1,32 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Veruthian.Library.Collections
 {
-    public class SequentialDataLookup<K, V> : ILookup<K, V>
+    public class SequentialDataLookup<A, T> : ILookup<A, T>
     {
-        List<ILookup<K, V>> lookups;
+        List<ILookup<A, T>> lookups;
 
 
-        public SequentialDataLookup() => lookups = new List<ILookup<K, V>>();
+        public SequentialDataLookup() => lookups = new List<ILookup<A, T>>();
 
 
-        public V this[K key]
+        public T this[A address]
         {
             get
             {
                 foreach (var lookup in lookups)
                 {
-                    if (lookup.TryGet(key, out var value))
+                    if (lookup.TryGet(address, out var value))
                         return value;
                 }
 
-                throw new KeyNotFoundException();
+                throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             }
         }
 
-        public bool Contains(V value)
+        public bool Contains(T value)
         {
             foreach (var lookup in lookups)
                 if (lookup.Contains(value))
@@ -34,53 +35,53 @@ namespace Veruthian.Library.Collections
             return false;
         }
 
-        public bool HasKey(K key)
+        public bool IsValidAddress(A address)
         {
             foreach (var lookup in lookups)
-                if (lookup.HasKey(key))
+                if (lookup.IsValidAddress(address))
                     return true;
 
             return false;
         }
 
-        public bool TryGet(K key, out V value)
+        public bool TryGet(A address, out T value)
         {
             foreach (var lookup in lookups)
-                if (lookup.TryGet(key, out value))
+                if (lookup.TryGet(address, out value))
                     return true;
 
-            value = default(V);
+            value = default(T);
 
             return false;
         }
 
-        public int Count
+        public Numeric.Number Count
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
-                    foreach (var key in lookup.Keys)
-                        keys.Add(key);
+                    foreach (var address in lookup.Addresses)
+                        addresses.Add(address);
 
-                return keys.Count;
+                return addresses.Count;
             }
         }
 
-        public IEnumerable<(K, V)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
                 {
-                    foreach ((K Key, V Value) pair in lookup.Pairs)
+                    foreach ((A Address, T Value) pair in lookup.Pairs)
                     {
-                        if (!keys.Contains(pair.Key))
+                        if (!addresses.Contains(pair.Address))
                         {
-                            keys.Add(pair.Key);
+                            addresses.Add(pair.Address);
                             yield return pair;
                         }
                     }
@@ -88,37 +89,37 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerable<K> Keys
+        public IEnumerable<A> Addresses
         {
             get
             {
-                var keys = new HashSet<K>();
+                var addresses = new HashSet<A>();
 
                 foreach (var lookup in lookups)
                 {
-                    foreach (var key in lookup.Keys)
+                    foreach (var address in lookup.Addresses)
                     {
-                        if (!keys.Contains(key))
+                        if (!addresses.Contains(address))
                         {
-                            keys.Add(key);
-                            yield return key;
+                            addresses.Add(address);
+                            yield return address;
                         }
                     }
                 }
             }
         }
 
-        public IEnumerator<V> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            var keys = new HashSet<K>();
+            var addresses = new HashSet<A>();
 
             foreach (var lookup in lookups)
             {
-                foreach ((K Key, V Value) pair in lookup.Pairs)
+                foreach ((A Address, T Value) pair in lookup.Pairs)
                 {
-                    if (!keys.Contains(pair.Key))
+                    if (!addresses.Contains(pair.Address))
                     {
-                        keys.Add(pair.Key);
+                        addresses.Add(pair.Address);
                         
                         yield return pair.Value;
                     }

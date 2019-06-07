@@ -1,5 +1,6 @@
 using System;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Text.Encodings
@@ -135,9 +136,9 @@ namespace Veruthian.Library.Text.Encodings
 
 
 
-        public struct Encoder : ITransformer<uint, BitTwiddler>
+        public struct Encoder : IStepTransformer<uint, BitTwiddler>
         {
-            public BitTwiddler Process(uint value) => Encode(value);
+            public (bool Complete, BitTwiddler Result) Process(uint data) => (true, Encode(data));
 
             // 1) U+0000  to U+007F (ASCII)             -> [0] 0xxx-xxxx;
             // 2) U+0080  to U+07FF                     -> [0] 110y-yyyy; [1]: 10xx-xxxx
@@ -187,9 +188,9 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct Decoder : ITransformer<BitTwiddler, uint>
+        public struct Decoder : IStepTransformer<BitTwiddler, uint>
         {
-            public uint Process(BitTwiddler value) => Decode(value);
+            public (bool Complete, uint Result) Process(BitTwiddler value) => (true, Decode(value));
 
             public static uint Decode(BitTwiddler value)
             {
@@ -206,21 +207,21 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct ByteDecoder : ITransformer<byte, uint?>
+        public struct ByteDecoder : IStepTransformer<byte, uint>
         {
             uint state;
 
             int bytesRemaining;
 
 
-            public uint? Process(byte value)
+            public (bool Complete, uint Result) Process(byte data)
             {
                 try
                 {
                     if (bytesRemaining == 0)
-                        ProcessLeading(value, out state, out bytesRemaining);
+                        ProcessLeading(data, out state, out bytesRemaining);
                     else
-                        ProcessTrailing(value, ref state, ref bytesRemaining);
+                        ProcessTrailing(data, ref state, ref bytesRemaining);
 
 
                     if (bytesRemaining == 0)
@@ -229,17 +230,18 @@ namespace Veruthian.Library.Text.Encodings
 
                         state = 0;
 
-                        return result;
+                        return (true, result);
 
                     }
                     else
                     {
-                        return null;
+                        return (false, default(uint));
                     }
                 }
                 catch
                 {
                     Reset();
+
                     throw;
                 }
             }

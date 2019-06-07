@@ -77,9 +77,9 @@ namespace Veruthian.Library.Collections.Extensions
             return builder.ToString();
         }
 
-        public static string ToTableString<K, V>(this IEnumerable<(K, V)> items, string tableStart = "{", string tableEnd = "}",
+        public static string ToTableString<A, V>(this IEnumerable<(A, V)> items, string tableStart = "{", string tableEnd = "}",
                                                                                  string pairStart = "", string pairEnd = "", string pairSeparator = ",",
-                                                                                 string keyStart = "[", string keyEnd = "] = ",
+                                                                                 string addressStart = "[", string addressEnd = "] = ",
                                                                                  string valueStart = "'", string valueEnd = "'")
         {
             var builder = new StringBuilder();
@@ -89,7 +89,7 @@ namespace Veruthian.Library.Collections.Extensions
 
             builder.Append(tableStart);
 
-            foreach ((K key, V value) in items)
+            foreach ((A address, V value) in items)
             {
                 if (started)
                     builder.Append(pairSeparator);
@@ -98,10 +98,10 @@ namespace Veruthian.Library.Collections.Extensions
 
                 builder.Append(pairStart);
 
-                // Key
-                builder.Append(keyStart);
-                builder.Append(key);
-                builder.Append(keyEnd);
+                // Address
+                builder.Append(addressStart);
+                builder.Append(address);
+                builder.Append(addressEnd);
 
                 // Value
                 builder.Append(valueStart);

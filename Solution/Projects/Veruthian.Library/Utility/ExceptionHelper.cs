@@ -4,34 +4,75 @@ namespace Veruthian.Library.Utility
 {
     public static class ExceptionHelper
     {
-        public static void VerifyPositive(int value, string argumentName = null)
+        public static void VerifyPositive(int value, string argumentName)
+            => VerifyAtLeast(value, 0, argumentName);
+
+        public static void VerifyNegative(int value, string argumentName)
+            => VerifyAtMost(value, -1, argumentName);
+
+        public static void VerifyLessThan(int value, int lessThan, string argumentName)
         {
-            if (value < 0)
-                throw new ArgumentException(argumentName);
+            if (value < lessThan)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be less than {lessThan}");
         }
 
-        public static void VerifyInBounds(int index, int start, int end, string argumentName = null)
+        public static void VerifyGreaterThan(int value, int greaterThan, string argumentName)
         {
-            if (index < start || index >= end)
-                throw new ArgumentOutOfRangeException(argumentName);
+            if (value > greaterThan)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be greater than {greaterThan}");
         }
 
-        public static void VerifyInRange(int index, int length, int start, int end, string indexName = null, string lengthName = null)
+        public static void VerifyAtLeast(int value, int atLeast, string argumentName)
         {
-            if (index < start || index >= end)
+            if (value <= atLeast)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be at least {atLeast}");
+        }
+
+        public static void VerifyAtMost(int value, int atMost, string argumentName)
+        {
+            if (value >= atMost)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be at most {atMost}");
+        }
+
+        public static void VerifyInBetween(int value, int start, int end, string argumentName)
+        {
+            if (value <= start || value >= end)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be between {start} and {end}");
+        }
+
+        public static void VerifyBetween(int value, int start, int end, string argumentName)
+        {
+            if (value < start || value > end)
+                throw new ArgumentOutOfRangeException(argumentName, $"{argumentName ?? "value"} must be between {start} and {end}");
+        }
+
+        public static void VerifyPositiveInBounds(int value, int length, int start, int end, string indexName, string lengthName)
+        {
+            if (value < start || value > end)
                 throw new ArgumentOutOfRangeException(indexName);
 
-            if (length < 0 || index + length > end)
+            if (length < 0 || value + length > end)
+                throw new ArgumentOutOfRangeException(lengthName);
+        }
+
+        public static void VerifyInBounds(int value, int length, int start, int end, string indexName, string lengthName)
+        {
+            if (value < start || value > end)
+                throw new ArgumentOutOfRangeException(indexName);
+
+            if (value + length > end)
                 throw new ArgumentOutOfRangeException(lengthName);
         }
 
         public static void VerifyIndexInBounds(int index, int start, int end)
         {
-            if (index < start || index >= end)
+            if (index < start || index > end)
                 throw new IndexOutOfRangeException();
         }
 
-        public static void VerifyNotNull<S>(S value, string argumentName = null)
+
+
+        public static void VerifyNotNull<S>(S value, string argumentName)
         {
             if (value == null)
                 throw new ArgumentNullException(argumentName);

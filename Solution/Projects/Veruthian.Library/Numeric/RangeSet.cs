@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Veruthian.Library.Collections;
@@ -7,12 +8,9 @@ using Veruthian.Library.Utility;
 namespace Veruthian.Library.Numeric
 {
     public sealed class RangeSet<T> : RangeSet<T, RangeSet<T>>
-        where T : ISequential<T>, IBounded<T>
+        where T : ISequential<T>
     {
         public RangeSet<T> Remove(RangeSet<T> set) => Remove(this, set);
-
-        public RangeSet<T> Complement() => Complement(this);
-
 
         public static bool operator ==(RangeSet<T> left, RangeSet<T> right) => left.Equals(right);
 
@@ -26,14 +24,11 @@ namespace Veruthian.Library.Numeric
         public static RangeSet<T> operator +(RangeSet<T> left, RangeSet<T> right) => Union(left, right);
 
         public static RangeSet<T> operator -(RangeSet<T> set, RangeSet<T> remove) => Remove(set, remove);
-
-
-        public static RangeSet<T> operator ~(RangeSet<T> set) => Complement(set);
     }
 
 
-    public abstract class RangeSet<T, TSet> : IEquatable<TSet>
-        where T : ISequential<T>, IBounded<T>
+    public abstract class RangeSet<T, TSet> : IEquatable<TSet>, IContainer<T>
+        where T : ISequential<T>
         where TSet : RangeSet<T, TSet>, new()
     {
         static readonly Range<T>[] defaultRanges;
@@ -62,7 +57,7 @@ namespace Veruthian.Library.Numeric
 
         public static readonly TSet Empty = new TSet();
 
-        public int Count => ranges == null ? 0 : ranges.Length;
+        public Number Count => ranges == null ? Number.Zero : ranges.Length;
 
         private Range<T>[] RangeArray => ranges ?? defaultRanges;
 
@@ -74,7 +69,7 @@ namespace Veruthian.Library.Numeric
         public bool IsRange => Count == 1 && !ranges[0].IsSingle;
 
 
-        public int Find(T value) => Range<T>.Find(RangeArray, value);
+        private int Find(T value) => Range<T>.Find(RangeArray, value);
 
         public bool Contains(T value) => Range<T>.Contains(RangeArray, value);
 
@@ -163,7 +158,7 @@ namespace Veruthian.Library.Numeric
                 {
                     items.Add(current);
 
-                    if (current.Equals(current.MaxValue))
+                    if (current.Equals(high))
                         break;
                     else
                         current = current.Next;
@@ -173,35 +168,44 @@ namespace Veruthian.Library.Numeric
             return items.ToArray();
         }
 
-        public IEnumerable<Range<T>> Ranges()
+        public IEnumerable<Range<T>> Ranges
         {
-            foreach (var range in RangeArray)
-                yield return range;
+            get
+            {
+                foreach (var range in RangeArray)
+                    yield return range;
+            }
         }
 
-        public IEnumerable<T> Items()
+        public IEnumerable<T> Items
         {
-            var items = new List<T>();
-
-            foreach (var range in RangeArray)
+            get
             {
-                var current = range.Low;
-                var high = range.High;
+                var items = new List<T>();
 
-                while (current.CompareTo(high) <= 0)
+                foreach (var range in RangeArray)
                 {
-                    yield return current;
+                    var current = range.Low;
+                    var high = range.High;
 
-                    if (current.Equals(current.MaxValue))
-                        break;
-                    else
-                        current = current.Next;
+                    while (current.CompareTo(high) <= 0)
+                    {
+                        yield return current;
+
+                        if (current.Equals(high))
+                            break;
+                        else
+                            current = current.Next;
+                    }
                 }
             }
         }
-        
-        #endregion
 
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => Items.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
+
+        #endregion
 
         #region Constructors
 
@@ -264,17 +268,6 @@ namespace Veruthian.Library.Numeric
             var reduced = Range<T>.NormalizeUnordered(ranges);
 
             return Create(reduced);
-        }
-
-
-        // From Complement
-        public static TSet Complement(TSet set) => FromComplement(set);
-
-        protected static TSet FromComplement(TSet set)
-        {
-            var ranges = Range<T>.NormalizedComplement(set.RangeArray);
-
-            return Create(ranges);
         }
 
         // Subtraction    

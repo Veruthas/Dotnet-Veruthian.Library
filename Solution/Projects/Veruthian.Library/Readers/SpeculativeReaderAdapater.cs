@@ -3,16 +3,6 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Readers
 {
-    public class SpeculativeReaderAdapater<T> : SpeculativeReaderAdapaterBase<T>
-    {
-        protected SpeculativeReaderAdapater(ISpeculativeReader<T> reader)
-        {
-            this.SpeculativeReader = reader;
-        }
-
-        protected override ISpeculativeReader<T> SpeculativeReader { get; }
-    }
-
     public abstract class SpeculativeReaderAdapaterBase<T> : LookaheadReaderAdapterBase<T>, ISpeculativeReader<T>
     {
         protected abstract ISpeculativeReader<T> SpeculativeReader { get; }
@@ -27,10 +17,9 @@ namespace Veruthian.Library.Readers
 
         public virtual int MarkPosition => SpeculativeReader.MarkPosition;
 
-        public virtual T PeekFromMark(int lookahead) => SpeculativeReader.PeekFromMark(lookahead);
+        public virtual T LookFromMark(int amount) => SpeculativeReader.LookFromMark(amount);
 
-        public virtual IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false) => SpeculativeReader.PeekFromMark(lookahead, amount, includeEnd);
-
+        public virtual IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false) => SpeculativeReader.LookFromMark(amount, length, includeEnd);
 
         public virtual void Mark()
         {
@@ -72,5 +61,15 @@ namespace Veruthian.Library.Readers
 
 
         protected virtual void OnRollback(int markedPosition, int speculatedPosition) { }
+    }
+
+    public class SpeculativeReaderAdapater<T> : SpeculativeReaderAdapaterBase<T>
+    {
+        protected SpeculativeReaderAdapater(ISpeculativeReader<T> reader)
+        {
+            this.SpeculativeReader = reader;
+        }
+
+        protected override ISpeculativeReader<T> SpeculativeReader { get; }
     }
 }

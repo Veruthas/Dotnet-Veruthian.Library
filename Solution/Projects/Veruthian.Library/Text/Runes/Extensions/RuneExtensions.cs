@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Processing;
 using Veruthian.Library.Text.Encodings;
 using Veruthian.Library.Text.Lines;
@@ -11,30 +11,33 @@ namespace Veruthian.Library.Text.Runes.Extensions
     {
         // Rune Decoder
         public static IEnumerable<Rune> DecodeValues<T, TDecoder>(this IEnumerable<T> items, TDecoder decoder, string onIncomplete)
-            where TDecoder : ITransformer<T, uint?>
+            where TDecoder : IStepTransformer<T, uint>
         {
             var enumerator = items.GetEnumerator();
 
             if (items == null)
                 throw new ArgumentNullException("items");
 
-            uint? result = 0;
+
+            var complete = true;
 
             while (enumerator.MoveNext())
             {
-                result = decoder.Process(enumerator.Current);
+                var result = decoder.Process(enumerator.Current);
 
-                if (result != null)
-                    yield return (Rune)result.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    yield return (Rune)result.Result;
             }
 
-            if (result == null)
+            if (!complete)
                 throw new RuneException(onIncomplete);
         }
 
 
         // byte.Utf8... -> Rune
-        public static IEnumerable<Rune> AsUtf8Runes(this IEnumerable<byte> bytes)
+        public static IEnumerable<Rune> FromByteUtf8(this IEnumerable<byte> bytes)
         {
             var decoder = new Utf8.ByteDecoder();
 
@@ -42,7 +45,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
         }
 
         // byte.Utf16... -> Rune
-        public static IEnumerable<Rune> AsUtf16Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> FromByteUtf16(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf16.ByteDecoder(endianness);
 
@@ -51,11 +54,48 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // byte.Utf32... -> Rune
-        public static IEnumerable<Rune> AsUtf32Runes(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
+        public static IEnumerable<Rune> FromByteUtf32(this IEnumerable<byte> bytes, ByteOrder endianness = ByteOrder.LittleEndian)
         {
             var decoder = new Utf32.ByteDecoder(endianness);
 
             return DecodeValues(bytes, decoder, "Ill-formed Utf32.");
+        }
+
+
+        // Rune... -> byte.Utf8
+        public static IEnumerable<byte> ToByteUtf8(this IEnumerable<Rune> runes)
+        {
+            foreach(var rune in runes)
+            {
+                var bytes = rune.ToUtf8();
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
+        }
+
+        // Rune... -> byte.Utf16
+        public static IEnumerable<byte> ToByteUtf16(this IEnumerable<Rune> runes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            foreach (var rune in runes)
+            {
+                var bytes = rune.ToUtf16(endianness);
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
+        }
+
+        // Rune... -> byte.Utf32
+        public static IEnumerable<byte> ToByteUtf32(this IEnumerable<Rune> runes, ByteOrder endianness = ByteOrder.LittleEndian)
+        {
+            foreach (var rune in runes)
+            {
+                var bytes = rune.ToUtf32(endianness);
+
+                for (int i = 0; i < bytes.ByteCount; i++)
+                    yield return bytes.GetByte(i);
+            }
         }
 
 
@@ -108,18 +148,20 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
             var decoder = new Utf16.CharDecoder();
 
-            bool result = true;
+            bool complete = true;
 
             for (int i = start; i < amount; i++)
             {
-                var utf32 = decoder.Process(value[i]);
+                var result = decoder.Process(value[i]);
 
-                if (utf32 != null)
-                    yield return (Rune)utf32.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    yield return (Rune)result.Result;
             }
 
 
-            if (!result)
+            if (!complete)
                 throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
         }
@@ -167,18 +209,20 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
             var decoder = new Utf16.CharDecoder();
 
-            bool result = true;
+            bool complete = true;
 
             for (int i = start; i < amount; i++)
             {
-                var utf32 = decoder.Process(value[i]);
+                var result = decoder.Process(value[i]);
 
-                if (utf32 != null)
-                    runes[index++] = (Rune)utf32.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    runes[index++] = (Rune)result.Result;
             }
 
 
-            if (!result)
+            if (!complete)
                 throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
 
@@ -191,44 +235,29 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
 
         // -> RuneString
-        public static RuneString ToRuneString(this ICollection<Rune> runes)
-        {
-            return new RuneString(runes);
-        }
-
-        public static RuneString ToRuneString(this IList<Rune> runes, int index)
-        {
-            return new RuneString(runes, index);
-        }
-
-        public static RuneString ToRuneString(this IList<Rune> runes, int index, int length)
-        {
-            return new RuneString(runes, index, length);
-        }
-
         public static RuneString ToRuneString(this IEnumerable<Rune> runes)
         {
-            return new RuneString(runes);
+            return RuneString.Extract(runes);
         }
 
         public static RuneString ToRuneString(this IEnumerable<char> chars)
         {
-            return new RuneString(ToRunes(chars));
+            return RuneString.Extract(ToRunes(chars));
         }
 
         public static RuneString ToRuneString(this string value)
         {
-            return new RuneString(value);
+            return RuneString.From(value);
         }
 
         public static RuneString ToRuneString(this string value, int start)
         {
-            return new RuneString(value, start);
+            return RuneString.From(value.ToRuneArray(), start);
         }
 
         public static RuneString ToRuneString(this string value, int start, int amount)
         {
-            return new RuneString(value, start, amount);
+            return RuneString.From(value.ToRuneArray(), start, amount);
         }
 
 
@@ -280,6 +309,5 @@ namespace Veruthian.Library.Text.Runes.Extensions
         {
             return TextSegment.GetLines<Rune, RuneString>(values, c => (uint)c, (s, p, l) => s.Extract(p, l), ending, withEnding);
         }
-
     }
 }

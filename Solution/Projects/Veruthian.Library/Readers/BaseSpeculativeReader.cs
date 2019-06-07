@@ -5,29 +5,35 @@ namespace Veruthian.Library.Readers
 {
     public abstract class BaseSpeculativeReader<T> : BaseVariableLookaheadReader<T>, ISpeculativeReader<T>
     {
-        protected struct MarkItem
+        protected struct Marker
         {
             public int Position { get; }
 
             public int Index { get; }
 
-            public MarkItem(int position, int index)
+            public Marker(int position, int index)
             {
                 this.Position = position;
+
                 this.Index = index;
             }
 
-            public override string ToString()
-            {
-                return string.Format("Position: {0}; Index: {1}", Position, Index);
-            }
+
+            public override string ToString() => $"{nameof(Position)}: {Position}; {nameof(Index)}: {Index}";
+
+
+            public static implicit operator (int Position, int Index)(Marker value) => (value.Position, value.Index);
+
+            public static implicit operator Marker((int Position, int Index) value) => new Marker(value.Position, value.Index);
+
         }
 
-        Stack<MarkItem> marks = new Stack<MarkItem>();
+        Stack<Marker> marks = new Stack<Marker>();
 
 
         public BaseSpeculativeReader() { }
 
+        // Initialize
         protected override void Initialize()
         {
             marks.Clear();
@@ -35,49 +41,9 @@ namespace Veruthian.Library.Readers
             base.Initialize();
         }
 
-        public T PeekFromMark(int lookahead)
-        {
-            if (lookahead < 0)
-                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
-
-            var mark = marks.Peek();
-
-            int index = mark.Index + lookahead;
-
-            EnsureIndex(index);
-
-            var item = RawPeekByIndex(index);
-
-            return item;
-        }
-
-        public IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false)
-        {
-            if (lookahead < 0)
-                throw new ArgumentOutOfRangeException("lookahead", lookahead, "Lookahead cannot be less than 0");
-
-            if (amount < 0)
-                throw new ArgumentOutOfRangeException("amount", amount, "Amount cannot be less than 0");
-
-            var mark = marks.Peek();
-
-            int index = mark.Index + lookahead;
-
-            EnsureIndex(index + amount);
-
-            for (int i = index; i < index + amount; i++)
-            {
-                if (i < Size || includeEnd)
-                    yield return RawPeekByIndex(i);
-                else
-                    yield break;
-            }
-
-        }
-
 
         // Mark information
-        protected Stack<MarkItem> Marks => marks;
+        protected Stack<Marker> Marks => marks;
 
         protected override bool CanReset => !IsSpeculating;
 
@@ -90,9 +56,51 @@ namespace Veruthian.Library.Readers
 
 
         // Mark
-        public void Mark() => CreateMark(Position, Index);
+        public void Mark() => CreateMark(Position, CacheIndex);
 
-        protected void CreateMark(int position, int index) => marks.Push(new MarkItem(position, index));
+        protected void CreateMark(int position, int index) => marks.Push(new Marker(position, index));
+
+        // LookFromMark
+        public T LookFromMark(int amount)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("lookahead", amount, "Lookahead cannot be less than 0");
+
+            var mark = marks.Peek();
+
+            int index = mark.Index + amount;
+
+            EnsureIndex(index);
+
+            var item = RawPeekByIndex(index);
+
+            return item;
+        }
+
+        public IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false)
+        {
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("lookahead", amount, "Lookahead cannot be less than 0");
+
+            if (length < 0)
+                throw new ArgumentOutOfRangeException("amount", length, "Amount cannot be less than 0");
+
+            var realAmount = length != null ? length.Value : (Position - MarkPosition) + amount;
+
+            var mark = marks.Peek();
+
+            int index = mark.Index + amount;
+
+            EnsureIndex(index + realAmount);
+
+            for (int i = index; i < index + realAmount; i++)
+            {
+                if (i < CacheSize || includeEnd)
+                    yield return RawPeekByIndex(i);
+                else
+                    yield break;
+            }
+        }
 
 
         // Commit
@@ -113,7 +121,7 @@ namespace Veruthian.Library.Readers
 
             var mark = marks.Pop();
 
-            this.Index = mark.Index;
+            this.CacheIndex = mark.Index;
 
             this.Position = mark.Position;
         }

@@ -9,18 +9,18 @@ A shared group of libraries for all Veruthian dotnet projects.
 ##### Containers
 - IContainer<T> : IEnumerable<T>
 - IExpandableContainer<T> : IContainer<T> => DataSet
-- IPool<K, A> : IContainer<(K, A)>
+- IPool<A, D> : IContainer<(K, A)>
         
 ##### Lookups
-- ILookup<K, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
-- IMutableLookup<K, V> : ILookup<K, V>
-- IExpandableLookup<K, V> : ILookup<K, V> => DataLookup
+- ILookup<A, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
+- IMutableLookup<A, V> : ILookup<A, V>
+- IExpandableLookup<A, V> : ILookup<A, V> => DataLookup
 
-##### Indices
-- IIndex<K, V>: ILookup<K, V>
-- IMutableIndex<K, V>: IIndex<K, V>, IMutableLookup<K, V> => DataArray
-- IOrderedIndex<K, V>: IIndex<K, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
-- IExpandableIndex<K, V> : IIndex<K, V>, IExpandableLookup<K, V>, IExpandableContainer<V> => DataList
+##### Vectors
+- IVector<A, V>: ILookup<A, V>
+- IMutableVector<A, V>: IVector<A, V>, IMutableLookup<A, V> => DataArray
+- IOrderedVector<A, V>: IVector<A, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
+- IExpandableVector<A, V> : IVector<A, V>, IExpandableLookup<A, V>, IExpandableContainer<V> => DataList
 
 **Veruthian.Libray.Numeric**
 -- 

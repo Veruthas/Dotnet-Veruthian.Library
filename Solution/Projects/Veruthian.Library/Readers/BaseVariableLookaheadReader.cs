@@ -5,7 +5,7 @@ namespace Veruthian.Library.Readers
 {
     public abstract class BaseVariableLookaheadReader<T> : BaseLookaheadReader<T>
     {
-        List<T> items = new List<T>();
+        List<T> cache = new List<T>();
 
         int index;
 
@@ -13,18 +13,18 @@ namespace Veruthian.Library.Readers
         public BaseVariableLookaheadReader() { }
 
 
-        protected int Index { get => index; set => index = value; }
+        protected List<T> Cache => cache;
 
-        protected List<T> Items { get => items; }
+        protected int CacheIndex { get => index; set => index = value; }
 
-        protected int Size { get => items.Count; }
+        protected int CacheSize => cache.Count;
 
-        protected virtual bool CanReset { get => true; }
+        protected virtual bool CanReset => true;
 
 
         protected override void Initialize()
         {
-            items.Clear();
+            cache.Clear();
 
             index = 0;
 
@@ -34,7 +34,7 @@ namespace Veruthian.Library.Readers
 
         protected void EnsureIndex(int index)
         {
-            int available = (Size - index);
+            int available = (CacheSize - index);
 
             // Prefetch (d + 1) items
             if (available <= 0)
@@ -48,21 +48,16 @@ namespace Veruthian.Library.Readers
         {
             if (!EndFound)
             {
-                int lastPosition = Size;
+                int lastPosition = CacheSize;
 
                 for (int i = 0; i < amount; i++)
                 {
                     bool success = GetNext(out T next);
 
                     if (success)
-                    {
-                        items.Add(next);
-                    }
+                        cache.Add(next);
                     else
-                    {
                         EndPosition = lastPosition + i;
-
-                    }
                 }
             }
         }
@@ -70,13 +65,13 @@ namespace Veruthian.Library.Readers
         protected T RawPeekByIndex(int index)
         {
             // We don't want to add infinite end items, just return the cached end item
-            if (EndFound && index >= items.Count)
+            if (EndFound && index >= cache.Count)
                 return LastItem;
             else
-                return items[index];
+                return cache[index];
         }
 
-        protected override T RawPeek(int lookahead = 0) => RawPeekByIndex(index + lookahead);
+        protected override T RawLookahead(int lookahead = 0) => RawPeekByIndex(index + lookahead);
 
 
         protected override void MoveNext()
@@ -87,12 +82,8 @@ namespace Veruthian.Library.Readers
 
                 index++;
 
-                if (index == Size && CanReset)
-                {
-                    index = 0;
-
-                    items.Clear();
-                }
+                if (index == CacheSize && CanReset)
+                    Reset();
 
                 EnsureLookahead(1);
             }
@@ -102,33 +93,40 @@ namespace Veruthian.Library.Readers
 
         protected override void SkipAhead(int amount)
         {
-            if (index < Size)
+            if (index + amount >= CacheSize)
             {
-                int delta = Size - index;
-
-                if (CanReset)
-                {
-                    index = 0;
-
-                    items.Clear();
-                }
-                else
-                {
-                    index = Size;
-                }
+                var delta = (CacheSize - index);
 
                 Position += delta;
 
                 amount -= delta;
-            }
 
-            for (int i = 0; i < amount; i++)
+                index = CacheSize;
+
+                if (CanReset)
+                    Reset();
+
+                for (int i = 0; i < amount; i++)
+                {
+                    MoveNext();
+
+                    if (IsEnd)
+                        break;
+                }
+            }
+            else
             {
-                MoveNext();
+                index += amount;
 
-                if (IsEnd)
-                    break;
+                Position += amount;
             }
+        }
+
+        protected virtual void Reset()
+        {
+            index = 0;
+
+            cache.Clear();
         }
     }
 }

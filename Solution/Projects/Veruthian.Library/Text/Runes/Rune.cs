@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Globalization;
 using Veruthian.Library.Numeric;
+using Veruthian.Library.Numeric.Binary;
 using Veruthian.Library.Text.Encodings;
 
 namespace Veruthian.Library.Text.Runes
@@ -236,11 +237,11 @@ namespace Veruthian.Library.Text.Runes
 
 
         // RuneString
-        public RuneString ToRuneString() => new RuneString(this);
+        public RuneString ToRuneString() => RuneString.Of(this);
 
-        public RuneString Replicate(int count) => new RuneString(this, count);
+        public RuneString Replicate(int count) => RuneString.Repeat(this, count);
 
-        public static RuneString operator *(Rune value, int count) => new RuneString(value, count);
+        public static RuneString operator *(Rune value, int count) => value.Replicate(count);
 
 
         // Equality
@@ -407,9 +408,10 @@ namespace Veruthian.Library.Text.Runes
                 throw new ArgumentOutOfRangeException("index", "Need at least 2 bytes to process Utf16");
 
             decoder.Process(array[index++]);
+
             var result = decoder.Process(array[index++]);
 
-            if (result == null)
+            if (!result.Complete)
             {
                 if (index + 2 > array.Length)
                     throw new ArgumentOutOfRangeException("index", "Need 4 bytes to process Utf16 surrogate pair");
@@ -417,11 +419,11 @@ namespace Veruthian.Library.Text.Runes
                 decoder.Process(array[index++]);
                 result = decoder.Process(array[index++]);
 
-                if (result == null)
+                if (!result.Complete)
                     throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
             }
 
-            return new Rune(result.GetValueOrDefault());
+            return new Rune(result.Result);
         }
 
 
@@ -454,7 +456,7 @@ namespace Veruthian.Library.Text.Runes
             decoder.Process(array[index++]);
             var result = decoder.Process(array[index++]);
 
-            return new Rune(result.GetValueOrDefault());
+            return new Rune(result.Result);
         }
 
 

@@ -1,30 +1,26 @@
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
     /* 
-        IContainer<T>
-        IExpandableContainer<T> : IContainer<T> => DataSet        
-        IPool<K, A> : IContainer<(K, A)>
+        IContainer<T> => FixedContainer
+        IResizableContainer<T> : IContainer<T> => DataSet        
 
-        ILookup<K, V> : IContainer<V>  => NestedDataLookup, SequentialDataLookup
-        IMutableLookup<K, V> : ILookup<K, V>
-        IExpandableLookup<K, V> : ILookup<K, V> => DataLookup
+        IPool<A, D> : IContainer<(A, D)>
+        
+        ILookup<A, T> : IContainer<T>  => FixedLookup, NestedDataLookup, SequentialDataLookup
+        IMutableLookup<A, T> : ILookup<A, T>
+        IResizableLookup<A, T> : ILookup<A, T> => DataLookup
 
-        IIndex<K, V>: ILookup<K, V>
-        IMutableIndex<K, V>: IIndex<K, V>, IMutableLookup<K, V> => DataArray
-        IOrderedIndex<K, V>: IIndex<K, V>, IExpandableContainer<V> => SortedDataList, SortedDataSet
-        IExpandableIndex<K, V> : IIndex<K, V>, IExpandableLookup<K, V>, IExpandableContainer<V> => DataList
-
-        Future:
-            IStack<T> : IContainer<T>
-            IQueue<T> : IContainer<T>
-            IDeque<T> : IStack<T>, IQueue<T>        
+        IVector<A, T>: ILookup<A, T> => FixedVector, DataString
+        IResizableVector<A, T>: IVector<A, T>, IMutableLookup<A, T> => DataVector
+        IExpandableVector<A, T> : IVector<A, T>, IExpandableLookup<A, T>, IExpandableContainer<T> => DataList
     */
 
     public interface IContainer<T> : IEnumerable<T>
     {
-        int Count { get; }
+        Number Count { get; }
 
         bool Contains(T value);
     }

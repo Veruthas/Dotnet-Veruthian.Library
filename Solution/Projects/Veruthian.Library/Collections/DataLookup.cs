@@ -2,46 +2,47 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataLookup<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
+    public class DataLookup<A, T> : IMutableLookup<A, T>, IResizableLookup<A, T>
     {
-        Dictionary<K, V> dictionary;
+        Dictionary<A, T> dictionary;
 
 
-        public DataLookup() => this.dictionary = new Dictionary<K, V>();
+        public DataLookup() => this.dictionary = new Dictionary<A, T>();
 
 
-        public V this[K key]
+        public T this[A address]
         {
-            get => dictionary.ContainsKey(key) ? dictionary[key] : throw new KeyNotFoundException();
-            set => dictionary[key] = dictionary.ContainsKey(key) ? value : throw new KeyNotFoundException();
+            get => dictionary.ContainsKey(address) ? dictionary[address] : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
+            set => dictionary[address] = dictionary.ContainsKey(address) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
         }
 
-        V ILookup<K, V>.this[K key] => this[key];
+        T ILookup<A, T>.this[A address] => this[address];
 
-        public bool TryGet(K key, out V value)
+        public bool TryGet(A address, out T value)
         {
-            if (dictionary.ContainsKey(key))
+            if (dictionary.ContainsKey(address))
             {
-                value = dictionary[key];
+                value = dictionary[address];
 
                 return true;
             }
             else
             {
-                value = default(V);
+                value = default(T);
 
                 return false;
             }
         }
 
-        public bool TrySet(K key, V value)
+        public bool TrySet(A address, T value)
         {
-            if (dictionary.ContainsKey(key))
+            if (dictionary.ContainsKey(address))
             {
-                dictionary[key] = value;
+                dictionary[address] = value;
 
                 return true;
             }
@@ -52,12 +53,12 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public int Count => dictionary.Count;
+        public Number Count => dictionary.Count;
 
 
-        public IEnumerable<K> Keys => dictionary.Keys;
+        public IEnumerable<A> Addresses => dictionary.Keys;
 
-        public IEnumerable<(K, V)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
@@ -66,42 +67,42 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerator<V> GetEnumerator() => dictionary.Values.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => dictionary.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-        public bool Contains(V value) => dictionary.ContainsValue(value);
+        public bool Contains(T value) => dictionary.ContainsValue(value);
 
-        public bool HasKey(K key) => dictionary.ContainsKey(key);
+        public bool IsValidAddress(A address) => dictionary.ContainsKey(address);
 
-        public void Insert(K key, V value)
+        public void Insert(A address, T value)
         {
-            if (dictionary.ContainsKey(key))
-                throw new ArgumentException($"Key {key.ToString()} already exists", "key");
+            if (dictionary.ContainsKey(address))
+                throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
 
-            dictionary.Add(key, value);
+            dictionary.Add(address, value);
         }
 
-        public V GetOrInsert(K key, V value)
+        public T GetOrInsert(A address, T value)
         {
-            if (TryGet(key, out var result))
+            if (TryGet(address, out var result))
             {
                 return result;
             }
             else
             {
-                Insert(key, value);
+                Insert(address, value);
                 return value;
             }
         }
 
-        public void RemoveBy(K key)
+        public void RemoveBy(A address)
         {
-            if (!HasKey(key))
-                throw new ArgumentException($"Key {key.ToString()} does not exist", "key");
+            if (!IsValidAddress(address))
+                throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
 
-            dictionary.Remove(key);
+            dictionary.Remove(address);
         }
 
         public void Clear() => dictionary.Clear();

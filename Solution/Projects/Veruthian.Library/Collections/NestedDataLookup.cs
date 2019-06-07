@@ -1,39 +1,40 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public class NestedDataLookup<K, V> : IMutableLookup<K, V>, IExpandableLookup<K, V>
+    public class NestedDataLookup<A, T> : IMutableLookup<A, T>, IResizableLookup<A, T>
     {
-        Dictionary<K, (V value, bool active)> items = new Dictionary<K, (V, bool)>();
+        Dictionary<A, (T value, bool active)> items = new Dictionary<A, (T, bool)>();
 
-        ILookup<K, V> parent;
+        ILookup<A, T> parent;
 
 
         public NestedDataLookup() { }
 
-        public NestedDataLookup(ILookup<K, V> parent) => this.parent = parent;
+        public NestedDataLookup(ILookup<A, T> parent) => this.parent = parent;
 
 
-        public ILookup<K, V> Parent => parent;
+        public ILookup<A, T> Parent => parent;
 
 
-        public V this[K key]
+        public T this[A address]
         {
-            get => TryGet(key, out var value) ? value : throw new KeyNotFoundException();
+            get => TryGet(address, out var value) ? value : throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             set
             {
-                if (!TrySet(key, value))
-                    throw new KeyNotFoundException();
+                if (!TrySet(address, value))
+                    throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             }
         }
 
-        V ILookup<K, V>.this[K key] => this[key];
+        T ILookup<A, T>.this[A address] => this[address];
 
-        public bool TryGet(K key, out V value)
+        public bool TryGet(A address, out T value)
         {
-            if (items.TryGetValue(key, out var result))
+            if (items.TryGetValue(address, out var result))
             {
                 if (result.active)
                 {
@@ -44,21 +45,21 @@ namespace Veruthian.Library.Collections
             }
             else if (parent != null)
             {
-                return parent.TryGet(key, out value);
+                return parent.TryGet(address, out value);
             }
 
-            value = default(V);
+            value = default(T);
 
             return false;
         }
 
-        public bool TrySet(K key, V value)
+        public bool TrySet(A address, T value)
         {
-            if (items.TryGetValue(key, out var result))
+            if (items.TryGetValue(address, out var result))
             {
                 if (result.active)
                 {
-                    items[key] = (value, true);
+                    items[address] = (value, true);
                     return true;
                 }
                 else
@@ -66,19 +67,19 @@ namespace Veruthian.Library.Collections
                     return false;
                 }
             }
-            else if (parent != null && parent.HasKey(key))
+            else if (parent != null && parent.IsValidAddress(address))
             {
-                items.Add(key, (value, true));
+                items.Add(address, (value, true));
             }
 
             return false;
         }
 
-        public int Count
+        public Number Count
         {
             get
             {
-                int count = 0;
+                var count = Number.Zero;
 
                 // Should I cache this value?
                 foreach (var item in items.Values)
@@ -109,7 +110,7 @@ namespace Veruthian.Library.Collections
             parent = null;
         }
 
-        public bool Contains(V value)
+        public bool Contains(T value)
         {
             if (value == null)
             {
@@ -121,9 +122,9 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach ((K key, V value) pair in parent.Pairs)
+                    foreach ((A address, T value) pair in parent.Pairs)
                     {
-                        if (!items.ContainsKey(pair.key) && pair.value == null)
+                        if (!items.ContainsKey(pair.address) && pair.value == null)
                             return true;
                     }
                 }
@@ -138,9 +139,9 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach ((K key, V value) pair in parent.Pairs)
+                    foreach ((A address, T value) pair in parent.Pairs)
                     {
-                        if (!items.ContainsKey(pair.key) && pair.value.Equals(value))
+                        if (!items.ContainsKey(pair.address) && pair.value.Equals(value))
                             return true;
                     }
                 }
@@ -150,55 +151,55 @@ namespace Veruthian.Library.Collections
         }
 
 
-        public bool HasKey(K key)
+        public bool IsValidAddress(A address)
         {
-            if (items.TryGetValue(key, out var item))
+            if (items.TryGetValue(address, out var item))
                 return item.active;
             else
-                return parent != null && parent.HasKey(key);
+                return parent != null && parent.IsValidAddress(address);
         }
 
 
-        public void Insert(K key, V value)
+        public void Insert(A address, T value)
         {
-            if (HasKey(key))
-                throw new ArgumentException($"Key {key.ToString()} already exists", "key");
+            if (IsValidAddress(address))
+                throw new ArgumentException($"Address {address.ToString()} already exists", nameof(address));
 
-            items.Add(key, (value, true));
+            items.Add(address, (value, true));
         }
 
-        public V GetOrInsert(K key, V value)
+        public T GetOrInsert(A address, T value)
         {
-            if (TryGet(key, out var result))
+            if (TryGet(address, out var result))
             {
                 return result;
             }
             else
             {
-                Insert(key, value);
+                Insert(address, value);
                 
                 return value;
             }
         }
 
-        public void RemoveBy(K key)
+        public void RemoveBy(A address)
         {
-            if (this.items.TryGetValue(key, out var value))
+            if (this.items.TryGetValue(address, out var value))
             {
-                items[key] = (value.value, false);
+                items[address] = (value.value, false);
             }
             else if (this.parent != null)
             {
-                if (this.parent.HasKey(key))
-                    items.Add(key, (default(V), false));
+                if (this.parent.IsValidAddress(address))
+                    items.Add(address, (default(T), false));
             }
             else
             {
-                throw new ArgumentException($"Key {key.ToString()} does not exist", "key");
+                throw new ArgumentException($"Address {address.ToString()} does not exist", nameof(address));
             }
         }
 
-        public IEnumerable<K> Keys
+        public IEnumerable<A> Addresses
         {
             get
             {
@@ -210,16 +211,16 @@ namespace Veruthian.Library.Collections
 
                 if (parent != null)
                 {
-                    foreach (var key in parent.Keys)
+                    foreach (var address in parent.Addresses)
                     {
-                        if (!items.ContainsKey(key))
-                            yield return key;
+                        if (!items.ContainsKey(address))
+                            yield return address;
                     }
                 }
             }
         }
 
-        public IEnumerable<(K, V)> Pairs
+        public IEnumerable<(A Address, T Value)> Pairs
         {
             get
             {
@@ -240,7 +241,7 @@ namespace Veruthian.Library.Collections
             }
         }
 
-        public IEnumerator<V> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             foreach (var pair in items)
             {

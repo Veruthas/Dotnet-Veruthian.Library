@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataSet<T> : IExpandableContainer<T>, IEnumerable<T>
+    public class DataSet<T> : IResizableContainer<T>, IEnumerable<T>
     {
         HashSet<T> items;
 
 
-        public DataSet() { }
+        public DataSet() => this.items = new HashSet<T>();
 
         public DataSet(IEqualityComparer<T> comparer) => this.items = new HashSet<T>(comparer);
 
@@ -19,14 +20,20 @@ namespace Veruthian.Library.Collections
 
         public DataSet(IEqualityComparer<T> comparer, params T[] items) => this.items = new HashSet<T>(items, comparer);
 
-        public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);        
+        public DataSet(IEqualityComparer<T> comparer, IEnumerable<T> items) => this.items = new HashSet<T>(items, comparer);
 
 
-        public int Count => items.Count;
+        public Number Count => items.Count;
+
 
         public bool Contains(T value) => items.Contains(value);
 
         public void Add(T value) => items.Add(value);
+
+        public void Add(IEnumerable<T> values)
+        {
+            this.items.UnionWith(values);
+        }
 
         public bool Remove(T value) => items.Remove(value);
 
@@ -38,7 +45,9 @@ namespace Veruthian.Library.Collections
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
+        private const string start = "{", end = "}", separator = ", ";
 
-        public override string ToString() => this.ToListString("{", "}", ", ") ;        
+
+        public override string ToString() => this.ToListString(start, end, separator);
     }
 }

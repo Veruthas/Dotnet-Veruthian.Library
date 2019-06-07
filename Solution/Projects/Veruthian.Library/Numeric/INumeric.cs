@@ -3,18 +3,20 @@ namespace Veruthian.Library.Numeric
     public interface INumeric<T> : IOrderable<T>
         where T : INumeric<T>
     {
-        T Add(T other);
-    
-        T Subtract(T other);
-    
-        T Delta(T other);
+        T Sum(T addend);
 
-        T Multiply(T other);
+        T Difference(T subtrahend);
 
-        T Divide(T other);        
+        T Delta(T subtrahend);
 
-        T Divide(T other, out T remainder);
+        T Product(T multiplicand);
 
-        T Modulus(T other);
+        T Power(T exponent);
+
+        T Quotient(T divisor);
+
+        T Remainder(T divisor);
+
+        (T Quotient, T Remainder) Division(T divisor);
     }
 }

@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{17
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Veruthian.Library", "Projects\Veruthian.Library\Veruthian.Library.csproj", "{B10B0E02-06DC-4C8B-8D8E-64AE03DB4A80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Veruthian.Library.Tests", "Projects\Veruthian.Library.Tests\Veruthian.Library.Tests.csproj", "{DC7C9A8A-7ADA-47D1-90E7-1AE9F24FD3FC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_Console", "Projects\_Console\_Console.csproj", "{BBB1FEF3-B111-4509-BB2B-B0683C4B3436}"
 EndProject
 Global

@@ -1,27 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Readers
 {
-    public interface ISpeculativeReader<out T> : ILookaheadReader<T>
+    public interface ISpeculativeReader<out T> : ILookaheadReader<T>, ISpeculative
     {
-        bool IsSpeculating { get; }
-
-
         int MarkPosition { get; }
 
+        T LookFromMark(int amount);
 
-        T PeekFromMark(int lookahead);
-
-        IEnumerable<T> PeekFromMark(int lookahead, int amount, bool includeEnd = false);
-
-
-        void Mark();
-
-
-        void Commit();
-
-
-        void Rollback();
+        IEnumerable<T> LookFromMark(int amount, int? length, bool includeEnd = false);        
     }
 }

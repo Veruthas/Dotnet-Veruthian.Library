@@ -4,10 +4,10 @@ namespace Veruthian.Library.Readers
 {
     public interface ILookaheadReader<out T> : IReader<T>
     {
-        T Peek(int lookahead);
+        T Lookahead(int amount);
 
-        IEnumerable<T> Peek(int lookahead, int amount, bool includeEnd = false);
+        IEnumerable<T> Lookahead(int amount, int length, bool includeEnd = false);
         
-        bool PeekIsEnd(int lookahead);
+        bool IsEndAhead(int amount);
     }
 }

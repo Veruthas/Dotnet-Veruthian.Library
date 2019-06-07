@@ -68,7 +68,7 @@ namespace Veruthian.Library.Utility
                 hash = (hash * primeOffset) + c.GetHashCode();
                 hash = (hash * primeOffset) + d.GetHashCode();
                 hash = (hash * primeOffset) + e.GetHashCode();
-                
+
                 return hash;
             }
         }
@@ -81,6 +81,19 @@ namespace Veruthian.Library.Utility
 
                 foreach (var item in items)
                     hash = (hash * primeOffset) + item.GetHashCode();
+
+                return hash;
+            }
+        }
+
+        public int Combine<T>(int count, params T[] items)
+        {
+            unchecked
+            {
+                int hash = primeBase;
+
+                for (int i = 0; i < count; i++)
+                    hash = (hash * primeOffset) + items[i].GetHashCode();
 
                 return hash;
             }

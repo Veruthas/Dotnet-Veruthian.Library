@@ -1,31 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Collections
 {
-    public class DataPool<K, A> : IPool<K, A>
+    public class DataPool<A, D> : IPool<A, D>
     {
-        Dictionary<K, (K, A)> items = new Dictionary<K, (K, A)>();
+        Dictionary<A, (A, D)> items = new Dictionary<A, (A, D)>();
 
 
-        public int Count => items.Count;
+        public Number Count => items.Count;
 
-        bool IContainer<(K, A)>.Contains((K, A) value) => items.ContainsValue(value);
+        bool IContainer<(A, D)>.Contains((A, D) value) => items.ContainsValue(value);
 
-        public IEnumerator<(K, A)> GetEnumerator() => items.Values.GetEnumerator();
+        public IEnumerator<(A, D)> GetEnumerator() => items.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => items.Values.GetEnumerator();
 
-        public bool HasKey(K key) => items.ContainsKey(key);
+        public bool HasAddress(A address) => items.ContainsKey(address);
 
-        public (K, A) Resolve(K key, A attribute = default(A))
+        public (A, D) Resolve(A address, D data = default(D))
         {
-            if (!items.TryGetValue(key, out var pair))
+            if (!items.TryGetValue(address, out var pair))
             {
-                pair = (key, attribute);
+                pair = (address, data);
 
-                items.Add(key, pair);
+                items.Add(address, pair);
             }
 
             return pair;
@@ -34,5 +35,5 @@ namespace Veruthian.Library.Collections
         public override string ToString() => this.ToTableString();
     }
 
-    public class DataPool<K> : DataPool<K, object> { }
+    public class DataPool<A> : DataPool<A, object> { }
 }
