@@ -197,15 +197,14 @@ namespace Veruthian.Library.Text.Encodings
         #endregion
 
 
-        public struct Encoder : ITransformer<uint, BitTwiddler>
+        public struct Encoder : IStepTransformer<uint, BitTwiddler>
         {
             bool reverse;
 
             public Encoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
 
 
-            public BitTwiddler Process(uint value) => Encode(value, reverse);
-
+            public (bool Complete, BitTwiddler Result) Process(uint data) => (true, Encode(data, reverse));
 
             private static BitTwiddler Encode(uint value, bool reverse)
             {
@@ -230,13 +229,13 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct Decoder : ITransformer<BitTwiddler, uint>
+        public struct Decoder : IStepTransformer<BitTwiddler, uint>
         {
             bool reverse;
 
             public Decoder(ByteOrder endianness = ByteOrder.LittleEndian) => reverse = (endianness == ByteOrder.BigEndian);
 
-            public uint Process(BitTwiddler value) => Decode(value, reverse);
+            public (bool Complete, uint Result) Process(BitTwiddler data) => (true, Decode(data, reverse));
 
             private static uint Decode(BitTwiddler value, bool reverse)
             {
@@ -267,7 +266,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct ByteDecoder : ITransformer<byte, uint?>
+        public struct ByteDecoder : IStepTransformer<byte, uint>
         {
             bool isLittleEndian;
 
@@ -281,22 +280,22 @@ namespace Veruthian.Library.Text.Encodings
                 this.isLittleEndian = endianness == ByteOrder.LittleEndian;
             }
 
-            public uint? Process(byte value)
+            public (bool Complete, uint Result) Process(byte data) 
             {
                 if (current == default(ushort))
                 {
-                    AddByte(value, !isLittleEndian);
+                    AddByte(data, !isLittleEndian);
 
-                    return null;
+                    return (false, 0);
                 }
                 else
                 {
-                    AddByte(value, isLittleEndian);
+                    AddByte(data, isLittleEndian);
 
                     if (ProcessResult(out var result))
-                        return result;
+                        return (true, result);
                     else
-                        return null;
+                        return (false, 0);
                 }
             }
 
@@ -357,45 +356,45 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct CharDecoder : ITransformer<char, uint?>
+        public struct CharDecoder : IStepTransformer<char, uint>
         {
             char leadingSurrogate;
 
-            public uint? Process(char value)
+            public (bool Complete, uint Result) Process(char data)
             {
                 // Finished
                 if (leadingSurrogate == default(char))
                 {
-                    if (IsLeadingSurrogate(value))
+                    if (IsLeadingSurrogate(data))
                     {
-                        leadingSurrogate = value;
+                        leadingSurrogate = data;
 
-                        return null;
+                        return (false, default(char));
                     }
-                    else if (IsTrailingSurrogate(value))
+                    else if (IsTrailingSurrogate(data))
                     {
-                        throw MissingLeadingSurrogate(value);
+                        throw MissingLeadingSurrogate(data);
                     }
                     else
                     {
-                        var result = ToUtf32(value);
+                        var result = ToUtf32(data);
 
-                        return result;
+                        return (true, result);
                     }
                 }
-                else if (IsTrailingSurrogate(value))
+                else if (IsTrailingSurrogate(data))
                 {
-                    var result = CombineSurrogates(leadingSurrogate, value);
+                    var result = CombineSurrogates(leadingSurrogate, data);
 
                     leadingSurrogate = default(char);
 
-                    return result;
+                    return (true, result);
                 }
                 else
                 {
                     leadingSurrogate = default(char);
 
-                    throw InvalidTrailingSurrogate(value);
+                    throw InvalidTrailingSurrogate(data);
                 }
             }
         }

@@ -11,24 +11,27 @@ namespace Veruthian.Library.Text.Runes.Extensions
     {
         // Rune Decoder
         public static IEnumerable<Rune> DecodeValues<T, TDecoder>(this IEnumerable<T> items, TDecoder decoder, string onIncomplete)
-            where TDecoder : ITransformer<T, uint?>
+            where TDecoder : IStepTransformer<T, uint>
         {
             var enumerator = items.GetEnumerator();
 
             if (items == null)
                 throw new ArgumentNullException("items");
 
-            uint? result = 0;
+
+            var complete = true;
 
             while (enumerator.MoveNext())
             {
-                result = decoder.Process(enumerator.Current);
+                var result = decoder.Process(enumerator.Current);
 
-                if (result != null)
-                    yield return (Rune)result.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    yield return (Rune)result.Result;
             }
 
-            if (result == null)
+            if (!complete)
                 throw new RuneException(onIncomplete);
         }
 
@@ -145,18 +148,20 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
             var decoder = new Utf16.CharDecoder();
 
-            bool result = true;
+            bool complete = true;
 
             for (int i = start; i < amount; i++)
             {
-                var utf32 = decoder.Process(value[i]);
+                var result = decoder.Process(value[i]);
 
-                if (utf32 != null)
-                    yield return (Rune)utf32.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    yield return (Rune)result.Result;
             }
 
 
-            if (!result)
+            if (!complete)
                 throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
         }
@@ -204,18 +209,20 @@ namespace Veruthian.Library.Text.Runes.Extensions
 
             var decoder = new Utf16.CharDecoder();
 
-            bool result = true;
+            bool complete = true;
 
             for (int i = start; i < amount; i++)
             {
-                var utf32 = decoder.Process(value[i]);
+                var result = decoder.Process(value[i]);
 
-                if (utf32 != null)
-                    runes[index++] = (Rune)utf32.GetValueOrDefault();
+                complete = result.Complete;
+
+                if (complete)
+                    runes[index++] = (Rune)result.Result;
             }
 
 
-            if (!result)
+            if (!complete)
                 throw new RuneException(Utf16.MissingTrailingSurrogateMessage());
 
 
