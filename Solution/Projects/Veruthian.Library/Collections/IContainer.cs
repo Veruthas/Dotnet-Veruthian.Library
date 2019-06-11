@@ -7,6 +7,7 @@ namespace Veruthian.Library.Collections
         IContainer<T> => FixedContainer
         IResizableContainer<T> : IContainer<T> => DataSet        
 
+        IStack<T> : IContainer<T>
         IPool<A, D> : IContainer<(A, D)>
         
         ILookup<A, T> : IContainer<T>  => FixedLookup, NestedDataLookup, SequentialDataLookup
