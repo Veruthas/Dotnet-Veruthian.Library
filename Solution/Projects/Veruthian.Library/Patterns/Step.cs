@@ -7,6 +7,8 @@ namespace Veruthian.Library.Patterns
 
         public Step(string name) => this.Name = name;
 
+        public Step(object data) => this.Data = data;
+
         public Step(string name, object data) { this.Name = name; this.Data = data; }
 
 
@@ -21,6 +23,6 @@ namespace Veruthian.Library.Patterns
         public IStep Next { get; set; }
 
 
-        public override string ToString() => Name;
+        public override string ToString() => Name ?? Data?.ToString() ?? base.ToString();
     }
 }

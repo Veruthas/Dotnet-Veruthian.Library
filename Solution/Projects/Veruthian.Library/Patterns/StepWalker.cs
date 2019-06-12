@@ -6,16 +6,22 @@ namespace Veruthian.Library.Patterns
     {
         IStack<IStep> steps;
 
+        IStep start;
+        
+
         public StepWalker(IStep step)
         {
+            this.start = step;
+
             this.steps = new DataStack<IStep>();
 
             steps.Push(step);
         }
 
-        public IStep Current => steps.Count.IsZero ? null : steps.Peek();
 
-        public bool CurrentCompleted { get; private set; }
+        public IStep Step => steps.Count.IsZero ? null : steps.Peek();
+
+        public bool StepCompleted { get; private set; }
 
         public void Walk(bool status)
         {
@@ -23,13 +29,13 @@ namespace Veruthian.Library.Patterns
             {
                 var step = steps.Peek();
 
-                if (!CurrentCompleted)
+                if (!StepCompleted)
                 {
                     if (status)
                     {
                         if (step.Shunt != null)
                         {
-                            steps.Push(step);
+                            steps.Push(step.Shunt);
                         }
                         else if (step.Down != null)
                         {
@@ -37,12 +43,12 @@ namespace Veruthian.Library.Patterns
                         }
                         else
                         {
-                            CurrentCompleted = true;
+                            StepCompleted = true;
                         }
                     }
                     else
                     {
-                        CurrentCompleted = true;
+                        StepCompleted = true;
                     }
                 }
                 else
@@ -53,26 +59,26 @@ namespace Veruthian.Library.Patterns
                         {
                             steps.Replace(step.Down);
 
-                            CurrentCompleted = false;
+                            StepCompleted = false;
                         }
                         else if (!status & step.Next != null)
                         {
                             steps.Replace(step.Next);
 
-                            CurrentCompleted = false;
+                            StepCompleted = false;
                         }
                         else
                         {
                             steps.Pop();
                         }
 
-                        CurrentCompleted = false;
+                        StepCompleted = false;
                     }
                     else if (step.Next != null)
                     {
                         steps.Replace(step.Next);
 
-                        CurrentCompleted = false;
+                        StepCompleted = false;
                     }
                     else
                     {
@@ -80,6 +86,15 @@ namespace Veruthian.Library.Patterns
                     }
                 }
             }
+        }
+    
+        public void Reset()
+        {
+            this.steps.Clear();
+
+            this.steps.Push(start);
+
+            StepCompleted = false;
         }
     }
 }
