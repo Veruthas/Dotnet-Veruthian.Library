@@ -85,7 +85,9 @@ namespace Veruthian.Library.Numeric
 
         #region Properties
 
-        public bool IsZero => IsSimple && value == 0;
+        public bool IsZero => units == null && value == 0;
+
+        public bool IsNotZero => units != null || value != 0;
 
         public bool IsOne => value == 1;
 
