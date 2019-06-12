@@ -3,7 +3,6 @@ namespace Veruthian.Library.Patterns
     public class Step : IStep
     {
 
-
         public Step() { }
 
         public Step(string name) => this.Name = name;
@@ -17,9 +16,9 @@ namespace Veruthian.Library.Patterns
 
         public IStep Shunt { get; set; }
 
-        public IStep Left { get; set; }
+        public IStep Down { get; set; }
 
-        public IStep Right { get; set; }
+        public IStep Next { get; set; }
 
 
         public override string ToString() => Name;

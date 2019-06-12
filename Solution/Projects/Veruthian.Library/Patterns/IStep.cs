@@ -4,8 +4,8 @@ namespace Veruthian.Library.Patterns
     {
          IStep Shunt { get; }
 
-         IStep Left { get;  }
+         IStep Down { get;  }
 
-         IStep Right { get; }
+         IStep Next { get; }
     }
 }
