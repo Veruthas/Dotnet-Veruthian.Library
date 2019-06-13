@@ -1,23 +1,27 @@
 namespace Veruthian.Library.Patterns
 {
-    public class Step : IStep
+    public abstract class Step : IStep
     {
-        public Step() { }
+        public virtual string Type => null;
 
-        public Step(string name) => Name = name;
-
-
-        public string Name { get; }
+        public virtual string Label => null;
 
 
-        public IStep Shunt { get; set; }
+        IStep IStep.Shunt => GetShunt();
 
-        public IStep Down { get; set; }
+        IStep IStep.Down => GetDown();
 
-        public IStep Next { get; set; }
+        IStep IStep.Next => GetNext();
+
+
+        protected virtual IStep GetShunt() => null;
+
+        protected virtual IStep GetDown() => null;
+
+        protected virtual IStep GetNext() => null;
 
 
 
-        public override string ToString() => Name ?? "<step>";
+        public override string ToString() => (Type == null ? (Label == null ? "" : Label) : (Label == null ? Type : Label + ":" + Type));
     }
 }

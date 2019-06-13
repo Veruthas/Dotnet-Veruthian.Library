@@ -1,8 +1,13 @@
 namespace Veruthian.Library.Patterns
 {
-    public class BooleanStep : Step
+    public sealed class BooleanStep : GeneralStep
     {
-        private BooleanStep(bool? value) : base(value == null ? "null" : value.ToString()) => Value = value;
+        private BooleanStep(bool? value) => this.Value = value;
+
+        public override string Type => "Boolean";
+
+        public override string Label => Value == true ? "True" : Value == false ? "False" : "Null";
+
 
         public bool? Value { get; }
 
