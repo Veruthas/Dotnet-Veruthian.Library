@@ -1,3 +1,4 @@
+using System;
 using Veruthian.Library.Collections;
 
 namespace Veruthian.Library.Patterns
@@ -8,6 +9,10 @@ namespace Veruthian.Library.Patterns
 
         IStep start;
 
+        bool? state;
+
+        bool completed;
+
 
         public StepWalker(IStep step)
         {
@@ -15,15 +20,34 @@ namespace Veruthian.Library.Patterns
 
             this.stack = new DataStack<IStep>();
 
-            stack.Push(step);
+            Reset();
+        }
+
+        public void Reset()
+        {
+            this.stack.Clear();
+
+            this.stack.Push(start);
+
+            state = true;
+
+            completed = false;
         }
 
 
         public IStep Step => stack.Count.IsZero ? null : stack.Peek();
 
-        public bool StepCompleted { get; private set; }
+        public bool? State
+        {
+            get => state;
+            set => this.state = value;
+        }
 
-        public void Walk(bool? state)
+        public bool StepCompleted => completed;
+
+
+
+        public void Walk()
         {
             if (stack.Count.IsNotZero)
             {
@@ -47,12 +71,12 @@ namespace Veruthian.Library.Patterns
                         }
                         else
                         {
-                            StepCompleted = true;
+                            completed = true;
                         }
                     }
                     else
                     {
-                        StepCompleted = true;
+                        completed = true;
                     }
                 }
                 else
@@ -63,24 +87,26 @@ namespace Veruthian.Library.Patterns
                         {
                             stack.Replace(step.Down);
 
-                            StepCompleted = false;
+                            completed = false;
                         }
                         else if (state == false && step.Next != null)
                         {
                             stack.Replace(step.Next);
 
-                            StepCompleted = false;
+                            completed = false;
                         }
                         else
                         {
                             stack.Pop();
                         }
+
+                        state = true;
                     }
                     else if (step.Next != null && state == true)
                     {
                         stack.Replace(step.Next);
 
-                        StepCompleted = false;
+                        completed = false;
                     }
                     else
                     {
@@ -90,13 +116,6 @@ namespace Veruthian.Library.Patterns
             }
         }
 
-        public void Reset()
-        {
-            this.stack.Clear();
 
-            this.stack.Push(start);
-
-            StepCompleted = false;
-        }
     }
 }

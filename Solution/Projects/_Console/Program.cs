@@ -15,17 +15,7 @@ namespace _Console
                 new NamedStep("B"),
                 new NamedStep("C")
                 {
-                    Down = new NamedStep("D")
-                    {
-                        Down = new NamedStep("E")
-                        {
-                            Down = new NamedStep("F")
-                        }
-                    }
-                },
-                new NamedStep("G")
-                {
-                    Shunt = new Step
+                    Shunt = new NamedStep("Condition")
                     {
                         Down = BooleanStep.True
                     },
@@ -45,38 +35,44 @@ namespace _Console
                             Next = new NamedStep("ElseNext")
                         }
                     }
+                },
+                new NamedStep("D")
+                {
+                    Down = new NamedStep("E")
+                    {
+                        Down = new NamedStep("F")
+                        {
+                            Down = new NamedStep("G")
+                        }
+                    }
                 }
             );
 
 
             var w = new StepWalker(a);
 
-            bool? state = true;
-
             while (w.Step != null)
             {
                 switch (w.Step)
                 {
                     case BooleanStep truth:
-                        Console.WriteLine($"{truth.Value} {(w.StepCompleted ? "Completed" : "Started")}  {state}");
+                        Console.WriteLine($"{truth.Value} {(w.StepCompleted ? "Completed" : "Started")}  {w.State}");
                         if (w.StepCompleted)
-                            state = truth.Value;
+                            w.State = truth.Value;
                         break;
                     case NamedStep named:
-                        Console.WriteLine($"{named} {(w.StepCompleted ? "Completed" : "Started")} {state}");
-                        if (named.Name == "F" && !w.StepCompleted)
-                            state = null;
-                        else if (named.Name == "C" && w.StepCompleted)
-                            state = true;
+                        Console.WriteLine($"{named} {(w.StepCompleted ? "Completed" : "Started")} {w.State}");
+                        if (named.Name == "Condition" && !w.StepCompleted)
+                            w.State = false;
                         break;
                     default:
-                        Console.WriteLine($"{w.Step} {(w.StepCompleted ? "Completed" : "Started")} {state}");
+                        Console.WriteLine($"{w.Step} {(w.StepCompleted ? "Completed" : "Started")} {w.State}");
                         if (!w.StepCompleted)
-                            state = true;
+                            w.State = true;
                         break;
                 }
 
-                w.Walk(state);
+                w.Walk();
             }
 
             Pause();
