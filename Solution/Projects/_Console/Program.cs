@@ -10,49 +10,67 @@ namespace _Console
 
             var g = new StepGenerator();
 
-            var a = g.Sequence(new NamedStep("A"), new NamedStep("B"), new NamedStep("C")
-            {
-                Shunt = new Step
+            var a = g.Sequence(
+                new NamedStep("A"),
+                new NamedStep("B"),
+                new NamedStep("C")
                 {
-                    Down = BooleanStep.True
-                },
-                Down = new Step
-                {
-                    Next = new NamedStep("Then")
+                    Down = new NamedStep("D")
                     {
-                        Down = new NamedStep("ThenDown"),
-                        Next = new NamedStep("ThenNext")
+                        Down = new NamedStep("E")
+                        {
+                            Down = new NamedStep("F")
+                        }
                     }
                 },
-                Next = new Step
+                new NamedStep("G")
                 {
-                    Next = new NamedStep("Else")
+                    Shunt = new Step
                     {
-                        Down = new NamedStep("ElseDown"),
-                        Next = new NamedStep("ElseNext")
+                        Down = BooleanStep.True
+                    },
+                    Down = new Step
+                    {
+                        Next = new NamedStep("Then")
+                        {
+                            Down = new NamedStep("ThenDown"),
+                            Next = new NamedStep("ThenNext")
+                        }
+                    },
+                    Next = new Step
+                    {
+                        Next = new NamedStep("Else")
+                        {
+                            Down = new NamedStep("ElseDown"),
+                            Next = new NamedStep("ElseNext")
+                        }
                     }
                 }
-            });
+            );
 
 
             var w = new StepWalker(a);
 
-            var state = true;
+            bool? state = true;
 
             while (w.Step != null)
             {
                 switch (w.Step)
                 {
                     case BooleanStep truth:
-                        Console.WriteLine($"{truth.Value} {(w.StepCompleted ? "Completed" : "Started")}");
+                        Console.WriteLine($"{truth.Value} {(w.StepCompleted ? "Completed" : "Started")}  {state}");
                         if (w.StepCompleted)
                             state = truth.Value;
                         break;
                     case NamedStep named:
-                        Console.WriteLine($"{named} {(w.StepCompleted ? "Completed" : "Started")}");
+                        Console.WriteLine($"{named} {(w.StepCompleted ? "Completed" : "Started")} {state}");
+                        if (named.Name == "F" && !w.StepCompleted)
+                            state = null;
+                        else if (named.Name == "C" && w.StepCompleted)
+                            state = true;
                         break;
                     default:
-                        //Console.WriteLine($"{w.Step} {(w.StepCompleted ? "Completed" : "Started")}");
+                        Console.WriteLine($"{w.Step} {(w.StepCompleted ? "Completed" : "Started")} {state}");
                         if (!w.StepCompleted)
                             state = true;
                         break;

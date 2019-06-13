@@ -8,5 +8,6 @@ namespace Veruthian.Library.Patterns
 
         public IStep Next { get; set; }
 
+        public override string ToString() => $"step<{GetHashCode()}>";
     }
 }

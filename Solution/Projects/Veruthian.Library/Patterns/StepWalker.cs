@@ -4,42 +4,46 @@ namespace Veruthian.Library.Patterns
 {
     public class StepWalker
     {
-        IStack<IStep> steps;
+        IStack<IStep> stack;
 
         IStep start;
-        
+
 
         public StepWalker(IStep step)
         {
             this.start = step;
 
-            this.steps = new DataStack<IStep>();
+            this.stack = new DataStack<IStep>();
 
-            steps.Push(step);
+            stack.Push(step);
         }
 
 
-        public IStep Step => steps.Count.IsZero ? null : steps.Peek();
+        public IStep Step => stack.Count.IsZero ? null : stack.Peek();
 
         public bool StepCompleted { get; private set; }
 
-        public void Walk(bool status)
+        public void Walk(bool? state)
         {
-            if (steps.Count.IsNotZero)
+            if (stack.Count.IsNotZero)
             {
-                var step = steps.Peek();
+                var step = stack.Peek();
 
                 if (!StepCompleted)
                 {
-                    if (status)
+                    if (state == true)
                     {
                         if (step.Shunt != null)
                         {
-                            steps.Push(step.Shunt);
+                            stack.Push(step.Shunt);
                         }
                         else if (step.Down != null)
                         {
-                            steps.Push(step.Down);
+                            stack.Push(step.Down);
+                        }
+                        else if (step.Next != null)
+                        {
+                            stack.Replace(step.Next);
                         }
                         else
                         {
@@ -55,44 +59,42 @@ namespace Veruthian.Library.Patterns
                 {
                     if (step.Shunt != null)
                     {
-                        if (status & step.Down != null)
+                        if (state == true && step.Down != null)
                         {
-                            steps.Replace(step.Down);
+                            stack.Replace(step.Down);
 
                             StepCompleted = false;
                         }
-                        else if (!status & step.Next != null)
+                        else if (state == false && step.Next != null)
                         {
-                            steps.Replace(step.Next);
+                            stack.Replace(step.Next);
 
                             StepCompleted = false;
                         }
                         else
                         {
-                            steps.Pop();
+                            stack.Pop();
                         }
-
-                        StepCompleted = false;
                     }
-                    else if (step.Next != null)
+                    else if (step.Next != null && state == true)
                     {
-                        steps.Replace(step.Next);
+                        stack.Replace(step.Next);
 
                         StepCompleted = false;
                     }
                     else
                     {
-                        steps.Pop();
+                        stack.Pop();
                     }
                 }
             }
         }
-    
+
         public void Reset()
         {
-            this.steps.Clear();
+            this.stack.Clear();
 
-            this.steps.Push(start);
+            this.stack.Push(start);
 
             StepCompleted = false;
         }
