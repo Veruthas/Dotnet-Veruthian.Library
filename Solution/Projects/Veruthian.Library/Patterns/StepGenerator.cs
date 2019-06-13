@@ -4,7 +4,7 @@ namespace Veruthian.Library.Patterns
     {
         public IStep Sequence(params IStep[] steps)
         {
-            Step first = new NamedStep("Sequence");
+            Step first = new Step("Sequence");
 
             Step current = null;
 
@@ -33,7 +33,7 @@ namespace Veruthian.Library.Patterns
 
         public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
-            return new NamedStep("IfThenElse")
+            return new Step("IfThenElse")
             {
                 Shunt = condition,
                 Down = thenStep,
@@ -43,7 +43,7 @@ namespace Veruthian.Library.Patterns
 
         public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
-            return new NamedStep("UnlessThenElse")
+            return new Step("UnlessThenElse")
             {
                 Shunt = condition,
                 Down = elseStep,

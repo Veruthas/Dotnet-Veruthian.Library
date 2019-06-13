@@ -7,42 +7,41 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-
             var g = new StepGenerator();
 
             var a = g.Sequence(
-                new NamedStep("A"),
-                new NamedStep("B"),
-                new NamedStep("C")
+                new Step("A"),
+                new Step("B"),
+                new Step("C")
                 {
-                    Shunt = new NamedStep("Condition")
+                    Shunt = new Step("Condition")
                     {
                         Down = BooleanStep.True
                     },
                     Down = new Step
                     {
-                        Next = new NamedStep("Then")
+                        Next = new Step("Then")
                         {
-                            Down = new NamedStep("ThenDown"),
-                            Next = new NamedStep("ThenNext")
+                            Down = new Step("ThenDown"),
+                            Next = new Step("ThenNext")
                         }
                     },
                     Next = new Step
                     {
-                        Next = new NamedStep("Else")
+                        Next = new Step("Else")
                         {
-                            Down = new NamedStep("ElseDown"),
-                            Next = new NamedStep("ElseNext")
+                            Down = new Step("ElseDown"),
+                            Next = new Step("ElseNext")
                         }
                     }
                 },
-                new NamedStep("D")
+                new Step("D")
                 {
-                    Down = new NamedStep("E")
+                    Down = new Step("E")
                     {
-                        Down = new NamedStep("F")
+                        Down = new Step("F")
                         {
-                            Down = new NamedStep("G")
+                            Down = new Step("G")
                         }
                     }
                 }
@@ -60,7 +59,7 @@ namespace _Console
                         if (w.StepCompleted)
                             w.State = truth.Value;
                         break;
-                    case NamedStep named:
+                    case Step named:
                         Console.WriteLine($"{named} {(w.StepCompleted ? "Completed" : "Started")} {w.State}");
                         if (named.Name == "Condition" && !w.StepCompleted)
                             w.State = false;

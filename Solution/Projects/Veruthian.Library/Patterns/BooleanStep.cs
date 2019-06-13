@@ -1,17 +1,10 @@
 namespace Veruthian.Library.Patterns
 {
-    public class BooleanStep : IStep
+    public class BooleanStep : Step
     {
-        private BooleanStep(bool? value) => Value = value;
+        private BooleanStep(bool? value) : base(value == null ? "null" : value.ToString()) => Value = value;
 
         public bool? Value { get; }
-
-
-        public IStep Shunt => null;
-
-        public IStep Down => null;
-
-        public IStep Next => null;
 
 
         public static BooleanStep True = new BooleanStep(true);
