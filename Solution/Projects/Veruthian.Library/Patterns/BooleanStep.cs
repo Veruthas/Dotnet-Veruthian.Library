@@ -2,9 +2,9 @@ namespace Veruthian.Library.Patterns
 {
     public class BooleanStep : IStep
     {
-        private BooleanStep(bool value) => Value = value;
+        private BooleanStep(bool? value) => Value = value;
 
-        public bool Value { get; }
+        public bool? Value { get; }
 
 
         public IStep Shunt => null;
@@ -17,5 +17,7 @@ namespace Veruthian.Library.Patterns
         public static BooleanStep True = new BooleanStep(true);
 
         public static BooleanStep False = new BooleanStep(false);
+
+        public static BooleanStep Null = new BooleanStep(null);
     }
 }
