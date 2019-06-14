@@ -12,6 +12,19 @@ namespace Veruthian.Library.Patterns
 
         public BooleanStep Null => BooleanStep.Null;
 
+        // Typed
+        public GeneralStep Typed(string type)
+            => new GeneralStep(type);
+
+        public GeneralStep Typed(string type, IStep step)
+            => new GeneralStep(type) { Down = step };
+
+        public GeneralStep Typed(string type, string name)
+            => new GeneralStep(type, name);
+
+        public GeneralStep Typed(string type, string name, IStep step)
+            => new GeneralStep(type, name) { Down = step };
+
 
         // Sequence
         public GeneralStep Sequence(params IStep[] steps) => Sequence((IEnumerable<IStep>)steps);
@@ -52,7 +65,7 @@ namespace Veruthian.Library.Patterns
                 if (current != first)
                 {
                     var next = new GeneralStep();
-                    
+
                     current.Next = next;
 
                     current = next;
@@ -65,6 +78,7 @@ namespace Veruthian.Library.Patterns
 
             return first;
         }
+
 
         // Optional
         public GeneralStep Optional(IStep step)
@@ -215,25 +229,46 @@ namespace Veruthian.Library.Patterns
 
 
         // Repeat
-        public GeneralStep Repeat(IStep step)
+        public GeneralStep While(IStep condition, IStep step)
         {
             var repeater = new GeneralStep();
 
-            repeater.Shunt = step;
-
-            repeater.Next = True;
+            repeater.Shunt = condition;            
 
             repeater.Down = new GeneralStep
             {
                 Down = step,
 
-                Next = repeater                
+                Next = repeater
             };
+
+            repeater.Next = True;
 
             return repeater;
         }
 
-        public GeneralStep Exactly(int times, IStep step) 
+        public GeneralStep Until(IStep condition, IStep step)
+        {
+            var repeater = new GeneralStep();
+
+            repeater.Shunt = condition;                        
+
+            repeater.Down = True;
+
+            repeater.Next = new GeneralStep
+            {
+                Down = step,
+
+                Next = repeater
+            };
+            
+            return repeater;
+        }
+
+        public GeneralStep Repeat(IStep step)
+            => While(step, step);
+
+        public GeneralStep Exactly(int times, IStep step)
         {
             var first = new GeneralStep();
 
@@ -255,7 +290,7 @@ namespace Veruthian.Library.Patterns
 
             return first;
         }
-    
+
         public GeneralStep AtMost(int times, IStep step)
         {
             var first = new GeneralStep();
@@ -286,7 +321,7 @@ namespace Veruthian.Library.Patterns
 
             return first;
         }
- 
+
         public GeneralStep AtLeast(int times, IStep step)
         {
             var result = Exactly(times, step);
@@ -295,7 +330,7 @@ namespace Veruthian.Library.Patterns
 
             return result;
         }
- 
+
         public GeneralStep Between(int min, int max, IStep step)
         {
             var result = Exactly(min, step);
