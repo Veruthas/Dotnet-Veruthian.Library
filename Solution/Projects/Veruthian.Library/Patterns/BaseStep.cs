@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Patterns
 {
-    public abstract class Step : IStep
+    public abstract class BaseStep : IStep
     {
         public abstract string Type { get; }
 

@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Patterns
 {
-    public class GeneralStep : Step
+    public class GeneralStep : BaseStep
     {
         public GeneralStep() { }
 

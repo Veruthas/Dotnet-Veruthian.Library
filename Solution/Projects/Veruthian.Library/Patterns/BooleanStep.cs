@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Patterns
 {
-    public sealed class BooleanStep : GeneralStep
+    public sealed class BooleanStep : BaseStep
     {
         private BooleanStep(bool? value) => this.Value = value;
 
