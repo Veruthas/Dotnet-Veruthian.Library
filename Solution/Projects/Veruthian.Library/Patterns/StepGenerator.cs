@@ -227,7 +227,7 @@ namespace Veruthian.Library.Patterns
             {
                 Down = step,
 
-                Next = repeater
+                Next = repeater                
             };
 
             return repeater;
@@ -285,6 +285,24 @@ namespace Veruthian.Library.Patterns
             }
 
             return first;
+        }
+ 
+        public GeneralStep AtLeast(int times, IStep step)
+        {
+            var result = Exactly(times, step);
+
+            result.Next = Repeat(step);
+
+            return result;
+        }
+ 
+        public GeneralStep Between(int min, int max, IStep step)
+        {
+            var result = Exactly(min, step);
+
+            result.Next = AtMost(max - min, step);
+
+            return result;
         }
     }
 }
