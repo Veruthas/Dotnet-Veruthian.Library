@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Patterns
+namespace Veruthian.Library.Steps
 {
     public class GeneralStep : BaseLinkStep
     {

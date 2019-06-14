@@ -1,7 +1,7 @@
 using System;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Patterns
+namespace Veruthian.Library.Steps
 {
     public class StepWalker
     {

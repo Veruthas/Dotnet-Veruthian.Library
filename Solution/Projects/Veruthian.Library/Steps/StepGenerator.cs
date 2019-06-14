@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Utility;
 
-namespace Veruthian.Library.Patterns
+namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {

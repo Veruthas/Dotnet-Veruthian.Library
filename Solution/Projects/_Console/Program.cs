@@ -1,5 +1,5 @@
 ﻿using System;
-using Veruthian.Library.Patterns;
+using Veruthian.Library.Steps;
 
 namespace _Console
 {
