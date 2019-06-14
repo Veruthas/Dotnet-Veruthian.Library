@@ -6,11 +6,13 @@ namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
+        // Boolean
         public BooleanStep True => BooleanStep.True;
 
         public BooleanStep False => BooleanStep.False;
 
         public BooleanStep Null => BooleanStep.Null;
+
 
         // Typed
         public GeneralStep Typed(string type)
