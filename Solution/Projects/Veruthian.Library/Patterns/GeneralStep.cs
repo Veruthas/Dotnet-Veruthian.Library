@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Patterns
 {
-    public class GeneralStep : BaseStep
+    public class GeneralStep : BaseLinkStep
     {
         public GeneralStep() { }
 
@@ -15,19 +15,5 @@ namespace Veruthian.Library.Patterns
         public override string Type { get; }
 
         public override string Name { get; }
-
-
-        public IStep Shunt { get; set; }
-
-        public IStep Down { get; set; }
-
-        public IStep Next { get; set; }
-
-
-        protected override IStep GetShunt() => Shunt;
-
-        protected override IStep GetDown() => Down;
-
-        protected override IStep GetNext() => Next;
     }
 }
