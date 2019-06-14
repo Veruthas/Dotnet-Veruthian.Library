@@ -6,7 +6,7 @@ namespace Veruthian.Library.Patterns
 
         public override string Type => "Boolean";
 
-        public override string Label => Value == true ? "True" : Value == false ? "False" : "Null";
+        public override string Name => Value == true ? "True" : Value == false ? "False" : "Null";
 
 
         public bool? Value { get; }

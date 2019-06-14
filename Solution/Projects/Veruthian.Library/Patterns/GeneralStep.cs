@@ -4,16 +4,17 @@ namespace Veruthian.Library.Patterns
     {
         public GeneralStep() { }
 
-        public GeneralStep(string type = null, string label = null)
+        public GeneralStep(string type = null, string name = null)
         {
             this.Type = type;
 
-            this.Label = label;
+            this.Name = name;
         }
+
 
         public override string Type { get; }
 
-        public override string Label { get; }
+        public override string Name { get; }
 
 
         public IStep Shunt { get; set; }

@@ -2,9 +2,9 @@ namespace Veruthian.Library.Patterns
 {
     public abstract class Step : IStep
     {
-        public virtual string Type => null;
+        public abstract string Type { get; }
 
-        public virtual string Label => null;
+        public abstract string Name { get; }
 
 
         IStep IStep.Shunt => GetShunt();
@@ -22,6 +22,6 @@ namespace Veruthian.Library.Patterns
 
 
 
-        public override string ToString() => (Type == null ? (Label == null ? "" : Label) : (Label == null ? Type : Label + ":" + Type));
+        public override string ToString() => (Type == null ? (Name == null ? "" : Name) : (Name == null ? Type : Name + ":" + Type));
     }
 }
