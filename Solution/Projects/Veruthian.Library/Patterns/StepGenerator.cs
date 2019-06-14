@@ -1,32 +1,30 @@
+using System.Collections.Generic;
+using Veruthian.Library.Collections.Extensions;
 using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Patterns
 {
     public class StepGenerator
     {
-        public Step True => BooleanStep.True;
+        public BooleanStep True => BooleanStep.True;
 
-        public Step False => BooleanStep.False;
+        public BooleanStep False => BooleanStep.False;
 
-        public Step Null => BooleanStep.Null;
+        public BooleanStep Null => BooleanStep.Null;
 
 
         // Sequence
-        public Step Sequence(params IStep[] steps)
+        public GeneralStep Sequence(params IStep[] steps) => Sequence((IEnumerable<IStep>)steps);
+
+        public GeneralStep Sequence(IEnumerable<IStep> steps)
         {
-            var first = new GeneralStep("Sequence");
+            var first = new GeneralStep();
 
             var current = first;
 
             foreach (var step in steps)
             {
-                if (current == first)
-                {
-                    current = new GeneralStep();
-
-                    first.Down = current;
-                }
-                else
+                if (current != first)
                 {
                     var next = new GeneralStep();
 
@@ -42,62 +40,96 @@ namespace Veruthian.Library.Patterns
         }
 
 
+        // Choice
+        public GeneralStep Choice(params IStep[] steps)
+        {
+            var first = new GeneralStep();
+
+            var current = first;
+
+            foreach (var step in steps)
+            {
+                if (current != first)
+                {
+                    var next = new GeneralStep();
+                    
+                    current.Next = next;
+
+                    current = next;
+                }
+
+                current.Shunt = current.Down = step;
+            }
+
+            current.Next = False;
+
+            return first;
+        }
+
         // Optional
-        public Step Optional(IStep step)
+        public GeneralStep Optional(IStep step)
         {
             ExceptionHelper.VerifyNotNull(step, nameof(step));
 
-            return new GeneralStep("If")
+            return new GeneralStep
             {
                 Shunt = step,
+
                 Down = step,
+
                 Next = True
             };
         }
 
 
         // If
-        public Step If(IStep condition)
+        public GeneralStep If(IStep condition)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
-            return new GeneralStep("If")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = True,
+
                 Next = False
             };
         }
 
-        public Step IfThen(IStep condition, IStep thenStep)
+        public GeneralStep IfThen(IStep condition, IStep thenStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
             ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
 
-            return new GeneralStep("IfThen")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = thenStep,
+
                 Next = False
             };
         }
 
-        public Step IfElse(IStep condition, IStep elseStep)
+        public GeneralStep IfElse(IStep condition, IStep elseStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
             ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
 
-            return new GeneralStep("IfElse")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = True,
+
                 Next = elseStep
             };
         }
 
-        public Step IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public GeneralStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
@@ -105,57 +137,65 @@ namespace Veruthian.Library.Patterns
 
             ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
 
-            return new GeneralStep("IfThenElse")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = thenStep,
+
                 Next = elseStep
             };
         }
 
 
         // Unless
-        public Step Unless(IStep condition)
+        public GeneralStep Unless(IStep condition)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
-            return new GeneralStep("Unless")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = False,
+
                 Next = True
             };
         }
 
-        public Step UnlessThen(IStep condition, IStep thenStep)
+        public GeneralStep UnlessThen(IStep condition, IStep thenStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
             ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
 
-            return new GeneralStep("UnlessThen")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = False,
+
                 Next = thenStep
             };
         }
 
-        public Step UnlessElse(IStep condition, IStep elseStep)
+        public GeneralStep UnlessElse(IStep condition, IStep elseStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
             ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
 
-            return new GeneralStep("UnlessElse")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = elseStep,
+
                 Next = True
             };
         }
 
-        public Step UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public GeneralStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
             ExceptionHelper.VerifyNotNull(condition, nameof(condition));
 
@@ -163,31 +203,88 @@ namespace Veruthian.Library.Patterns
 
             ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
 
-            return new GeneralStep("UnlessThenElse")
+            return new GeneralStep
             {
                 Shunt = condition,
+
                 Down = elseStep,
+
                 Next = thenStep
             };
         }
 
 
         // Repeat
-        public Step Repeat(IStep step)
+        public GeneralStep Repeat(IStep step)
         {
-            var repeater = new GeneralStep("Repeat");
+            var repeater = new GeneralStep();
 
             repeater.Shunt = step;
-            
+
             repeater.Next = True;
 
             repeater.Down = new GeneralStep
             {
                 Down = step,
+
                 Next = repeater
             };
 
             return repeater;
+        }
+
+        public GeneralStep Exactly(int times, IStep step) 
+        {
+            var first = new GeneralStep();
+
+            var current = first;
+
+            for (int i = 0; i < times; i++)
+            {
+                if (current != first)
+                {
+                    var next = new GeneralStep();
+
+                    current.Next = next;
+
+                    current = next;
+                }
+
+                current.Down = step;
+            }
+
+            return first;
+        }
+    
+        public GeneralStep AtMost(int times, IStep step)
+        {
+            var first = new GeneralStep();
+
+            var current = first;
+
+            for (int i = 0; i < times; i++)
+            {
+                if (current != first)
+                {
+                    var next = new GeneralStep();
+
+                    current.Next = next;
+
+                    current = next;
+                }
+
+                current.Shunt = step;
+
+                var down = new GeneralStep();
+
+                current.Down = down;
+
+                down.Down = step;
+
+                current = down;
+            }
+
+            return first;
         }
     }
 }
