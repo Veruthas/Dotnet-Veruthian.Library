@@ -5,11 +5,36 @@ namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
-        // Empty
-        private EmptyStep True => new EmptyStep();
+        // Boolean
+        public GeneralStep True
+        {
+            get
+            {
+                return new GeneralStep()
+                {
+                    Shunt = ShuntTrue,
+                    Down = ShuntTrue
+                };
+            }
+        }
 
-        private EmptyStep False => null;
-        
+        public GeneralStep False
+        {
+            get
+            {
+                return new GeneralStep()
+                {
+                    Shunt = ShuntTrue,
+                    Down = ShuntFalse
+                };
+            }
+        }
+
+
+        private EmptyStep ShuntTrue => new EmptyStep();
+
+        private EmptyStep ShuntFalse => null;
+
 
         // Typed
         public GeneralStep Typed(string type)
@@ -88,7 +113,7 @@ namespace Veruthian.Library.Steps
 
                 Down = step,
 
-                Next = True
+                Next = ShuntTrue
             };
         }
 
@@ -104,7 +129,7 @@ namespace Veruthian.Library.Steps
 
                 Down = new EmptyStep(),
 
-                Next = False
+                Next = ShuntFalse
             };
         }
 
@@ -120,7 +145,7 @@ namespace Veruthian.Library.Steps
 
                 Down = thenStep,
 
-                Next = False
+                Next = ShuntFalse
             };
         }
 
@@ -134,7 +159,7 @@ namespace Veruthian.Library.Steps
             {
                 Shunt = condition,
 
-                Down = True,
+                Down = ShuntTrue,
 
                 Next = elseStep
             };
@@ -168,9 +193,9 @@ namespace Veruthian.Library.Steps
             {
                 Shunt = condition,
 
-                Down = False,
+                Down = ShuntFalse,
 
-                Next = True
+                Next = ShuntTrue
             };
         }
 
@@ -184,7 +209,7 @@ namespace Veruthian.Library.Steps
             {
                 Shunt = condition,
 
-                Down = False,
+                Down = ShuntFalse,
 
                 Next = thenStep
             };
@@ -202,7 +227,7 @@ namespace Veruthian.Library.Steps
 
                 Down = elseStep,
 
-                Next = True
+                Next = ShuntTrue
             };
         }
 
@@ -239,7 +264,7 @@ namespace Veruthian.Library.Steps
                 Next = repeater
             };
 
-            repeater.Next = True;
+            repeater.Next = ShuntTrue;
 
             return repeater;
         }
@@ -250,7 +275,7 @@ namespace Veruthian.Library.Steps
 
             repeater.Shunt = condition;
 
-            repeater.Down = True;
+            repeater.Down = ShuntTrue;
 
             repeater.Next = new GeneralStep
             {
