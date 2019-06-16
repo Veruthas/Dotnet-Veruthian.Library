@@ -5,13 +5,11 @@ namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
-        // Boolean
-        public BooleanStep True => BooleanStep.True;
+        // Empty
+        private EmptyStep True => new EmptyStep();
 
-        public BooleanStep False => BooleanStep.False;
-
-        public BooleanStep Null => BooleanStep.Null;
-
+        private EmptyStep False => null;
+        
 
         // Typed
         public GeneralStep Typed(string type)
@@ -75,8 +73,6 @@ namespace Veruthian.Library.Steps
                 current.Shunt = current.Down = step;
             }
 
-            current.Next = False;
-
             return first;
         }
 
@@ -106,7 +102,7 @@ namespace Veruthian.Library.Steps
             {
                 Shunt = condition,
 
-                Down = True,
+                Down = new EmptyStep(),
 
                 Next = False
             };
@@ -234,7 +230,7 @@ namespace Veruthian.Library.Steps
         {
             var repeater = new GeneralStep();
 
-            repeater.Shunt = condition;            
+            repeater.Shunt = condition;
 
             repeater.Down = new GeneralStep
             {
@@ -252,7 +248,7 @@ namespace Veruthian.Library.Steps
         {
             var repeater = new GeneralStep();
 
-            repeater.Shunt = condition;                        
+            repeater.Shunt = condition;
 
             repeater.Down = True;
 
@@ -262,7 +258,7 @@ namespace Veruthian.Library.Steps
 
                 Next = repeater
             };
-            
+
             return repeater;
         }
 

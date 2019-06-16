@@ -83,24 +83,46 @@ namespace Veruthian.Library.Steps
                 {
                     if (step.Shunt != null)
                     {
-                        if (state == true && step.Down != null)
+                        if (state == true)
                         {
-                            stack.Replace(step.Down);
+                            if (step.Down != null)
+                            {
+                                stack.Replace(step.Down);
 
-                            completed = false;
+                                completed = false;
+
+                                state = true;
+                            }
+                            else
+                            {
+                                stack.Pop();
+
+                                state = false;
+                            }
                         }
-                        else if (state == false && step.Next != null)
+                        else if (state == false)
                         {
-                            stack.Replace(step.Next);
+                            if (step.Next != null)
+                            {
+                                stack.Replace(step.Next);
 
-                            completed = false;
+                                completed = false;
+
+                                state = true;
+                            }
+                            else
+                            {
+                                stack.Pop();
+
+                                state = false;
+                            }
                         }
                         else
                         {
                             stack.Pop();
-                        }
 
-                        state = true;
+                            state = true;
+                        }
                     }
                     else if (step.Next != null && state == true)
                     {
