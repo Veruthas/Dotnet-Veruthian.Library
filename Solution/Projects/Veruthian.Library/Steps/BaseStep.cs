@@ -22,6 +22,6 @@ namespace Veruthian.Library.Steps
 
 
 
-        public override string ToString() => (Type == null ? (Name == null ? "" : Name) : (Name == null ? Type : Name + ":" + Type));
+        public override string ToString() => (Type == null ? (Name == null ? "" : ":" + Name) : (Name == null ? Type : Type + ":" + Name));
     }
 }
