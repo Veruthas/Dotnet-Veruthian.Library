@@ -9,13 +9,6 @@ namespace Veruthian.Library.Steps
         protected EmptyStep ShuntFalse => null;
 
 
-        protected virtual IStep Shunt(IStep shunt) => shunt;
-        
-
-        protected virtual GeneralStep Condition(IStep shunt, IStep down, IStep next)
-            => new GeneralStep { Shunt = shunt, Down = down, Next = next };
-
-
         // Boolean
         public GeneralStep True
         {
@@ -83,37 +76,6 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-
-        // Choice
-        public GeneralStep Choice(params IStep[] steps)
-            => Choice(steps as IEnumerable<IStep>);
-
-        public GeneralStep Choice(IEnumerable<IStep> steps)
-        {
-            GeneralStep first = null;
-
-            GeneralStep current = null;
-
-            foreach (var step in steps)
-            {
-                var choice = IfThen(step, step);
-
-                if (first == null)
-                    first = current = choice;
-                else
-                {
-                    current.Next = choice;
-                    current = choice;
-                }
-            }
-
-            return first;
-        }
-
-
-        // Optional
-        public virtual GeneralStep Optional(IStep step)
-            => Condition(step, ShuntTrue, ShuntTrue);
 
         // If
         public GeneralStep If(IStep condition)
@@ -252,9 +214,6 @@ namespace Veruthian.Library.Steps
             return repeater;
         }
 
-        public GeneralStep Repeat(IStep step)
-            => While(step, step);
-
         public GeneralStep Exactly(int times, IStep step)
         {
             var first = new GeneralStep();
@@ -278,7 +237,7 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        public GeneralStep AtMost(int times, IStep step)
+        public GeneralStep AtMost(int times, IStep condition, IStep step)
         {
             var first = new GeneralStep();
 
@@ -295,7 +254,7 @@ namespace Veruthian.Library.Steps
                     current = next;
                 }
 
-                current.Shunt = step;
+                current.Shunt = condition;
 
                 var down = new GeneralStep();
 
@@ -309,20 +268,20 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        public GeneralStep AtLeast(int times, IStep step)
+        public GeneralStep AtLeast(int times, IStep condition, IStep step)
         {
             var result = Exactly(times, step);
 
-            result.Next = Repeat(step);
+            result.Next = While(condition, step);
 
             return result;
         }
 
-        public GeneralStep Between(int min, int max, IStep step)
+        public GeneralStep Between(int min, int max, IStep condition, IStep step)
         {
             var result = Exactly(min, step);
 
-            result.Next = AtMost(max - min, step);
+            result.Next = AtMost(max - min, condition, step);
 
             return result;
         }
