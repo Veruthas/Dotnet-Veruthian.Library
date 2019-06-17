@@ -27,7 +27,8 @@ namespace Veruthian.Library.Steps
         {
             this.stack.Clear();
 
-            this.stack.Push(start);
+            if (start != null)
+                this.stack.Push(start);
 
             state = true;
 
@@ -137,7 +138,5 @@ namespace Veruthian.Library.Steps
                 }
             }
         }
-
-
     }
 }
