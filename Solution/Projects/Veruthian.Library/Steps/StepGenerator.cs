@@ -1,10 +1,21 @@
 using System.Collections.Generic;
-using Veruthian.Library.Utility;
 
 namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
+        protected EmptyStep ShuntTrue => new EmptyStep();
+
+        protected EmptyStep ShuntFalse => null;
+
+
+        protected virtual IStep Shunt(IStep shunt) => shunt;
+        
+
+        protected virtual GeneralStep Condition(IStep shunt, IStep down, IStep next)
+            => new GeneralStep { Shunt = shunt, Down = down, Next = next };
+
+
         // Boolean
         public GeneralStep True
         {
@@ -31,11 +42,6 @@ namespace Veruthian.Library.Steps
         }
 
 
-        private EmptyStep ShuntTrue => new EmptyStep();
-
-        private EmptyStep ShuntFalse => null;
-
-
         // Typed
         public GeneralStep Typed(string type)
             => new GeneralStep(type);
@@ -51,13 +57,14 @@ namespace Veruthian.Library.Steps
 
 
         // Sequence
-        public GeneralStep Sequence(params IStep[] steps) => Sequence((IEnumerable<IStep>)steps);
+        public GeneralStep Sequence(params IStep[] steps)
+            => Sequence(steps as IEnumerable<IStep>);
 
         public GeneralStep Sequence(IEnumerable<IStep> steps)
         {
-            var first = new GeneralStep();
+            GeneralStep first = new GeneralStep();
 
-            var current = first;
+            GeneralStep current = first;
 
             foreach (var step in steps)
             {
@@ -79,23 +86,25 @@ namespace Veruthian.Library.Steps
 
         // Choice
         public GeneralStep Choice(params IStep[] steps)
-        {
-            var first = new GeneralStep();
+            => Choice(steps as IEnumerable<IStep>);
 
-            var current = first;
+        public GeneralStep Choice(IEnumerable<IStep> steps)
+        {
+            GeneralStep first = null;
+
+            GeneralStep current = null;
 
             foreach (var step in steps)
             {
-                if (current != first)
+                var choice = IfThen(step, step);
+
+                if (first == null)
+                    first = current = choice;
+                else
                 {
-                    var next = new GeneralStep();
-
-                    current.Next = next;
-
-                    current = next;
+                    current.Next = choice;
+                    current = choice;
                 }
-
-                current.Shunt = current.Down = step;
             }
 
             return first;
@@ -103,26 +112,12 @@ namespace Veruthian.Library.Steps
 
 
         // Optional
-        public GeneralStep Optional(IStep step)
-        {
-            ExceptionHelper.VerifyNotNull(step, nameof(step));
-
-            return new GeneralStep
-            {
-                Shunt = step,
-
-                Down = step,
-
-                Next = ShuntTrue
-            };
-        }
-
+        public virtual GeneralStep Optional(IStep step)
+            => Condition(step, ShuntTrue, ShuntTrue);
 
         // If
         public GeneralStep If(IStep condition)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -135,10 +130,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep IfThen(IStep condition, IStep thenStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -151,10 +142,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep IfElse(IStep condition, IStep elseStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -167,12 +154,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
-
-            ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -187,8 +168,6 @@ namespace Veruthian.Library.Steps
         // Unless
         public GeneralStep Unless(IStep condition)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -201,10 +180,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep UnlessThen(IStep condition, IStep thenStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -217,10 +192,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep UnlessElse(IStep condition, IStep elseStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
@@ -233,12 +204,6 @@ namespace Veruthian.Library.Steps
 
         public GeneralStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
-            ExceptionHelper.VerifyNotNull(condition, nameof(condition));
-
-            ExceptionHelper.VerifyNotNull(thenStep, nameof(thenStep));
-
-            ExceptionHelper.VerifyNotNull(elseStep, nameof(elseStep));
-
             return new GeneralStep
             {
                 Shunt = condition,
