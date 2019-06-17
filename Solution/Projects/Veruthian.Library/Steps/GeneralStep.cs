@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class GeneralStep : BaseLinkStep
+    public class GeneralStep : LinkStep
     {
         public GeneralStep() { }
 

@@ -1,61 +1,81 @@
 using System.Collections.Generic;
+using Veruthian.Library.Numeric;
 
 namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
-        protected EmptyStep ShuntTrue => new EmptyStep();
+        private Number linkNumber = Number.Zero;
 
-        protected EmptyStep ShuntFalse => null;
+        public bool NameLinks { get; set; }
+
+        public bool TypeConstructs { get; set; }
 
 
-        // Boolean
-        public GeneralStep True
-        {
-            get
-            {
-                return new GeneralStep()
-                {
-                    Shunt = ShuntTrue,
-                    Down = ShuntTrue
-                };
-            }
-        }
+        protected GeneralStep NewLinkStep()
+            => NameLinks ? new GeneralStep(name: $"Step #{linkNumber++}") : new GeneralStep();
 
-        public GeneralStep False
-        {
-            get
-            {
-                return new GeneralStep()
-                {
-                    Shunt = ShuntTrue,
-                    Down = ShuntFalse
-                };
-            }
-        }
+        protected IStep ResultStep(string type, string name, IStep step)
+            => TypeConstructs && type != null ? Typed(type, name, step) : step;
+
+        protected IStep ShuntTrue => new EmptyStep();
+
+        protected IStep ShuntFalse => null;
 
 
         // Typed
-        public GeneralStep Typed(string type)
+        public IStep Typed(string type)
             => new GeneralStep(type);
 
-        public GeneralStep Typed(string type, IStep step)
+        public IStep Typed(string type, IStep step)
             => new GeneralStep(type) { Down = step };
 
-        public GeneralStep Typed(string type, string name)
+        public IStep Typed(string type, string name)
             => new GeneralStep(type, name);
 
-        public GeneralStep Typed(string type, string name, IStep step)
+        public IStep Typed(string type, string name, IStep step)
             => new GeneralStep(type, name) { Down = step };
 
 
+
+        // Boolean
+        public IStep True
+        {
+            get
+            {
+                var step = NewLinkStep();
+
+                step.Shunt = ShuntTrue;
+
+                step.Down = ShuntTrue;
+
+                return ResultStep("Boolean", "True", step);
+            }
+        }
+
+        public IStep False
+        {
+            get
+            {
+                var step = NewLinkStep();
+                
+                step.Shunt = ShuntTrue;
+
+                step.Down = ShuntFalse;
+
+                return ResultStep("Boolean", "False", step);
+            }
+        }
+
+
+
         // Sequence
-        public GeneralStep Sequence(params IStep[] steps)
+        public IStep Sequence(params IStep[] steps)
             => Sequence(steps as IEnumerable<IStep>);
 
-        public GeneralStep Sequence(IEnumerable<IStep> steps)
+        public IStep Sequence(IEnumerable<IStep> steps)
         {
-            GeneralStep first = new GeneralStep();
+            GeneralStep first = NewLinkStep();
 
             GeneralStep current = first;
 
@@ -63,7 +83,7 @@ namespace Veruthian.Library.Steps
             {
                 if (current != first)
                 {
-                    var next = new GeneralStep();
+                    var next = NewLinkStep();
 
                     current.Next = next;
 
@@ -73,24 +93,24 @@ namespace Veruthian.Library.Steps
                 current.Down = step;
             }
 
-            return first;
+            return ResultStep("Sequence", null, first);
         }
 
 
         // If
-        public GeneralStep If(IStep condition)
+        public IStep If(IStep condition)
         {
             return new GeneralStep
             {
                 Shunt = condition,
 
-                Down = new EmptyStep(),
+                Down = ShuntTrue,
 
                 Next = ShuntFalse
             };
         }
 
-        public GeneralStep IfThen(IStep condition, IStep thenStep)
+        public IStep IfThen(IStep condition, IStep thenStep)
         {
             return new GeneralStep
             {
@@ -102,7 +122,7 @@ namespace Veruthian.Library.Steps
             };
         }
 
-        public GeneralStep IfElse(IStep condition, IStep elseStep)
+        public IStep IfElse(IStep condition, IStep elseStep)
         {
             return new GeneralStep
             {
@@ -114,7 +134,7 @@ namespace Veruthian.Library.Steps
             };
         }
 
-        public GeneralStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
             return new GeneralStep
             {
@@ -128,7 +148,7 @@ namespace Veruthian.Library.Steps
 
 
         // Unless
-        public GeneralStep Unless(IStep condition)
+        public IStep Unless(IStep condition)
         {
             return new GeneralStep
             {
@@ -140,7 +160,7 @@ namespace Veruthian.Library.Steps
             };
         }
 
-        public GeneralStep UnlessThen(IStep condition, IStep thenStep)
+        public IStep UnlessThen(IStep condition, IStep thenStep)
         {
             return new GeneralStep
             {
@@ -152,7 +172,7 @@ namespace Veruthian.Library.Steps
             };
         }
 
-        public GeneralStep UnlessElse(IStep condition, IStep elseStep)
+        public IStep UnlessElse(IStep condition, IStep elseStep)
         {
             return new GeneralStep
             {
@@ -164,7 +184,7 @@ namespace Veruthian.Library.Steps
             };
         }
 
-        public GeneralStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
         {
             return new GeneralStep
             {
@@ -178,7 +198,7 @@ namespace Veruthian.Library.Steps
 
 
         // Repeat
-        public GeneralStep While(IStep condition, IStep step)
+        public IStep While(IStep condition, IStep step)
         {
             var repeater = new GeneralStep();
 
@@ -196,7 +216,7 @@ namespace Veruthian.Library.Steps
             return repeater;
         }
 
-        public GeneralStep Until(IStep condition, IStep step)
+        public IStep Until(IStep condition, IStep step)
         {
             var repeater = new GeneralStep();
 
@@ -214,30 +234,10 @@ namespace Veruthian.Library.Steps
             return repeater;
         }
 
-        public GeneralStep Exactly(int times, IStep step)
-        {
-            var first = new GeneralStep();
+        public IStep Exactly(int times, IStep step)
+            => Exactly(times, step, true);
 
-            var current = first;
-
-            for (int i = 0; i < times; i++)
-            {
-                if (current != first)
-                {
-                    var next = new GeneralStep();
-
-                    current.Next = next;
-
-                    current = next;
-                }
-
-                current.Down = step;
-            }
-
-            return first;
-        }
-
-        public GeneralStep AtMost(int times, IStep condition, IStep step)
+        public IStep AtMost(int times, IStep condition, IStep step)
         {
             var first = new GeneralStep();
 
@@ -268,22 +268,45 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        public GeneralStep AtLeast(int times, IStep condition, IStep step)
+        public IStep AtLeast(int times, IStep condition, IStep step)
         {
-            var result = Exactly(times, step);
+            var result = Exactly(times, step, false);
 
             result.Next = While(condition, step);
 
             return result;
         }
 
-        public GeneralStep Between(int min, int max, IStep condition, IStep step)
+        public IStep Between(int min, int max, IStep condition, IStep step)
         {
-            var result = Exactly(min, step);
+            var result = Exactly(min, step, false);
 
             result.Next = AtMost(max - min, condition, step);
 
             return result;
+        }
+
+        private GeneralStep Exactly(int times, IStep step, bool label)
+        {
+            var first = new GeneralStep();
+
+            var current = first;
+
+            for (int i = 0; i < times; i++)
+            {
+                if (current != first)
+                {
+                    var next = new GeneralStep();
+
+                    current.Next = next;
+
+                    current = next;
+                }
+
+                current.Down = step;
+            }
+
+            return first;
         }
     }
 }
