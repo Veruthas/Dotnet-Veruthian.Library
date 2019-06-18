@@ -12,10 +12,10 @@ namespace Veruthian.Library.Steps
         public bool TypeConstructs { get; set; }
 
 
-        protected GeneralStep NewLinkStep()
-            => NameLinks ? new GeneralStep(name: $"Step #{linkNumber++}") : new GeneralStep();
+        protected GeneralStep NewLinkStep(IStep down = null, IStep next = null, IStep shunt = null)
+            => new GeneralStep(name: NameLinks ? $"Step #{linkNumber++}" : null) { Shunt = shunt, Down = down, Next = next };
 
-        protected IStep ResultStep(string type, string name, IStep step)
+        protected IStep ResultStep(IStep step, string type = null, string name = null)
             => TypeConstructs && type != null ? Typed(type, name, step) : step;
 
         protected IStep ShuntTrue => new EmptyStep();
@@ -39,17 +39,15 @@ namespace Veruthian.Library.Steps
 
 
         // Boolean
+        public const string TrueType = "True";
+
         public IStep True
         {
             get
             {
-                var step = NewLinkStep();
+                var step = NewLinkStep(shunt: ShuntTrue, down: ShuntTrue);
 
-                step.Shunt = ShuntTrue;
-
-                step.Down = ShuntTrue;
-
-                return ResultStep("Boolean", "True", step);
+                return ResultStep(step, type: "True");
             }
         }
 
@@ -57,13 +55,9 @@ namespace Veruthian.Library.Steps
         {
             get
             {
-                var step = NewLinkStep();
-                
-                step.Shunt = ShuntTrue;
+                var step = NewLinkStep(shunt: ShuntTrue, down: ShuntFalse);
 
-                step.Down = ShuntFalse;
-
-                return ResultStep("Boolean", "False", step);
+                return ResultStep(step, type: "False");
             }
         }
 
@@ -93,7 +87,7 @@ namespace Veruthian.Library.Steps
                 current.Down = step;
             }
 
-            return ResultStep("Sequence", null, first);
+            return ResultStep(first, type: "Sequence");
         }
 
 
