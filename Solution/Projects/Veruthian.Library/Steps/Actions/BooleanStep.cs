@@ -29,7 +29,7 @@ namespace Veruthian.Library.Steps.Actions
 
         public void Act(StepWalker walker, ObjectTable states)
         {
-            if (walker.StepStarted)
+            if (!walker.StepCompleted)
             {
                 if (AtStart)
                     walker.State = Value;

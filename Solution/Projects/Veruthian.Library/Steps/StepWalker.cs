@@ -43,11 +43,10 @@ namespace Veruthian.Library.Steps
             get => state;
             set => this.state = value;
         }
-
-        public bool StepStarted => !completed;
         
         public bool StepCompleted => completed;
 
+        public bool WalkCompleted => stack.Count.IsZero;
 
         public void Walk()
         {
