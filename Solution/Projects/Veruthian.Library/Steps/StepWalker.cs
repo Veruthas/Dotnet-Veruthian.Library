@@ -44,8 +44,9 @@ namespace Veruthian.Library.Steps
             set => this.state = value;
         }
 
+        public bool StepStarted => !completed;
+        
         public bool StepCompleted => completed;
-
 
 
         public void Walk()
