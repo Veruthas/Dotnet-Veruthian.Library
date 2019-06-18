@@ -197,7 +197,7 @@ namespace Veruthian.Library.Text.Encodings
         #endregion
 
 
-        public struct Encoder : IStepTransformer<uint, BitTwiddler>
+        public struct Encoder : IStepwiseTransformer<uint, BitTwiddler>
         {
             bool reverse;
 
@@ -229,7 +229,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct Decoder : IStepTransformer<BitTwiddler, uint>
+        public struct Decoder : IStepwiseTransformer<BitTwiddler, uint>
         {
             bool reverse;
 
@@ -266,7 +266,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct ByteDecoder : IStepTransformer<byte, uint>
+        public struct ByteDecoder : IStepwiseTransformer<byte, uint>
         {
             bool isLittleEndian;
 
@@ -356,7 +356,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct CharDecoder : IStepTransformer<char, uint>
+        public struct CharDecoder : IStepwiseTransformer<char, uint>
         {
             char leadingSurrogate;
 

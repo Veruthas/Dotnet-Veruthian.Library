@@ -136,7 +136,7 @@ namespace Veruthian.Library.Text.Encodings
 
 
 
-        public struct Encoder : IStepTransformer<uint, BitTwiddler>
+        public struct Encoder : IStepwiseTransformer<uint, BitTwiddler>
         {
             public (bool Complete, BitTwiddler Result) Process(uint data) => (true, Encode(data));
 
@@ -188,7 +188,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct Decoder : IStepTransformer<BitTwiddler, uint>
+        public struct Decoder : IStepwiseTransformer<BitTwiddler, uint>
         {
             public (bool Complete, uint Result) Process(BitTwiddler value) => (true, Decode(value));
 
@@ -207,7 +207,7 @@ namespace Veruthian.Library.Text.Encodings
             }
         }
 
-        public struct ByteDecoder : IStepTransformer<byte, uint>
+        public struct ByteDecoder : IStepwiseTransformer<byte, uint>
         {
             uint state;
 

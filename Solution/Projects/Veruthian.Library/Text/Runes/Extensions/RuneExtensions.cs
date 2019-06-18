@@ -11,7 +11,7 @@ namespace Veruthian.Library.Text.Runes.Extensions
     {
         // Rune Decoder
         public static IEnumerable<Rune> DecodeValues<T, TDecoder>(this IEnumerable<T> items, TDecoder decoder, string onIncomplete)
-            where TDecoder : IStepTransformer<T, uint>
+            where TDecoder : IStepwiseTransformer<T, uint>
         {
             var enumerator = items.GetEnumerator();
 
