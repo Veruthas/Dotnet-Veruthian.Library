@@ -1,8 +1,8 @@
 namespace Veruthian.Library.Steps
 {
-    public class EmptyStep : BaseStep
+    public class TerminalStep : BaseStep
     {
-        public EmptyStep(string type = null, string name = null)
+        public TerminalStep(string type = null, string name = null)
         {
             Type = type;
 

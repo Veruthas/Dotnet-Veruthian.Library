@@ -12,15 +12,13 @@ namespace Veruthian.Library.Steps
         public bool TypeConstructs { get; set; }
 
 
-        protected GeneralStep NewLinkStep(IStep down = null, IStep next = null, IStep shunt = null)
-            => new GeneralStep(name: NameLinks ? $"Step #{linkNumber++}" : null) { Shunt = shunt, Down = down, Next = next };
+        protected string NewName() => NameLinks ? NewName() : null;
 
-        protected IStep ResultStep(IStep step, string type = null, string name = null)
-            => TypeConstructs && type != null ? Typed(type, name, step) : step;
+        protected GeneralStep NewLinkStep(IStep shunt = null, IStep down = null, IStep next = null)
+            => new GeneralStep(name: NewName()) { Shunt = shunt, Down = down, Next = next };
 
-        protected IStep ShuntTrue => new EmptyStep();
-
-        protected IStep ShuntFalse => null;
+        protected IStep ResultStep(IStep step, string type = null)
+            => (TypeConstructs && type != null) ? Typed(type, NewName(), step) : step;
 
 
         // Typed
@@ -37,41 +35,20 @@ namespace Veruthian.Library.Steps
             => new GeneralStep(type, name) { Down = step };
 
 
-
-        // Boolean
-        public const string TrueType = "True";
-
-        public IStep True
-        {
-            get
-            {
-                var step = NewLinkStep(shunt: ShuntTrue, down: ShuntTrue);
-
-                return ResultStep(step, type: "True");
-            }
-        }
-
-        public IStep False
-        {
-            get
-            {
-                var step = NewLinkStep(shunt: ShuntTrue, down: ShuntFalse);
-
-                return ResultStep(step, type: "False");
-            }
-        }
-
-
-
         // Sequence
+        public const string SequenceType = "Sequence";
+
         public IStep Sequence(params IStep[] steps)
             => Sequence(steps as IEnumerable<IStep>);
 
         public IStep Sequence(IEnumerable<IStep> steps)
-        {
-            GeneralStep first = NewLinkStep();
+            => ResultStep(RawSequence(steps), SequenceType);
 
-            GeneralStep current = first;
+        protected IStep RawSequence(IEnumerable<IStep> steps)
+        {
+            var first = NewLinkStep();
+
+            var current = first;
 
             foreach (var step in steps)
             {
@@ -86,154 +63,160 @@ namespace Veruthian.Library.Steps
 
                 current.Down = step;
             }
-
-            return ResultStep(first, type: "Sequence");
+            return first;
         }
+
+
+
+        // Condition
+        protected IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type = null)
+        {
+            var result = NewLinkStep(shunt: condition, down: onTrue, next: onFalse);
+
+            return ResultStep(result, type);
+        }
+
+        protected IStep ShuntTrue => new TerminalStep(name: NewName());
+
+        protected IStep ShuntFalse => null;
+
+
+        // Boolean
+        public const string TrueType = "True";
+
+        public IStep True => ResultStep(RawTrue, TrueType);
+
+        protected IStep RawTrue => NewLinkStep(shunt: ShuntTrue, down: ShuntTrue);
+
+
+        public const string FalseType = "False";
+
+        public IStep False => ResultStep(RawFalse, FalseType);
+
+        protected IStep RawFalse => NewLinkStep(shunt: ShuntTrue, down: ShuntFalse);
+
+
 
 
         // If
+        public const string IfType = "If";
+
+        public const string IfThenType = "IfThen";
+
+        public const string IfElseType = "IfElse";
+
+        public const string IfThenElseType = "IfThenElse";
+
+
         public IStep If(IStep condition)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = ShuntTrue,
-
-                Next = ShuntFalse
-            };
-        }
+            => Condition(condition, onTrue: ShuntTrue, onFalse: ShuntFalse, type: IfType);
 
         public IStep IfThen(IStep condition, IStep thenStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = thenStep,
-
-                Next = ShuntFalse
-            };
-        }
+            => Condition(condition, onTrue: thenStep, onFalse: ShuntFalse, type: IfThenType);
 
         public IStep IfElse(IStep condition, IStep elseStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = ShuntTrue,
-
-                Next = elseStep
-            };
-        }
+            => Condition(condition, onTrue: ShuntTrue, onFalse: elseStep, type: IfElseType);
 
         public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = thenStep,
-
-                Next = elseStep
-            };
-        }
+            => Condition(condition, onTrue: thenStep, onFalse: elseStep, type: IfThenElseType);
 
 
         // Unless
+        public const string UnlessType = "Unless";
+
+        public const string UnlessThenType = "UnlessThen";
+
+        public const string UnlessElseType = "UnlessElse";
+
+        public const string UnlessThenElseType = "UnlessThenElse";
+
+
         public IStep Unless(IStep condition)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = ShuntFalse,
-
-                Next = ShuntTrue
-            };
-        }
+            => Condition(condition, onTrue: ShuntFalse, onFalse: ShuntTrue, type: UnlessType);
 
         public IStep UnlessThen(IStep condition, IStep thenStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = ShuntFalse,
-
-                Next = thenStep
-            };
-        }
+            => Condition(condition, onTrue: ShuntFalse, onFalse: thenStep, type: UnlessThenType);
 
         public IStep UnlessElse(IStep condition, IStep elseStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = elseStep,
-
-                Next = ShuntTrue
-            };
-        }
+            => Condition(condition, onTrue: elseStep, onFalse: ShuntTrue, type: UnlessElseType);
 
         public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
-        {
-            return new GeneralStep
-            {
-                Shunt = condition,
-
-                Down = elseStep,
-
-                Next = thenStep
-            };
-        }
+            => Condition(condition, onTrue: elseStep, onFalse: thenStep, type: UnlessThenElseType);
 
 
         // Repeat
+        public const string WhileType = "While";
+
+        public const string UntilType = "Until";
+
+        public const string ExactlyType = "Exactly";
+
+        public const string AtMostType = "AtMost";
+
+        public const string AtLeastType = "AtLeast";
+
+        public const string BetweenType = "Between";
+
+
         public IStep While(IStep condition, IStep step)
+            => ResultStep(RawWhile(condition, step), WhileType);
+
+
+        public IStep Until(IStep condition, IStep step)
+            => ResultStep(RawUntil(condition, step), UntilType);
+
+        public IStep Exactly(int times, IStep step)
+            => ResultStep(RawExactly(times, step), ExactlyType);
+
+        public IStep AtMost(int times, IStep condition, IStep step)
+            => ResultStep(RawAtMost(times, condition, step), AtMostType);
+
+        public IStep AtLeast(int times, IStep condition, IStep step)
+            => ResultStep(RawAtLeast(times, condition, step), AtLeastType);
+
+        public IStep Between(int min, int max, IStep condition, IStep step)
+            => ResultStep(RawBetween(min, max, condition, step), BetweenType);
+
+
+        protected GeneralStep RawWhile(IStep condition, IStep step)
         {
-            var repeater = new GeneralStep();
+            var repeater = NewLinkStep();
 
             repeater.Shunt = condition;
 
-            repeater.Down = new GeneralStep
-            {
-                Down = step,
+            repeater.Down = NewLinkStep
+            (
+                down: step,
 
-                Next = repeater
-            };
+                next: repeater
+            );
 
             repeater.Next = ShuntTrue;
 
             return repeater;
         }
 
-        public IStep Until(IStep condition, IStep step)
+        protected GeneralStep RawUntil(IStep condition, IStep step)
         {
-            var repeater = new GeneralStep();
+            var repeater = NewLinkStep();
 
             repeater.Shunt = condition;
 
             repeater.Down = ShuntTrue;
 
-            repeater.Next = new GeneralStep
-            {
-                Down = step,
+            repeater.Next = NewLinkStep
+            (
+                down: step,
 
-                Next = repeater
-            };
+                next: repeater
+            );
 
             return repeater;
         }
 
-        public IStep Exactly(int times, IStep step)
-            => Exactly(times, step, true);
-
-        public IStep AtMost(int times, IStep condition, IStep step)
+        protected GeneralStep RawExactly(int times, IStep step)
         {
-            var first = new GeneralStep();
+            var first = NewLinkStep();
 
             var current = first;
 
@@ -241,7 +224,30 @@ namespace Veruthian.Library.Steps
             {
                 if (current != first)
                 {
-                    var next = new GeneralStep();
+                    var next = NewLinkStep();
+
+                    current.Next = next;
+
+                    current = next;
+                }
+
+                current.Down = step;
+            }
+
+            return first;
+        }
+
+        protected GeneralStep RawAtMost(int times, IStep condition, IStep step)
+        {
+            var first = NewLinkStep();
+
+            var current = first;
+
+            for (int i = 0; i < times; i++)
+            {
+                if (current != first)
+                {
+                    var next = NewLinkStep();
 
                     current.Next = next;
 
@@ -250,7 +256,7 @@ namespace Veruthian.Library.Steps
 
                 current.Shunt = condition;
 
-                var down = new GeneralStep();
+                var down = NewLinkStep();
 
                 current.Down = down;
 
@@ -262,45 +268,22 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        public IStep AtLeast(int times, IStep condition, IStep step)
+        protected GeneralStep RawAtLeast(int times, IStep condition, IStep step)
         {
-            var result = Exactly(times, step, false);
+            var result = RawExactly(times, step);
 
-            result.Next = While(condition, step);
+            result.Next = RawWhile(condition, step);
 
             return result;
         }
 
-        public IStep Between(int min, int max, IStep condition, IStep step)
+        protected GeneralStep RawBetween(int min, int max, IStep condition, IStep step)
         {
-            var result = Exactly(min, step, false);
+            var result = RawExactly(min, step);
 
-            result.Next = AtMost(max - min, condition, step);
+            result.Next = RawAtMost(max - min, condition, step);
 
             return result;
-        }
-
-        private GeneralStep Exactly(int times, IStep step, bool label)
-        {
-            var first = new GeneralStep();
-
-            var current = first;
-
-            for (int i = 0; i < times; i++)
-            {
-                if (current != first)
-                {
-                    var next = new GeneralStep();
-
-                    current.Next = next;
-
-                    current = next;
-                }
-
-                current.Down = step;
-            }
-
-            return first;
         }
     }
 }
