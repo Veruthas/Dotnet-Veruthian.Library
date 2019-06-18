@@ -18,7 +18,7 @@ namespace Veruthian.Library.Steps
             => new GeneralStep(name: NewName()) { Shunt = shunt, Down = down, Next = next };
 
         protected IStep ResultStep(IStep step, string type = null)
-            => (TypeConstructs && type != null) ? Typed(type, NewName(), step) : step;
+            => (TypeConstructs && type != null) ? new NestedStep(type, NewName(), step) : step;
 
 
         // Typed
