@@ -4,7 +4,7 @@ using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Readers
 {
-    public interface ISpeculativeReader<out T> : ILookaheadReader<T>, ISpeculative
+    public interface ISpeculativeReader<out T> : ILookaheadReader<T>, ISpeculator
     {
         int MarkPosition { get; }
 

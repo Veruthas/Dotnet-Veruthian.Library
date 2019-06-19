@@ -3,13 +3,13 @@ using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Steps.Actions
 {
-    public class SpeculateStep : BaseStep, IActionStep<ISpeculative>, IActionStep<ObjectTable>
+    public class SpeculateStep : BaseStep, IActionStep<ISpeculator>, IActionStep<ObjectTable>
     {
         public override string Type => "Speculate";
 
         public override string Name => null;
 
-        public bool? Act(bool? state, bool completed, ISpeculative speculative)
+        public bool? Act(bool? state, bool completed, ISpeculator speculative)
         {
             if (!completed)
                 speculative.Mark();
@@ -23,6 +23,6 @@ namespace Veruthian.Library.Steps.Actions
         public const string SpeculativeAddress = "SpeculateStep.Speculative";
 
         public bool? Act(bool? state, bool completed, ObjectTable table)
-            => Act(state, completed, table.Get<ISpeculative>(SpeculativeAddress));
+            => Act(state, completed, table.Get<ISpeculator>(SpeculativeAddress));
     }
 }

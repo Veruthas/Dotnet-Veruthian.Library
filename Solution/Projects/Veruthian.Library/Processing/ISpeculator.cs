@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Processing
 {
-    public interface ISpeculative
+    public interface ISpeculator
     {
         bool IsSpeculating { get; }
 
