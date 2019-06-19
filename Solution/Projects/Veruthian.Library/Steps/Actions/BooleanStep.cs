@@ -27,18 +27,20 @@ namespace Veruthian.Library.Steps.Actions
 
         public const string TypeName = "Boolean";
 
-        public void Act(StepWalker walker, ObjectTable states)
+        public bool? Act(bool? state, bool completed)
         {
-            if (!walker.StepCompleted)
+            if (!completed)
             {
                 if (AtStart)
-                    walker.State = Value;
+                    return Value;
             }
             else
             {
                 if (AtComplete)
-                    walker.State = Value;
+                    return Value;
             }
+
+            return state;
         }
     }
 }

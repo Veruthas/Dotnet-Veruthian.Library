@@ -4,6 +4,11 @@ namespace Veruthian.Library.Steps
 {
     public interface IActionStep : IStep
     {
-        void Act(StepWalker walker, ObjectTable states);
+        bool? Act(bool? state, bool completed);
+    }
+
+    public interface IActionStep<in T> : IStep
+    {
+        bool? Act(bool? state, bool completed, T value);
     }
 }
