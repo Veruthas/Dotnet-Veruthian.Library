@@ -7,12 +7,9 @@ namespace Veruthian.Library.Steps.Actions
     {
         protected MatchStep() { }
 
-        protected MatchStep(string name) => this.Name = name;
-
-
-        public override string Type => $"Match";
-
-        public override string Name { get; }
+        public const string TypeName = "Match";
+        
+        public override string Type => TypeName;
 
 
         public abstract (bool Result, object State) Match(T item, object state = null);
@@ -44,7 +41,7 @@ namespace Veruthian.Library.Steps.Actions
 
         protected abstract string MatchingTo { get; }
 
-        public override string ToString() => StepString($"{Type}<{MatchingTo ?? "NULL"}>", Name);
+        public override string ToString() => $"{Type}<{MatchingTo ?? "NULL"}>";
 
 
         public const string ReaderAddress = "MatchStep.Reader";

@@ -4,12 +4,11 @@ namespace Veruthian.Library.Steps
     {
         public abstract string Type { get; }
 
-        public abstract string Name { get; }
-
 
         IStep IStep.Shunt => GetShunt();
 
-        IStep IStep.Down => GetDown();
+        IStep IStep.Step => GetDown();
+
 
         IStep IStep.Next => GetNext();
 
@@ -22,9 +21,6 @@ namespace Veruthian.Library.Steps
 
 
 
-        public override string ToString() => StepString(Type, Name);
-
-        protected string StepString(string Type, string Name)
-            => (Type == null ? (Name == null ? "" : "Step:" + Name) : (Name == null ? Type : Type + ":" + Name));
+        public override string ToString() => Type ?? "Step";        
     }
 }

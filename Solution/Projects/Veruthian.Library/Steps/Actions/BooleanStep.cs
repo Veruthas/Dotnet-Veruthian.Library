@@ -13,9 +13,10 @@ namespace Veruthian.Library.Steps.Actions
             this.AtComplete = atComplete;
         }
 
-        public override string Type => TypeName;
 
-        public override string Name => Value == true ? "True" : Value == false ? "False" : "Null";
+        public const string TypeName = "Boolean";
+
+        public override string Type => TypeName;
 
 
         public bool? Value { get; }
@@ -23,9 +24,6 @@ namespace Veruthian.Library.Steps.Actions
         public bool AtStart { get; }
 
         public bool AtComplete { get; }
-
-
-        public const string TypeName = "Boolean";
 
         public bool? Act(bool? state, bool completed)
         {

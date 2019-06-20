@@ -2,10 +2,10 @@ namespace Veruthian.Library.Steps
 {
     public abstract class BaseNestedStep : BaseStep
     {
-        protected BaseNestedStep(IStep step) => Down = step;
+        protected BaseNestedStep(IStep step) => Step = step;
 
-        public IStep Down { get; }
+        public IStep Step { get; }
 
-        protected override IStep GetDown() => Down;
+        protected override IStep GetDown() => Step;
     }
 }

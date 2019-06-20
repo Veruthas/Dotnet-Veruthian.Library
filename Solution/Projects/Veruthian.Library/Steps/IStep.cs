@@ -4,11 +4,9 @@ namespace Veruthian.Library.Steps
     {
         string Type { get; }
 
-        string Name { get; }
-        
         IStep Shunt { get; }
 
-        IStep Down { get; }
+        IStep Step { get; }
 
         IStep Next { get; }
     }

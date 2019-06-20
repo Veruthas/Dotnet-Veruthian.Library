@@ -62,9 +62,9 @@ namespace Veruthian.Library.Steps
                         {
                             stack.Push(step.Shunt);
                         }
-                        else if (step.Down != null)
+                        else if (step.Step != null)
                         {
-                            stack.Push(step.Down);
+                            stack.Push(step.Step);
                         }
                         else if (step.Next != null)
                         {
@@ -86,9 +86,9 @@ namespace Veruthian.Library.Steps
                     {
                         if (state == true)
                         {
-                            if (step.Down != null)
+                            if (step.Step != null)
                             {
-                                stack.Replace(step.Down);
+                                stack.Replace(step.Step);
 
                                 completed = false;
 

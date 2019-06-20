@@ -6,8 +6,6 @@ namespace Veruthian.Library.Steps.Actions
     {
         public MatchSetStep(IContainer<T> set) => this.Set = set;
 
-        public MatchSetStep(string name, IContainer<T> set) :base(name) => this.Set = set;
-
         public IContainer<T> Set { get; }
 
         protected override string MatchingTo => Set?.ToString();

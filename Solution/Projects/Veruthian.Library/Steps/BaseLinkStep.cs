@@ -2,7 +2,7 @@ namespace Veruthian.Library.Steps
 {
     public abstract class BaseLinkStep : BaseStep
     {
-        public IStep Shunt { get; set; }
+        public IStep Shunt { get; set; }    
 
         public IStep Down { get; set; }
 

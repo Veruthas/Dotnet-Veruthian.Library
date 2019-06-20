@@ -11,8 +11,6 @@ namespace _Console
         {
             var g = new StepGenerator();
 
-            g.NameAllSteps = true;
-
             g.TypeAllConstructs = true;
 
             var letter = new MatchSetStep<Rune>(RuneSet.Letter);

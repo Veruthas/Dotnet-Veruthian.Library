@@ -7,9 +7,10 @@ namespace Veruthian.Library.Steps.Actions
     {
         public SpeculateStep(IStep step) : base(step) { }
 
-        public override string Type => "Speculate";
 
-        public override string Name => null;
+        public const string TypeName = "Speculate";
+        
+        public override string Type => TypeName;
 
 
         public bool? Act(bool? state, bool completed, ISpeculator speculative)

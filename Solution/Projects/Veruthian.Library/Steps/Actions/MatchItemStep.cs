@@ -6,8 +6,6 @@ namespace Veruthian.Library.Steps.Actions
         where T : IEquatable<T>
     {
         public MatchItemStep(T value) => this.Value = value;
-
-        public MatchItemStep(string name, T value) : base(name) => this.Value = value;
         
 
         public T Value { get; }

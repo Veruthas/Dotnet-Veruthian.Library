@@ -8,8 +8,6 @@ namespace Veruthian.Library.Steps.Actions
     {
         public MatchSequence(IEnumerable<T> sequence) => this.Sequence = sequence;
 
-        public MatchSequence(string name, IEnumerable<T> sequence) : base(name) => this.Sequence = sequence;
-
         public IEnumerable<T> Sequence { get; }
 
         protected override string MatchingTo => Sequence?.ToString();
