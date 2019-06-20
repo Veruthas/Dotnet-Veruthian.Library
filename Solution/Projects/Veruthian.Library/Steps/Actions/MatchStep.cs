@@ -5,6 +5,16 @@ namespace Veruthian.Library.Steps.Actions
 {
     public abstract class MatchStep<T> : BaseStep, IActionStep<IReader<T>>, IActionStep<ObjectTable>
     {
+        protected MatchStep() { }
+
+        protected MatchStep(string name) => this.Name = name;
+
+
+        public override string Type => $"Match";
+
+        public override string Name { get; }
+
+
         public abstract (bool Result, object State) Match(T item, object state = null);
 
         public bool? Act(bool? state, bool completed, IReader<T> reader)
@@ -31,6 +41,11 @@ namespace Veruthian.Library.Steps.Actions
 
             return state;
         }
+
+        protected abstract string MatchingTo { get; }
+
+        public override string ToString() => StepString($"{Type}<{MatchingTo ?? "NULL"}>", Name);
+
 
         public const string ReaderAddress = "MatchStep.Reader";
 
