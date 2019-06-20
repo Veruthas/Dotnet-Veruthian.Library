@@ -1,21 +1,19 @@
 namespace Veruthian.Library.Steps
 {
-    public class NestedStep : BaseStep
+    public class NestedStep : BaseNestedStep
     {
         public NestedStep(string type, IStep step)
+            : base(step)
         {
             this.Type = type;
-
-            this.Down = step;
         }
 
         public NestedStep(string type, string name, IStep step)
+            : base(step)
         {
             this.Type = type;
 
             this.Name = name;
-
-            this.Down = step;
         }
 
 
@@ -23,9 +21,9 @@ namespace Veruthian.Library.Steps
 
         public override string Name { get; }
 
-        public IStep Down { get; }
+        public IStep Step { get; }
 
 
-        protected override IStep GetDown() =>  Down;
+        protected override IStep GetDown() => Down;
     }
 }

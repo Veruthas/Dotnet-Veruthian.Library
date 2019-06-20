@@ -3,11 +3,14 @@ using Veruthian.Library.Processing;
 
 namespace Veruthian.Library.Steps.Actions
 {
-    public class SpeculateStep : BaseStep, IActionStep<ISpeculator>, IActionStep<ObjectTable>
+    public class SpeculateStep : BaseNestedStep, IActionStep<ISpeculator>, IActionStep<ObjectTable>
     {
+        public SpeculateStep(IStep step) : base(step) { }
+
         public override string Type => "Speculate";
 
         public override string Name => null;
+
 
         public bool? Act(bool? state, bool completed, ISpeculator speculative)
         {
