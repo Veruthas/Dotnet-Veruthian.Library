@@ -7,29 +7,31 @@ namespace Veruthian.Library.Steps
     {
         private Number linkNumber = Number.Zero;
 
-        public bool NameLinks { get; set; }
 
-        public bool TypeConstructs { get; set; }
+        // Generate General
+        public bool NameAllSteps { get; set; }
+
+        public bool TypeAllConstructs { get; set; }
 
 
-        protected string NewName() => NameLinks ? NewName() : null;
+        public string GenerateStepName() => NameAllSteps ? GenerateStepName() : null;
 
-        protected GeneralStep NewLinkStep(IStep shunt = null, IStep down = null, IStep next = null)
-            => new GeneralStep(name: NewName()) { Shunt = shunt, Down = down, Next = next };
+        public GeneralStep GenerateGeneralStep(IStep shunt = null, IStep down = null, IStep next = null)
+            => new GeneralStep(name: GenerateStepName()) { Shunt = shunt, Down = down, Next = next };
 
-        protected IStep ResultStep(IStep step, string type = null)
-            => (TypeConstructs && type != null) ? new NestedStep(type, NewName(), step) : step;
+        public IStep GenerateConstruct(IStep step, string type = null)
+            => (TypeAllConstructs && type != null) ? new NestedStep(type, GenerateStepName(), step) : step;
 
 
         // Typed
         public IStep Typed(string type)
             => new GeneralStep(type);
 
-        public IStep Typed(string type, IStep step)
-            => new GeneralStep(type) { Down = step };
-
         public IStep Typed(string type, string name)
             => new GeneralStep(type, name);
+
+        public IStep Typed(string type, IStep step)
+            => new GeneralStep(type) { Down = step };
 
         public IStep Typed(string type, string name, IStep step)
             => new GeneralStep(type, name) { Down = step };
@@ -42,11 +44,11 @@ namespace Veruthian.Library.Steps
             => Sequence(steps as IEnumerable<IStep>);
 
         public IStep Sequence(IEnumerable<IStep> steps)
-            => ResultStep(RawSequence(steps), SequenceType);
+            => GenerateConstruct(RawSequence(steps), SequenceType);
 
         protected IStep RawSequence(IEnumerable<IStep> steps)
         {
-            var first = NewLinkStep();
+            var first = GenerateGeneralStep();
 
             var current = first;
 
@@ -54,7 +56,7 @@ namespace Veruthian.Library.Steps
             {
                 if (current != first)
                 {
-                    var next = NewLinkStep();
+                    var next = GenerateGeneralStep();
 
                     current.Next = next;
 
@@ -71,12 +73,12 @@ namespace Veruthian.Library.Steps
         // Condition
         protected IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type = null)
         {
-            var result = NewLinkStep(shunt: condition, down: onTrue, next: onFalse);
+            var result = GenerateGeneralStep(shunt: condition, down: onTrue, next: onFalse);
 
-            return ResultStep(result, type);
+            return GenerateConstruct(result, type);
         }
 
-        protected IStep ShuntTrue => new TerminalStep(name: NewName());
+        protected IStep ShuntTrue => new TerminalStep(name: GenerateStepName());
 
         protected IStep ShuntFalse => null;
 
@@ -84,16 +86,16 @@ namespace Veruthian.Library.Steps
         // Boolean
         public const string TrueType = "True";
 
-        public IStep True => ResultStep(RawTrue, TrueType);
+        public IStep True => GenerateConstruct(RawTrue, TrueType);
 
-        protected IStep RawTrue => NewLinkStep(shunt: ShuntTrue, down: ShuntTrue);
+        protected IStep RawTrue => GenerateGeneralStep(shunt: ShuntTrue, down: ShuntTrue);
 
 
         public const string FalseType = "False";
 
-        public IStep False => ResultStep(RawFalse, FalseType);
+        public IStep False => GenerateConstruct(RawFalse, FalseType);
 
-        protected IStep RawFalse => NewLinkStep(shunt: ShuntTrue, down: ShuntFalse);
+        protected IStep RawFalse => GenerateGeneralStep(shunt: ShuntTrue, down: ShuntFalse);
 
 
 
@@ -159,32 +161,32 @@ namespace Veruthian.Library.Steps
 
 
         public IStep While(IStep condition, IStep step)
-            => ResultStep(RawWhile(condition, step), WhileType);
+            => GenerateConstruct(RawWhile(condition, step), WhileType);
 
 
         public IStep Until(IStep condition, IStep step)
-            => ResultStep(RawUntil(condition, step), UntilType);
+            => GenerateConstruct(RawUntil(condition, step), UntilType);
 
         public IStep Exactly(int times, IStep step)
-            => ResultStep(RawExactly(times, step), ExactlyType);
+            => GenerateConstruct(RawExactly(times, step), ExactlyType);
 
         public IStep AtMost(int times, IStep condition, IStep step)
-            => ResultStep(RawAtMost(times, condition, step), AtMostType);
+            => GenerateConstruct(RawAtMost(times, condition, step), AtMostType);
 
         public IStep AtLeast(int times, IStep condition, IStep step)
-            => ResultStep(RawAtLeast(times, condition, step), AtLeastType);
+            => GenerateConstruct(RawAtLeast(times, condition, step), AtLeastType);
 
         public IStep Between(int min, int max, IStep condition, IStep step)
-            => ResultStep(RawBetween(min, max, condition, step), BetweenType);
+            => GenerateConstruct(RawBetween(min, max, condition, step), BetweenType);
 
 
         protected GeneralStep RawWhile(IStep condition, IStep step)
         {
-            var repeater = NewLinkStep();
+            var repeater = GenerateGeneralStep();
 
             repeater.Shunt = condition;
 
-            repeater.Down = NewLinkStep
+            repeater.Down = GenerateGeneralStep
             (
                 down: step,
 
@@ -198,13 +200,13 @@ namespace Veruthian.Library.Steps
 
         protected GeneralStep RawUntil(IStep condition, IStep step)
         {
-            var repeater = NewLinkStep();
+            var repeater = GenerateGeneralStep();
 
             repeater.Shunt = condition;
 
             repeater.Down = ShuntTrue;
 
-            repeater.Next = NewLinkStep
+            repeater.Next = GenerateGeneralStep
             (
                 down: step,
 
@@ -216,7 +218,7 @@ namespace Veruthian.Library.Steps
 
         protected GeneralStep RawExactly(int times, IStep step)
         {
-            var first = NewLinkStep();
+            var first = GenerateGeneralStep();
 
             var current = first;
 
@@ -224,7 +226,7 @@ namespace Veruthian.Library.Steps
             {
                 if (current != first)
                 {
-                    var next = NewLinkStep();
+                    var next = GenerateGeneralStep();
 
                     current.Next = next;
 
@@ -239,7 +241,7 @@ namespace Veruthian.Library.Steps
 
         protected GeneralStep RawAtMost(int times, IStep condition, IStep step)
         {
-            var first = NewLinkStep();
+            var first = GenerateGeneralStep();
 
             var current = first;
 
@@ -247,7 +249,7 @@ namespace Veruthian.Library.Steps
             {
                 if (current != first)
                 {
-                    var next = NewLinkStep();
+                    var next = GenerateGeneralStep();
 
                     current.Next = next;
 
@@ -256,7 +258,7 @@ namespace Veruthian.Library.Steps
 
                 current.Shunt = condition;
 
-                var down = NewLinkStep();
+                var down = GenerateGeneralStep();
 
                 current.Down = down;
 
