@@ -12,11 +12,15 @@ namespace Veruthian.Library.Steps
         public bool TypeAllConstructs { get; set; }
 
 
-        protected LinkStep NewStep(IStep shunt = null, IStep down = null, IStep next = null)
-            => new GeneralStep() { Shunt = shunt, Down = down, Next = next };
+        private LinkStep NewStep(IStep shunt = null, IStep down = null, IStep next = null)
+            => new LinkStep { Shunt = shunt, Down = down, Next = next };
 
-        protected IStep GenerateConstruct(IStep step, string type = null)
-            => (TypeAllConstructs && type != null) ? new NestedStep(type,  step) : step;
+        public IStep GenerateConstruct(IStep step, string type = null, bool? setType = null)
+        {
+            bool wrap = setType == null ? TypeAllConstructs : setType.Value;
+
+            return (wrap && type != null) ? new NestedStep(type, step) : step;
+        }
 
 
         // Typed
@@ -33,10 +37,13 @@ namespace Veruthian.Library.Steps
         public IStep Sequence(params IStep[] steps)
             => Sequence(steps as IEnumerable<IStep>);
 
-        public IStep Sequence(IEnumerable<IStep> steps)
+        public IStep Sequence(IStep[] steps, bool? setType)
+            => Sequence(steps as IEnumerable<IStep>);
+
+        public IStep Sequence(IEnumerable<IStep> steps, bool? setType = null)
             => GenerateConstruct(RawSequence(steps), SequenceType);
 
-        protected IStep RawSequence(IEnumerable<IStep> steps)
+        private IStep RawSequence(IEnumerable<IStep> steps)
         {
             var first = NewStep();
 
@@ -63,33 +70,32 @@ namespace Veruthian.Library.Steps
         }
 
 
-
         // Condition
-        protected IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type = null)
+        private IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type = null)
         {
             var result = NewStep(shunt: condition, down: onTrue, next: onFalse);
 
             return GenerateConstruct(result, type);
         }
 
-        protected IStep ShuntTrue => new TerminalStep();
+        private IStep ShuntTrue => new TerminalStep();
 
-        protected IStep ShuntFalse => null;
+        private IStep ShuntFalse => null;
 
 
         // Boolean
         public const string TrueType = "True";
 
-        public IStep True => GenerateConstruct(RawTrue, TrueType);
+        public IStep True(bool? setType = null) => GenerateConstruct(RawTrue, TrueType);
 
-        protected IStep RawTrue => NewStep(shunt: ShuntTrue, down: ShuntTrue);
+        private IStep RawTrue => NewStep(shunt: ShuntTrue, down: ShuntTrue);
 
 
         public const string FalseType = "False";
 
-        public IStep False => GenerateConstruct(RawFalse, FalseType);
+        public IStep False(bool? setType = null) => GenerateConstruct(RawFalse, FalseType);
 
-        protected IStep RawFalse => NewStep(shunt: ShuntTrue, down: ShuntFalse);
+        private IStep RawFalse => NewStep(shunt: ShuntTrue, down: ShuntFalse);
 
 
 
@@ -103,16 +109,16 @@ namespace Veruthian.Library.Steps
         public const string IfThenElseType = "IfThenElse";
 
 
-        public IStep If(IStep condition)
+        public IStep If(IStep condition, bool? setType = null)
             => Condition(condition, onTrue: ShuntTrue, onFalse: ShuntFalse, type: IfType);
 
-        public IStep IfThen(IStep condition, IStep thenStep)
+        public IStep IfThen(IStep condition, IStep thenStep, bool? setType = null)
             => Condition(condition, onTrue: thenStep, onFalse: ShuntFalse, type: IfThenType);
 
-        public IStep IfElse(IStep condition, IStep elseStep)
+        public IStep IfElse(IStep condition, IStep elseStep, bool? setType = null)
             => Condition(condition, onTrue: ShuntTrue, onFalse: elseStep, type: IfElseType);
 
-        public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
             => Condition(condition, onTrue: thenStep, onFalse: elseStep, type: IfThenElseType);
 
 
@@ -126,16 +132,16 @@ namespace Veruthian.Library.Steps
         public const string UnlessThenElseType = "UnlessThenElse";
 
 
-        public IStep Unless(IStep condition)
+        public IStep Unless(IStep condition, bool? setType = null)
             => Condition(condition, onTrue: ShuntFalse, onFalse: ShuntTrue, type: UnlessType);
 
-        public IStep UnlessThen(IStep condition, IStep thenStep)
+        public IStep UnlessThen(IStep condition, IStep thenStep, bool? setType = null)
             => Condition(condition, onTrue: ShuntFalse, onFalse: thenStep, type: UnlessThenType);
 
-        public IStep UnlessElse(IStep condition, IStep elseStep)
+        public IStep UnlessElse(IStep condition, IStep elseStep, bool? setType = null)
             => Condition(condition, onTrue: elseStep, onFalse: ShuntTrue, type: UnlessElseType);
 
-        public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
+        public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
             => Condition(condition, onTrue: elseStep, onFalse: thenStep, type: UnlessThenElseType);
 
 
@@ -153,27 +159,27 @@ namespace Veruthian.Library.Steps
         public const string BetweenType = "Between";
 
 
-        public IStep While(IStep condition, IStep step)
+        public IStep While(IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawWhile(condition, step), WhileType);
 
 
-        public IStep Until(IStep condition, IStep step)
+        public IStep Until(IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawUntil(condition, step), UntilType);
 
-        public IStep Exactly(int times, IStep step)
+        public IStep Exactly(int times, IStep step, bool? setType = null)
             => GenerateConstruct(RawExactly(times, step), ExactlyType);
 
-        public IStep AtMost(int times, IStep condition, IStep step)
+        public IStep AtMost(int times, IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawAtMost(times, condition, step), AtMostType);
 
-        public IStep AtLeast(int times, IStep condition, IStep step)
+        public IStep AtLeast(int times, IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawAtLeast(times, condition, step), AtLeastType);
 
-        public IStep Between(int min, int max, IStep condition, IStep step)
+        public IStep Between(int min, int max, IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawBetween(min, max, condition, step), BetweenType);
 
 
-        protected LinkStep RawWhile(IStep condition, IStep step)
+        private LinkStep RawWhile(IStep condition, IStep step)
         {
             var repeater = NewStep();
 
@@ -191,7 +197,7 @@ namespace Veruthian.Library.Steps
             return repeater;
         }
 
-        protected LinkStep RawUntil(IStep condition, IStep step)
+        private LinkStep RawUntil(IStep condition, IStep step)
         {
             var repeater = NewStep();
 
@@ -209,7 +215,7 @@ namespace Veruthian.Library.Steps
             return repeater;
         }
 
-        protected LinkStep RawExactly(int times, IStep step)
+        private LinkStep RawExactly(int times, IStep step)
         {
             var first = NewStep();
 
@@ -232,7 +238,7 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        protected LinkStep RawAtMost(int times, IStep condition, IStep step)
+        private LinkStep RawAtMost(int times, IStep condition, IStep step)
         {
             var first = NewStep();
 
@@ -263,7 +269,7 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        protected LinkStep RawAtLeast(int times, IStep condition, IStep step)
+        private LinkStep RawAtLeast(int times, IStep condition, IStep step)
         {
             var result = RawExactly(times, step);
 
@@ -272,7 +278,7 @@ namespace Veruthian.Library.Steps
             return result;
         }
 
-        protected LinkStep RawBetween(int min, int max, IStep condition, IStep step)
+        private LinkStep RawBetween(int min, int max, IStep condition, IStep step)
         {
             var result = RawExactly(min, step);
 
