@@ -1113,7 +1113,11 @@ namespace Veruthian.Library.Numeric
             }
             else if (this.IsZero)
             {
-                builder.Append(symbols[0]);
+                if (pad)
+                    for (var i = 0; i < groupLength; i++)
+                        builder.Append(symbols[0]);
+                else
+                    builder.Append(symbols[0]);
             }
             else
             {
