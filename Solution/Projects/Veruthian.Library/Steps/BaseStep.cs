@@ -25,6 +25,6 @@ namespace Veruthian.Library.Steps
         public override string ToString() => StepString(Type, Name);
 
         protected string StepString(string Type, string Name)
-            => (Type == null ? (Name == null ? "" : ":" + Name) : (Name == null ? Type : Type + ":" + Name));
+            => (Type == null ? (Name == null ? "" : "Step:" + Name) : (Name == null ? Type : Type + ":" + Name));
     }
 }

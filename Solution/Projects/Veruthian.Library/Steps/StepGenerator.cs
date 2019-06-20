@@ -14,7 +14,7 @@ namespace Veruthian.Library.Steps
         public bool TypeAllConstructs { get; set; }
 
 
-        public string GenerateStepName() => NameAllSteps ? GenerateStepName() : null;
+        public string GenerateStepName() => NameAllSteps ? (linkNumber++).ToHexadecimalString() : null;
 
         public GeneralStep GenerateGeneralStep(IStep shunt = null, IStep down = null, IStep next = null)
             => new GeneralStep(name: GenerateStepName()) { Shunt = shunt, Down = down, Next = next };
@@ -50,11 +50,15 @@ namespace Veruthian.Library.Steps
         {
             var first = GenerateGeneralStep();
 
-            var current = first;
+            var current = null as GeneralStep;
 
             foreach (var step in steps)
             {
-                if (current != first)
+                if (current == null)
+                {
+                    current = first;
+                }
+                else
                 {
                     var next = GenerateGeneralStep();
 
@@ -224,7 +228,7 @@ namespace Veruthian.Library.Steps
 
             for (int i = 0; i < times; i++)
             {
-                if (current != first)
+                if (i > 0)
                 {
                     var next = GenerateGeneralStep();
 
@@ -247,7 +251,7 @@ namespace Veruthian.Library.Steps
 
             for (int i = 0; i < times; i++)
             {
-                if (current != first)
+                if (i > 0)
                 {
                     var next = GenerateGeneralStep();
 
