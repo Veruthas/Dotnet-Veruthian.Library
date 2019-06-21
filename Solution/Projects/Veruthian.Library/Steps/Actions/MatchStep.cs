@@ -12,7 +12,7 @@ namespace Veruthian.Library.Steps.Actions
         public override string Type => TypeName;
 
 
-        public abstract (bool Result, object State) Match(T item, object state = null);
+        public abstract (bool Result, object State) Match(T value, object state = null);
 
         public bool? Act(bool? state, bool completed, IReader<T> reader)
         {

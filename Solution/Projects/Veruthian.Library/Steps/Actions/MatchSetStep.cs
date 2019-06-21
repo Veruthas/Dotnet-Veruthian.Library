@@ -10,12 +10,12 @@ namespace Veruthian.Library.Steps.Actions
 
         protected override string MatchingTo => Set?.ToString();
 
-        public override (bool Result, object State) Match(T item, object state = null)
+        public override (bool Result, object State) Match(T value, object state = null)
         {
             if (Set == null)
                 return (false, null);
             else
-                return (Set.Contains(item), null);
+                return (Set.Contains(value), null);
         }            
     }
 }
