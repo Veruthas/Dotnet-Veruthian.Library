@@ -41,7 +41,7 @@ namespace Veruthian.Library.Steps
             => Sequence(steps as IEnumerable<IStep>);
 
         public IStep Sequence(IEnumerable<IStep> steps, bool? setType = null)
-            => GenerateConstruct(RawSequence(steps), SequenceType);
+            => GenerateConstruct(RawSequence(steps), SequenceType, setType);
 
         private IStep RawSequence(IEnumerable<IStep> steps)
         {
@@ -75,7 +75,7 @@ namespace Veruthian.Library.Steps
         {
             var result = NewStep(shunt: condition, down: onTrue, next: onFalse);
 
-            return GenerateConstruct(result, type);
+            return GenerateConstruct(result, type, null);
         }
 
         private IStep ShuntTrue => new TerminalStep();
@@ -86,14 +86,14 @@ namespace Veruthian.Library.Steps
         // Boolean
         public const string TrueType = "True";
 
-        public IStep True(bool? setType = null) => GenerateConstruct(RawTrue, TrueType);
+        public IStep True(bool? setType = null) => GenerateConstruct(RawTrue, TrueType, setType);
 
         private IStep RawTrue => NewStep(shunt: ShuntTrue, down: ShuntTrue);
 
 
         public const string FalseType = "False";
 
-        public IStep False(bool? setType = null) => GenerateConstruct(RawFalse, FalseType);
+        public IStep False(bool? setType = null) => GenerateConstruct(RawFalse, FalseType, setType);
 
         private IStep RawFalse => NewStep(shunt: ShuntTrue, down: ShuntFalse);
 
@@ -160,23 +160,23 @@ namespace Veruthian.Library.Steps
 
 
         public IStep While(IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawWhile(condition, step), WhileType);
+            => GenerateConstruct(RawWhile(condition, step), WhileType, setType);
 
 
         public IStep Until(IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawUntil(condition, step), UntilType);
+            => GenerateConstruct(RawUntil(condition, step), UntilType, setType);
 
         public IStep Exactly(int times, IStep step, bool? setType = null)
-            => GenerateConstruct(RawExactly(times, step), ExactlyType);
+            => GenerateConstruct(RawExactly(times, step), ExactlyType, setType);
 
         public IStep AtMost(int times, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawAtMost(times, condition, step), AtMostType);
+            => GenerateConstruct(RawAtMost(times, condition, step), AtMostType, setType);
 
         public IStep AtLeast(int times, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawAtLeast(times, condition, step), AtLeastType);
+            => GenerateConstruct(RawAtLeast(times, condition, step), AtLeastType, setType);
 
         public IStep Between(int min, int max, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawBetween(min, max, condition, step), BetweenType);
+            => GenerateConstruct(RawBetween(min, max, condition, step), BetweenType, setType);
 
 
         private LinkStep RawWhile(IStep condition, IStep step)
