@@ -6,10 +6,10 @@ namespace Veruthian.Library.Steps.Actions.Extensions
 {
     public static class MatchExtensions
     {
-        public static IStep MatchItem<T>(T value) where T : IEquatable<T> => new MatchValueStep<T>(value);
+        public static IStep MatchValue<T>(this StepGenerator generator, T value) where T : IEquatable<T> => new MatchValueStep<T>(value);
 
-        public static IStep MatchSequence<T>(IEnumerable<T> sequence) where T : IEquatable<T> => new MatchSequenceStep<T>(sequence);
+        public static IStep MatchSequence<T>(this StepGenerator generator, IEnumerable<T> sequence) where T : IEquatable<T> => new MatchSequenceStep<T>(sequence);
 
-        public static IStep MatchSet<T>(IContainer<T> set) => new MatchSetStep<T>(set);
+        public static IStep MatchSet<T>(this StepGenerator generator, IContainer<T> set) => new MatchSetStep<T>(set);
     }
 }

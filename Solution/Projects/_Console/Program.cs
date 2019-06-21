@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Veruthian.Library.Numeric;
 using Veruthian.Library.Steps;
 using Veruthian.Library.Steps.Actions;
+using Veruthian.Library.Steps.Actions.Extensions;
 using Veruthian.Library.Text.Runes;
 
 namespace _Console
@@ -13,11 +14,9 @@ namespace _Console
         {
             var g = new StepGenerator();
 
-            g.TypeAllConstructs = true;
+            var spaces = g.SpeculateRepeat(g.MatchSet(RuneSet.Whitespace));
 
-            var letter = new MatchSetStep<Rune>(RuneSet.Letter);
-
-            var word = g.Exactly(4, letter);
+            var word = g.Sequence(g.Exactly(5, g.MatchSet(RuneSet.Letter)));
 
             StepProcessor.Process(word, Trace);
 
@@ -28,20 +27,24 @@ namespace _Console
 
         static ConditionalWeakTable<IStep, string> names = new ConditionalWeakTable<IStep, string>();
 
+        static int indent;
+
         public static bool? Trace(IStep step, bool? state, bool completed)
         {
             string name;
 
             if (!names.TryGetValue(step, out name))
             {
-                name = id.ToHexadecimalString(groupLength: 8, pad: true);
+                name = id.ToHexadecimalString(groupLength: 4, pad: true);
 
                 id++;
 
                 names.Add(step, name);
             }
+            
+            Console.WriteLine($"{new string('|', indent )}{step}:{name} {(completed ? "Completed" : "Started")}: {(state == null ? "null" : completed.ToString())}");
 
-            Console.WriteLine($"{step}:{name} {(completed ? "Completed" : "Started")}: {(state == null ? "null" : completed.ToString())}");
+            indent += completed ? -1 : 1;
 
             return state;
         }

@@ -4,7 +4,7 @@ namespace Veruthian.Library.Steps.Actions.Extensions
     {
         // Speculate
         private static IStep Speculate(IStep step)
-            => Speculate(step);
+            => new SpeculateStep(step);
 
         public static IStep Speculate(this StepGenerator generator, IStep step)
             => Speculate(step);
