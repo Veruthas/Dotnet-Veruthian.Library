@@ -71,11 +71,11 @@ namespace Veruthian.Library.Steps
 
 
         // Condition
-        private IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type = null)
+        private IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type, bool? setType)
         {
             var result = NewStep(shunt: condition, down: onTrue, next: onFalse);
 
-            return GenerateConstruct(result, type, null);
+            return GenerateConstruct(result, type, setType);
         }
 
         private IStep ShuntTrue => new TerminalStep();
@@ -110,16 +110,16 @@ namespace Veruthian.Library.Steps
 
 
         public IStep If(IStep condition, bool? setType = null)
-            => Condition(condition, onTrue: ShuntTrue, onFalse: ShuntFalse, type: IfType);
+            => Condition(condition, ShuntTrue, ShuntFalse, IfType, setType);
 
         public IStep IfThen(IStep condition, IStep thenStep, bool? setType = null)
-            => Condition(condition, onTrue: thenStep, onFalse: ShuntFalse, type: IfThenType);
+            => Condition(condition, thenStep, ShuntFalse, IfThenType, setType);
 
         public IStep IfElse(IStep condition, IStep elseStep, bool? setType = null)
-            => Condition(condition, onTrue: ShuntTrue, onFalse: elseStep, type: IfElseType);
+            => Condition(condition, ShuntTrue, elseStep,  IfElseType, setType);
 
         public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
-            => Condition(condition, onTrue: thenStep, onFalse: elseStep, type: IfThenElseType);
+            => Condition(condition, thenStep, elseStep, IfThenElseType, setType);
 
 
         // Unless
@@ -133,16 +133,16 @@ namespace Veruthian.Library.Steps
 
 
         public IStep Unless(IStep condition, bool? setType = null)
-            => Condition(condition, onTrue: ShuntFalse, onFalse: ShuntTrue, type: UnlessType);
+            => Condition(condition, ShuntFalse, ShuntTrue, UnlessType, setType);
 
         public IStep UnlessThen(IStep condition, IStep thenStep, bool? setType = null)
-            => Condition(condition, onTrue: ShuntFalse, onFalse: thenStep, type: UnlessThenType);
+            => Condition(condition, ShuntFalse, thenStep, UnlessThenType, setType);
 
         public IStep UnlessElse(IStep condition, IStep elseStep, bool? setType = null)
-            => Condition(condition, onTrue: elseStep, onFalse: ShuntTrue, type: UnlessElseType);
+            => Condition(condition, elseStep, ShuntTrue, UnlessElseType, setType);
 
         public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
-            => Condition(condition, onTrue: elseStep, onFalse: thenStep, type: UnlessThenElseType);
+            => Condition(condition, elseStep, thenStep, UnlessThenElseType, setType);
 
 
         // Repeat
@@ -161,7 +161,6 @@ namespace Veruthian.Library.Steps
 
         public IStep While(IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawWhile(condition, step), WhileType, setType);
-
 
         public IStep Until(IStep condition, IStep step, bool? setType = null)
             => GenerateConstruct(RawUntil(condition, step), UntilType, setType);
