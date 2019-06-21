@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps.Actions.Extensions
 {
-    public static class ActionExtensions
+    public static class SpeculateExtensions
     {
         // Speculate
         private static IStep Speculate(IStep step)
