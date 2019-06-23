@@ -7,7 +7,7 @@ namespace Veruthian.Library.Steps
 
         IStep IStep.Shunt => GetShunt();
 
-        IStep IStep.Step => GetDown();
+        IStep IStep.Down => GetDown();
 
         IStep IStep.Next => GetNext();
 

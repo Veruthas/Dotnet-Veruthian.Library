@@ -4,7 +4,7 @@ namespace Veruthian.Library.Steps
     {
         IStep Shunt { get; }
 
-        IStep Step { get; }
+        IStep Down { get; }
 
         IStep Next { get; }
     }

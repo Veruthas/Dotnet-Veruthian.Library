@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Steps
 {
-    public class NamedStepTable<N>
-        where N : BaseNamedStep
+    public class StepTable<N>
+        where N : BaseNestedStep
     {
         private Func<string, N> newStep;
 
         private Dictionary<string, N> steps;
 
-        public NamedStepTable(Func<string, N> newStep)
+        public StepTable(Func<string, N> newStep)
         {
             this.newStep = newStep;
 
@@ -25,11 +25,11 @@ namespace Veruthian.Library.Steps
             {
                 var step = GetStep(name);
 
-                step.Step = value;
+                step.Down = value;
             }
         }
 
-        private N GetStep(string name)
+        public N GetStep(string name)
         {
             if (!steps.TryGetValue(name, out var step))
             {

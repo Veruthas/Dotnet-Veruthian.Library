@@ -4,9 +4,6 @@ namespace Veruthian.Library.Steps
     {
         protected BaseNamedStep(string name) => this.Name = name;
 
-        protected BaseNamedStep(string name, IStep step) : base(step) => this.Name = name;
-
-
         public string Name { get; }
     }
 }
