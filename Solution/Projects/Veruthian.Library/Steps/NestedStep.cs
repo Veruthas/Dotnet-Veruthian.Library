@@ -11,7 +11,5 @@ namespace Veruthian.Library.Steps
         public NestedStep(string description, IStep down) { this.Description = description; this.Down = down; }
 
         public override string Description { get; }
-
-        protected override IStep GetDown() => base.Down;
     }
 }
