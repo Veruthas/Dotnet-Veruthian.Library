@@ -5,47 +5,13 @@ namespace Veruthian.Library.Steps
 {
     public class StepGenerator
     {
-        private Number linkNumber = Number.Zero;
-
-
-        // Generate General
-        public bool TypeAllConstructs { get; set; }
-
-
-        private LinkStep NewStep(IStep shunt = null, IStep down = null, IStep next = null)
-            => new LinkStep { Shunt = shunt, Down = down, Next = next };
-
-        public IStep GenerateConstruct(IStep step, string type = null, bool? setType = null)
-        {
-            bool wrap = setType == null ? TypeAllConstructs : setType.Value;
-
-            return (wrap && type != null) ? new NestedStep(type, step) : step;
-        }
-
-
-        // Typed
-        public IStep Typed(string type)
-            => new GeneralStep(type);
-
-        public IStep Typed(string type, IStep step)
-            => new GeneralStep(type) { Down = step };
-
-
         // Sequence
-        public const string SequenceType = "Sequence";
-
-        public IStep Sequence(params IStep[] steps)
+        public virtual IStep Sequence(params IStep[] steps)
             => Sequence(steps as IEnumerable<IStep>);
 
-        public IStep Sequence(IStep[] steps, bool? setType)
-            => Sequence(steps as IEnumerable<IStep>);
-
-        public IStep Sequence(IEnumerable<IStep> steps, bool? setType = null)
-            => GenerateConstruct(RawSequence(steps), SequenceType, setType);
-
-        private IStep RawSequence(IEnumerable<IStep> steps)
+        public virtual IStep Sequence(IEnumerable<IStep> steps)
         {
-            var first = NewStep();
+            var first = new LinkStep();
 
             var current = null as LinkStep;
 
@@ -57,7 +23,7 @@ namespace Veruthian.Library.Steps
                 }
                 else
                 {
-                    var next = NewStep();
+                    var next = new LinkStep();
 
                     current.Next = next;
 
@@ -70,153 +36,94 @@ namespace Veruthian.Library.Steps
         }
 
 
-        // Condition
-        private IStep Condition(IStep condition, IStep onTrue, IStep onFalse, string type, bool? setType)
-        {
-            var result = NewStep(shunt: condition, down: onTrue, next: onFalse);
+        // Conditions
+        private IStep Condition(IStep condition, IStep onTrue, IStep onFalse)
+            => new LinkStep { Shunt = condition, Down = onTrue, Next = onFalse };
 
-            return GenerateConstruct(result, type, setType);
-        }
-
-        private IStep ShuntTrue => new TerminalStep();
+        private IStep ShuntTrue => new EmptyStep();
 
         private IStep ShuntFalse => null;
 
 
+
         // Boolean
-        public const string TrueType = "True";
+        public virtual IStep True => new LinkStep { Shunt = ShuntTrue, Down = ShuntTrue };
 
-        public IStep True(bool? setType = null) => GenerateConstruct(RawTrue, TrueType, setType);
-
-        private IStep RawTrue => NewStep(shunt: ShuntTrue, down: ShuntTrue);
-
-
-        public const string FalseType = "False";
-
-        public IStep False(bool? setType = null) => GenerateConstruct(RawFalse, FalseType, setType);
-
-        private IStep RawFalse => NewStep(shunt: ShuntTrue, down: ShuntFalse);
+        public virtual IStep False => new LinkStep { Shunt = ShuntTrue, Down = ShuntFalse };
 
 
 
         // If
-        public const string IfType = "If";
+        public virtual IStep If(IStep condition)
+            => Condition(condition, ShuntTrue, ShuntFalse);
 
-        public const string IfThenType = "IfThen";
+        public virtual IStep IfThen(IStep condition, IStep thenStep)
+            => Condition(condition, thenStep, ShuntFalse);
 
-        public const string IfElseType = "IfElse";
+        public virtual IStep IfElse(IStep condition, IStep elseStep)
+            => Condition(condition, ShuntTrue, elseStep);
 
-        public const string IfThenElseType = "IfThenElse";
-
-
-        public IStep If(IStep condition, bool? setType = null)
-            => Condition(condition, ShuntTrue, ShuntFalse, IfType, setType);
-
-        public IStep IfThen(IStep condition, IStep thenStep, bool? setType = null)
-            => Condition(condition, thenStep, ShuntFalse, IfThenType, setType);
-
-        public IStep IfElse(IStep condition, IStep elseStep, bool? setType = null)
-            => Condition(condition, ShuntTrue, elseStep,  IfElseType, setType);
-
-        public IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
-            => Condition(condition, thenStep, elseStep, IfThenElseType, setType);
+        public virtual IStep IfThenElse(IStep condition, IStep thenStep, IStep elseStep)
+            => Condition(condition, thenStep, elseStep);
 
 
         // Unless
-        public const string UnlessType = "Unless";
+        public virtual IStep Unless(IStep condition)
+            => Condition(condition, ShuntFalse, ShuntTrue);
 
-        public const string UnlessThenType = "UnlessThen";
+        public virtual IStep UnlessThen(IStep condition, IStep thenStep)
+            => Condition(condition, ShuntFalse, thenStep);
 
-        public const string UnlessElseType = "UnlessElse";
+        public virtual IStep UnlessElse(IStep condition, IStep elseStep)
+            => Condition(condition, elseStep, ShuntTrue);
 
-        public const string UnlessThenElseType = "UnlessThenElse";
-
-
-        public IStep Unless(IStep condition, bool? setType = null)
-            => Condition(condition, ShuntFalse, ShuntTrue, UnlessType, setType);
-
-        public IStep UnlessThen(IStep condition, IStep thenStep, bool? setType = null)
-            => Condition(condition, ShuntFalse, thenStep, UnlessThenType, setType);
-
-        public IStep UnlessElse(IStep condition, IStep elseStep, bool? setType = null)
-            => Condition(condition, elseStep, ShuntTrue, UnlessElseType, setType);
-
-        public IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep, bool? setType = null)
-            => Condition(condition, elseStep, thenStep, UnlessThenElseType, setType);
+        public virtual IStep UnlessThenElse(IStep condition, IStep thenStep, IStep elseStep)
+            => Condition(condition, elseStep, thenStep);
 
 
         // Repeat
-        public const string WhileType = "While";
-
-        public const string UntilType = "Until";
-
-        public const string ExactlyType = "Exactly";
-
-        public const string AtMostType = "AtMost";
-
-        public const string AtLeastType = "AtLeast";
-
-        public const string BetweenType = "Between";
-
-
-        public IStep While(IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawWhile(condition, step), WhileType, setType);
-
-        public IStep Until(IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawUntil(condition, step), UntilType, setType);
-
-        public IStep Exactly(int times, IStep step, bool? setType = null)
-            => GenerateConstruct(RawExactly(times, step), ExactlyType, setType);
-
-        public IStep AtMost(int times, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawAtMost(times, condition, step), AtMostType, setType);
-
-        public IStep AtLeast(int times, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawAtLeast(times, condition, step), AtLeastType, setType);
-
-        public IStep Between(int min, int max, IStep condition, IStep step, bool? setType = null)
-            => GenerateConstruct(RawBetween(min, max, condition, step), BetweenType, setType);
-
-
-        private LinkStep RawWhile(IStep condition, IStep step)
+        public virtual IStep While(IStep condition, IStep step)
         {
-            var repeater = NewStep();
+            var repeater = new LinkStep();
 
             repeater.Shunt = condition;
 
-            repeater.Down = NewStep
-            (
-                down: step,
+            repeater.Down = new LinkStep
+            {
+                Down = step,
 
-                next: repeater
-            );
+                Next = repeater
+            };
 
             repeater.Next = ShuntTrue;
 
             return repeater;
         }
 
-        private LinkStep RawUntil(IStep condition, IStep step)
+        public virtual IStep Until(IStep condition, IStep step)
         {
-            var repeater = NewStep();
+            var repeater = new LinkStep();
 
             repeater.Shunt = condition;
 
             repeater.Down = ShuntTrue;
 
-            repeater.Next = NewStep
-            (
-                down: step,
+            repeater.Next = new LinkStep
+            {
+                Down = step,
 
-                next: repeater
-            );
+                Next = repeater
+            };
 
             return repeater;
         }
 
+        public virtual IStep Exactly(int times, IStep step)
+            => RawExactly(times, step);
+
         private LinkStep RawExactly(int times, IStep step)
         {
-            var first = NewStep();
+            var first = new LinkStep();
 
             var current = first;
 
@@ -224,7 +131,7 @@ namespace Veruthian.Library.Steps
             {
                 if (i > 0)
                 {
-                    var next = NewStep();
+                    var next = new LinkStep();
 
                     current.Next = next;
 
@@ -237,9 +144,9 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        private LinkStep RawAtMost(int times, IStep condition, IStep step)
+        public virtual IStep AtMost(int times, IStep condition, IStep step)
         {
-            var first = NewStep();
+            var first = new LinkStep();
 
             var current = first;
 
@@ -247,7 +154,7 @@ namespace Veruthian.Library.Steps
             {
                 if (i > 0)
                 {
-                    var next = NewStep();
+                    var next = new LinkStep();
 
                     current.Next = next;
 
@@ -256,7 +163,7 @@ namespace Veruthian.Library.Steps
 
                 current.Shunt = condition;
 
-                var down = NewStep();
+                var down = new LinkStep();
 
                 current.Down = down;
 
@@ -268,20 +175,20 @@ namespace Veruthian.Library.Steps
             return first;
         }
 
-        private LinkStep RawAtLeast(int times, IStep condition, IStep step)
+        public virtual IStep AtLeast(int times, IStep condition, IStep step)
         {
             var result = RawExactly(times, step);
 
-            result.Next = RawWhile(condition, step);
+            result.Next = While(condition, step);
 
             return result;
         }
 
-        private LinkStep RawBetween(int min, int max, IStep condition, IStep step)
+        public virtual IStep Between(int min, int max, IStep condition, IStep step)
         {
             var result = RawExactly(min, step);
 
-            result.Next = RawAtMost(max - min, condition, step);
+            result.Next = AtMost(max - min, condition, step);
 
             return result;
         }

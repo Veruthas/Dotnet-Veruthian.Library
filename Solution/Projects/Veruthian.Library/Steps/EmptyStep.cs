@@ -1,6 +1,6 @@
 namespace Veruthian.Library.Steps
 {
-    public class LinkStep : BaseLinkStep
+    public class EmptyStep : BaseStep
     {
         public override string Description => null;
     }

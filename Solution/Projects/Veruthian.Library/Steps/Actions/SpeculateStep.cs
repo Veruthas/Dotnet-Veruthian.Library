@@ -7,11 +7,9 @@ namespace Veruthian.Library.Steps.Actions
     {
         public SpeculateStep(IStep step) : base(step) { }
 
-
-        public const string TypeName = "Speculate";
         
-        public override string Type => TypeName;
-
+        public override string Description => "Speculate";
+        
 
         public bool? Act(bool? state, bool completed, ISpeculator speculative)
         {
@@ -24,7 +22,7 @@ namespace Veruthian.Library.Steps.Actions
         }
 
 
-        public const string SpeculativeAddress = "SpeculateStep.Speculative";
+        public const string SpeculativeAddress = "SpeculateStep.Speculative";        
 
         public bool? Act(bool? state, bool completed, ObjectTable table)
             => Act(state, completed, table.Get<ISpeculator>(SpeculativeAddress));

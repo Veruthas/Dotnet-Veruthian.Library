@@ -13,17 +13,13 @@ namespace Veruthian.Library.Steps.Actions
             this.AtComplete = atComplete;
         }
 
-
-        public const string TypeName = "Boolean";
-
-        public override string Type => TypeName;
-
-
         public bool? Value { get; }
 
         public bool AtStart { get; }
 
         public bool AtComplete { get; }
+
+        public override string Description => $"Boolean<{(Value == null ? "null" : Value.ToString())}>";
 
         public bool? Act(bool? state, bool completed)
         {
