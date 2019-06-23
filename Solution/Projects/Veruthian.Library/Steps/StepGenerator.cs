@@ -7,9 +7,12 @@ namespace Veruthian.Library.Steps
     {
         // Sequence
         public virtual IStep Sequence(params IStep[] steps)
-            => Sequence(steps as IEnumerable<IStep>);
+            => RawSequence(steps as IEnumerable<IStep>);
 
         public virtual IStep Sequence(IEnumerable<IStep> steps)
+            => RawSequence(steps);
+
+        public IStep RawSequence(IEnumerable<IStep> steps)
         {
             var first = new LinkStep();
 
