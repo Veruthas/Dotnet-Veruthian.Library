@@ -22,7 +22,7 @@ namespace Veruthian.Library.Steps
             {
                 var current = walker.Step;
 
-                switch (step)
+                switch (current)
                 {
                     case IActionStep action:
                         walker.State = action.Act(walker.State, walker.StepCompleted);
@@ -44,7 +44,7 @@ namespace Veruthian.Library.Steps
             {
                 var current = walker.Step;
 
-                switch (step)
+                switch (current)
                 {
                     case IActionStep action:
                         walker.State = action.Act(walker.State, walker.StepCompleted);
@@ -70,7 +70,7 @@ namespace Veruthian.Library.Steps
             {
                 var current = walker.Step;
 
-                switch (step)
+                switch (current)
                 {
                     case IActionStep action:
                         walker.State = action.Act(walker.State, walker.StepCompleted);
@@ -101,7 +101,7 @@ namespace Veruthian.Library.Steps
             {
                 var current = walker.Step;
 
-                switch (step)
+                switch (current)
                 {
                     case IActionStep action:
                         walker.State = action.Act(walker.State, walker.StepCompleted);
