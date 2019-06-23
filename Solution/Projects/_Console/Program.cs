@@ -16,7 +16,7 @@ namespace _Console
 
             var spaces = g.SpeculateRepeat(g.MatchSet(RuneSet.Whitespace));
 
-            var word = g.Sequence(g.Exactly(5, g.MatchSet(RuneSet.Letter)));
+            var word = g.Exactly(5, g.MatchSet(RuneSet.Letter));
 
             StepProcessor.Process(word, Trace);
 

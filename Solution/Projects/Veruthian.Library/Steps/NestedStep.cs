@@ -2,6 +2,12 @@ namespace Veruthian.Library.Steps
 {
     public class NestedStep : BaseNestedStep
     {
+        public NestedStep() { }
+
+        public NestedStep(IStep step) : base(step) { }
+
+        public NestedStep(string description) => this.Description = description;
+
         public NestedStep(string description, IStep step) : base(step) => this.Description = description;
 
         public override string Description { get; }
