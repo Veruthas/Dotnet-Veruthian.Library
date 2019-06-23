@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps.Actions.Extensions
+namespace Veruthian.Library.Steps.Boolean
 {
     public static class BooleanExtensions
     {

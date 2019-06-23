@@ -1,7 +1,7 @@
 using Veruthian.Library.Collections;
 using Veruthian.Library.Readers;
 
-namespace Veruthian.Library.Steps.Actions
+namespace Veruthian.Library.Steps.Match
 {
     public abstract class MatchStep<T> : BaseStep, IActionStep<IReader<T>>, IActionStep<ObjectTable>
     {

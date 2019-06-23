@@ -1,4 +1,4 @@
-namespace Veruthian.Library.Steps.Actions.Extensions
+namespace Veruthian.Library.Steps.Speculate
 {
     public static class SpeculateExtensions
     {

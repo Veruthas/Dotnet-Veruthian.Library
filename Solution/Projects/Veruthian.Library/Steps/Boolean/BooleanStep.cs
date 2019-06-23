@@ -1,6 +1,6 @@
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps.Actions
+namespace Veruthian.Library.Steps.Boolean
 {
     public class BooleanStep : BaseStep, IActionStep
     {

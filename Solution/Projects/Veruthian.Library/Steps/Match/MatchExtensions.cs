@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps.Actions.Extensions
+namespace Veruthian.Library.Steps.Match
 {
     public static class MatchExtensions
     {

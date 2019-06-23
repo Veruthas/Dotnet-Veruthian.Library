@@ -1,7 +1,7 @@
 using Veruthian.Library.Collections;
 using Veruthian.Library.Processing;
 
-namespace Veruthian.Library.Steps.Actions
+namespace Veruthian.Library.Steps.Speculate
 {
     public class SpeculateStep : BaseNestedStep, IActionStep<ISpeculator>, IActionStep<ObjectTable>
     {

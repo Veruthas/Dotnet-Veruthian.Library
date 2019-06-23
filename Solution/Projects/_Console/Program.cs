@@ -12,7 +12,7 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var g = new StepGenerator();
+            var g = new NamedStepGenerator();
 
             var spaces = g.SpeculateRepeat(g.MatchSet(RuneSet.Whitespace));
 
@@ -41,10 +41,14 @@ namespace _Console
 
                 names.Add(step, name);
             }
-            
-            Console.WriteLine($"{new string('|', indent )}{step}:{name} {(completed ? "Completed" : "Started")}: {(state == null ? "null" : completed.ToString())}");
 
-            indent += completed ? -1 : 1;
+            if (completed)
+                indent--;
+
+            Console.WriteLine($"{new string('|', indent)}{(step.ToString() ?? "Step")}:{name} {(completed ? "Completed" : "Started")}: {(state == null ? "null" : completed.ToString())}");
+
+            if (!completed)
+                indent++;
 
             return state;
         }
