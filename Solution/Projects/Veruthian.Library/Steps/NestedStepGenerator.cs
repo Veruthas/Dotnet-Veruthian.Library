@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Steps
 {
-    public class NamedStepGenerator : StepGenerator
+    public class NestedStepGenerator : StepGenerator
     {
         public override IStep Sequence(params IStep[] steps)
             => new NestedStep("Seqeuence", base.Sequence(steps));

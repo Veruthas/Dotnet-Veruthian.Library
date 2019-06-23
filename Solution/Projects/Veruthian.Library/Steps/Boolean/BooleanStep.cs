@@ -4,20 +4,16 @@ namespace Veruthian.Library.Steps.Boolean
 {
     public class BooleanStep : BaseStep, IActionStep
     {
-        public BooleanStep(bool? value, bool atStart = false, bool atComplete = false)
+        public BooleanStep(bool? value, bool atStart = false)
         {
             this.Value = value;
 
             this.AtStart = atStart;
-
-            this.AtComplete = atComplete;
         }
 
         public bool? Value { get; }
 
         public bool AtStart { get; }
-
-        public bool AtComplete { get; }
 
         public override string Description => $"Boolean<{(Value == null ? "null" : Value.ToString())}>";
 
@@ -25,12 +21,6 @@ namespace Veruthian.Library.Steps.Boolean
         {
             if (!completed)
             {
-                if (AtStart)
-                    return Value;
-            }
-            else
-            {
-                if (AtComplete)
                     return Value;
             }
 

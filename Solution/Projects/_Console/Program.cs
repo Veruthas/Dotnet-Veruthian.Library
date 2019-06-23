@@ -12,7 +12,7 @@ namespace _Console
     {
         static void Main(string[] args)
         {
-            var g = new NamedStepGenerator();
+            var g = new NestedStepGenerator();
 
             var spaces = g.SpeculateRepeat(g.MatchSet(RuneSet.Whitespace));
 

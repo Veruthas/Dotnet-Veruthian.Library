@@ -5,7 +5,7 @@ namespace Veruthian.Library.Steps.Speculate
 {
     public class SpeculateStep : BaseNestedStep, IActionStep<ISpeculator>, IActionStep<ObjectTable>
     {
-        public SpeculateStep(IStep down) => this.Down = down;
+        public SpeculateStep(IStep step) => this.Down = step;
 
 
         public override string Description => "Speculate";
