@@ -6,7 +6,7 @@ using Veruthian.Library.Processing;
 using Veruthian.Library.Readers;
 using Veruthian.Library.Readers.Extensions;
 using Veruthian.Library.Steps;
-using Veruthian.Library.Steps.Match;
+using Veruthian.Library.Steps.Reader;
 using Veruthian.Library.Steps.Speculate;
 using Veruthian.Library.Text.Runes;
 
@@ -42,6 +42,26 @@ namespace _Console
 
             reader = r;
 
+            // r.Mark();
+
+            // while (true)
+            // {
+            //     if (r.IsEnd)
+            //     {
+            //         Console.WriteLine($"{r.Position}:'{r.Current.ToPrintableString()}'");
+                    
+            //         if (r.IsSpeculating)
+            //             r.Rollback();
+            //         else
+            //             break;
+            //     }
+
+            //     Console.WriteLine($"{r.Position}:'{r.Current.ToPrintableString()}'");
+
+            //     r.Advance();
+            // }
+
+
             var s = new Speculator(r);
 
             var table = new ObjectTable();
@@ -51,6 +71,7 @@ namespace _Console
             SpeculateStep.PrepareTable(table, s);
 
             StepProcessor.Process(rules["Word"], table, Trace);
+
 
             Pause();
         }
@@ -62,7 +83,7 @@ namespace _Console
         static int indent;
 
         static IReader<Rune> reader;
-        
+
         public static bool? Trace(IStep step, bool? state, bool completed, ObjectTable table)
         {
             string name;

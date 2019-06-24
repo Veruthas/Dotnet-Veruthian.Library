@@ -48,7 +48,7 @@ namespace Veruthian.Library.Readers
         {
             if (!EndFound)
             {
-                int lastPosition = CacheSize;
+                int lastPosition = Position - index;
 
                 for (int i = 0; i < amount; i++)
                 {
@@ -57,7 +57,7 @@ namespace Veruthian.Library.Readers
                     if (success)
                         cache.Add(next);
                     else
-                        EndPosition = lastPosition + i;
+                        EndPosition = lastPosition + CacheSize;
                 }
             }
         }
