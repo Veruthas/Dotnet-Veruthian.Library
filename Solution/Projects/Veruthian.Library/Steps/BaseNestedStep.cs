@@ -1,9 +1,9 @@
 namespace Veruthian.Library.Steps
 {
-    public abstract class BaseNestedStep : BaseStep
+    public abstract class BaseNestedStep : BaseContainedStep
     {
-        public IStep Down { get; set; }
+        public override IStep Step { get; set; }
 
-        protected override IStep GetDown() => Down;
+        protected override IStep GetDown() => Step;
     }
 }

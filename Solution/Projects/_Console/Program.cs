@@ -56,6 +56,7 @@ namespace _Console
             StepProcessor.Process(rules["File"], table, Trace);
 
             Console.WriteLine($"Step Count: {count}");
+
             Pause();
         }
 
@@ -69,27 +70,33 @@ namespace _Console
 
         public static bool? Trace(IStep step, bool? state, bool completed, ObjectTable table)
         {
-            string name;
+            var description = step.ToString();
 
-            if (!names.TryGetValue(step, out name))
+            if (description != null)
             {
-                name = id.ToHexadecimalString();
+                string name;
 
-                id++;
+                if (!names.TryGetValue(step, out name))
+                {
+                    name = id.ToHexadecimalString();
 
-                names.Add(step, name);
+                    id++;
+
+                    names.Add(step, name);
+                }
+
+                if (completed)
+                    indent--;
+
+
+                Console.WriteLine($"{new string('|', indent)}{(description ?? "Step")} {(completed ? "Completed" : "Started")}: {(state == null ? "Null" : state.ToString())} ({reader.Position}, '{reader.Current}')");
+
+                if (!completed)
+                    indent++;
+
+                count++;
             }
-
-            if (completed)
-                indent--;
-
-            Console.WriteLine($"{new string('|', indent)}{(step.ToString() ?? "Step")} {(completed ? "Completed" : "Started")}: {(state == null ? "Null" : state.ToString())} ({reader.Position}, '{reader.Current}')");
-
-            if (!completed)
-                indent++;
-
-            count++;
-
+            
             return state;
         }
 

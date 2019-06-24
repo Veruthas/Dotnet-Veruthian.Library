@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace Veruthian.Library.Steps
 {
-    public class StepTable<N>
-        where N : BaseNestedStep
+    public class StepTable<S>
+        where S : BaseContainedStep
     {
-        private Func<string, N> newStep;
+        private Func<string, S> newStep;
 
-        private Dictionary<string, N> steps;
+        private Dictionary<string, S> steps;
 
-        public StepTable(Func<string, N> newStep)
+        public StepTable(Func<string, S> newStep)
         {
             this.newStep = newStep;
 
-            this.steps = new Dictionary<string, N>();
+            this.steps = new Dictionary<string, S>();
         }
 
 
@@ -25,11 +25,11 @@ namespace Veruthian.Library.Steps
             {
                 var step = GetStep(name);
 
-                step.Down = value;
+                step.Step = value;
             }
         }
 
-        public N GetStep(string name)
+        public S GetStep(string name)
         {
             if (!steps.TryGetValue(name, out var step))
             {
