@@ -52,15 +52,15 @@ namespace Veruthian.Library.Steps
             => new NestedStep("Until", base.Until(condition, step));
 
         public override IStep Exactly(int times, IStep step)
-            => new NestedStep("Exactly", base.Exactly(times, step));
+            => new NestedStep($"Exactly<{times}>", base.Exactly(times, step));
 
         public override IStep AtMost(int times, IStep condition, IStep step)
-            => new NestedStep("AtMost", base.AtMost(times, condition, step));
+            => new NestedStep($"AtMost<{times}>", base.AtMost(times, condition, step));
 
         public override IStep AtLeast(int times, IStep condition, IStep step)
-            => new NestedStep("AtLeast", base.AtLeast(times, condition, step));
+            => new NestedStep($"AtLeast<{times}>", base.AtLeast(times, condition, step));
             
         public override IStep Between(int min, int max, IStep condition, IStep step)
-            => new NestedStep("Between", base.Between(min, max, condition, step));
+            => new NestedStep($"Between<{min},{max}>", base.Between(min, max, condition, step));
     }
 }
