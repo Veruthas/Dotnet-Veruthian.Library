@@ -21,7 +21,7 @@ namespace _Console
             var g = new NestedStepGenerator();
 
             // rule File = Space (Symbols / Number / Word) (unless Rune);
-            rules["File"] = g.Sequence(rules["Space"], g.Choice(rules["Symbols"], rules["Number"], rules["Word"]), g.Unless(g.MatchSet(RuneSet.Complete)));
+            rules["File"] = g.Sequence(rules["Space"], g.SpeculateRepeat(g.Choice(rules["Symbols"], rules["Number"], rules["Word"])), g.Unless(g.MatchSet(RuneSet.Complete)));
 
             // rule Symbols = (Symbol > 1) Space;
             rules["Symbols"] = g.Sequence(g.SpeculateAtLeast(1, g.MatchSet(RuneSet.Symbol)), rules["Space"]);
@@ -36,30 +36,13 @@ namespace _Console
             rules["Space"] = g.SpeculateRepeat(g.MatchSet(RuneSet.Whitespace));
 
 
-            RuneString a = "Hello";
+            RuneString a = @"Hello, world!
+            How are you doing?
+            I am doing fine!!!";
 
             var r = a.GetRecollectiveReader();
 
             reader = r;
-
-            // r.Mark();
-
-            // while (true)
-            // {
-            //     if (r.IsEnd)
-            //     {
-            //         Console.WriteLine($"{r.Position}:'{r.Current.ToPrintableString()}'");
-                    
-            //         if (r.IsSpeculating)
-            //             r.Rollback();
-            //         else
-            //             break;
-            //     }
-
-            //     Console.WriteLine($"{r.Position}:'{r.Current.ToPrintableString()}'");
-
-            //     r.Advance();
-            // }
 
 
             var s = new Speculator(r);
@@ -70,9 +53,9 @@ namespace _Console
 
             SpeculateStep.PrepareTable(table, s);
 
-            StepProcessor.Process(rules["Word"], table, Trace);
+            StepProcessor.Process(rules["File"], table, Trace);
 
-
+            Console.WriteLine($"Step Count: {count}");
             Pause();
         }
 
@@ -80,7 +63,7 @@ namespace _Console
 
         static ConditionalWeakTable<IStep, string> names = new ConditionalWeakTable<IStep, string>();
 
-        static int indent;
+        static int indent, count;
 
         static IReader<Rune> reader;
 
@@ -104,6 +87,8 @@ namespace _Console
 
             if (!completed)
                 indent++;
+
+            count++;
 
             return state;
         }
