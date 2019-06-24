@@ -17,7 +17,7 @@ namespace Veruthian.Library.Steps.Reader
 
         public override string ToString() => $"{Description}<{MatchingTo ?? "NULL"}>";
 
-        protected override bool Act(IReader<T> reader)
+        public override bool Act(IReader<T> reader)
         {
             object matchState = null;
 

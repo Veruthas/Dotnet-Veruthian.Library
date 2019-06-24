@@ -5,7 +5,7 @@ namespace Veruthian.Library.Steps.Reader
 {
     public abstract class ReaderStep<T> : BaseStep, IActionStep<IReader<T>>, IActionStep<ObjectTable>
     {
-        protected abstract bool Act(IReader<T> reader);
+        public abstract bool Act(IReader<T> reader);
 
         public bool? Act(bool? state, bool completed, IReader<T> reader)
         {
