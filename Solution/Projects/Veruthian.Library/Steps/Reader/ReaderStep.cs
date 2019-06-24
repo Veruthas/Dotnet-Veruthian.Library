@@ -15,7 +15,6 @@ namespace Veruthian.Library.Steps.Reader
                 return state;
         }
 
-
         public const string ReaderAddress = "ReaderStep.Reader";
 
         public bool? Act(bool? state, bool completed, ObjectTable table)

@@ -19,7 +19,7 @@ namespace Veruthian.Library.Steps.Boolean
 
         public bool? Act(bool? state, bool completed)
         {
-            if (completed)
+            if (!completed)
                 return Value;
 
             return state;
