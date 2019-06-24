@@ -9,7 +9,7 @@ namespace Veruthian.Library.Steps.Speculate
 
 
         public override string Description => "Speculate";
-        
+
 
         public bool? Act(bool? state, bool completed, ISpeculator speculative)
         {
@@ -22,9 +22,12 @@ namespace Veruthian.Library.Steps.Speculate
         }
 
 
-        public const string SpeculativeAddress = "SpeculateStep.Speculative";        
+        public const string SpeculativeAddress = "SpeculateStep.Speculative";
 
         public bool? Act(bool? state, bool completed, ObjectTable table)
             => Act(state, completed, table.Get<ISpeculator>(SpeculativeAddress));
+
+        public static void PrepareTable(ObjectTable table, ISpeculator speculator)
+            => table.GetOrInsert(SpeculativeAddress, speculator);
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Veruthian.Library.Steps.Match
+namespace Veruthian.Library.Steps.Reader
 {
     public class MatchSequenceStep<T> : MatchStep<T>
         where T : IEquatable<T>

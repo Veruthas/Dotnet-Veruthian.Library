@@ -1,6 +1,6 @@
 using System;
 
-namespace Veruthian.Library.Steps.Match
+namespace Veruthian.Library.Steps.Reader
 {
     public class MatchValueStep<T> : MatchStep<T>
         where T : IEquatable<T>

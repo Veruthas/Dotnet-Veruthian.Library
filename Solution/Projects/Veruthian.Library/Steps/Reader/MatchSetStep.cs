@@ -1,6 +1,6 @@
 using Veruthian.Library.Collections;
 
-namespace Veruthian.Library.Steps.Match
+namespace Veruthian.Library.Steps.Reader
 {
     public class MatchSetStep<T> : MatchStep<T>
     {

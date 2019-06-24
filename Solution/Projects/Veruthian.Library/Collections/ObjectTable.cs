@@ -36,7 +36,7 @@ namespace Veruthian.Library.Collections
 
         public T GetOrInsert<T>(string address, T value)
         {
-            return (T)this.GetOrInsert(address, value);
+            return (T)base.GetOrInsert(address, value);
         }
 
 
@@ -54,7 +54,7 @@ namespace Veruthian.Library.Collections
         {
             var refValue = new Ref<T>(value);
 
-            refValue = (Ref<T>)this.GetOrInsert(address, refValue);
+            refValue = (Ref<T>)base.GetOrInsert(address, refValue);
 
             return refValue;
         }
