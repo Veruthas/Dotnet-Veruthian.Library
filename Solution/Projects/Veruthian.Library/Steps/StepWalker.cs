@@ -66,10 +66,6 @@ namespace Veruthian.Library.Steps
                         {
                             stack.Push(step.Down);
                         }
-                        else if (step.Next != null)
-                        {
-                            stack.Replace(step.Next);
-                        }
                         else
                         {
                             completed = true;
@@ -79,7 +75,7 @@ namespace Veruthian.Library.Steps
                     {
                         completed = true;
 
-                        state = true;                        
+                        state = true;
                     }
                     else
                     {
@@ -90,45 +86,30 @@ namespace Veruthian.Library.Steps
                 {
                     if (step.Shunt != null)
                     {
-                        if (state == true)
-                        {
-                            if (step.Down != null)
-                            {
-                                stack.Replace(step.Down);
-
-                                completed = false;
-
-                                state = true;
-                            }
-                            else
-                            {
-                                stack.Pop();
-
-                                state = false;
-                            }
-                        }
-                        else if (state == false)
-                        {
-                            if (step.Next != null)
-                            {
-                                stack.Replace(step.Next);
-
-                                completed = false;
-
-                                state = true;
-                            }
-                            else
-                            {
-                                stack.Pop();
-
-                                state = false;
-                            }
-                        }
-                        else
+                        if (state == null)
                         {
                             stack.Pop();
 
                             state = true;
+                        }
+                        else
+                        {
+                            var next = state == true ? step.Down : step.Next;
+
+                            if (next != null)
+                            {
+                                stack.Replace(next);
+
+                                completed = false;
+
+                                state = true;
+                            }
+                            else
+                            {
+                                stack.Pop();
+
+                                state = false;
+                            }
                         }
                     }
                     else if (step.Next != null && state == true)
@@ -138,7 +119,7 @@ namespace Veruthian.Library.Steps
                         completed = false;
                     }
                     else if (state == null)
-                    {                        
+                    {
                         stack.Pop();
 
                         state = true;

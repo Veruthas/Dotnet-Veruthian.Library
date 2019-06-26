@@ -16,6 +16,56 @@ namespace _Console
     {
         static void Main(string[] args)
         {
+            var a = new LabeledStep("A")
+            {                
+                Down = new LabeledStep("B")
+                {
+                    Shunt = new LabeledStep("C")
+                    {
+                        Down = new LabeledStep("D")
+                    },
+                    Down = new LabeledStep("E")
+                    {
+                        Down = new LabeledStep("F")
+                    }
+                },
+                Next = new LabeledStep("G")
+                {
+                    Next = new LabeledStep("H")
+                }
+            };
+
+            var indent = 0;
+
+            var w = new StepWalker(a);
+
+            while (!w.WalkCompleted)
+            {
+                var completed = w.StepCompleted;
+
+                var state = w.State;
+
+                var labeled = w.Step as LabeledStep;
+
+                if (labeled.Label == "C")
+                    w.State = null;
+
+                if (completed)
+                    indent--;
+
+                Console.WriteLine($"{new string('|', indent)}{labeled.Label} {(completed ? "Completed" : "Started")}: {(state == null ? "Null" : state.ToString())}");
+
+                if (!completed)
+                    indent++;
+
+                w.Walk();
+            }
+
+            Pause();
+        }
+
+        private static void SimpleStep()
+        {
             var rules = new StepTable<NestedStep>((name) => new NestedStep(name));
 
             var g = new NestedStepGenerator();
@@ -56,8 +106,6 @@ namespace _Console
             StepProcessor.Process(rules["File"], table, Trace);
 
             Console.WriteLine($"Step Count: {count}");
-
-            Pause();
         }
 
         static Number id;
@@ -96,7 +144,7 @@ namespace _Console
 
                 count++;
             }
-            
+
             return state;
         }
 
