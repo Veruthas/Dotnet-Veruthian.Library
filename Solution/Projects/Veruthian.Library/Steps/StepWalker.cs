@@ -43,7 +43,7 @@ namespace Veruthian.Library.Steps
             get => state;
             set => this.state = value;
         }
-        
+
         public bool StepCompleted => completed;
 
         public bool WalkCompleted => stack.Count.IsZero;
@@ -74,6 +74,12 @@ namespace Veruthian.Library.Steps
                         {
                             completed = true;
                         }
+                    }
+                    else if (state == null)
+                    {
+                        completed = true;
+
+                        state = true;                        
                     }
                     else
                     {
@@ -130,6 +136,12 @@ namespace Veruthian.Library.Steps
                         stack.Replace(step.Next);
 
                         completed = false;
+                    }
+                    else if (state == null)
+                    {                        
+                        stack.Pop();
+
+                        state = true;
                     }
                     else
                     {
