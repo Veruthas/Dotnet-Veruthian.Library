@@ -54,7 +54,7 @@ namespace Veruthian.Library.Steps
             {
                 var step = stack.Peek();
 
-                if (!StepCompleted)
+                if (!completed)
                 {
                     if (state == true)
                     {

@@ -47,7 +47,7 @@ namespace _Console
 
                 var labeled = w.Step as LabeledStep;
 
-                if (labeled.Label == "C")
+                if (labeled.Label == "B")
                     w.State = null;
 
                 if (completed)
