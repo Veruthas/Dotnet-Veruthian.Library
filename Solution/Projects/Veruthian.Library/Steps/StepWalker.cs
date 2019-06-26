@@ -71,15 +71,14 @@ namespace Veruthian.Library.Steps
                             completed = true;
                         }
                     }
-                    else if (state == null)
-                    {
-                        completed = true;
-
-                        state = true;
-                    }
                     else
                     {
                         completed = true;
+
+                        if (state == null)
+                        {
+                            state = true;
+                        }
                     }
                 }
                 else
@@ -118,15 +117,14 @@ namespace Veruthian.Library.Steps
 
                         completed = false;
                     }
-                    else if (state == null)
-                    {
-                        stack.Pop();
-
-                        state = true;
-                    }
                     else
                     {
                         stack.Pop();
+
+                        if (state == null)
+                        {
+                            state = true;
+                        }
                     }
                 }
             }
