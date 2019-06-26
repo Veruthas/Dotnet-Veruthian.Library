@@ -16,8 +16,15 @@ namespace _Console
     {
         static void Main(string[] args)
         {
+            SimpleParser();
+
+            Pause();
+        }
+
+        private static void SimpleSteps()
+        {
             var a = new LabeledStep("A")
-            {                
+            {
                 Down = new LabeledStep("B")
                 {
                     Shunt = new LabeledStep("C")
@@ -60,11 +67,9 @@ namespace _Console
 
                 w.Walk();
             }
-
-            Pause();
         }
-
-        private static void SimpleStep()
+        
+        private static void SimpleParser()
         {
             var rules = new StepTable<NestedStep>((name) => new NestedStep(name));
 
