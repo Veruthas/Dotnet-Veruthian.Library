@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Veruthian.Library.Steps
 {
     public class StepTable<S>
-        where S : BaseContainedStep
+        where S : BaseNestedStep
     {
         private Func<string, S> newStep;
 
@@ -25,7 +25,7 @@ namespace Veruthian.Library.Steps
             {
                 var step = GetStep(name);
 
-                step.Step = value;
+                step.Down = value;
             }
         }
 

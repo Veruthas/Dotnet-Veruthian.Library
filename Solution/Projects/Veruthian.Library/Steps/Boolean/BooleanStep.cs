@@ -15,7 +15,7 @@ namespace Veruthian.Library.Steps.Boolean
 
         public bool AtStart { get; }
 
-        public override string Description => $"Boolean<{(Value == null ? "null" : Value.ToString())}>";
+        public override string Description => $"Boolean<{(Value == null ? "Null" : Value.ToString())}>";
 
         public bool? Act(bool? state, bool completed)
         {

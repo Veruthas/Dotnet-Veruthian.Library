@@ -4,11 +4,11 @@ namespace Veruthian.Library.Steps
     {
         public NestedStep() { }
 
-        public NestedStep(IStep step) => this.Step = step;
+        public NestedStep(IStep step) => this.Down = step;
 
         public NestedStep(string description) => this.Description = description;
 
-        public NestedStep(string description, IStep step) { this.Description = description; this.Step = step; }
+        public NestedStep(string description, IStep step) { this.Description = description; this.Down = step; }
 
         public override string Description { get; }
     }
